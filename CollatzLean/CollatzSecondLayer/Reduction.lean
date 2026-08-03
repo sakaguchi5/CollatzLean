@@ -1,4 +1,5 @@
 import CollatzLean.CollatzSecondLayer.SpecialC3
+import CollatzLean.CollatzSecondLayer.CylinderUpgradeProof
 
 /-!
 # 非有界軌道の無限部分列型四分岐還元
@@ -20,6 +21,23 @@ structure ReductionBridge where
   movingCompactness : MovingCompactnessPrinciple
   cylinderUpgrade : CylinderUpgradePrinciple
   infiniteTerminalAnalysis : InfiniteTerminalAnalysisPrinciple
+
+namespace ReductionBridge
+
+/--
+第一bridgeの証明と、Baker型算術入力から構成した第二bridgeを用いて、
+最終的な第三bridgeだけを受け取るReductionBridgeを構成する。
+-/
+theorem ofArithmetic
+    (hBaker : TwoThreeGapPolynomialBound)
+    (hPow : PolynomialBelowTwoPower)
+    (hInfinite : InfiniteTerminalAnalysisPrinciple) :
+    ReductionBridge where
+  movingCompactness := movingCompactnessPrinciple
+  cylinderUpgrade := cylinderUpgradePrinciple_of_arithmetic hBaker hPow
+  infiniteTerminalAnalysis := hInfinite
+
+end ReductionBridge
 
 /--
 非有界odd-only軌道は、三つの例外または深さ非有界な特殊C3へ落ちる。

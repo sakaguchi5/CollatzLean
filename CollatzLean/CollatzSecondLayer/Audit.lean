@@ -12,8 +12,12 @@ namespace CollatzSecondLayer
 
 #check OddOrbit
 #check MovingLimitData
+#check movingCompactnessPrinciple
 #check FirstCrossingSequenceData
 #check C3CylinderSequence
+#check TwoThreeGapPolynomialBound
+#check PolynomialBelowTwoPower
+#check cylinderUpgradePrinciple_of_arithmetic
 #check TerminalPairData
 #check InfiniteTerminalExtraction
 #check InfiniteTerminalAnalysis
@@ -23,6 +27,9 @@ namespace CollatzSecondLayer
 #check HasPersistentAlternativeExit
 #check HasArbitrarilyDeepSpecialC3
 #check InfiniteTerminalAnalysisPrinciple
+#check zeroShadow_impossible
+#check commonCenter_impossible
+#check ReductionBridge.ofArithmetic
 #check AsymptoticSpecialC3ExclusionPrinciple
 #check unbounded_orbit_reduction
 #check arbitrarilyDeepSpecialC3_of_unbounded_of_no_exceptions

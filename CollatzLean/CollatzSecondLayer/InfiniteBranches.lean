@@ -152,7 +152,7 @@ theorem sourceFinish
 
 end TerminalAnalysisPacket
 
-/-- 特殊C3へ残る前に閉じる有限出口。 -/
+/-- 特殊C3へ残る前に閉じる有限出口。zero/common-centerは下で不可能と証明する。 -/
 inductive ClosedExitAt
     {O : OddOrbit}
     {S : C3CylinderSequence O}
@@ -161,9 +161,6 @@ inductive ClosedExitAt
     (P : TerminalAnalysisPacket E n) : Type
   | captureSuccess (h : CapturedCarry P.carry)
   | positiveShadow (h : 0 < P.shadow.shadow)
-  | zeroShadow (h : P.shadow.shadow = 0)
-  | commonCenter
-      (h : center P.criticalPair.A = center P.criticalPair.R)
 
 /-- deferred carry・negative shadow・changing centerが同時に残る有限項。 -/
 structure SpecialC3At
@@ -177,6 +174,114 @@ structure SpecialC3At
   changingCenter :
     center P.criticalPair.A ≠ center P.criticalPair.R
 
+/-- determinant非零なterminal suffixは空語ではない。 -/
+lemma terminalPair_R_ne_nil (T : TerminalPairData) : T.R ≠ [] := by
+  intro hnil
+  apply T.detR_ne
+  simp [hnil, determinant, oddSteps, twoSteps]
+
+/-- 非空語のaffine定数は正。 -/
+lemma affineConst_pos_of_ne_nil
+    {w : ExpWord} (hne : w ≠ []) : 0 < affineConst w := by
+  cases w with
+  | nil => exact False.elim (hne rfl)
+  | cons e w =>
+      simp [affineConst]
+
+/-- 整数版affine定数は、自然数版affine定数の整数キャストに一致する。 -/
+@[simp]
+lemma affineConstInt_eq_cast_affineConst
+    (w : ExpWord) :
+    affineConstInt w = (affineConst w : ℤ) := by
+  induction w with
+  | nil =>
+      simp [affineConstInt, affineConst]
+  | cons e w ih =>
+      simp [affineConstInt, affineConst]
+
+/--
+非空語では、canonical開始値に対する整数affine式の右辺は正である。
+-/
+lemma canonical_affine_rhs_pos
+    {w : ExpWord}
+    (hne : w ≠ []) :
+    0 <
+      (3 : ℤ) ^ oddSteps w * (canonicalStart w : ℤ) +
+        affineConstInt w := by
+  have hBnat : 0 < affineConst w :=
+    affineConst_pos_of_ne_nil hne
+  have hB : 0 < affineConstInt w := by
+    rw [affineConstInt_eq_cast_affineConst]
+    exact_mod_cast hBnat
+  have hpow_nonneg :
+      0 ≤ (3 : ℤ) ^ oddSteps w := by
+    exact pow_nonneg (by norm_num) _
+  have hstart_nonneg :
+      0 ≤ (canonicalStart w : ℤ) := by
+    omega
+  have hmul_nonneg :
+      0 ≤
+        (3 : ℤ) ^ oddSteps w *
+          (canonicalStart w : ℤ) :=
+    mul_nonneg hpow_nonneg hstart_nonneg
+  exact add_pos_of_nonneg_of_pos hmul_nonneg hB
+
+/-- canonical integer shadowはzeroになれない。 -/
+theorem zeroShadow_impossible
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) :
+    P.shadow.shadow ≠ 0 := by
+  intro hzero
+  have hreal := P.shadow.realizes
+  unfold RealizesInt at hreal
+  rw [hzero, mul_zero] at hreal
+  have hpos :
+      0 <
+        (3 : ℤ) ^ oddSteps P.criticalPair.R *
+            (canonicalStart P.criticalPair.R : ℤ) +
+          affineConstInt P.criticalPair.R :=
+    canonical_affine_rhs_pos
+      (terminalPair_R_ne_nil P.criticalPair)
+  have hzero_rhs :
+      (3 : ℤ) ^ oddSteps P.criticalPair.R *
+            (canonicalStart P.criticalPair.R : ℤ) +
+          affineConstInt P.criticalPair.R = 0 :=
+    hreal.symm
+  exact (ne_of_gt hpos) hzero_rhs
+
+/-- terminal pairの二つのcenterは一致しない。 -/
+theorem commonCenter_impossible
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) :
+    center P.criticalPair.A ≠ center P.criticalPair.R := by
+  intro hcenter
+  rcases P.criticalPair.centerDifference with ⟨kappa, hkappaOdd, hdiff⟩
+  have hkappa : kappa ≠ 0 := by
+    intro hk
+    subst kappa
+    rcases hkappaOdd with ⟨z, hz⟩
+    omega
+  have hkappaQ : (kappa : ℚ) ≠ 0 := by exact_mod_cast hkappa
+  have htwo : (2 : ℚ) ^ P.criticalPair.lambdaA ≠ 0 := by
+    norm_num
+  have hdetA : (determinant P.criticalPair.A : ℚ) ≠ 0 := by
+    exact_mod_cast P.criticalPair.detA_ne
+  have hdetR : (determinant P.criticalPair.R : ℚ) ≠ 0 := by
+    exact_mod_cast P.criticalPair.detR_ne
+  have hquot :
+      (((2 : ℚ) ^ P.criticalPair.lambdaA) * (kappa : ℚ)) /
+          ((determinant P.criticalPair.A : ℚ) *
+            (determinant P.criticalPair.R : ℚ)) ≠ 0 := by
+    exact div_ne_zero (mul_ne_zero htwo hkappaQ) (mul_ne_zero hdetA hdetR)
+  apply hquot
+  rw [← hdiff, hcenter, sub_self]
+
 /-- 各有限packetは閉じる出口か特殊C3項のどちらかへ落ちる。 -/
 theorem analysisOutcome_nonempty
     {O : OddOrbit}
@@ -188,11 +293,8 @@ theorem analysisOutcome_nonempty
   rcases carryComparison_split P.carry with hcap | hdefer
   · exact ⟨Sum.inl (ClosedExitAt.captureSuccess hcap)⟩
   · rcases lt_trichotomy P.shadow.shadow 0 with hneg | hzero | hpos
-    · by_cases hcenter :
-          center P.criticalPair.A = center P.criticalPair.R
-      · exact ⟨Sum.inl (ClosedExitAt.commonCenter hcenter)⟩
-      · exact ⟨Sum.inr ⟨hdefer, hneg, hcenter⟩⟩
-    · exact ⟨Sum.inl (ClosedExitAt.zeroShadow hzero)⟩
+    · exact ⟨Sum.inr ⟨hdefer, hneg, commonCenter_impossible P⟩⟩
+    · exact False.elim ((zeroShadow_impossible P) hzero)
     · exact ⟨Sum.inl (ClosedExitAt.positiveShadow hpos)⟩
 
 /--
@@ -225,27 +327,6 @@ structure InfinitePositiveShadow
   evidence : ∀ n : ℕ,
     0 < (A.packet (select.index n)).shadow.shadow
 
-/-- zero shadowが無限部分列上で持続する。 -/
-structure InfiniteZeroShadow
-    {O : OddOrbit}
-    {S : C3CylinderSequence O}
-    {E : InfiniteTerminalExtraction S}
-    (A : InfiniteTerminalAnalysis E) where
-  select : Subsequence
-  evidence : ∀ n : ℕ,
-    (A.packet (select.index n)).shadow.shadow = 0
-
-/-- common centerが無限部分列上で持続する。 -/
-structure InfiniteCommonCenter
-    {O : OddOrbit}
-    {S : C3CylinderSequence O}
-    {E : InfiniteTerminalExtraction S}
-    (A : InfiniteTerminalAnalysis E) where
-  select : Subsequence
-  evidence : ∀ n : ℕ,
-    center (A.packet (select.index n)).criticalPair.A =
-      center (A.packet (select.index n)).criticalPair.R
-
 /-- 特殊C3へ残らない第三の例外を、無限部分列として分類する。 -/
 inductive PersistentAlternativeExitData
     {O : OddOrbit}
@@ -254,8 +335,6 @@ inductive PersistentAlternativeExitData
     (A : InfiniteTerminalAnalysis E) : Type
   | captured (D : InfiniteCapturedCarry A)
   | positive (D : InfinitePositiveShadow A)
-  | zero (D : InfiniteZeroShadow A)
-  | commonCenter (D : InfiniteCommonCenter A)
 
 /-- 第三の例外：閉じるはずの出口が無限部分列上で持続する。 -/
 def HasPersistentAlternativeExit : Prop :=

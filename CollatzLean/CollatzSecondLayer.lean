@@ -4,6 +4,7 @@ import CollatzLean.CollatzSecondLayer.MovingCompactness
 import CollatzLean.CollatzSecondLayer.LimitWord
 import CollatzLean.CollatzSecondLayer.FirstCrossing
 import CollatzLean.CollatzSecondLayer.C3Cylinder
+import CollatzLean.CollatzSecondLayer.CylinderUpgradeProof
 import CollatzLean.CollatzSecondLayer.InfiniteTerminal
 import CollatzLean.CollatzSecondLayer.InfiniteBranches
 import CollatzLean.CollatzSecondLayer.SpecialC3
