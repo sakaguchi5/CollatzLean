@@ -1,0 +1,11 @@
+import CollatzLean.CollatzSecondLayer.InfiniteOrbit
+import CollatzLean.CollatzSecondLayer.FutureMinimum
+import CollatzLean.CollatzSecondLayer.MovingCompactness
+import CollatzLean.CollatzSecondLayer.LimitWord
+import CollatzLean.CollatzSecondLayer.FirstCrossing
+import CollatzLean.CollatzSecondLayer.C3Cylinder
+import CollatzLean.CollatzSecondLayer.TerminalChain
+import CollatzLean.CollatzSecondLayer.ShadowBranches
+import CollatzLean.CollatzSecondLayer.SpecialC3
+import CollatzLean.CollatzSecondLayer.Reduction
+import CollatzLean.CollatzSecondLayer.Audit
