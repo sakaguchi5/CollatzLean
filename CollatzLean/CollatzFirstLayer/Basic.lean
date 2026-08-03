@@ -1,4 +1,3 @@
---import Mathlib
 import Mathlib.Data.Nat.Factorization.Defs
 import Mathlib.Tactic.Ring
 

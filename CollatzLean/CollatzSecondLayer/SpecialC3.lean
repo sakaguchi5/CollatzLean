@@ -1,12 +1,12 @@
 import CollatzLean.CollatzSecondLayer.InfiniteBranches
 
 /-!
-# 深さ非有界な特殊C3部分列
+# 深さ非有界な修正後Special C3部分列
 
-有限SpecialC3 packet一個の存在ではなく、同一の無限解析列から抽出され、
-first-carry深さが任意に大きくなる特殊C3部分列を最終障害として定義する。
-
-C3排除定理が否定すべき対象は `HasArbitrarilyDeepSpecialC3` である。
+Special C3は、最小非負canonical終点をnegative shadowと誤認する旧定義を廃止する。
+修正後は、suffix開始値がcanonical境界（replay quotient 0）にあり、一つ下の
+合同代表に対応するpredecessor shadowが負で、first-carryがdeferredとなる項を
+保存する。
 -/
 
 namespace CollatzSecondLayer
@@ -14,7 +14,7 @@ namespace CollatzSecondLayer
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
 
-/-- 一つの特殊C3項だけを保存する有限snapshot。 -/
+/-- 一つの修正後Special C3項だけを保存する有限snapshot。 -/
 structure SpecialC3Data where
   sourceCylinder : CanonicalC3Witness
   terminalPair : TerminalPairData
@@ -25,14 +25,55 @@ structure SpecialC3Data where
   carry : CarryComparison
   carryOrigin : CarryOrigin terminalPair carry
   deferredCarry : DeferredCarry carry
-  shadow : CanonicalShadowData terminalPair.R
-  negativeShadow : shadow.shadow < 0
-  changingCenter :
-    center terminalPair.A ≠ center terminalPair.R
+  replay :
+    CanonicalReplayCoordinate
+      terminalPair.R terminalPair.YA terminalPair.YAR
+  canonicalBoundary : replay.quotient = 0
+  negativePredecessorShadow :
+    predecessorShadow terminalPair.R < 0
+
+namespace SpecialC3Data
+
+/-- Special C3 snapshotが持つconnection方程式。 -/
+theorem connectionEquation (D : SpecialC3Data) :
+    (D.terminalPair.YAR : ℤ) -
+        predecessorShadow D.terminalPair.R =
+      2 * (3 : ℤ) ^ oddSteps D.terminalPair.R := by
+  have h := D.replay.connectionEquation
+  rw [D.canonicalBoundary] at h
+  simpa using h
+
+/-- negative predecessor shadowの大きさをexactに表す。 -/
+theorem negativeShadowExact (D : SpecialC3Data) :
+    - predecessorShadow D.terminalPair.R =
+      2 * (3 : ℤ) ^ oddSteps D.terminalPair.R -
+        (D.terminalPair.YAR : ℤ) := by
+  have h := D.connectionEquation
+  linear_combination h
+
+/-- Special C3では実終点は`2*3^q`より小さい。 -/
+theorem finish_lt_two_mul_threePow (D : SpecialC3Data) :
+    (D.terminalPair.YAR : ℤ) <
+      2 * (3 : ℤ) ^ oddSteps D.terminalPair.R := by
+  have h := D.connectionEquation
+  have hneg := D.negativePredecessorShadow
+  omega
+
+/-- canonical境界ではsuffix開始値はcanonical最小非負代表そのもの。 -/
+theorem suffixStart_eq_canonicalStart (D : SpecialC3Data) :
+    D.terminalPair.YA = canonicalStart D.terminalPair.R :=
+  D.replay.start_eq_canonical_of_quotient_eq_zero D.canonicalBoundary
+
+/-- terminal center差は自動的に非零。 -/
+theorem changingCenter (D : SpecialC3Data) :
+    center D.terminalPair.A ≠ center D.terminalPair.R :=
+  D.terminalPair.center_ne
+
+end SpecialC3Data
 
 namespace SpecialC3At
 
-/-- 無限解析列中の特殊C3項から有限snapshotを切り出す。 -/
+/-- 無限解析列中の修正後Special C3項から有限snapshotを切り出す。 -/
 def snapshot
     {O : OddOrbit}
     {S : C3CylinderSequence O}
@@ -48,14 +89,14 @@ def snapshot
   carry := P.carry
   carryOrigin := P.carryOrigin
   deferredCarry := H.deferredCarry
-  shadow := P.shadow
-  negativeShadow := H.negativeShadow
-  changingCenter := H.changingCenter
+  replay := P.replayCoordinate
+  canonicalBoundary := H.canonicalBoundary
+  negativePredecessorShadow := H.negativePredecessorShadow
 
 end SpecialC3At
 
 /--
-特殊C3項が一つの無限解析列から狭義単調な部分列として抽出され、
+修正後Special C3項が一つの無限解析列から狭義単調な部分列として抽出され、
 そのfirst-carry深さが無限大へ進むこと。
 -/
 structure ArbitrarilyDeepSpecialC3Data
@@ -70,7 +111,7 @@ structure ArbitrarilyDeepSpecialC3Data
     ∀ M : ℕ, ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       M < (A.packet (select.index j)).carry.d
 
-/-- 深さが任意に大きい特殊C3部分列が存在すること。 -/
+/-- 深さが任意に大きい修正後Special C3部分列が存在すること。 -/
 def HasArbitrarilyDeepSpecialC3 : Prop :=
   ∃ O : OddOrbit,
   ∃ S : C3CylinderSequence O,
@@ -81,9 +122,10 @@ def HasArbitrarilyDeepSpecialC3 : Prop :=
 /--
 第三bridge。
 
-各無限terminal抽出から、深さ非有界な解析packet列を構成し、
-閉じる出口が無限部分列上で持続するか、深さ非有界な特殊C3部分列へ送る。
-無限鳩の巣、deep extraction、first-carry深さ保存をここへ集約する。
+各無限terminal抽出からpacket列を構成し、alternative exit候補が無限部分列上で
+持続するか、深さ非有界な修正後Special C3部分列へ送る。
+強いterminal抽出、carry比較構成、無限鳩の巣、bounded-depth rigidityをここへ
+集約する。
 -/
 def InfiniteTerminalAnalysisPrinciple : Prop :=
   ∀ O : OddOrbit,

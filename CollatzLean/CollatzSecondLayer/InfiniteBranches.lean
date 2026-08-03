@@ -1,14 +1,18 @@
 import CollatzLean.CollatzSecondLayer.InfiniteTerminal
+import CollatzLean.CollatzFirstLayer.CanonicalReplay
+import CollatzLean.CollatzFirstLayer.CarrySynchronization
 import CollatzLean.CollatzFirstLayer.DepthCoefficient
 
 /-!
-# 無限terminal解析と部分列分岐
+# canonical replay座標による無限terminal解析
 
-terminal pairを一つだけ選ぶのではなく、無限terminal部分列の各項へ
-first-carry・integer shadow・center解析packetを付与する。
+旧`CanonicalShadowData`は最小非負canonical代表の終点を任意データとして保存していた。
+その終点は常に正であり、negative shadowにはなり得ない。
 
-その後、閉じる出口が無限部分列上で持続するか、特殊C3項の深さが
-無限大へ進む部分列を抽出する。深さ発散は後者だけに要求する。
+ここではshadowを語から自動構成し、実suffix開始値のcanonical replay quotientと、
+一つ下の合同代表に対応する`predecessorShadow`を用いて分岐する。
+特殊C3へ残るのは、replay quotientが0で、predecessor shadowが負、かつcarryが
+Deferredになる項だけである。
 -/
 
 namespace CollatzSecondLayer
@@ -16,29 +20,30 @@ namespace CollatzSecondLayer
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
 
-/-- 自然数に限定しない有限語のアフィン実現式。 -/
-def RealizesInt (w : ExpWord) (x y : ℤ) : Prop :=
-  (2 : ℤ) ^ twoSteps w * y =
-    (3 : ℤ) ^ oddSteps w * x + affineConstInt w
-
-/-- canonical開始値に対応する整数shadow。 -/
-structure CanonicalShadowData (w : ExpWord) where
-  shadow : ℤ
-  realizes : RealizesInt w (canonicalStart w : ℤ) shadow
-
-/-- first-carry二分岐を適用できる有限整数データ。 -/
-structure CarryComparison where
+/-- first-carry三分岐を適用できる未調整の有限整数データ。 -/
+structure RawCarryComparison where
   x : ℕ
   y : ℕ
   d : ℕ
   e : ℕ
   a : ℕ
   u : ℕ
-  depth_le : d ≤ e
   difference : y = x + 2 ^ d * u
   difference_odd : Odd u
   lower_factorization : 3 * x + 1 = 2 ^ e * a
   lower_odd : Odd a
+
+/-- raw carry比較の完全な三分岐。 -/
+noncomputable def RawCarryComparison.outcome
+    (C : RawCarryComparison) :
+    FirstCarryOutcome C.x C.y C.d C.e C.a C.u :=
+  first_carry_trichotomy
+    C.difference C.difference_odd
+    C.lower_factorization C.lower_odd
+
+/-- 同期prefixを消費し、`d ≤ e`へ到達したprepared carry比較。 -/
+structure CarryComparison extends RawCarryComparison where
+  depth_le : d ≤ e
 
 /-- carry比較がterminal pairの二つの実終点から作られたこと。 -/
 structure CarryOrigin
@@ -86,10 +91,7 @@ structure Subsequence where
   index : ℕ → ℕ
   index_strict : StrictMono index
 
-/--
-無限terminal抽出の第`n`項に付随する解析packet。
-元terminal pairとの由来は型引数と`CarryOrigin`で固定される。
--/
+/-- 無限terminal抽出の第`n`項に付随する解析packet。 -/
 structure TerminalAnalysisPacket
     {O : OddOrbit}
     {S : C3CylinderSequence O}
@@ -97,7 +99,6 @@ structure TerminalAnalysisPacket
     (n : ℕ) where
   carry : CarryComparison
   carryOrigin : CarryOrigin (E.pair n) carry
-  shadow : CanonicalShadowData (E.pair n).R
 
 namespace TerminalAnalysisPacket
 
@@ -150,19 +151,63 @@ theorem sourceFinish
     P.criticalPair.YAR = P.sourceCylinder.finish :=
   E.sourceFinish n
 
+/-- suffix実行からcanonical replay座標を自動構成する。 -/
+def replayCoordinate
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) :
+    CanonicalReplayCoordinate
+      P.criticalPair.R P.criticalPair.YA P.criticalPair.YAR :=
+  canonicalReplayCoordinate_of_runs
+    P.criticalPair.runR P.criticalPair.R_nonempty
+
+/-- packetのsuffix開始値がcanonical代表から何回replayされたか。 -/
+def replayQuotient
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) : ℕ :=
+  P.replayCoordinate.quotient
+
+/-- packetに対するconnection方程式。 -/
+theorem connectionEquation
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) :
+    (P.criticalPair.YAR : ℤ) -
+        predecessorShadow P.criticalPair.R =
+      2 * (3 : ℤ) ^ oddSteps P.criticalPair.R *
+        ((P.replayQuotient : ℤ) + 1) :=
+  P.replayCoordinate.connectionEquation
+
 end TerminalAnalysisPacket
 
-/-- 特殊C3へ残る前に閉じる有限出口。zero/common-centerは下で不可能と証明する。 -/
-inductive ClosedExitAt
+/-- 特殊C3へ残る前に現れる有限alternative exit候補。 -/
+inductive AlternativeExitAt
     {O : OddOrbit}
     {S : C3CylinderSequence O}
     {E : InfiniteTerminalExtraction S}
     {n : ℕ}
     (P : TerminalAnalysisPacket E n) : Type
   | captureSuccess (h : CapturedCarry P.carry)
-  | positiveShadow (h : 0 < P.shadow.shadow)
+  | lowerNaturalReplay
+      (h : LowerNaturalReplayData
+        P.criticalPair.R P.criticalPair.YA P.criticalPair.YAR)
+  | positivePredecessorShadow
+      (h : 0 < predecessorShadow P.criticalPair.R)
 
-/-- deferred carry・negative shadow・changing centerが同時に残る有限項。 -/
+/--
+特殊C3へ残る有限項。
+
+* carryはdeferred
+* suffix開始値はcanonical代表そのもの（replay quotient 0）
+* 一つ下の合同代表に対応するshadowは負
+-/
 structure SpecialC3At
     {O : OddOrbit}
     {S : C3CylinderSequence O}
@@ -170,137 +215,64 @@ structure SpecialC3At
     {n : ℕ}
     (P : TerminalAnalysisPacket E n) : Type where
   deferredCarry : DeferredCarry P.carry
-  negativeShadow : P.shadow.shadow < 0
-  changingCenter :
-    center P.criticalPair.A ≠ center P.criticalPair.R
+  canonicalBoundary : P.replayQuotient = 0
+  negativePredecessorShadow :
+    predecessorShadow P.criticalPair.R < 0
 
-/-- determinant非零なterminal suffixは空語ではない。 -/
-lemma terminalPair_R_ne_nil (T : TerminalPairData) : T.R ≠ [] := by
-  intro hnil
-  apply T.detR_ne
-  simp [hnil, determinant, oddSteps, twoSteps]
-
-/-- 非空語のaffine定数は正。 -/
-lemma affineConst_pos_of_ne_nil
-    {w : ExpWord} (hne : w ≠ []) : 0 < affineConst w := by
-  cases w with
-  | nil => exact False.elim (hne rfl)
-  | cons e w =>
-      simp [affineConst]
-
-/-- 整数版affine定数は、自然数版affine定数の整数キャストに一致する。 -/
-@[simp]
-lemma affineConstInt_eq_cast_affineConst
+/-- canonical最小非負代表の終点は常に正。 -/
+theorem canonicalEndpoint_positive
     (w : ExpWord) :
-    affineConstInt w = (affineConst w : ℤ) := by
-  induction w with
-  | nil =>
-      simp [affineConstInt, affineConst]
-  | cons e w ih =>
-      simp [affineConstInt, affineConst]
+    0 < canonicalEnd w :=
+  canonicalEnd_pos w
 
-/--
-非空語では、canonical開始値に対する整数affine式の右辺は正である。
--/
-lemma canonical_affine_rhs_pos
-    {w : ExpWord}
-    (hne : w ≠ []) :
-    0 <
-      (3 : ℤ) ^ oddSteps w * (canonicalStart w : ℤ) +
-        affineConstInt w := by
-  have hBnat : 0 < affineConst w :=
-    affineConst_pos_of_ne_nil hne
-  have hB : 0 < affineConstInt w := by
-    rw [affineConstInt_eq_cast_affineConst]
-    exact_mod_cast hBnat
-  have hpow_nonneg :
-      0 ≤ (3 : ℤ) ^ oddSteps w := by
-    exact pow_nonneg (by norm_num) _
-  have hstart_nonneg :
-      0 ≤ (canonicalStart w : ℤ) := by
-    omega
-  have hmul_nonneg :
-      0 ≤
-        (3 : ℤ) ^ oddSteps w *
-          (canonicalStart w : ℤ) :=
-    mul_nonneg hpow_nonneg hstart_nonneg
-  exact add_pos_of_nonneg_of_pos hmul_nonneg hB
+/-- canonical終点そのものをnegative shadowにする枝は不可能。 -/
+theorem negativeCanonicalEndpoint_impossible
+    (w : ExpWord) :
+    ¬ ((canonicalEnd w : ℤ) < 0) := by
+  exact not_lt_of_ge (by omega)
 
-/-- canonical integer shadowはzeroになれない。 -/
-theorem zeroShadow_impossible
-    {O : OddOrbit}
-    {S : C3CylinderSequence O}
-    {E : InfiniteTerminalExtraction S}
-    {n : ℕ}
-    (P : TerminalAnalysisPacket E n) :
-    P.shadow.shadow ≠ 0 := by
-  intro hzero
-  have hreal := P.shadow.realizes
-  unfold RealizesInt at hreal
-  rw [hzero, mul_zero] at hreal
-  have hpos :
-      0 <
-        (3 : ℤ) ^ oddSteps P.criticalPair.R *
-            (canonicalStart P.criticalPair.R : ℤ) +
-          affineConstInt P.criticalPair.R :=
-    canonical_affine_rhs_pos
-      (terminalPair_R_ne_nil P.criticalPair)
-  have hzero_rhs :
-      (3 : ℤ) ^ oddSteps P.criticalPair.R *
-            (canonicalStart P.criticalPair.R : ℤ) +
-          affineConstInt P.criticalPair.R = 0 :=
-    hreal.symm
-  exact (ne_of_gt hpos) hzero_rhs
+/-- predecessor shadowはzeroになれない。 -/
+theorem predecessorShadow_zero_impossible
+    (w : ExpWord) :
+    predecessorShadow w ≠ 0 :=
+  predecessorShadow_ne_zero w
 
-/-- terminal pairの二つのcenterは一致しない。 -/
+/-- terminal pairの二つのcenterは常に異なる。 -/
 theorem commonCenter_impossible
     {O : OddOrbit}
     {S : C3CylinderSequence O}
     {E : InfiniteTerminalExtraction S}
     {n : ℕ}
     (P : TerminalAnalysisPacket E n) :
-    center P.criticalPair.A ≠ center P.criticalPair.R := by
-  intro hcenter
-  rcases P.criticalPair.centerDifference with ⟨kappa, hkappaOdd, hdiff⟩
-  have hkappa : kappa ≠ 0 := by
-    intro hk
-    subst kappa
-    rcases hkappaOdd with ⟨z, hz⟩
-    omega
-  have hkappaQ : (kappa : ℚ) ≠ 0 := by exact_mod_cast hkappa
-  have htwo : (2 : ℚ) ^ P.criticalPair.lambdaA ≠ 0 := by
-    norm_num
-  have hdetA : (determinant P.criticalPair.A : ℚ) ≠ 0 := by
-    exact_mod_cast P.criticalPair.detA_ne
-  have hdetR : (determinant P.criticalPair.R : ℚ) ≠ 0 := by
-    exact_mod_cast P.criticalPair.detR_ne
-  have hquot :
-      (((2 : ℚ) ^ P.criticalPair.lambdaA) * (kappa : ℚ)) /
-          ((determinant P.criticalPair.A : ℚ) *
-            (determinant P.criticalPair.R : ℚ)) ≠ 0 := by
-    exact div_ne_zero (mul_ne_zero htwo hkappaQ) (mul_ne_zero hdetA hdetR)
-  apply hquot
-  rw [← hdiff, hcenter, sub_self]
+    center P.criticalPair.A ≠ center P.criticalPair.R :=
+  P.criticalPair.center_ne
 
-/-- 各有限packetは閉じる出口か特殊C3項のどちらかへ落ちる。 -/
+/-- 各有限packetはalternative exit候補か修正後Special C3項へ落ちる。 -/
 theorem analysisOutcome_nonempty
     {O : OddOrbit}
     {S : C3CylinderSequence O}
     {E : InfiniteTerminalExtraction S}
     {n : ℕ}
     (P : TerminalAnalysisPacket E n) :
-    Nonempty (ClosedExitAt P ⊕ SpecialC3At P) := by
+    Nonempty (AlternativeExitAt P ⊕ SpecialC3At P) := by
   rcases carryComparison_split P.carry with hcap | hdefer
-  · exact ⟨Sum.inl (ClosedExitAt.captureSuccess hcap)⟩
-  · rcases lt_trichotomy P.shadow.shadow 0 with hneg | hzero | hpos
-    · exact ⟨Sum.inr ⟨hdefer, hneg, commonCenter_impossible P⟩⟩
-    · exact False.elim ((zeroShadow_impossible P) hzero)
-    · exact ⟨Sum.inl (ClosedExitAt.positiveShadow hpos)⟩
+  · exact ⟨Sum.inl (AlternativeExitAt.captureSuccess hcap)⟩
+  · by_cases hq : P.replayQuotient = 0
+    · rcases lt_trichotomy
+          (predecessorShadow P.criticalPair.R) 0 with
+        hneg | hzero | hpos
+      · exact ⟨Sum.inr ⟨hdefer, hq, hneg⟩⟩
+      · exact False.elim
+          ((predecessorShadow_zero_impossible P.criticalPair.R) hzero)
+      · exact ⟨Sum.inl
+          (AlternativeExitAt.positivePredecessorShadow hpos)⟩
+    · have hqpos : 0 < P.replayQuotient :=
+        Nat.pos_of_ne_zero hq
+      exact ⟨Sum.inl
+        (AlternativeExitAt.lowerNaturalReplay
+          (P.replayCoordinate.lowerNaturalReplay hqpos))⟩
 
-/--
-無限terminal部分列の全項へpacketを付与する。
-深さ非有界性は、特殊C3部分列を選んだ段階で保持する。
--/
+/-- 無限terminal部分列の全項へpacketを付与する。 -/
 structure InfiniteTerminalAnalysis
     {O : OddOrbit}
     {S : C3CylinderSequence O}
@@ -317,26 +289,41 @@ structure InfiniteCapturedCarry
   evidence : ∀ n : ℕ,
     CapturedCarry (A.packet (select.index n)).carry
 
-/-- positive shadowが無限部分列上で持続する。 -/
-structure InfinitePositiveShadow
+/-- 正の回数だけ下側の自然数replayが残る。 -/
+structure InfiniteLowerNaturalReplay
     {O : OddOrbit}
     {S : C3CylinderSequence O}
     {E : InfiniteTerminalExtraction S}
     (A : InfiniteTerminalAnalysis E) where
   select : Subsequence
   evidence : ∀ n : ℕ,
-    0 < (A.packet (select.index n)).shadow.shadow
+    LowerNaturalReplayData
+      (A.packet (select.index n)).criticalPair.R
+      (A.packet (select.index n)).criticalPair.YA
+      (A.packet (select.index n)).criticalPair.YAR
 
-/-- 特殊C3へ残らない第三の例外を、無限部分列として分類する。 -/
+/-- predecessor shadowが正となる枝が無限に持続する。 -/
+structure InfinitePositivePredecessorShadow
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    (A : InfiniteTerminalAnalysis E) where
+  select : Subsequence
+  evidence : ∀ n : ℕ,
+    0 < predecessorShadow
+      (A.packet (select.index n)).criticalPair.R
+
+/-- 修正後Special C3へ残らない第三の例外。 -/
 inductive PersistentAlternativeExitData
     {O : OddOrbit}
     {S : C3CylinderSequence O}
     {E : InfiniteTerminalExtraction S}
     (A : InfiniteTerminalAnalysis E) : Type
   | captured (D : InfiniteCapturedCarry A)
-  | positive (D : InfinitePositiveShadow A)
+  | lowerReplay (D : InfiniteLowerNaturalReplay A)
+  | positivePredecessor (D : InfinitePositivePredecessorShadow A)
 
-/-- 第三の例外：閉じるはずの出口が無限部分列上で持続する。 -/
+/-- 第三の例外：alternative exit候補が無限部分列上で持続する。 -/
 def HasPersistentAlternativeExit : Prop :=
   ∃ O : OddOrbit,
   ∃ S : C3CylinderSequence O,
