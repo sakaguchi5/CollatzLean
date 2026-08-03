@@ -1,12 +1,12 @@
-import CollatzLean.CollatzSecondLayer.ShadowBranches
+import CollatzLean.CollatzSecondLayer.InfiniteBranches
 
 /-!
-# 特殊C3有限障害
+# 深さ非有界な特殊C3部分列
 
-first-carryが持ち越され、integer shadowが負であり、
-common-centerへ入らない有限packetを特殊C3証人として定義する。
-無限軌道そのものは定義に含めないが、元cylinder・terminal pair・carryの
-由来等式は有限証人へ保存する。
+有限SpecialC3 packet一個の存在ではなく、同一の無限解析列から抽出され、
+first-carry深さが任意に大きくなる特殊C3部分列を最終障害として定義する。
+
+C3排除定理が否定すべき対象は `HasArbitrarilyDeepSpecialC3` である。
 -/
 
 namespace CollatzSecondLayer
@@ -14,10 +14,7 @@ namespace CollatzSecondLayer
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
 
-/--
-polynomial-small canonical C3列から抽出された、
-failed-carry・changing-center・negative-shadow型の有限障害。
--/
+/-- 一つの特殊C3項だけを保存する有限snapshot。 -/
 structure SpecialC3Data where
   sourceCylinder : CanonicalC3Witness
   terminalPair : TerminalPairData
@@ -33,54 +30,71 @@ structure SpecialC3Data where
   changingCenter :
     center terminalPair.A ≠ center terminalPair.R
 
-/-- 特殊C3有限障害が存在すること。 -/
-def HasSpecialC3 : Prop := Nonempty SpecialC3Data
+namespace SpecialC3At
+
+/-- 無限解析列中の特殊C3項から有限snapshotを切り出す。 -/
+def snapshot
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    {P : TerminalAnalysisPacket E n}
+    (H : SpecialC3At P) : SpecialC3Data where
+  sourceCylinder := P.sourceCylinder
+  terminalPair := P.criticalPair
+  sourceRelation := P.sourceRelation
+  sourceStart := P.sourceStart
+  sourceFinish := P.sourceFinish
+  carry := P.carry
+  carryOrigin := P.carryOrigin
+  deferredCarry := H.deferredCarry
+  shadow := P.shadow
+  negativeShadow := H.negativeShadow
+  changingCenter := H.changingCenter
+
+end SpecialC3At
 
 /--
-一つのterminal解析packetは、別出口か特殊C3のどちらかへ必ず落ちる。
-この分岐自体には未証明の数学を隠していない。
+特殊C3項が一つの無限解析列から狭義単調な部分列として抽出され、
+そのfirst-carry深さが無限大へ進むこと。
 -/
-theorem terminalAnalysis_outcome
+structure ArbitrarilyDeepSpecialC3Data
     {O : OddOrbit}
     {S : C3CylinderSequence O}
-    {T : TerminalChainData S}
-    (P : TerminalAnalysisPacket S T) :
-    Nonempty (AlternativeExitData P) ∨
-      ∃ _hdefer : DeferredCarry P.carry,
-        P.shadow.shadow < 0 ∧
-        center P.criticalPair.A ≠ center P.criticalPair.R := by
-  rcases carryComparison_split P.carry with hcap | hdefer
-  · exact Or.inl ⟨AlternativeExitData.captureSuccess hcap⟩
-  · rcases lt_trichotomy P.shadow.shadow 0 with hneg | hzero | hpos
-    · by_cases hcenter :
-          center P.criticalPair.A = center P.criticalPair.R
-      · exact Or.inl ⟨AlternativeExitData.commonCenter hcenter⟩
-      · exact Or.inr ⟨hdefer, hneg, hcenter⟩
-    · exact Or.inl ⟨AlternativeExitData.zeroShadow hzero⟩
-    · exact Or.inl ⟨AlternativeExitData.positiveShadow hpos⟩
+    {E : InfiniteTerminalExtraction S}
+    (A : InfiniteTerminalAnalysis E) where
+  select : Subsequence
+  special : ∀ n : ℕ,
+    SpecialC3At (A.packet (select.index n))
+  depths_tend_to_infinity :
+    ∀ M : ℕ, ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
+      M < (A.packet (select.index j)).carry.d
 
-/-- terminal解析packetから、別出口または由来情報付き特殊C3を構成する。 -/
-theorem alternativeExit_or_specialC3
-    {O : OddOrbit}
-    {S : C3CylinderSequence O}
-    {T : TerminalChainData S}
-    (P : TerminalAnalysisPacket S T) :
-    HasAlternativeExit ∨ HasSpecialC3 := by
-  rcases terminalAnalysis_outcome P with hExit | hSpecial
-  · exact Or.inl ⟨O, S, T, P, hExit⟩
-  · rcases hSpecial with ⟨hdefer, hneg, hcenter⟩
-    exact Or.inr ⟨{
-      sourceCylinder := P.sourceCylinder
-      terminalPair := P.criticalPair
-      sourceRelation := P.sourceRelation
-      sourceStart := P.sourceStart
-      sourceFinish := P.sourceFinish
-      carry := P.carry
-      carryOrigin := P.carryOrigin
-      deferredCarry := hdefer
-      shadow := P.shadow
-      negativeShadow := hneg
-      changingCenter := hcenter
-    }⟩
+/-- 深さが任意に大きい特殊C3部分列が存在すること。 -/
+def HasArbitrarilyDeepSpecialC3 : Prop :=
+  ∃ O : OddOrbit,
+  ∃ S : C3CylinderSequence O,
+  ∃ E : InfiniteTerminalExtraction S,
+  ∃ A : InfiniteTerminalAnalysis E,
+    Nonempty (ArbitrarilyDeepSpecialC3Data A)
+
+/--
+第三bridge。
+
+各無限terminal抽出から、深さ非有界な解析packet列を構成し、
+閉じる出口が無限部分列上で持続するか、深さ非有界な特殊C3部分列へ送る。
+無限鳩の巣、deep extraction、first-carry深さ保存をここへ集約する。
+-/
+def InfiniteTerminalAnalysisPrinciple : Prop :=
+  ∀ O : OddOrbit,
+  ∀ S : C3CylinderSequence O,
+  ∀ E : InfiniteTerminalExtraction S,
+    ∃ A : InfiniteTerminalAnalysis E,
+      Nonempty (PersistentAlternativeExitData A) ∨
+      Nonempty (ArbitrarilyDeepSpecialC3Data A)
+
+/-- C3排除側が最終的に証明すべき命題。 -/
+def AsymptoticSpecialC3ExclusionPrinciple : Prop :=
+  ¬ HasArbitrarilyDeepSpecialC3
 
 end CollatzSecondLayer

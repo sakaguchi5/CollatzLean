@@ -4,8 +4,8 @@ import CollatzLean.CollatzSecondLayer.MovingCompactness
 import CollatzLean.CollatzSecondLayer.LimitWord
 import CollatzLean.CollatzSecondLayer.FirstCrossing
 import CollatzLean.CollatzSecondLayer.C3Cylinder
-import CollatzLean.CollatzSecondLayer.TerminalChain
-import CollatzLean.CollatzSecondLayer.ShadowBranches
+import CollatzLean.CollatzSecondLayer.InfiniteTerminal
+import CollatzLean.CollatzSecondLayer.InfiniteBranches
 import CollatzLean.CollatzSecondLayer.SpecialC3
 import CollatzLean.CollatzSecondLayer.Reduction
-import CollatzLean.CollatzSecondLayer.Audit
+--import CollatzLean.CollatzSecondLayer.Audit
