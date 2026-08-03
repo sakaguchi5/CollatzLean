@@ -3,13 +3,12 @@ import CollatzLean.CollatzSecondLayer.MovingCompactnessConsequences
 import CollatzLean.CollatzSecondLayer.CylinderConsequences
 
 /-!
-# 第二層・canonical replay再構築の監査
+# 第二層・prepared carry接続の監査
 
-* 第一bridgeは完全証明済み。
-* canonical終点とpredecessor shadowは語から自動構成する。
-* 現行Special C3はcanonical境界・negative predecessor shadow・deferred carryで定義する。
-* determinant非零、center差、alpha深さ収支はterminal runから自動導出する。
-* 未証明プレースホルダーは使用しない。
+* positive replayはactual `Runs`まで保存する。
+* ordered terminal差分と下側軌道埋込みから最小同期境界を自動構成する。
+* prepared carry深さはSpecial C3 suffix長の2倍以下である。
+* 未証明の強いterminal抽出とbounded-depth rigidityは第三bridgeに残す。
 -/
 
 namespace CollatzSecondLayer
@@ -18,67 +17,60 @@ open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
 
 #check canonicalEnd
-#check canonicalEnd_realizes
-#check canonicalEnd_pos
 #check CanonicalReplayCoordinate
-#check LowerNaturalReplayData
-#check canonicalReplayCoordinate_of_runs
-#check predecessorStart_neg
-#check predecessorShadow
-#check predecessorShadow_realizes
-#check predecessorShadow_ne_zero
-#check predecessorShadow_neg_iff
-#check predecessorShadow_pos_iff
-#check CanonicalReplayCoordinate.connectionEquation
-#check CanonicalReplayCoordinate.quotient_eq_zero_iff_start_eq_canonical
 #check CanonicalReplayCoordinate.lowerNaturalReplay
+#check ExpWord.Runs.replay_down
+#check LowerNaturalRunReplayData
+#check CanonicalReplayCoordinate.lowerNaturalRunReplay
 
-#check FirstCarryOutcome
+#check OrderedDifferenceData
+#check OrderedDifferenceData.value_lt
+#check OrderedDifferenceData.twoPow_le_difference
+#check TerminalLowerOrbitEmbedding
+#check terminalLowerOrbitEmbeddingOfExtraction
+#check SynchronizationBoundaryData
+#check synchronizationBoundaryOfOrbit
+#check PreparedCarryData
+#check PreparedCarryData.ofOrbit
+#check PreparedCarryData.remainingDepth_pos
+#check PreparedCarryData.depth_balance
+#check PreparedCarryData.syncLength_add_remainingDepth_le_original
+#check PreparedCarryData.toCarryComparison
+
 #check RawCarryComparison
-#check RawCarryComparison.outcome
-#check first_carry_trichotomy_nonempty
-#check ExpWord.Runs.replay_of_gap_depth_gt_twoSteps
-#check ExpWord.Runs.replay_endpoint_exact_difference
-
-#check determinant_ne_zero_of_valid_nonempty
-#check alpha_gap_suffix_balance
-#check terminal_suffix_exact_twoFactor
-
-#check OddOrbit
-#check MovingLimitData
-#check movingCompactnessPrinciple
-#check MovingLimitData.limitExponent_zero_eq_one
-#check MovingLimitData.limitWord_twoSteps_le_quadratic
-
-#check FirstCrossingSequenceData
-#check C3CylinderSequence
-#check TwoThreeGapPolynomialBound
-#check PolynomialBelowTwoPower
-#check cylinderUpgradePrinciple_of_arithmetic
-#check FirstCrossingCylinder.finish_le_start_add_length
-#check C3CylinderSequence.finishes_polynomialSmall
-
-#check TerminalPairData
-#check TerminalPairData.suffixDepthBalance
-#check TerminalPairData.omegaExactDepth
-#check TerminalPairData.center_ne
-#check InfiniteTerminalExtraction
-#check TerminalAnalysisPacket.replayCoordinate
-#check TerminalAnalysisPacket.connectionEquation
+#check CarryComparison
+#check CarryOrigin
+#check TerminalAnalysisPacket
+#check TerminalAnalysisPacket.prepared
+#check TerminalAnalysisPacket.carry
+#check TerminalAnalysisPacket.carryOrigin
 #check AlternativeExitAt
 #check SpecialC3At
 #check analysisOutcome_nonempty
-#check InfiniteTerminalAnalysis
-#check PersistentAlternativeExitData
-#check ArbitrarilyDeepSpecialC3Data
+#check InfiniteLowerNaturalReplay
+
 #check SpecialC3Data.connectionEquation
 #check SpecialC3Data.negativeShadowExact
 #check SpecialC3Data.finish_lt_two_mul_threePow
-#check SpecialC3Data.suffixStart_eq_canonicalStart
+#check SpecialC3Data.originalDepth_le_twice_suffixLength
+#check SpecialC3Data.preparedDepth_le_twice_suffixLength
+#check SpecialC3Data.syncLength_add_preparedDepth_le_twice_suffixLength
 
+#check MovingLimitData.limitExponent_zero_eq_one
+#check MovingLimitData.limitWord_twoSteps_le_quadratic
+#check FirstCrossingCylinder.finish_le_start_add_length
+#check C3CylinderSequence.finishes_polynomialSmall
+
+#check InfiniteTerminalExtraction
+#check InfiniteTerminalAnalysis
+#check PersistentAlternativeExitData
+#check ArbitrarilyDeepSpecialC3Data
 #check HasInfiniteTerminalExtractionObstruction
 #check HasPersistentAlternativeExit
 #check HasArbitrarilyDeepSpecialC3
+#check TerminalPacketConstructionPrinciple
+#check InfiniteOutcomeExtractionPrinciple
+#check infiniteTerminalAnalysisPrinciple_of_parts
 #check InfiniteTerminalAnalysisPrinciple
 #check ReductionBridge.ofArithmetic
 #check AsymptoticSpecialC3ExclusionPrinciple

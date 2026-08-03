@@ -1,4 +1,5 @@
 import CollatzLean.CollatzFirstLayer.CanonicalReplay
+import CollatzLean.CollatzFirstLayer.DownwardReplay
 import CollatzLean.CollatzFirstLayer.CarrySynchronization
 import CollatzLean.CollatzFirstLayer.TerminalConsequences
 
@@ -12,6 +13,7 @@ import CollatzLean.CollatzSecondLayer.C3Cylinder
 import CollatzLean.CollatzSecondLayer.CylinderUpgradeProof
 import CollatzLean.CollatzSecondLayer.CylinderConsequences
 import CollatzLean.CollatzSecondLayer.InfiniteTerminal
+import CollatzLean.CollatzSecondLayer.PreparedCarry
 import CollatzLean.CollatzSecondLayer.InfiniteBranches
 import CollatzLean.CollatzSecondLayer.SpecialC3
 import CollatzLean.CollatzSecondLayer.Reduction

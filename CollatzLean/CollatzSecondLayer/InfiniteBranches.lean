@@ -1,18 +1,13 @@
-import CollatzLean.CollatzSecondLayer.InfiniteTerminal
-import CollatzLean.CollatzFirstLayer.CanonicalReplay
-import CollatzLean.CollatzFirstLayer.CarrySynchronization
+import CollatzLean.CollatzSecondLayer.PreparedCarry
+import CollatzLean.CollatzFirstLayer.DownwardReplay
 import CollatzLean.CollatzFirstLayer.DepthCoefficient
 
 /-!
-# canonical replay座標による無限terminal解析
+# prepared carryとcanonical replayによる無限terminal解析
 
-旧`CanonicalShadowData`は最小非負canonical代表の終点を任意データとして保存していた。
-その終点は常に正であり、negative shadowにはなり得ない。
-
-ここではshadowを語から自動構成し、実suffix開始値のcanonical replay quotientと、
-一つ下の合同代表に対応する`predecessorShadow`を用いて分岐する。
-特殊C3へ残るのは、replay quotientが0で、predecessor shadowが負、かつcarryが
-Deferredになる項だけである。
+packetはordered terminal差分と下側値の軌道埋込みだけを保存する。
+最小同期境界、上下同期run、prepared carry比較はそこから自動構成する。
+positive replay枝はアフィン等式だけでなくactual `Runs`まで保存する。
 -/
 
 namespace CollatzSecondLayer
@@ -20,7 +15,7 @@ namespace CollatzSecondLayer
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
 
-/-- first-carry三分岐を適用できる未調整の有限整数データ。 -/
+/-- first-carry三分岐を適用できる有限整数データ。 -/
 structure RawCarryComparison where
   x : ℕ
   y : ℕ
@@ -41,15 +36,35 @@ noncomputable def RawCarryComparison.outcome
     C.difference C.difference_odd
     C.lower_factorization C.lower_odd
 
-/-- 同期prefixを消費し、`d ≤ e`へ到達したprepared carry比較。 -/
+/-- 同期prefixを消費して`d ≤ e`へ到達したcarry比較。 -/
 structure CarryComparison extends RawCarryComparison where
   depth_le : d ≤ e
 
-/-- carry比較がterminal pairの二つの実終点から作られたこと。 -/
+/-- prepared carryからfirst-carry二分岐へ渡す比較を構成する。 -/
+def PreparedCarryData.toCarryComparison
+    {O : OddOrbit} {T : TerminalPairData}
+    (P : PreparedCarryData O T) : CarryComparison where
+  x := P.boundary.lowerFinish
+  y := P.upperFinish
+  d := P.remainingDepth
+  e := P.boundary.nextExponent
+  a := P.boundary.nextOddPart
+  u := 3 ^ oddSteps P.boundary.word * P.ordered.oddPart
+  difference := by
+    simpa [PreparedCarryData.remainingDepth, Nat.mul_assoc] using
+      P.upperDifference
+  difference_odd := P.upperDifferenceOdd
+  lower_factorization := P.boundary.lowerNextFactorization
+  lower_odd := P.boundary.lowerNextOdd
+  depth_le := P.boundary.remaining_le_next
+
+/-- carry比較がterminal pairから同期構成されたことを完全に保存する。 -/
 structure CarryOrigin
-    (T : TerminalPairData) (C : CarryComparison) : Prop where
-  lowerValue : C.x = T.YA
-  upperValue : C.y = T.YAR
+    (O : OddOrbit)
+    (T : TerminalPairData)
+    (C : CarryComparison) : Type where
+  prepared : PreparedCarryData O T
+  carry_eq : C = prepared.toCarryComparison
 
 /-- first-carryが差の深さで捕捉される枝。 -/
 structure CapturedCarry (C : CarryComparison) : Type where
@@ -91,14 +106,17 @@ structure Subsequence where
   index : ℕ → ℕ
   index_strict : StrictMono index
 
-/-- 無限terminal抽出の第`n`項に付随する解析packet。 -/
+/--
+無限terminal抽出の第`n`項に付随する解析packet。
+難しい抽出側が与えるのはordered完全差分だけであり、
+軌道埋込み、同期prefix、prepared carryはsource cylinderから自動構成される。
+-/
 structure TerminalAnalysisPacket
     {O : OddOrbit}
     {S : C3CylinderSequence O}
     (E : InfiniteTerminalExtraction S)
     (n : ℕ) where
-  carry : CarryComparison
-  carryOrigin : CarryOrigin (E.pair n) carry
+  ordered : OrderedDifferenceData (E.pair n)
 
 namespace TerminalAnalysisPacket
 
@@ -151,6 +169,45 @@ theorem sourceFinish
     P.criticalPair.YAR = P.sourceCylinder.finish :=
   E.sourceFinish n
 
+/-- source cylinderから下側値`YA`の実軌道位置を自動取得する。 -/
+def lowerOrbit
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (_P : TerminalAnalysisPacket E n) :
+    TerminalLowerOrbitEmbedding O (E.pair n) :=
+  terminalLowerOrbitEmbeddingOfExtraction E n
+
+/-- ordered差分から最小同期境界を通じてprepared carryを構成する。 -/
+noncomputable def prepared
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) :
+    PreparedCarryData O P.criticalPair :=
+  PreparedCarryData.ofOrbit P.ordered P.lowerOrbit
+
+/-- packetのprepared first-carry比較。 -/
+noncomputable def carry
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) : CarryComparison :=
+  P.prepared.toCarryComparison
+
+/-- carry比較のterminal由来。 -/
+noncomputable def carryOrigin
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {E : InfiniteTerminalExtraction S}
+    {n : ℕ}
+    (P : TerminalAnalysisPacket E n) :
+    CarryOrigin O P.criticalPair P.carry :=
+  ⟨P.prepared, rfl⟩
+
 /-- suffix実行からcanonical replay座標を自動構成する。 -/
 def replayCoordinate
     {O : OddOrbit}
@@ -196,7 +253,7 @@ inductive AlternativeExitAt
     (P : TerminalAnalysisPacket E n) : Type
   | captureSuccess (h : CapturedCarry P.carry)
   | lowerNaturalReplay
-      (h : LowerNaturalReplayData
+      (h : LowerNaturalRunReplayData
         P.criticalPair.R P.criticalPair.YA P.criticalPair.YAR)
   | positivePredecessorShadow
       (h : 0 < predecessorShadow P.criticalPair.R)
@@ -204,7 +261,7 @@ inductive AlternativeExitAt
 /--
 特殊C3へ残る有限項。
 
-* carryはdeferred
+* prepared carryはdeferred
 * suffix開始値はcanonical代表そのもの（replay quotient 0）
 * 一つ下の合同代表に対応するshadowは負
 -/
@@ -270,7 +327,8 @@ theorem analysisOutcome_nonempty
         Nat.pos_of_ne_zero hq
       exact ⟨Sum.inl
         (AlternativeExitAt.lowerNaturalReplay
-          (P.replayCoordinate.lowerNaturalReplay hqpos))⟩
+          (P.replayCoordinate.lowerNaturalRunReplay
+            P.criticalPair.runR hqpos))⟩
 
 /-- 無限terminal部分列の全項へpacketを付与する。 -/
 structure InfiniteTerminalAnalysis
@@ -289,7 +347,7 @@ structure InfiniteCapturedCarry
   evidence : ∀ n : ℕ,
     CapturedCarry (A.packet (select.index n)).carry
 
-/-- 正の回数だけ下側の自然数replayが残る。 -/
+/-- 一段下のactual natural runが無限部分列上で残る。 -/
 structure InfiniteLowerNaturalReplay
     {O : OddOrbit}
     {S : C3CylinderSequence O}
@@ -297,7 +355,7 @@ structure InfiniteLowerNaturalReplay
     (A : InfiniteTerminalAnalysis E) where
   select : Subsequence
   evidence : ∀ n : ℕ,
-    LowerNaturalReplayData
+    LowerNaturalRunReplayData
       (A.packet (select.index n)).criticalPair.R
       (A.packet (select.index n)).criticalPair.YA
       (A.packet (select.index n)).criticalPair.YAR
