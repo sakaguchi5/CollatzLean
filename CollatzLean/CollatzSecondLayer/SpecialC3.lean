@@ -5,7 +5,8 @@ import CollatzLean.CollatzSecondLayer.ShadowBranches
 
 first-carryが持ち越され、integer shadowが負であり、
 common-centerへ入らない有限packetを特殊C3証人として定義する。
-無限軌道そのものは定義に含めない。
+無限軌道そのものは定義に含めないが、元cylinder・terminal pair・carryの
+由来等式は有限証人へ保存する。
 -/
 
 namespace CollatzSecondLayer
@@ -20,8 +21,12 @@ failed-carry・changing-center・negative-shadow型の有限障害。
 structure SpecialC3Data where
   sourceCylinder : CanonicalC3Witness
   terminalPair : TerminalPairData
-  sourceRelation : terminalPair.R = sourceCylinder.word
+  sourceRelation :
+    terminalPair.A ++ terminalPair.R = sourceCylinder.word
+  sourceStart : terminalPair.X = sourceCylinder.start
+  sourceFinish : terminalPair.YAR = sourceCylinder.finish
   carry : CarryComparison
+  carryOrigin : CarryOrigin terminalPair carry
   deferredCarry : DeferredCarry carry
   shadow : CanonicalShadowData terminalPair.R
   negativeShadow : shadow.shadow < 0
@@ -36,7 +41,10 @@ def HasSpecialC3 : Prop := Nonempty SpecialC3Data
 この分岐自体には未証明の数学を隠していない。
 -/
 theorem terminalAnalysis_outcome
-    (P : TerminalAnalysisPacket) :
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {T : TerminalChainData S}
+    (P : TerminalAnalysisPacket S T) :
     Nonempty (AlternativeExitData P) ∨
       ∃ _hdefer : DeferredCarry P.carry,
         P.shadow.shadow < 0 ∧
@@ -51,18 +59,24 @@ theorem terminalAnalysis_outcome
     · exact Or.inl ⟨AlternativeExitData.zeroShadow hzero⟩
     · exact Or.inl ⟨AlternativeExitData.positiveShadow hpos⟩
 
-/-- terminal解析packetから、別出口または特殊C3を構成する。 -/
+/-- terminal解析packetから、別出口または由来情報付き特殊C3を構成する。 -/
 theorem alternativeExit_or_specialC3
-    (P : TerminalAnalysisPacket) :
+    {O : OddOrbit}
+    {S : C3CylinderSequence O}
+    {T : TerminalChainData S}
+    (P : TerminalAnalysisPacket S T) :
     HasAlternativeExit ∨ HasSpecialC3 := by
   rcases terminalAnalysis_outcome P with hExit | hSpecial
-  · exact Or.inl ⟨P, hExit⟩
+  · exact Or.inl ⟨O, S, T, P, hExit⟩
   · rcases hSpecial with ⟨hdefer, hneg, hcenter⟩
     exact Or.inr ⟨{
       sourceCylinder := P.sourceCylinder
       terminalPair := P.criticalPair
       sourceRelation := P.sourceRelation
+      sourceStart := P.sourceStart
+      sourceFinish := P.sourceFinish
       carry := P.carry
+      carryOrigin := P.carryOrigin
       deferredCarry := hdefer
       shadow := P.shadow
       negativeShadow := hneg

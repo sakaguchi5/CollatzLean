@@ -5,6 +5,7 @@ import CollatzLean.CollatzFirstLayer.Terminal
 # terminal pairと抽出障害
 
 polynomial-small C3列から、第一層のterminal・center解析へ渡す有限pairを定義する。
+各pairについて、元cylinderの添字・語・開始値・終点を型のフィールドとして保存する。
 抽出できない場合は、第二の明示的な例外として保存する。
 -/
 
@@ -25,6 +26,10 @@ structure TerminalPairData where
   uA : ℕ
   uAR : ℕ
   gap : ℕ
+  /-- `A` は実際のodd-only有限実行である。 -/
+  runA : Runs A X YA
+  /-- `R` は `A` の終点から続く実際のodd-only有限実行である。 -/
+  runR : Runs R YA YAR
   realizesA : Realizes A X YA
   realizesAR : Realizes (A ++ R) X YAR
   returnA : IsReturn X YA lambdaA uA
@@ -37,6 +42,16 @@ structure TerminalPairData where
   detR_ne : determinant R ≠ 0
 
 namespace TerminalPairData
+
+/-- 保存された実行証明から `A` のアフィン実現を再取得できる。 -/
+theorem realizesA_of_run (T : TerminalPairData) :
+    Realizes T.A T.X T.YA :=
+  T.runA.realizes
+
+/-- 保存された二つの実行証明から `A ++ R` のアフィン実現を再取得できる。 -/
+theorem realizesAR_of_runs (T : TerminalPairData) :
+    Realizes (T.A ++ T.R) T.X T.YAR := by
+  exact realizes_append T.runA.realizes T.runR.realizes
 
 /-- terminal pairのomegaはanchor深さの2冪と奇数核へ分解される。 -/
 theorem oddKernel (T : TerminalPairData) :
@@ -59,15 +74,58 @@ theorem centerDifference (T : TerminalPairData) :
 
 end TerminalPairData
 
-/-- C3 cylinder列から抽出された有限terminal chain。 -/
+/--
+一つのterminal pairと、そのpairを抽出した元cylinderを束ねる有限entry。
+
+以前の任意の `extracted : Prop` と異なり、語・開始値・終点の一致を
+具体的な等式として保持するため、無関係なpairをchainへ混入できない。
+-/
+structure TerminalChainEntry
+    {O : OddOrbit} (S : C3CylinderSequence O) where
+  pair : TerminalPairData
+  sourceIndex : ℕ
+  sourceRelation :
+    pair.A ++ pair.R =
+      (S.cylinder sourceIndex).snapshot.word
+  sourceStart :
+    pair.X =
+      (S.cylinder sourceIndex).snapshot.start
+  sourceFinish :
+    pair.YAR =
+      (S.cylinder sourceIndex).snapshot.finish
+
+/-- C3 cylinder列から抽出された、由来情報付き有限terminal chain。 -/
 structure TerminalChainData {O : OddOrbit} (S : C3CylinderSequence O) where
-  pair : List TerminalPairData
-  pair_nonempty : pair ≠ []
-  sourceIndex : List ℕ
-  index_length : sourceIndex.length = pair.length
-  /-- 各pairが元cylinder列に由来することを表す抽出証明。 -/
-  extracted : Prop
-  extracted_proof : extracted
+  entry : List (TerminalChainEntry S)
+  entry_nonempty : entry ≠ []
+
+namespace TerminalChainData
+
+/-- chainに保存されたterminal pairの一覧。 -/
+def pair {O : OddOrbit} {S : C3CylinderSequence O}
+    (T : TerminalChainData S) : List TerminalPairData :=
+  T.entry.map (fun E => E.pair)
+
+/-- chainに保存された元cylinder添字の一覧。 -/
+def sourceIndex {O : OddOrbit} {S : C3CylinderSequence O}
+    (T : TerminalChainData S) : List ℕ :=
+  T.entry.map (fun E => E.sourceIndex)
+
+/-- entryが非空ならpair一覧も非空である。 -/
+theorem pair_nonempty {O : OddOrbit} {S : C3CylinderSequence O}
+    (T : TerminalChainData S) : T.pair ≠ [] := by
+  intro hnil
+  cases hentry : T.entry with
+  | nil => exact T.entry_nonempty hentry
+  | cons E Es => simpa [pair, hentry] using hnil
+
+/-- pair一覧と元cylinder添字一覧の長さは一致する。 -/
+theorem index_length {O : OddOrbit} {S : C3CylinderSequence O}
+    (T : TerminalChainData S) :
+    T.sourceIndex.length = T.pair.length := by
+  simp [sourceIndex, pair]
+
+end TerminalChainData
 
 /-- あるC3列から必要なterminal chainを抽出できない例外。 -/
 def HasTerminalExtractionObstruction : Prop :=
