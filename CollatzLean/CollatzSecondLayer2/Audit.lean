@@ -3,8 +3,8 @@ import CollatzLean.CollatzSecondLayer2
 /-!
 # CollatzSecondLayer2公開API監査
 
-旧`CollatzSecondLayer`、補集合的第三枝、未証明解析principleに依存せず、
-三つの正対象への無条件還元を監査する。
+既存の無条件raw三分岐、標準構成由来を保持する強化版三分岐、無条件outcome分解、
+および二つの局所原理から導くrefined三分岐を監査する。
 -/
 
 namespace CollatzSecondLayer2
@@ -29,6 +29,8 @@ namespace CollatzSecondLayer2
 #check PolynomialPreparedFullWindowFamily.normalizationTower
 #check AnchoredOneSidedMeanderData
 #check PolynomialSpecialC3TowerData
+
+-- 既存raw第三枝
 #check NormalizationGeneratedObstructionTowerData
 #check NormalizationGeneratedObstructionTowerData.captureGap_pos
 #check NormalizationGeneratedObstructionTowerData.nextDifference
@@ -38,5 +40,43 @@ namespace CollatzSecondLayer2
 #check unboundedOrbit_positive_trichotomy_on
 #check unbounded_odd_orbit_positive_trichotomy
 #check no_unbounded_odd_orbit_of_positive_exclusions
+
+-- 標準構成由来を保持する強化版第三枝
+#check StandardNormalizationGeneratedObstructionTowerData
+#check StandardNormalizationGeneratedObstructionTowerData.forget
+#check standardNormalizationObstructionOfPersistent
+#check standardPreparedFullWindow_positive_dichotomy
+#check unboundedOrbit_standard_positive_trichotomy_on
+#check unbounded_odd_orbit_standard_positive_trichotomy
+#check standardNormalization_implies_raw
+
+-- refinement局所算術
+#check movingFullWindowPreparation_windowTwoSteps_eq
+#check firstCrossing_threePow_lt_twoPow
+#check firstCrossing_twoPow_le_succ_mul_threePow
+#check OddOrbit.CapturedWindowAt.windowTwoSteps_add_captureGap_eq
+#check StandardNormalizationGeneratedObstructionTowerData.initial_threePow_lt_twoPow
+#check StandardNormalizationGeneratedObstructionTowerData.initial_twoPow_le_succ_mul_threePow
+#check OddOrbit.FiniteCaptureNormalizationData.terminalPacket
+#check firstDeferredTerminalOutcome_nonempty
+#check DeferredPreparedWindowOutcome.endpoint_large_or_special
+
+-- 無条件outcome tower分解
+#check FirstDeferredNormalizationTowerData
+#check EventuallySynchronizedNormalizationTowerData
+#check standardNormalization_outcomeTower_dichotomy
+
+-- 最終残余二構造とrefined還元
+#check CriticalCaptureTowerData
+#check LongSynchronizedPlateauTowerData
+#check RefinedNormalizationObstructionTowerData
+#check EventuallySynchronizedTowerToMeanderPrinciple
+#check FirstDeferredTowerRefinementPrinciple
+#check standardNormalization_refinement
+#check standardNormalization_residual_of_exclusions
+#check unboundedOrbit_refined_positive_trichotomy_on
+#check unboundedOrbit_refined_positive_quadrichotomy_on
+#check unbounded_odd_orbit_refined_positive_trichotomy
+#check no_unbounded_odd_orbit_of_refined_positive_exclusions
 
 end CollatzSecondLayer2

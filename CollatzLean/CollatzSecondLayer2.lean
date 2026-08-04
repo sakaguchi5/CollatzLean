@@ -20,12 +20,19 @@ import CollatzLean.CollatzSecondLayer2.PositiveObjects
 import CollatzLean.CollatzSecondLayer2.PreparedNormalizationTower
 import CollatzLean.CollatzSecondLayer2.NormalizationObstruction
 import CollatzLean.CollatzSecondLayer2.PositiveReduction
+import CollatzLean.CollatzSecondLayer2.NormalizationRefinementSource
+import CollatzLean.CollatzSecondLayer2.NormalizationRefinementFacts
+import CollatzLean.CollatzSecondLayer2.NormalizationOutcomeSplit
+import CollatzLean.CollatzSecondLayer2.NormalizationRefinement
+import CollatzLean.CollatzSecondLayer2.RefinedPositiveReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
 
 /-!
 # CollatzSecondLayer2
 
 旧`CollatzSecondLayer`をimportせず、第一層のみから再構成した第二層。
+
+## 無条件raw還元
 
 非有界odd-only軌道を、補集合を含まない次の三対象へ無条件に還元する。
 
@@ -35,5 +42,22 @@ import CollatzLean.CollatzSecondLayer2.PositiveReduction
 
 第三対象はpersistent captureのactual windowと、そのwindowから構成された
 finite-first-deferred / infinite-eventually-synchronized normalizationを保持する。
-未証明の解析的四分岐principleは公開定理の入力に含めない。
+
+## source-preserving refinement
+
+後段のcritical-shell解析で標準preparation由来を失わないよう、
+`StandardNormalizationGeneratedObstructionTowerData`を追加する。この強化版第三対象も
+非有界軌道から無条件に構成され、既存raw第三対象へ忘却できる。
+
+強化版towerは無条件に
+
+* `FirstDeferredNormalizationTowerData`
+* `EventuallySynchronizedNormalizationTowerData`
+
+へ分解される。最終refinementでは、二つの局所証明義務を経由して
+
+* `CriticalCaptureTowerData`
+* `LongSynchronizedPlateauTowerData`
+
+だけを新しい残余第三枝として残す。
 -/
