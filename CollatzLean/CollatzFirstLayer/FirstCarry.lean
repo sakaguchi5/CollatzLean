@@ -159,8 +159,53 @@ theorem first_carry_strict
         rw [pow_succ]
         ring
 
+/-- equal carryによって得られる、上側の追加carry商。 -/
+structure FirstCarryEqualData (y d : ℕ) where
+  quotient : ℕ
+  equation :
+    3 * y + 1 = 2 ^ (d + 1) * quotient
+
 /--
-下側の深さが差の深さと一致する場合、上側では少なくとも1ビット余分にcarryする。
+下側の深さが差の深さと一致する場合、
+上側では少なくとも1ビット余分にcarryするデータを構成する。
+-/
+def first_carry_equal_data
+    {x y d a u : ℕ}
+    (hxy : y = x + 2 ^ d * u)
+    (hu : Odd u)
+    (hx : 3 * x + 1 = 2 ^ d * a)
+    (ha : Odd a) :
+    FirstCarryEqualData y d := by
+  refine
+    { quotient := (a + 3 * u) / 2
+      equation := ?_ }
+  -- ここではゴールがPropなのでOddの存在証明を分解できる。
+  rcases hu with ⟨ku, rfl⟩
+  rcases ha with ⟨ka, rfl⟩
+  have hdiv :
+      ((2 * ka + 1) + 3 * (2 * ku + 1)) / 2 =
+        ka + 3 * ku + 2 := by
+    omega
+  calc
+    3 * y + 1
+        = (3 * x + 1) +
+            3 * 2 ^ d * (2 * ku + 1) := by
+              rw [hxy]
+              ring
+    _ = 2 ^ d * (2 * ka + 1) +
+          3 * 2 ^ d * (2 * ku + 1) := by
+            rw [hx]
+    _ = 2 ^ d *
+          ((2 * ka + 1) + 3 * (2 * ku + 1)) := by
+            ring
+    _ = 2 ^ (d + 1) *
+          (((2 * ka + 1) + 3 * (2 * ku + 1)) / 2) := by
+            rw [hdiv, pow_succ]
+            ring
+
+/--
+下側の深さが差の深さと一致する場合、
+上側では少なくとも1ビット余分にcarryする。
 -/
 theorem first_carry_equal
     {x y d a u : ℕ}
@@ -169,19 +214,9 @@ theorem first_carry_equal
     (hx : 3 * x + 1 = 2 ^ d * a)
     (ha : Odd a) :
     ∃ c : ℕ, 3 * y + 1 = 2 ^ (d + 1) * c := by
-  rcases hu with ⟨ku, rfl⟩
-  rcases ha with ⟨ka, rfl⟩
-  refine ⟨ka + 3 * ku + 2, ?_⟩
-  calc
-    3 * y + 1
-        = (3 * x + 1) + 3 * 2 ^ d * (2 * ku + 1) := by
-            rw [hxy]
-            ring
-    _ = 2 ^ d * (2 * ka + 1) +
-          3 * 2 ^ d * (2 * ku + 1) := by rw [hx]
-    _ = 2 ^ (d + 1) * (ka + 3 * ku + 2) := by
-          rw [pow_succ]
-          ring
+  let C := first_carry_equal_data hxy hu hx ha
+  exact ⟨C.quotient, C.equation⟩
+
 
 /-- first-carryの二分岐を一つにまとめた定理。 -/
 theorem first_carry_split
