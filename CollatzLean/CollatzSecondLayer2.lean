@@ -8,6 +8,8 @@ import CollatzLean.CollatzSecondLayer2.FirstCrossingPolynomial
 import CollatzLean.CollatzSecondLayer2.TwoAdicShell
 import CollatzLean.CollatzSecondLayer2.CaptureWindow
 import CollatzLean.CollatzSecondLayer2.CaptureNormalization
+import CollatzLean.CollatzSecondLayer2.CaptureNormalizationFromWindow
+import CollatzLean.CollatzSecondLayer2.PreparedNormalizationTower
 import CollatzLean.CollatzSecondLayer2.SpecialC3
 import CollatzLean.CollatzSecondLayer2.WindowAnalysis
 import CollatzLean.CollatzSecondLayer2.Synchronization
@@ -21,6 +23,8 @@ import CollatzLean.CollatzSecondLayer2.PositivePreparation
 import CollatzLean.CollatzSecondLayer2.PositiveObjects
 import CollatzLean.CollatzSecondLayer2.CertificateProjection
 import CollatzLean.CollatzSecondLayer2.PositiveReduction
+import CollatzLean.CollatzSecondLayer2.AnalyticFourWay
+import CollatzLean.CollatzSecondLayer2.StrongPositiveReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
 
 /-!
@@ -44,4 +48,6 @@ import CollatzLean.CollatzSecondLayer2.PositiveReduction
 * `polynomialPreparedFullWindowFamily`
 * `unboundedOrbit_positive_trichotomy_on`
 * `unbounded_odd_orbit_positive_trichotomy`
+* `CaptureNormalizationAnalyticFourWayPrinciple`
+* `unbounded_odd_orbit_strong_positive_trichotomy`
 -/

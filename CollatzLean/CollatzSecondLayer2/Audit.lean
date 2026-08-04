@@ -28,6 +28,13 @@ namespace CollatzSecondLayer2
 #check OddOrbit.CaptureNormalizationTrajectory
 #check OddOrbit.captureNormalizationTrajectory_of_ordered
 #check OddOrbit.captureNormalizationOutcome_nonempty
+#check OddOrbit.CapturedWindowAt.nextDifferenceData
+#check OddOrbit.SynchronizedWindowAt.nextDifferenceData
+#check OddOrbit.FiniteCaptureNormalizationData
+#check OddOrbit.InfiniteCaptureNormalizationData
+#check OddOrbit.captureNormalizationFromWindowOutcome_nonempty
+#check PreparedCaptureNormalizationTowerData
+#check PolynomialPreparedFullWindowFamily.normalizationTower
 #check LargeExcursionCertificate
 #check WeakExpandingPlateauCertificate
 #check CaptureNormalizationClassification
@@ -48,5 +55,15 @@ namespace CollatzSecondLayer2
 #check unboundedOrbit_positive_trichotomy_on
 #check unbounded_odd_orbit_positive_trichotomy
 #check no_unbounded_odd_orbit_of_positive_exclusions
+#check PolynomialDirectSpecialTowerData
+#check TrajectoryLargeExcursionTowerData
+#check TrajectoryWeakPlateauTowerData
+#check PersistentCaptureAnalyticOutcome
+#check CaptureNormalizationAnalyticFourWayPrinciple
+#check persistentCapture_strong_positive_reduction
+#check preparedFullWindow_strong_positive_reduction
+#check unboundedOrbit_strong_positive_trichotomy_on
+#check unbounded_odd_orbit_strong_positive_trichotomy
+#check no_unbounded_odd_orbit_of_strong_positive_exclusions
 
 end CollatzSecondLayer2
