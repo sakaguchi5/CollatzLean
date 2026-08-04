@@ -1,33 +1,47 @@
 import CollatzLean.CollatzSecondLayer2.Arithmetic
 import CollatzLean.CollatzSecondLayer2.AffineTransport
+import CollatzLean.CollatzSecondLayer2.DirectAffineTransport
 import CollatzLean.CollatzSecondLayer2.InfiniteOrbit
 import CollatzLean.CollatzSecondLayer2.FutureMinimum
 import CollatzLean.CollatzSecondLayer2.FirstCrossing
+import CollatzLean.CollatzSecondLayer2.FirstCrossingPolynomial
 import CollatzLean.CollatzSecondLayer2.TwoAdicShell
 import CollatzLean.CollatzSecondLayer2.CaptureWindow
+import CollatzLean.CollatzSecondLayer2.CaptureNormalization
 import CollatzLean.CollatzSecondLayer2.SpecialC3
 import CollatzLean.CollatzSecondLayer2.WindowAnalysis
 import CollatzLean.CollatzSecondLayer2.Synchronization
 import CollatzLean.CollatzSecondLayer2.AlternativeExclusion
 import CollatzLean.CollatzSecondLayer2.CaptureRefinement
 import CollatzLean.CollatzSecondLayer2.TransportRefinement
-import CollatzLean.CollatzSecondLayer2.MovingAnchorObstruction
-import CollatzLean.CollatzSecondLayer2.Reduction
+import CollatzLean.CollatzSecondLayer2.ExcursionCertificate
+import CollatzLean.CollatzSecondLayer2.WeakPlateauCertificate
+import CollatzLean.CollatzSecondLayer2.TrajectoryClassification
+import CollatzLean.CollatzSecondLayer2.PositivePreparation
+import CollatzLean.CollatzSecondLayer2.PositiveObjects
+import CollatzLean.CollatzSecondLayer2.CertificateProjection
+import CollatzLean.CollatzSecondLayer2.PositiveReduction
+--import CollatzLean.CollatzSecondLayer2.Reduction
 
 /-!
 # CollatzSecondLayer2
 
 旧`CollatzSecondLayer`をimportせず、第一層のみから再構成した第二層。
 
-公開する中心API:
+主還元は補集合的moving obstructionを使用せず、次の正対象だけを公開する。
 
-* `OddOrbit`
-* `OddOrbit.futureMinimumSequence`
-* `MovingFirstCrossingData`
-* `OddOrbit.CapturedWindowAt`
-* `OddOrbit.SynchronizedWindowAt`
-* `SpecialC3At`
-* `MovingAnchorExpandingBlockObstructionData`
-* `unboundedOrbit_trichotomy_on`
-* `unbounded_odd_orbit_trichotomy`
+* `AnchoredOneSidedMeanderData`
+* `PolynomialSpecialC3TowerData`
+* `CaptureGeneratedCriticalExpansionTowerData`
+
+中心API:
+
+* `TwoThreeGapPolynomialBound`
+* `DirectAffineTransportBound`
+* `OddOrbit.CaptureNormalizationTrajectory`
+* `LargeExcursionCertificate`
+* `WeakExpandingPlateauCertificate`
+* `polynomialPreparedFullWindowFamily`
+* `unboundedOrbit_positive_trichotomy_on`
+* `unbounded_odd_orbit_positive_trichotomy`
 -/

@@ -3,55 +3,50 @@ import CollatzLean.CollatzSecondLayer2
 /-!
 # CollatzSecondLayer2公開API監査
 
-このファイル自体も旧`CollatzSecondLayer`をimportしない。
+旧`CollatzSecondLayer`をimportせず、正の三対象への主還元を監査する。
 -/
 
 namespace CollatzSecondLayer2
 
 #check PolynomialBelowTwoPower
+#check TwoThreeGapPolynomialBound
 #check SuffixTransportBound
-#check affineConst_le_length_mul_transport
-#check endpoint_le_transport_mul_start_add_length
 #check endpoint_le_polynomial_of_transport
+#check DirectAffineTransportBound
+#check endpoint_le_directAffineTransport
 #check OddOrbit
 #check OddOrbit.futureMinimumSequence
 #check FirstCrossing
 #check MeanderAt
 #check MovingFirstCrossingData
-#check OneShellData
-#check OneShellData.exponent_eq_depth_of_depth_lt_two
-#check OneShellData.exponent_eq_two_of_two_lt_depth
-#check OneShellData.three_le_exponent_of_depth_eq_two
+#check futureMinimum_firstCrossing_start_polynomial
+#check firstCrossing_endpoint_le_start_add_length
 #check OddOrbit.WindowDifferenceData
 #check OddOrbit.CapturedWindowAt
-#check OddOrbit.WindowCarryOutcome
-#check OddOrbit.windowCarryOutcome_nonempty
-#check OddOrbit.CapturedWindowAt.windowTwoSteps_strict_decrease
-#check OddOrbit.windowTwoSteps_add_length_le_of_all_captured
-#check OddOrbit.not_all_windows_captured
-#check OddOrbit.SynchronizedWindowAt.windowTwoSteps_eq
+#check OddOrbit.SynchronizedWindowAt
+#check OddOrbit.DeferredWindowAt
+#check OddOrbit.CaptureNormalizationTrajectory
+#check OddOrbit.captureNormalizationTrajectory_of_ordered
+#check OddOrbit.captureNormalizationOutcome_nonempty
+#check LargeExcursionCertificate
+#check WeakExpandingPlateauCertificate
+#check CaptureNormalizationClassification
+#check captureNormalizationClassification_nonempty
 #check SpecialC3At
 #check OddOrbit.PreparedWindowPacket
-#check OddOrbit.PreparedWindowAlternative.endpoint_gt_two_mul_threePow_of_lowerReplay
-#check OddOrbit.PreparedWindowAlternative.endpoint_gt_two_mul_threePow_of_positiveShadow
-#check OddOrbit.preparedWindowAnalysis_nonempty
-#check OddOrbit.synchronizationBoundaryLength
 #check OddOrbit.prepareWindow
-#check OddOrbit.orderedWindowAnalysis_nonempty
-#check OddOrbit.PolynomialPreparedWindowSequence
-#check OddOrbit.PolynomialPreparedWindowSequence.eventually_capture_or_specialC3
-#check PolynomialPreparedRefinementSequence
-#check PolynomialPreparedRefinementSequence.persistentCapture_or_specialC3
-#check TransportPreparedRefinementSequence
-#check TransportPreparedRefinementSequence.persistentCapture_or_specialC3
-#check specialC3At_of_deferred
-#check SpecialC3SequenceData
-#check HasSpecialC3From
-#check MovingAnchorExpandingBlockObstructionData
-#check MovingAnchorExpandingBlockObstructionData.persistentCapture_of_polynomialRefinement
-#check specialC3_or_movingAnchorObstruction
-#check unboundedOrbit_trichotomy_on
-#check unbounded_odd_orbit_trichotomy
-#check no_unbounded_odd_orbit_of_three_exclusions
+#check PolynomialPreparedFullWindowFamily
+#check polynomialPreparedFullWindowFamily
+#check PolynomialPreparedFullWindowFamily.eventually_capture_or_specialC3
+#check PolynomialSpecialC3TowerData
+#check CaptureGeneratedCriticalExpansionTowerData
+#check DirectTransportSpecialTowerData.toPolynomialSpecialC3Tower
+#check LargeExcursionTowerData.toCriticalExpansionTower
+#check WeakPlateauTowerData.toCriticalExpansionTower
+#check persistentCapture_to_criticalExpansionTower
+#check preparedFullWindow_positive_dichotomy
+#check unboundedOrbit_positive_trichotomy_on
+#check unbounded_odd_orbit_positive_trichotomy
+#check no_unbounded_odd_orbit_of_positive_exclusions
 
 end CollatzSecondLayer2
