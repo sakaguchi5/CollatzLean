@@ -1,39 +1,39 @@
-import CollatzLean.CollatzSecondLayer2.PositiveObjects
-
+import CollatzLean.CollatzSecondLayer2.NormalizationObstruction
 
 /-!
-# persistent captureから正の三対象への中央還元
+# 非有界odd-only軌道の無条件な正の三分岐
 
-標準prepared full-window familyを構成し、十分後の各項を
-captureまたはpolynomial Special C3へ送る。
-persistent captureなら、同じmoving first-crossing項の長いproper-prefix膨張を
-capture witnessと束ね、capture-generated critical expansion towerを得る。
+弱い第三対象であった「capture印付きfirst-crossing prefix」を廃止し、
+persistent captureから実際に構成されたnormalization towerを第三対象とする。
+
+主定理は解析原理・補集合・未証明principleを入力に取らない。
 -/
 
 namespace CollatzSecondLayer2
 
 /-- persistent captureから第三の正対象を得る。 -/
-theorem persistentCapture_to_criticalExpansionTower
+theorem persistentCapture_to_normalizationObstruction
     {O : OddOrbit} {F : MovingFirstCrossingData O}
     (P : PolynomialPreparedFullWindowFamily F)
     (hPersistent : P.HasPersistentCapture) :
-    Nonempty (CaptureGeneratedCriticalExpansionTowerData O) :=
-  ⟨P.toCriticalExpansionTower hPersistent⟩
+    Nonempty (NormalizationGeneratedObstructionTowerData O) :=
+  ⟨P.toNormalizationGeneratedObstructionTower hPersistent⟩
 
-/-- 標準prepared familyの正の二分岐。 -/
+/-- 標準prepared familyの無条件な正の二分岐。 -/
 theorem preparedFullWindow_positive_dichotomy
     {O : OddOrbit} {F : MovingFirstCrossingData O}
     (P : PolynomialPreparedFullWindowFamily F)
     (hPow : PolynomialBelowTwoPower) :
     Nonempty (PolynomialSpecialC3TowerData O) ∨
-      Nonempty (CaptureGeneratedCriticalExpansionTowerData O) := by
+      Nonempty (NormalizationGeneratedObstructionTowerData O) := by
   rcases P.persistentCapture_or_polynomialSpecialC3 hPow with
     hPersistent | hSpecial
-  · exact Or.inr (persistentCapture_to_criticalExpansionTower P hPersistent)
+  · exact Or.inr
+      (persistentCapture_to_normalizationObstruction P hPersistent)
   · exact Or.inl hSpecial
 
 /--
-一つの非有界odd-only軌道を、三つの正の数学対象へ還元する。
+一つの非有界odd-only軌道を、三つの独立した正の数学対象へ還元する。
 -/
 theorem unboundedOrbit_positive_trichotomy_on
     (hGap : TwoThreeGapPolynomialBound)
@@ -41,7 +41,7 @@ theorem unboundedOrbit_positive_trichotomy_on
     (O : OddOrbit) (hU : O.Unbounded) :
     Nonempty (AnchoredOneSidedMeanderData O) ∨
       Nonempty (PolynomialSpecialC3TowerData O) ∨
-      Nonempty (CaptureGeneratedCriticalExpansionTowerData O) := by
+      Nonempty (NormalizationGeneratedObstructionTowerData O) := by
   classical
   let S : O.FutureMinimumSequence := O.futureMinimumSequence hU
   by_cases hM : ∃ j : ℕ, MeanderAt O (S.index j)
@@ -58,12 +58,12 @@ theorem unboundedOrbit_positive_trichotomy_on
     let P : PolynomialPreparedFullWindowFamily F :=
       polynomialPreparedFullWindowFamily hGap F
     rcases preparedFullWindow_positive_dichotomy P hPow with
-      hSpecial | hCritical
+      hSpecial | hNormalization
     · exact Or.inr (Or.inl hSpecial)
-    · exact Or.inr (Or.inr hCritical)
+    · exact Or.inr (Or.inr hNormalization)
 
 /--
-非有界odd-only軌道の存在を、三つの正の数学対象だけへ還元する。
+非有界odd-only軌道の存在を、三つの正対象だけへ無条件に還元する。
 -/
 theorem unbounded_odd_orbit_positive_trichotomy
     (hGap : TwoThreeGapPolynomialBound)
@@ -71,13 +71,13 @@ theorem unbounded_odd_orbit_positive_trichotomy
     HasUnboundedOddOrbit →
       HasAnchoredOneSidedMeander ∨
       HasPolynomialSpecialC3Tower ∨
-      HasCaptureGeneratedCriticalExpansionTower := by
+      HasNormalizationGeneratedObstructionTower := by
   rintro ⟨O, hU⟩
   rcases unboundedOrbit_positive_trichotomy_on hGap hPow O hU with
-    hM | hSpecial | hCritical
+    hM | hSpecial | hNormalization
   · exact Or.inl ⟨O, hM⟩
   · exact Or.inr (Or.inl ⟨O, hU, hSpecial⟩)
-  · exact Or.inr (Or.inr ⟨O, hU, hCritical⟩)
+  · exact Or.inr (Or.inr ⟨O, hU, hNormalization⟩)
 
 /-- 三つの正対象をすべて排除すれば非有界odd-only軌道は存在しない。 -/
 theorem no_unbounded_odd_orbit_of_positive_exclusions
@@ -85,13 +85,13 @@ theorem no_unbounded_odd_orbit_of_positive_exclusions
     (hPow : PolynomialBelowTwoPower)
     (hMeander : ¬ HasAnchoredOneSidedMeander)
     (hSpecial : ¬ HasPolynomialSpecialC3Tower)
-    (hCritical : ¬ HasCaptureGeneratedCriticalExpansionTower) :
+    (hNormalization : ¬ HasNormalizationGeneratedObstructionTower) :
     ¬ HasUnboundedOddOrbit := by
   intro hU
   rcases unbounded_odd_orbit_positive_trichotomy hGap hPow hU with
     h | h | h
   · exact hMeander h
   · exact hSpecial h
-  · exact hCritical h
+  · exact hNormalization h
 
 end CollatzSecondLayer2

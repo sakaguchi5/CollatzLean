@@ -9,22 +9,17 @@ import CollatzLean.CollatzSecondLayer2.TwoAdicShell
 import CollatzLean.CollatzSecondLayer2.CaptureWindow
 import CollatzLean.CollatzSecondLayer2.CaptureNormalization
 import CollatzLean.CollatzSecondLayer2.CaptureNormalizationFromWindow
-import CollatzLean.CollatzSecondLayer2.PreparedNormalizationTower
 import CollatzLean.CollatzSecondLayer2.SpecialC3
 import CollatzLean.CollatzSecondLayer2.WindowAnalysis
 import CollatzLean.CollatzSecondLayer2.Synchronization
 import CollatzLean.CollatzSecondLayer2.AlternativeExclusion
 import CollatzLean.CollatzSecondLayer2.CaptureRefinement
 import CollatzLean.CollatzSecondLayer2.TransportRefinement
-import CollatzLean.CollatzSecondLayer2.ExcursionCertificate
-import CollatzLean.CollatzSecondLayer2.WeakPlateauCertificate
-import CollatzLean.CollatzSecondLayer2.TrajectoryClassification
 import CollatzLean.CollatzSecondLayer2.PositivePreparation
 import CollatzLean.CollatzSecondLayer2.PositiveObjects
-import CollatzLean.CollatzSecondLayer2.CertificateProjection
+import CollatzLean.CollatzSecondLayer2.PreparedNormalizationTower
+import CollatzLean.CollatzSecondLayer2.NormalizationObstruction
 import CollatzLean.CollatzSecondLayer2.PositiveReduction
-import CollatzLean.CollatzSecondLayer2.AnalyticFourWay
-import CollatzLean.CollatzSecondLayer2.StrongPositiveReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
 
 /-!
@@ -32,22 +27,13 @@ import CollatzLean.CollatzSecondLayer2.StrongPositiveReduction
 
 旧`CollatzSecondLayer`をimportせず、第一層のみから再構成した第二層。
 
-主還元は補集合的moving obstructionを使用せず、次の正対象だけを公開する。
+非有界odd-only軌道を、補集合を含まない次の三対象へ無条件に還元する。
 
 * `AnchoredOneSidedMeanderData`
 * `PolynomialSpecialC3TowerData`
-* `CaptureGeneratedCriticalExpansionTowerData`
+* `NormalizationGeneratedObstructionTowerData`
 
-中心API:
-
-* `TwoThreeGapPolynomialBound`
-* `DirectAffineTransportBound`
-* `OddOrbit.CaptureNormalizationTrajectory`
-* `LargeExcursionCertificate`
-* `WeakExpandingPlateauCertificate`
-* `polynomialPreparedFullWindowFamily`
-* `unboundedOrbit_positive_trichotomy_on`
-* `unbounded_odd_orbit_positive_trichotomy`
-* `CaptureNormalizationAnalyticFourWayPrinciple`
-* `unbounded_odd_orbit_strong_positive_trichotomy`
+第三対象はpersistent captureのactual windowと、そのwindowから構成された
+finite-first-deferred / infinite-eventually-synchronized normalizationを保持する。
+未証明の解析的四分岐principleは公開定理の入力に含めない。
 -/

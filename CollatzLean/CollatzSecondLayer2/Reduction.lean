@@ -1,22 +1,19 @@
-import CollatzLean.CollatzSecondLayer2.StrongPositiveReduction
+import CollatzLean.CollatzSecondLayer2.PositiveReduction
 
 /-!
-# 非有界odd-only軌道の強い正の三分岐
+# 非有界odd-only軌道の無条件な正の三分岐
 
-暫定的なmarked capture還元とは別に、capture normalizationの解析的四分岐を
-明示的に経由する強い主定理を公開する。
-
-中心原理`CaptureNormalizationAnalyticFourWayPrinciple`には、
-一様多項式direct transport / trajectory large excursion /
-trajectory weak-expanding plateau / eventual synchronization actualization
-の完全な四分岐が集約される。
+公開する第三対象は、persistent captureからactualに構成された
+normalization outcome towerである。旧marked-prefix第三枝と、
+未証明の解析的四分岐principleは主還元から削除する。
 -/
 
 namespace CollatzSecondLayer2
 
-#check CaptureNormalizationAnalyticFourWayPrinciple
-#check unboundedOrbit_strong_positive_trichotomy_on
-#check unbounded_odd_orbit_strong_positive_trichotomy
-#check no_unbounded_odd_orbit_of_strong_positive_exclusions
+#check NormalizationGeneratedObstructionTowerData
+#check preparedFullWindow_positive_dichotomy
+#check unboundedOrbit_positive_trichotomy_on
+#check unbounded_odd_orbit_positive_trichotomy
+#check no_unbounded_odd_orbit_of_positive_exclusions
 
 end CollatzSecondLayer2

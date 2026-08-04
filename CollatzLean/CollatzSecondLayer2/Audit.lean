@@ -3,67 +3,40 @@ import CollatzLean.CollatzSecondLayer2
 /-!
 # CollatzSecondLayer2公開API監査
 
-旧`CollatzSecondLayer`をimportせず、正の三対象への主還元を監査する。
+旧`CollatzSecondLayer`、補集合的第三枝、未証明解析principleに依存せず、
+三つの正対象への無条件還元を監査する。
 -/
 
 namespace CollatzSecondLayer2
 
 #check PolynomialBelowTwoPower
 #check TwoThreeGapPolynomialBound
-#check SuffixTransportBound
-#check endpoint_le_polynomial_of_transport
-#check DirectAffineTransportBound
-#check endpoint_le_directAffineTransport
 #check OddOrbit
 #check OddOrbit.futureMinimumSequence
-#check FirstCrossing
-#check MeanderAt
 #check MovingFirstCrossingData
-#check futureMinimum_firstCrossing_start_polynomial
-#check firstCrossing_endpoint_le_start_add_length
 #check OddOrbit.WindowDifferenceData
 #check OddOrbit.CapturedWindowAt
 #check OddOrbit.SynchronizedWindowAt
 #check OddOrbit.DeferredWindowAt
-#check OddOrbit.CaptureNormalizationTrajectory
-#check OddOrbit.captureNormalizationTrajectory_of_ordered
-#check OddOrbit.captureNormalizationOutcome_nonempty
 #check OddOrbit.CapturedWindowAt.nextDifferenceData
 #check OddOrbit.SynchronizedWindowAt.nextDifferenceData
 #check OddOrbit.FiniteCaptureNormalizationData
 #check OddOrbit.InfiniteCaptureNormalizationData
 #check OddOrbit.captureNormalizationFromWindowOutcome_nonempty
-#check PreparedCaptureNormalizationTowerData
-#check PolynomialPreparedFullWindowFamily.normalizationTower
-#check LargeExcursionCertificate
-#check WeakExpandingPlateauCertificate
-#check CaptureNormalizationClassification
-#check captureNormalizationClassification_nonempty
-#check SpecialC3At
-#check OddOrbit.PreparedWindowPacket
-#check OddOrbit.prepareWindow
 #check PolynomialPreparedFullWindowFamily
 #check polynomialPreparedFullWindowFamily
-#check PolynomialPreparedFullWindowFamily.eventually_capture_or_specialC3
+#check PreparedCaptureNormalizationTowerData
+#check PolynomialPreparedFullWindowFamily.normalizationTower
+#check AnchoredOneSidedMeanderData
 #check PolynomialSpecialC3TowerData
-#check CaptureGeneratedCriticalExpansionTowerData
-#check DirectTransportSpecialTowerData.toPolynomialSpecialC3Tower
-#check LargeExcursionTowerData.toCriticalExpansionTower
-#check WeakPlateauTowerData.toCriticalExpansionTower
-#check persistentCapture_to_criticalExpansionTower
+#check NormalizationGeneratedObstructionTowerData
+#check NormalizationGeneratedObstructionTowerData.captureGap_pos
+#check NormalizationGeneratedObstructionTowerData.nextDifference
+#check PolynomialPreparedFullWindowFamily.toNormalizationGeneratedObstructionTower
+#check persistentCapture_to_normalizationObstruction
 #check preparedFullWindow_positive_dichotomy
 #check unboundedOrbit_positive_trichotomy_on
 #check unbounded_odd_orbit_positive_trichotomy
 #check no_unbounded_odd_orbit_of_positive_exclusions
-#check PolynomialDirectSpecialTowerData
-#check TrajectoryLargeExcursionTowerData
-#check TrajectoryWeakPlateauTowerData
-#check PersistentCaptureAnalyticOutcome
-#check CaptureNormalizationAnalyticFourWayPrinciple
-#check persistentCapture_strong_positive_reduction
-#check preparedFullWindow_strong_positive_reduction
-#check unboundedOrbit_strong_positive_trichotomy_on
-#check unbounded_odd_orbit_strong_positive_trichotomy
-#check no_unbounded_odd_orbit_of_strong_positive_exclusions
 
 end CollatzSecondLayer2
