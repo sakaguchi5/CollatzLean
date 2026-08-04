@@ -17,4 +17,14 @@ import CollatzLean.CollatzSecondLayer.PreparedCarry
 import CollatzLean.CollatzSecondLayer.InfiniteBranches
 import CollatzLean.CollatzSecondLayer.SpecialC3
 import CollatzLean.CollatzSecondLayer.Reduction
+
+import CollatzLean.CollatzSecondLayer.CoherentCylinders
+import CollatzLean.CollatzSecondLayer.TwoAdicDifference
+import CollatzLean.CollatzSecondLayer.OrderedTerminalChain
+import CollatzLean.CollatzSecondLayer.ChainOutcomes
+import CollatzLean.CollatzSecondLayer.SynchronizationDrift
+import CollatzLean.CollatzSecondLayer.SynchronizationTransport
+import CollatzLean.CollatzSecondLayer.RotationNormalization
+import CollatzLean.CollatzSecondLayer.RotationDriftStaircase
+import CollatzLean.CollatzSecondLayer.ChainReduction
 --import CollatzLean.CollatzSecondLayer.Audit
