@@ -37,6 +37,8 @@ import CollatzLean.CollatzSecondLayer2.ContractingWindowBounds
 import CollatzLean.CollatzSecondLayer2.NoCriticalDiscountedSpecialC3
 import CollatzLean.CollatzSecondLayer2.FirstCriticalTransition
 import CollatzLean.CollatzSecondLayer2.FinalPositiveReduction
+import CollatzLean.CollatzSecondLayer2.FirstCriticalTerminalRefinement
+import CollatzLean.CollatzSecondLayer2.FinalTerminalReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
 
 /-!
@@ -88,13 +90,19 @@ super-polynomial no-critical towerからscaled endpoint上界付きterminal Spec
 
 へ還元される。
 
-first-critical枝はさらに
+first-critical枝は従来の診断三枝
 
 * `LargeExpandingDefectTransitionTowerData`
 * `CaptureDenseTransitionTowerData`
 * `TerminalSpecialC3TransitionTowerData`
 
-へ無条件に分かれる。terminal Special C3は中央枝へ吸収せず、独立した内部枝として残す。
+に加え、terminalまで解析した最終三枝
+
+* `DeepLowerReplayTerminalTowerData`
+* `ShortPositiveShadowTerminalTowerData`
+* `TerminalSpecialC3TransitionTowerData`
+
+へ無条件に分かれる。
 
 既存の`CriticalCaptureTowerData`、`LongSynchronizedPlateauTowerData`、
 `RefinedNormalizationObstructionTowerData`は互換APIおよび中間診断対象として残す。

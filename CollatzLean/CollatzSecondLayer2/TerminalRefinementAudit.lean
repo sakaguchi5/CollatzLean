@@ -1,0 +1,36 @@
+import CollatzLean.CollatzSecondLayer2
+
+/-!
+# first-critical terminal refinement公開API監査
+-/
+
+namespace CollatzSecondLayer2
+
+#check CanonicalReplayCoordinate.lowerRunReplayCoordinate
+#check CanonicalReplayCoordinate.lowerRunReplayCoordinate_quotient
+#check CanonicalReplayCoordinate.lowerNaturalRunReplayCoordinate
+
+#check FirstCriticalTransitionTowerData.postCriticalCaptureDescent
+#check FirstCriticalTransitionTowerData.largePostCaptureDefectGapIdentity
+#check FirstCriticalTransitionTowerData.largePostCaptureDefectDepthOddSplit
+#check FirstCriticalTransitionTowerData.postCriticalFiniteDescent
+#check FirstCriticalTransitionTowerData.largeDefectTerminalBridge_quotient_pos
+#check FirstCriticalTransitionTowerData.deepLowerReplayTerminalOfLargeDefect
+#check FirstCriticalTransitionTowerData.largeDefectTerminalBridge
+
+#check DeepLowerReplayTerminalAt
+#check ShortPositiveShadowTerminalAt
+#check DeepLowerReplayTerminalTowerData
+#check ShortPositiveShadowTerminalTowerData
+#check FirstCriticalTerminalOutcomeTowerData
+#check FirstCriticalTransitionTowerData.terminal_trichotomy_at
+#check firstCriticalTerminal_classification
+#check firstCriticalTerminal_outcome
+
+#check unboundedOrbit_final_terminal_pentachotomy_on
+#check HasDeepLowerReplayTerminalTower
+#check HasShortPositiveShadowTerminalTower
+#check unbounded_odd_orbit_final_terminal_pentachotomy
+#check no_unbounded_odd_orbit_of_final_terminal_exclusions
+
+end CollatzSecondLayer2
