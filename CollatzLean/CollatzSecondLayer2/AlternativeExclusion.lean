@@ -37,15 +37,14 @@ namespace PolynomialPreparedWindowSequence
 /-- 十分長い項ではlower natural replayは存在しない。 -/
 theorem eventually_no_lowerNaturalReplay
     {O : OddOrbit}
-    (S : PolynomialPreparedWindowSequence O)
-    (hPow : PolynomialBelowTwoPower) :
+    (S : PolynomialPreparedWindowSequence O) :
     ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       ¬ Nonempty
         (LowerNaturalRunReplayData
           (O.segmentWord (S.start j) (S.length j))
           (O.value (S.start j))
           (O.value (S.start j + S.length j))) := by
-  obtain ⟨N, hN⟩ := polynomialBelowTwoMulThreePower hPow S.K S.A
+  obtain ⟨N, hN⟩ := polynomialBelowTwoMulThreePower S.K S.A
   obtain ⟨J, hJ⟩ := S.lengths_tend_to_infinity N
   refine ⟨J, ?_⟩
   intro j hj hReplay
@@ -65,13 +64,12 @@ theorem eventually_no_lowerNaturalReplay
 /-- 十分長い項ではcanonical positive predecessor shadowは存在しない。 -/
 theorem eventually_no_positivePredecessorShadow
     {O : OddOrbit}
-    (S : PolynomialPreparedWindowSequence O)
-    (hPow : PolynomialBelowTwoPower) :
+    (S : PolynomialPreparedWindowSequence O) :
     ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       ¬ ((S.packet j).replayCoordinate.quotient = 0 ∧
         0 < predecessorShadow
           (O.segmentWord (S.start j) (S.length j))) := by
-  obtain ⟨N, hN⟩ := polynomialBelowTwoMulThreePower hPow S.K S.A
+  obtain ⟨N, hN⟩ := polynomialBelowTwoMulThreePower S.K S.A
   obtain ⟨J, hJ⟩ := S.lengths_tend_to_infinity N
   refine ⟨J, ?_⟩
   intro j hj hPositive
@@ -93,14 +91,13 @@ theorem eventually_no_positivePredecessorShadow
 -/
 theorem eventually_capture_or_specialC3
     {O : OddOrbit}
-    (S : PolynomialPreparedWindowSequence O)
-    (hPow : PolynomialBelowTwoPower) :
+    (S : PolynomialPreparedWindowSequence O) :
     ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       Nonempty
         (CapturedWindowAt O (S.start j) (S.length j) ⊕
           SpecialC3At O (S.start j) (S.length j)) := by
-  obtain ⟨J₁, hLower⟩ := S.eventually_no_lowerNaturalReplay hPow
-  obtain ⟨J₂, hPositive⟩ := S.eventually_no_positivePredecessorShadow hPow
+  obtain ⟨J₁, hLower⟩ := S.eventually_no_lowerNaturalReplay
+  obtain ⟨J₂, hPositive⟩ := S.eventually_no_positivePredecessorShadow
   refine ⟨max J₁ J₂, ?_⟩
   intro j hj
   have hj₁ : J₁ ≤ j := le_trans (le_max_left _ _) hj

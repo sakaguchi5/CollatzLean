@@ -11,7 +11,7 @@ first-deferred towerのrefinementは、次の四段階の実定理として構�
 3. super-polynomial no-critical towerからlong synchronized plateau towerを構成する。
 4. 任意のfirst-deferred towerを前三種類の部分towerへ無条件に分類する。
 
-このファイルは四段階を最終三対象へ合成する。
+固定多項式の指数優越はLean内定理として閉じているため、外部入力には取らない。
 -/
 
 namespace CollatzSecondLayer2
@@ -22,7 +22,6 @@ first-deferred towerをPolynomial Special C3 / critical capture / long plateau�
 -/
 theorem firstDeferredTower_refinement
     (hGap : TwoThreeGapPolynomialBound)
-    (hPow : PolynomialBelowTwoPower)
     (O : OddOrbit)
     (D : StandardNormalizationGeneratedObstructionTowerData hGap O)
     (T : FirstDeferredNormalizationTowerData D) :
@@ -32,9 +31,10 @@ theorem firstDeferredTower_refinement
   rcases firstDeferred_subsequence_classification T with
     hPolynomial | hCritical | hSuper
   · rcases hPolynomial with ⟨P⟩
-    exact Or.inl ⟨P.toPolynomialSpecialC3Tower hPow⟩
+    exact Or.inl ⟨P.toPolynomialSpecialC3Tower⟩
   · exact Or.inr (Or.inl hCritical)
   · rcases hSuper with ⟨S⟩
-    exact Or.inr (Or.inr ⟨S.toLongSynchronizedPlateauTower⟩)
+    exact Or.inr
+      (Or.inr ⟨S.toLongSynchronizedPlateauTower⟩)
 
 end CollatzSecondLayer2

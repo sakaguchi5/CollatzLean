@@ -5,6 +5,7 @@ import CollatzLean.CollatzSecondLayer2.NormalizationRefinementObjects
 
 first-deferred towerのterminal endpointが一様多項式以下となる無限部分列を、
 terminal deferred三分岐と指数優越によってPolynomial Special C3 towerへ送る。
+指数優越はLean内定理`polynomialBelowTwoPower`から自動的に使用する。
 -/
 
 namespace CollatzSecondLayer2
@@ -74,8 +75,11 @@ theorem windowLength_pos
     (T : FirstDeferredNormalizationTowerData D)
     (j : ℕ) :
     0 < T.windowLength j := by
-  simpa [windowLength, crossingIndex,
-    StandardNormalizationGeneratedObstructionTowerData.windowLength] using
+  simpa [
+    windowLength,
+    crossingIndex,
+    StandardNormalizationGeneratedObstructionTowerData.windowLength
+  ] using
     (D.crossing.crossing (T.crossingIndex j)).length_pos
 
 /-- terminal deferred windowの三分岐を一つ選ぶ。 -/
@@ -141,7 +145,8 @@ theorem selected_lengths_tend_to_infinity
   refine ⟨J, ?_⟩
   intro j hj
   apply hJ (select j)
-  exact le_trans hj (nat_le_strictMono_apply select hselect j)
+  exact le_trans hj
+    (nat_le_strictMono_apply select hselect j)
 
 end FirstDeferredNormalizationTowerData
 
@@ -166,34 +171,31 @@ terminal endpointの固定多項式が`2 * 3^q`より小さくなる長さ閾値
 -/
 noncomputable def polynomialCutoff
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T) : ℕ :=
   Classical.choose
-    (polynomialBelowTwoMulThreePower hPow R.K R.A)
+    (polynomialBelowTwoMulThreePower R.K R.A)
 
 /-- `polynomialCutoff`以後では固定多項式が指数項より小さい。 -/
 theorem polynomialCutoff_spec
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T) :
     ∀ q : ℕ,
-      R.polynomialCutoff hPow ≤ q →
+      R.polynomialCutoff ≤ q →
         R.K * (q + 1) ^ R.A < 2 * 3 ^ q :=
   Classical.choose_spec
-    (polynomialBelowTwoMulThreePower hPow R.K R.A)
+    (polynomialBelowTwoMulThreePower R.K R.A)
 
 /--
 選択towerのwindow長が`polynomialCutoff`を超えるtail開始位置。
 -/
 noncomputable def tailCutoff
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
@@ -201,125 +203,117 @@ noncomputable def tailCutoff
   Classical.choose
     (T.selected_lengths_tend_to_infinity
       R.select R.select_strict
-      (R.polynomialCutoff hPow))
+      R.polynomialCutoff)
 
 /-- `tailCutoff`以後の選択項は必要なwindow長を持つ。 -/
 theorem tailCutoff_spec
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T) :
     ∀ j : ℕ,
-      R.tailCutoff hPow ≤ j →
-        R.polynomialCutoff hPow <
+      R.tailCutoff ≤ j →
+        R.polynomialCutoff <
           T.windowLength (R.select j) :=
   Classical.choose_spec
     (T.selected_lengths_tend_to_infinity
       R.select R.select_strict
-      (R.polynomialCutoff hPow))
+      R.polynomialCutoff)
 
 /-- 必要な長さ閾値を超えたtail部分列。 -/
 noncomputable def tailSelect
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T)
     (j : ℕ) : ℕ :=
-  R.select (R.tailCutoff hPow + j)
+  R.select (R.tailCutoff + j)
 
 /-- tail部分列に対応する元first-crossing添字。 -/
 noncomputable def tailCrossingSelect
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T)
     (j : ℕ) : ℕ :=
-  T.crossingIndex (R.tailSelect hPow j)
+  T.crossingIndex (R.tailSelect j)
 
 /-- terminal Special C3の元first-crossing内offset。 -/
 noncomputable def tailOffset
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T)
     (j : ℕ) : ℕ :=
   (polynomialPreparedFullWindowFamily hGap D.crossing).offset
-      (R.tailCrossingSelect hPow j) +
-    T.terminalTime (R.tailSelect hPow j)
+      (R.tailCrossingSelect j) +
+    T.terminalTime (R.tailSelect j)
 
 /-- tail選択列は狭義単調。 -/
 theorem tailSelect_strict
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T) :
-    StrictMono (R.tailSelect hPow) := by
+    StrictMono R.tailSelect := by
   intro a b hab
   simpa [tailSelect] using
     R.select_strict
-      (Nat.add_lt_add_left hab (R.tailCutoff hPow))
+      (Nat.add_lt_add_left hab R.tailCutoff)
 
 /-- 元first-crossing添字列も狭義単調。 -/
 theorem tailCrossingSelect_strict
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T) :
-    StrictMono (R.tailCrossingSelect hPow) := by
+    StrictMono R.tailCrossingSelect := by
   intro i j hij
   change
     D.source.select
-        (T.select (R.tailSelect hPow i)) <
+        (T.select (R.tailSelect i)) <
       D.source.select
-        (T.select (R.tailSelect hPow j))
+        (T.select (R.tailSelect j))
   exact
     D.source.select_strict
       (T.select_strict
-        (R.tailSelect_strict hPow hij))
+        (R.tailSelect_strict hij))
 
 /-- tail上の各window長は指数優越閾値以上。 -/
 theorem polynomialCutoff_le_tailWindowLength
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T)
     (j : ℕ) :
-    R.polynomialCutoff hPow ≤
-      T.windowLength (R.tailSelect hPow j) := by
+    R.polynomialCutoff ≤
+      T.windowLength (R.tailSelect j) := by
   have h :=
-    R.tailCutoff_spec hPow
-      (R.tailCutoff hPow + j)
+    R.tailCutoff_spec
+      (R.tailCutoff + j)
       (by omega)
   simpa [tailSelect] using h.le
 
 /-- tail上でも元のterminal endpoint多項式上界を保持する。 -/
 theorem tailTerminalEndpoint_bound
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T)
     (j : ℕ) :
-    T.terminalEndpoint (R.tailSelect hPow j) ≤
+    T.terminalEndpoint (R.tailSelect j) ≤
       R.K *
-        (T.windowLength (R.tailSelect hPow j) + 1) ^ R.A := by
+        (T.windowLength (R.tailSelect j) + 1) ^ R.A := by
   simpa [tailSelect] using
-    R.endpointBound (R.tailCutoff hPow + j)
+    R.endpointBound (R.tailCutoff + j)
 
 /--
 tail上ではlarge terminal枝が多項式上界と矛盾するため、
@@ -327,38 +321,36 @@ terminal deferred windowは必ずSpecial C3。
 -/
 noncomputable def tailSpecial
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T)
     (j : ℕ) :
     SpecialC3At O
-      (D.crossing.minima.index (R.tailCrossingSelect hPow j) +
-        R.tailOffset hPow j)
+      (D.crossing.minima.index (R.tailCrossingSelect j) +
+        R.tailOffset j)
       (D.crossing.crossingLength
-        (R.tailCrossingSelect hPow j)) := by
+        (R.tailCrossingSelect j)) := by
   classical
   have hNonempty :
       Nonempty
         (SpecialC3At O
-          (D.crossing.minima.index (R.tailCrossingSelect hPow j) +
-            R.tailOffset hPow j)
+          (D.crossing.minima.index (R.tailCrossingSelect j) +
+            R.tailOffset j)
           (D.crossing.crossingLength
-            (R.tailCrossingSelect hPow j))) := by
+            (R.tailCrossingSelect j))) := by
     rcases
         T.terminalEndpoint_large_or_special
-          (R.tailSelect hPow j) with
+          (R.tailSelect j) with
       hlarge | hSpecial
     · have hsmall :
-          T.terminalEndpoint (R.tailSelect hPow j) <
-            2 * 3 ^ T.windowLength (R.tailSelect hPow j) := by
+          T.terminalEndpoint (R.tailSelect j) <
+            2 * 3 ^ T.windowLength (R.tailSelect j) := by
         exact lt_of_le_of_lt
-          (R.tailTerminalEndpoint_bound hPow j)
+          (R.tailTerminalEndpoint_bound j)
           (R.polynomialCutoff_spec
-            hPow
-            (T.windowLength (R.tailSelect hPow j))
-            (R.polynomialCutoff_le_tailWindowLength hPow j))
+            (T.windowLength (R.tailSelect j))
+            (R.polynomialCutoff_le_tailWindowLength j))
       exfalso
       omega
     · simpa [
@@ -381,7 +373,6 @@ Polynomial Special C3 towerの出力位置表示へ移す。
 -/
 theorem tailOutput_endpointBound
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
@@ -389,13 +380,13 @@ theorem tailOutput_endpointBound
     ∀ j : ℕ,
       O.value
           (D.crossing.minima.index
-                (R.tailCrossingSelect hPow j) +
-            R.tailOffset hPow j +
+                (R.tailCrossingSelect j) +
+            R.tailOffset j +
             D.crossing.crossingLength
-              (R.tailCrossingSelect hPow j)) ≤
+              (R.tailCrossingSelect j)) ≤
         R.K *
           (D.crossing.crossingLength
-                (R.tailCrossingSelect hPow j) + 1) ^ R.A := by
+                (R.tailCrossingSelect j) + 1) ^ R.A := by
   intro j
   simpa [
     tailCrossingSelect,
@@ -410,14 +401,13 @@ theorem tailOutput_endpointBound
     PolynomialPreparedFullWindowFamily.start,
     Nat.add_assoc
   ] using
-    (R.tailTerminalEndpoint_bound hPow j)
+    (R.tailTerminalEndpoint_bound j)
 
 /--
 tailで選び直した元first-crossing window長も無限大へ進む。
 -/
 theorem tailLengths_tend_to_infinity
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
@@ -425,17 +415,17 @@ theorem tailLengths_tend_to_infinity
     ∀ M : ℕ, ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       M <
         D.crossing.crossingLength
-          (R.tailCrossingSelect hPow j) := by
+          (R.tailCrossingSelect j) := by
   intro M
   obtain ⟨J, hJ⟩ :=
     T.selected_lengths_tend_to_infinity
-      (R.tailSelect hPow)
-      (R.tailSelect_strict hPow)
+      R.tailSelect
+      R.tailSelect_strict
       M
   refine ⟨J, ?_⟩
   intro j hj
   have hlength :
-      M < T.windowLength (R.tailSelect hPow j) :=
+      M < T.windowLength (R.tailSelect j) :=
     hJ j hj
   simpa [
     tailCrossingSelect,
@@ -450,21 +440,20 @@ Polynomial Special C3 towerを与える。
 -/
 noncomputable def toPolynomialSpecialC3Tower
     {hGap : TwoThreeGapPolynomialBound}
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     {T : FirstDeferredNormalizationTowerData D}
     (R : PolynomialTerminalFirstDeferredTowerData T) :
     PolynomialSpecialC3TowerData O where
   crossing := D.crossing
-  select := R.tailCrossingSelect hPow
-  select_strict := R.tailCrossingSelect_strict hPow
-  offset := R.tailOffset hPow
-  special := R.tailSpecial hPow
+  select := R.tailCrossingSelect
+  select_strict := R.tailCrossingSelect_strict
+  offset := R.tailOffset
+  special := R.tailSpecial
   K := R.K
   A := R.A
-  endpointBound := R.tailOutput_endpointBound hPow
-  lengths_tend_to_infinity := R.tailLengths_tend_to_infinity hPow
+  endpointBound := R.tailOutput_endpointBound
+  lengths_tend_to_infinity := R.tailLengths_tend_to_infinity
 
 end PolynomialTerminalFirstDeferredTowerData
 

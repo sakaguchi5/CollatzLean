@@ -88,11 +88,10 @@ transport-polynomial refinementはpersistent captureまたはSpecial C3 refineme
 -/
 theorem persistentCapture_or_specialC3
     {O : OddOrbit} {F : MovingFirstCrossingData O}
-    (R : TransportPreparedRefinementSequence F)
-    (hPow : PolynomialBelowTwoPower) :
+    (R : TransportPreparedRefinementSequence F) :
     R.toPolynomialPreparedRefinementSequence.HasPersistentCapture ∨
       HasSpecialC3From F :=
-  R.toPolynomialPreparedRefinementSequence.persistentCapture_or_specialC3 hPow
+  R.toPolynomialPreparedRefinementSequence.persistentCapture_or_specialC3
 
 end TransportPreparedRefinementSequence
 end CollatzSecondLayer2

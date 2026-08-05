@@ -124,7 +124,8 @@ theorem movingFullWindow_fourPow_boundary_le_sq
     have h := oddSteps_le_twoSteps hvalid
     simpa [OddOrbit.windowTwoSteps, oddSteps] using h
   have hconsumed : O.windowTwoSteps n k < D.depth := by
-    simpa [k, n] using OddOrbit.synchronizationBoundaryLength_consumed_lt D
+    simpa [k, n] using
+      OddOrbit.synchronizationBoundaryLength_consumed_lt D
   have hkd : k ≤ D.depth := by omega
   have hpowkd : 4 ^ k ≤ 4 ^ D.depth :=
     Nat.pow_le_pow_right (by omega) hkd
@@ -244,15 +245,15 @@ def start
 /-- 十分後にはlower natural replayが存在しない。 -/
 theorem eventually_no_lowerNaturalReplay
     {O : OddOrbit} {F : MovingFirstCrossingData O}
-    (P : PolynomialPreparedFullWindowFamily F)
-    (hPow : PolynomialBelowTwoPower) :
+    (P : PolynomialPreparedFullWindowFamily F) :
     ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       ¬ Nonempty
         (LowerNaturalRunReplayData
           (O.segmentWord (P.start j) (F.crossingLength j))
           (O.value (P.start j))
           (O.value (P.start j + F.crossingLength j))) := by
-  obtain ⟨N, hN⟩ := polynomialBelowTwoMulThreePower hPow P.K P.A
+  obtain ⟨N, hN⟩ :=
+    polynomialBelowTwoMulThreePower P.K P.A
   obtain ⟨J, hJ⟩ := F.lengths_tend_to_infinity N
   refine ⟨J, ?_⟩
   intro j hj hReplay
@@ -268,20 +269,21 @@ theorem eventually_no_lowerNaturalReplay
   have hsmall :
       O.value (P.start j + F.crossingLength j) <
         2 * 3 ^ F.crossingLength j := by
-    exact lt_of_le_of_lt (P.endpointBound j)
+    exact lt_of_le_of_lt
+      (P.endpointBound j)
       (hN (F.crossingLength j) (by omega))
   omega
 
 /-- 十分後にはpositive predecessor shadowが存在しない。 -/
 theorem eventually_no_positivePredecessorShadow
     {O : OddOrbit} {F : MovingFirstCrossingData O}
-    (P : PolynomialPreparedFullWindowFamily F)
-    (hPow : PolynomialBelowTwoPower) :
+    (P : PolynomialPreparedFullWindowFamily F) :
     ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       ¬ ((P.packet j).replayCoordinate.quotient = 0 ∧
         0 < predecessorShadow
           (O.segmentWord (P.start j) (F.crossingLength j))) := by
-  obtain ⟨N, hN⟩ := polynomialBelowTwoMulThreePower hPow P.K P.A
+  obtain ⟨N, hN⟩ :=
+    polynomialBelowTwoMulThreePower P.K P.A
   obtain ⟨J, hJ⟩ := F.lengths_tend_to_infinity N
   refine ⟨J, ?_⟩
   intro j hj hPositive
@@ -297,28 +299,31 @@ theorem eventually_no_positivePredecessorShadow
   have hsmall :
       O.value (P.start j + F.crossingLength j) <
         2 * 3 ^ F.crossingLength j := by
-    exact lt_of_le_of_lt (P.endpointBound j)
+    exact lt_of_le_of_lt
+      (P.endpointBound j)
       (hN (F.crossingLength j) (by omega))
   omega
 
 /-- 十分後の各標準prepared full-windowはcaptureまたはSpecial C3。 -/
 theorem eventually_capture_or_specialC3
     {O : OddOrbit} {F : MovingFirstCrossingData O}
-    (P : PolynomialPreparedFullWindowFamily F)
-    (hPow : PolynomialBelowTwoPower) :
+    (P : PolynomialPreparedFullWindowFamily F) :
     ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       Nonempty
         (O.CapturedWindowAt (P.start j) (F.crossingLength j) ⊕
           SpecialC3At O (P.start j) (F.crossingLength j)) := by
-  obtain ⟨J₁, hLower⟩ := P.eventually_no_lowerNaturalReplay hPow
-  obtain ⟨J₂, hPositive⟩ := P.eventually_no_positivePredecessorShadow hPow
+  obtain ⟨J₁, hLower⟩ := P.eventually_no_lowerNaturalReplay
+  obtain ⟨J₂, hPositive⟩ := P.eventually_no_positivePredecessorShadow
   refine ⟨max J₁ J₂, ?_⟩
   intro j hj
   have hj₁ : J₁ ≤ j := le_trans (le_max_left _ _) hj
   have hj₂ : J₂ ≤ j := le_trans (le_max_right _ _) hj
-  rcases OddOrbit.preparedWindowAnalysis_nonempty (P.packet j) with ⟨hAlt | hSpecial⟩
+  rcases
+      OddOrbit.preparedWindowAnalysis_nonempty (P.packet j) with
+    ⟨hAlt | hSpecial⟩
   · cases hAlt with
-    | captured hcap => exact ⟨Sum.inl hcap⟩
+    | captured hcap =>
+        exact ⟨Sum.inl hcap⟩
     | lowerNaturalReplay hReplay =>
         exact False.elim (hLower j hj₁ ⟨hReplay⟩)
     | positivePredecessorShadow hq hshadow =>

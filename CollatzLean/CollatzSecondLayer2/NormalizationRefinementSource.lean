@@ -63,7 +63,8 @@ noncomputable def forget
 theorem lengths_tend_to_infinity
     {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
     (D : StandardNormalizationGeneratedObstructionTowerData hGap O) :
-    ∀ M : ℕ, ∃ J : ℕ, ∀ j : ℕ, J ≤ j → M < D.windowLength j := by
+    ∀ M : ℕ, ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
+      M < D.windowLength j := by
   intro M
   simpa [windowLength] using D.source.lengths_tend_to_infinity M
 
@@ -86,7 +87,8 @@ noncomputable def standardNormalizationObstructionOfPersistent
     StandardNormalizationGeneratedObstructionTowerData hGap O where
   crossing := F
   source :=
-    (polynomialPreparedFullWindowFamily hGap F).normalizationTower hPersistent
+    (polynomialPreparedFullWindowFamily hGap F).normalizationTower
+      hPersistent
 
 /-- 指定軌道上の標準構成由来normalization obstruction。 -/
 def HasStandardNormalizationGeneratedObstructionTowerOn
@@ -103,28 +105,29 @@ def HasStandardNormalizationGeneratedObstructionTower
 /-- 標準prepared familyの、由来を失わない無条件二分岐。 -/
 theorem standardPreparedFullWindow_positive_dichotomy
     (hGap : TwoThreeGapPolynomialBound)
-    (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit} (F : MovingFirstCrossingData O) :
     Nonempty (PolynomialSpecialC3TowerData O) ∨
-      Nonempty (StandardNormalizationGeneratedObstructionTowerData hGap O) := by
+      Nonempty
+        (StandardNormalizationGeneratedObstructionTowerData hGap O) := by
   let P : PolynomialPreparedFullWindowFamily F :=
     polynomialPreparedFullWindowFamily hGap F
-  rcases P.persistentCapture_or_polynomialSpecialC3 hPow with
+  rcases P.persistentCapture_or_polynomialSpecialC3 with
     hPersistent | hSpecial
   · exact Or.inr
       ⟨standardNormalizationObstructionOfPersistent hGap hPersistent⟩
   · exact Or.inl hSpecial
 
 /--
-一つの非有界odd-only軌道を、由来を保持した強化版第三対象を含む三枝へ無条件に還元する。
+一つの非有界odd-only軌道を、由来を保持した強化版第三対象を含む三枝へ
+無条件に還元する。
 -/
 theorem unboundedOrbit_standard_positive_trichotomy_on
     (hGap : TwoThreeGapPolynomialBound)
-    (hPow : PolynomialBelowTwoPower)
     (O : OddOrbit) (hU : O.Unbounded) :
     Nonempty (AnchoredOneSidedMeanderData O) ∨
       Nonempty (PolynomialSpecialC3TowerData O) ∨
-      Nonempty (StandardNormalizationGeneratedObstructionTowerData hGap O) := by
+      Nonempty
+        (StandardNormalizationGeneratedObstructionTowerData hGap O) := by
   classical
   let S : O.FutureMinimumSequence := O.futureMinimumSequence hU
   by_cases hM : ∃ j : ℕ, MeanderAt O (S.index j)
@@ -138,21 +141,21 @@ theorem unboundedOrbit_standard_positive_trichotomy_on
       }⟩
   · let F : MovingFirstCrossingData O :=
       movingFirstCrossingData_of_no_meander O hU S hM
-    rcases standardPreparedFullWindow_positive_dichotomy hGap hPow F with
+    rcases standardPreparedFullWindow_positive_dichotomy hGap F with
       hSpecial | hNormalization
     · exact Or.inr (Or.inl hSpecial)
     · exact Or.inr (Or.inr hNormalization)
 
 /-- 強化版無条件三分岐の存在命題。 -/
 theorem unbounded_odd_orbit_standard_positive_trichotomy
-    (hGap : TwoThreeGapPolynomialBound)
-    (hPow : PolynomialBelowTwoPower) :
+    (hGap : TwoThreeGapPolynomialBound) :
     HasUnboundedOddOrbit →
       HasAnchoredOneSidedMeander ∨
       HasPolynomialSpecialC3Tower ∨
       HasStandardNormalizationGeneratedObstructionTower hGap := by
   rintro ⟨O, hU⟩
-  rcases unboundedOrbit_standard_positive_trichotomy_on hGap hPow O hU with
+  rcases
+      unboundedOrbit_standard_positive_trichotomy_on hGap O hU with
     hM | hSpecial | hNormalization
   · exact Or.inl ⟨O, hM⟩
   · exact Or.inr (Or.inl ⟨O, hU, hSpecial⟩)

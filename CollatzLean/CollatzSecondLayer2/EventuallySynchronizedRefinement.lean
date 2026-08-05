@@ -1,17 +1,18 @@
 import CollatzLean.CollatzSecondLayer2.NormalizationRefinementObjects
+import CollatzLean.CollatzSecondLayer2.PeriodicExponent
 
 /-!
-# eventual synchronizationからone-sided meanderへ
+# eventual synchronizationの直接排除
 
-標準normalization towerのeventual-sync項では、十分後の各q-windowがsynchronizedとなる。
-したがって指数tailはq周期になる。
+標準normalization towerのeventual-sync項では、十分後の各q-windowがsynchronizedとなり、
+指数tailはq周期になる。
 
-同期開始後に値が`q * 3^q`を超えるfuture-minimumを一つ選ぶ。そこでmeanderでなければ
-first crossingが存在するが、q周期性によりその長さはq以下でなければならない。
-一方、future-minimumから始まる長さq以下のfirst crossingは開始値を`q * 3^q`以下に
-抑えるため矛盾する。
+従来は、同期開始後に十分大きいfuture-minimumを選んでactual anchored
+one-sided meanderへ送っていた。この構成を周期情報付きで保存し、一周期語が膨張する
+ことと`OddOrbit.no_expanding_periodic_exponent_tail`を組み合わせる。
 
-このファイルで`EventuallySynchronizedTowerToMeanderPrinciple`を実定理として閉じる。
+したがってeventual synchronizationはmeander枝へ残す必要がなく、正の自然数軌道上で
+直接矛盾となる。
 -/
 
 namespace CollatzSecondLayer2
@@ -95,7 +96,8 @@ theorem firstCrossing_length_le_of_exponent_period
   have hshift :
       O.segmentWord (anchor + q) (p - q) =
         O.segmentWord anchor (p - q) := by
-    simpa using O.segmentWord_add_period_eq hperiod 0 (p - q)
+    simpa using
+      O.segmentWord_add_period_eq hperiod 0 (p - q)
   have hsuffixExpanding :
       Expanding (O.segmentWord (anchor + q) (p - q)) := by
     rw [hshift]
@@ -106,7 +108,8 @@ theorem firstCrossing_length_le_of_exponent_period
       O.segmentWord anchor p =
         O.segmentWord anchor q ++
           O.segmentWord (anchor + q) (p - q) := by
-    simpa [hsum] using O.segmentWord_add anchor q (p - q)
+    simpa [hsum] using
+      O.segmentWord_add anchor q (p - q)
   have hfullExpanding :
       Expanding (O.segmentWord anchor p) := by
     rw [hdecomp]
@@ -134,10 +137,12 @@ theorem meanderAt_of_exponent_period_of_large_futureMinimum
     have hpq : p ≤ q :=
       firstCrossing_length_le_of_exponent_period
         hq hperiod hp
-    have hbound : O.value anchor ≤ q * 3 ^ q :=
+    have hbound :
+        O.value anchor ≤ q * 3 ^ q :=
       futureMinimum_start_le_of_crossingLength_le
         hmin hp hpq
-    exact False.elim (Nat.not_lt_of_ge hbound hlarge)
+    exact False.elim
+      (Nat.not_lt_of_ge hbound hlarge)
 
 namespace OddOrbit.InfiniteCaptureNormalizationData
 
@@ -158,28 +163,43 @@ theorem exponent_period_at_synchronizedTail
     I.eventuallySynchronized
       (I.synchronizationStart + t)
       (by omega)
-  simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using
-    S.upperExponent_eq_lower
+  simpa [
+    Nat.add_assoc,
+    Nat.add_comm,
+    Nat.add_left_comm
+  ] using S.upperExponent_eq_lower
 
 end OddOrbit.InfiniteCaptureNormalizationData
+
+/--
+actual anchored meanderに、その指数周期を失わず保存したデータ。
+-/
+structure PeriodicAnchoredOneSidedMeanderData (O : OddOrbit) where
+  data : AnchoredOneSidedMeanderData O
+  period : ℕ
+  period_pos : 0 < period
+  exponent_period : ∀ t : ℕ,
+    O.exponent (data.anchor + t + period) =
+      O.exponent (data.anchor + t)
 
 namespace EventuallySynchronizedNormalizationTowerData
 
 /--
-eventual-sync towerの一項だけからactual anchored one-sided meanderを構成する。
+eventual-sync towerの一項から、周期情報付きactual anchored meanderを構成する。
 -/
-noncomputable def toAnchoredOneSidedMeanderData
+noncomputable def toPeriodicAnchoredOneSidedMeanderData
     {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     (T : EventuallySynchronizedNormalizationTowerData D) :
-    AnchoredOneSidedMeanderData O := by
+    PeriodicAnchoredOneSidedMeanderData O := by
   classical
   let n : ℕ := D.source.select (T.select 0)
   let P : PolynomialPreparedFullWindowFamily D.crossing :=
     polynomialPreparedFullWindowFamily hGap D.crossing
   let start : ℕ :=
     D.crossing.minima.index n + P.offset n
-  let q : ℕ := D.crossing.crossingLength n
+  let q : ℕ :=
+    D.crossing.crossingLength n
   let I := T.data 0
   let synchronizedStart : ℕ :=
     start + I.synchronizationStart
@@ -210,17 +230,26 @@ noncomputable def toAnchoredOneSidedMeanderData
   have hN :
       ∀ m : ℕ, N ≤ m → M < O.value m :=
     Classical.choose_spec hEscape
-  let threshold : ℕ := max synchronizedStart N
-  let anchor : ℕ := O.tailMinIndex threshold
+  let threshold : ℕ :=
+    max synchronizedStart N
+  let anchor : ℕ :=
+    O.tailMinIndex threshold
   have hthresholdAnchor : threshold ≤ anchor := by
     simp only [OddOrbit.tailMinIndex_ge, anchor]
-  have hsynchronizedStartAnchor : synchronizedStart ≤ anchor := by
-    exact le_trans (Nat.le_max_left _ _) hthresholdAnchor
+  have hsynchronizedStartAnchor :
+      synchronizedStart ≤ anchor := by
+    exact le_trans
+      (Nat.le_max_left _ _)
+      hthresholdAnchor
   have hNAnchor : N ≤ anchor := by
-    exact le_trans (Nat.le_max_right _ _) hthresholdAnchor
-  have hlarge : q * 3 ^ q < O.value anchor := by
+    exact le_trans
+      (Nat.le_max_right _ _)
+      hthresholdAnchor
+  have hlarge :
+      q * 3 ^ q < O.value anchor := by
     simpa [M] using hN anchor hNAnchor
-  have hfutureMinimum : O.FutureMinimumAt anchor := by
+  have hfutureMinimum :
+      O.FutureMinimumAt anchor := by
     simpa [anchor] using
       O.futureMinimumAt_tailMinIndex threshold
   have hperiodAnchor :
@@ -229,12 +258,15 @@ noncomputable def toAnchoredOneSidedMeanderData
           O.exponent (anchor + t) := by
     intro t
     have h :=
-      hperiodStart (anchor - synchronizedStart + t)
+      hperiodStart
+        (anchor - synchronizedStart + t)
     have hbase :
-        synchronizedStart + (anchor - synchronizedStart) =
+        synchronizedStart +
+            (anchor - synchronizedStart) =
           anchor := by
       rw [Nat.add_comm]
-      exact Nat.sub_add_cancel hsynchronizedStartAnchor
+      exact Nat.sub_add_cancel
+        hsynchronizedStartAnchor
     have hshift :
         synchronizedStart +
             (anchor - synchronizedStart + t) =
@@ -242,23 +274,69 @@ noncomputable def toAnchoredOneSidedMeanderData
       rw [← Nat.add_assoc, hbase]
     rw [hshift] at h
     exact h
+  have hmeander :
+      MeanderAt O anchor :=
+    meanderAt_of_exponent_period_of_large_futureMinimum
+      hq hfutureMinimum hlarge hperiodAnchor
   exact
-    { unbounded := D.crossing.unbounded
-      anchor := anchor
-      futureMinimum := hfutureMinimum
-      meander :=
-        meanderAt_of_exponent_period_of_large_futureMinimum
-          hq hfutureMinimum hlarge hperiodAnchor }
+    { data :=
+        { unbounded := D.crossing.unbounded
+          anchor := anchor
+          futureMinimum := hfutureMinimum
+          meander := hmeander }
+      period := q
+      period_pos := hq
+      exponent_period := hperiodAnchor }
+
+/--
+互換用のactual anchored one-sided meander。
+周期情報付き構成から忘却して得る。
+-/
+noncomputable def toAnchoredOneSidedMeanderData
+    {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
+    {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
+    (T : EventuallySynchronizedNormalizationTowerData D) :
+    AnchoredOneSidedMeanderData O :=
+  T.toPeriodicAnchoredOneSidedMeanderData.data
+
+/--
+eventual synchronization towerは正の自然数軌道上では存在できない。
+
+周期情報付きmeanderの一周期語は膨張するが、
+膨張する周期指数tailは第一層の有限アフィン反復排除に反する。
+-/
+theorem impossible
+    {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
+    {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
+    (T : EventuallySynchronizedNormalizationTowerData D) :
+    False := by
+  let M :=
+    T.toPeriodicAnchoredOneSidedMeanderData
+  exact
+    O.no_expanding_periodic_exponent_tail
+      M.exponent_period
+      (M.data.meander M.period M.period_pos)
 
 end EventuallySynchronizedNormalizationTowerData
 
-/-- eventual-sync towerからactual anchored meanderを得る実定理。 -/
+/--
+eventual-sync towerからactual anchored meanderを得る従来の帰結。
+直接排除定理との互換性のため残す。
+-/
 theorem eventuallySynchronizedTower_to_meander
     {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     (T : EventuallySynchronizedNormalizationTowerData D) :
     Nonempty (AnchoredOneSidedMeanderData O) :=
   ⟨T.toAnchoredOneSidedMeanderData⟩
+
+/-- eventual-sync towerは存在できない。 -/
+theorem eventuallySynchronizedTower_impossible
+    {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
+    {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
+    (T : EventuallySynchronizedNormalizationTowerData D) :
+    False :=
+  T.impossible
 
 /-- eventual-sync towerをmeanderへ送る命題のまとめ。 -/
 def EventuallySynchronizedTowerToMeanderPrinciple : Prop :=
@@ -272,5 +350,18 @@ theorem eventuallySynchronizedTowerToMeanderPrinciple :
     EventuallySynchronizedTowerToMeanderPrinciple := by
   intro hGap O D T
   exact eventuallySynchronizedTower_to_meander T
+
+/-- eventual-sync towerを直接排除する命題のまとめ。 -/
+def EventuallySynchronizedTowerExclusionPrinciple : Prop :=
+  ∀ (hGap : TwoThreeGapPolynomialBound) (O : OddOrbit),
+    ∀ D : StandardNormalizationGeneratedObstructionTowerData hGap O,
+      EventuallySynchronizedNormalizationTowerData D →
+        False
+
+/-- `EventuallySynchronizedTowerExclusionPrinciple`は実際に成立する。 -/
+theorem eventuallySynchronizedTowerExclusionPrinciple :
+    EventuallySynchronizedTowerExclusionPrinciple := by
+  intro hGap O D T
+  exact eventuallySynchronizedTower_impossible T
 
 end CollatzSecondLayer2

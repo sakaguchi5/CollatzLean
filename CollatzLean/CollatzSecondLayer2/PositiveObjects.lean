@@ -142,8 +142,7 @@ theorem persistentCaptureSelect_captured
 -/
 theorem persistentCapture_or_polynomialSpecialC3
     {O : OddOrbit} {F : MovingFirstCrossingData O}
-    (P : PolynomialPreparedFullWindowFamily F)
-    (hPow : PolynomialBelowTwoPower) :
+    (P : PolynomialPreparedFullWindowFamily F) :
     P.HasPersistentCapture ∨
       Nonempty (PolynomialSpecialC3TowerData O) := by
   classical
@@ -152,7 +151,8 @@ theorem persistentCapture_or_polynomialSpecialC3
   · right
     obtain ⟨Ncap, hNcap⟩ :=
       P.eventually_no_capture_of_not_persistent hPersistent
-    obtain ⟨Nout, hNout⟩ := P.eventually_capture_or_specialC3 hPow
+    obtain ⟨Nout, hNout⟩ :=
+      P.eventually_capture_or_specialC3
     let N := max Ncap Nout
     let select : ℕ → ℕ := fun j => N + j
     have hselect : StrictMono select := by
@@ -173,7 +173,8 @@ theorem persistentCapture_or_polynomialSpecialC3
       cases outcome with
       | inl C =>
           exact False.elim (hNcap (select j) hjcap ⟨C⟩)
-      | inr S => exact S
+      | inr S =>
+          exact S
     refine ⟨{
       crossing := F
       select := select

@@ -40,6 +40,14 @@ import CollatzLean.CollatzSecondLayer2.RefinedPositiveReduction
 
 旧`CollatzSecondLayer`をimportせず、第一層のみから再構成した第二層。
 
+## 算術入力
+
+固定多項式が`2^(p+1)`より遅く成長する`PolynomialBelowTwoPower`は
+mathlibの漸近定理からLean内で証明済みである。
+
+外部の算術入力として残るのは、2と3の相対gapに対する
+`TwoThreeGapPolynomialBound`だけである。
+
 ## 無条件raw還元
 
 非有界odd-only軌道を、補集合を含まない次の三対象へ無条件に還元する。
@@ -67,10 +75,11 @@ first-deferred側は、次の四段階を実定理として証明する。
 3. super-polynomial no-critical条件からlong synchronized plateauを構成する。
 4. 任意のfirst-deferred towerを前三種類の部分towerへ無条件に分類する。
 
-eventual-sync側も、同期後の指数周期性と十分大きいfuture-minimumを使って
-actual anchored one-sided meanderへ送る実定理として証明する。
+eventual-sync側は同期後の指数周期性から膨張する周期指数tailを抽出し、
+第一層の有限アフィン反復排除によって直接矛盾へ送る。
 
-したがってrefined還元は局所証明義務を入力に取らない無条件定理であり、最終第三枝には
+したがってstandard normalization towerからmeander枝は新たに生成されず、
+refined還元は局所証明義務を入力に取らない無条件定理となる。最終第三枝には
 
 * `CriticalCaptureTowerData`
 * `LongSynchronizedPlateauTowerData`

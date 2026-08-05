@@ -67,10 +67,9 @@ obstruction上の任意のpolynomial prepared refinementではcaptureがpersiste
 theorem persistentCapture_of_polynomialRefinement
     {O : OddOrbit}
     (D : MovingAnchorExpandingBlockObstructionData O)
-    (R : PolynomialPreparedRefinementSequence D.crossing)
-    (hPow : PolynomialBelowTwoPower) :
+    (R : PolynomialPreparedRefinementSequence D.crossing) :
     R.HasPersistentCapture := by
-  rcases R.persistentCapture_or_specialC3 hPow with hcap | hspecial
+  rcases R.persistentCapture_or_specialC3 with hcap | hspecial
   · exact hcap
   · exact False.elim (D.noSpecialC3 hspecial)
 

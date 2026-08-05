@@ -88,8 +88,7 @@ polynomial-small prepared refinementはpersistent captureまたはSpecial C3 ref
 -/
 theorem persistentCapture_or_specialC3
     {O : OddOrbit} {F : MovingFirstCrossingData O}
-    (R : PolynomialPreparedRefinementSequence F)
-    (hPow : PolynomialBelowTwoPower) :
+    (R : PolynomialPreparedRefinementSequence F) :
     R.HasPersistentCapture ∨ HasSpecialC3From F := by
   classical
   by_cases hPersistent : R.HasPersistentCapture
@@ -98,7 +97,7 @@ theorem persistentCapture_or_specialC3
     obtain ⟨Ncap, hNcap⟩ :=
       R.eventually_no_capture_of_not_persistent hPersistent
     obtain ⟨Nout, hNout⟩ :=
-      R.toWindowSequence.eventually_capture_or_specialC3 hPow
+      R.toWindowSequence.eventually_capture_or_specialC3
     let N := max Ncap Nout
     let select' : ℕ → ℕ := fun j => R.select (N + j)
     let offset' : ℕ → ℕ := fun j => R.offset (N + j)
