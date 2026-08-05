@@ -3,8 +3,9 @@ import CollatzLean.CollatzSecondLayer2
 /-!
 # CollatzSecondLayer2公開API監査
 
-既存の無条件raw三分岐、標準構成由来を保持する強化版三分岐、無条件outcome分解、
-および二つの局所原理から導くrefined三分岐を監査する。
+既存raw三分岐、source-preserving強化三分岐、無条件outcome分解、
+first-deferred四段階refinement、およびeventual-sync局所原理だけを入力に取る
+refined三分岐を監査する。
 -/
 
 namespace CollatzSecondLayer2
@@ -66,12 +67,23 @@ namespace CollatzSecondLayer2
 #check EventuallySynchronizedNormalizationTowerData
 #check standardNormalization_outcomeTower_dichotomy
 
+-- first-deferred四段階refinement
+#check PolynomialTerminalFirstDeferredTowerData
+#check PolynomialTerminalFirstDeferredTowerData.toPolynomialSpecialC3Tower
+#check NoCriticalCaptureInFirstDeferred
+#check OddOrbit.FiniteCaptureNormalizationData.twoPow_captureCount_lt_succ
+#check FirstDeferredNormalizationTowerData.twoPow_captureCount_lt_windowLength_succ
+#check OddOrbit.FiniteCaptureNormalizationData.exists_synchronizedPlateau_of_mul_le_terminalTime
+#check SuperPolynomialNoCriticalFirstDeferredTowerData
+#check SuperPolynomialNoCriticalFirstDeferredTowerData.toLongSynchronizedPlateauTower
+#check firstDeferred_subsequence_classification
+#check firstDeferredTower_refinement
+
 -- 最終残余二構造とrefined還元
 #check CriticalCaptureTowerData
 #check LongSynchronizedPlateauTowerData
 #check RefinedNormalizationObstructionTowerData
 #check EventuallySynchronizedTowerToMeanderPrinciple
-#check FirstDeferredTowerRefinementPrinciple
 #check standardNormalization_refinement
 #check standardNormalization_residual_of_exclusions
 #check unboundedOrbit_refined_positive_trichotomy_on

@@ -23,6 +23,12 @@ import CollatzLean.CollatzSecondLayer2.PositiveReduction
 import CollatzLean.CollatzSecondLayer2.NormalizationRefinementSource
 import CollatzLean.CollatzSecondLayer2.NormalizationRefinementFacts
 import CollatzLean.CollatzSecondLayer2.NormalizationOutcomeSplit
+import CollatzLean.CollatzSecondLayer2.NormalizationRefinementObjects
+import CollatzLean.CollatzSecondLayer2.PolynomialTerminalRefinement
+import CollatzLean.CollatzSecondLayer2.CaptureCountRefinement
+import CollatzLean.CollatzSecondLayer2.LongPlateauRefinement
+import CollatzLean.CollatzSecondLayer2.FirstDeferredSubsequenceClassification
+import CollatzLean.CollatzSecondLayer2.FirstDeferredRefinement
 import CollatzLean.CollatzSecondLayer2.NormalizationRefinement
 import CollatzLean.CollatzSecondLayer2.RefinedPositiveReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
@@ -40,13 +46,9 @@ import CollatzLean.CollatzSecondLayer2.RefinedPositiveReduction
 * `PolynomialSpecialC3TowerData`
 * `NormalizationGeneratedObstructionTowerData`
 
-第三対象はpersistent captureのactual windowと、そのwindowから構成された
-finite-first-deferred / infinite-eventually-synchronized normalizationを保持する。
-
 ## source-preserving refinement
 
-後段のcritical-shell解析で標準preparation由来を失わないよう、
-`StandardNormalizationGeneratedObstructionTowerData`を追加する。この強化版第三対象も
+標準preparation由来を保持する`StandardNormalizationGeneratedObstructionTowerData`も
 非有界軌道から無条件に構成され、既存raw第三対象へ忘却できる。
 
 強化版towerは無条件に
@@ -54,10 +56,15 @@ finite-first-deferred / infinite-eventually-synchronized normalizationを保持�
 * `FirstDeferredNormalizationTowerData`
 * `EventuallySynchronizedNormalizationTowerData`
 
-へ分解される。最終refinementでは、二つの局所証明義務を経由して
+へ分解される。
 
-* `CriticalCaptureTowerData`
-* `LongSynchronizedPlateauTowerData`
+first-deferred側は、次の四段階を実定理として証明する。
 
-だけを新しい残余第三枝として残す。
+1. polynomial terminalからPolynomial Special C3 towerを構成する。
+2. no-critical条件からcapture数をcritical shellで抑える。
+3. super-polynomial no-critical条件からlong synchronized plateauを構成する。
+4. 任意のfirst-deferred towerを前三種類の部分towerへ無条件に分類する。
+
+したがってrefined還元が入力に取る局所証明義務は、eventual-sync towerをactualな
+anchored meanderへ送る`EventuallySynchronizedTowerToMeanderPrinciple`だけである。
 -/
