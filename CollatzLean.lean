@@ -1,5 +1,6 @@
 import CollatzLean.CollatzFirstLayer.Basic
 import CollatzLean.CollatzFirstLayer.Affine
+import CollatzLean.CollatzFirstLayer.PeriodicAffine
 import CollatzLean.CollatzFirstLayer.Center
 import CollatzLean.CollatzFirstLayer.Terminal
 import CollatzLean.CollatzFirstLayer.CanonicalResidue

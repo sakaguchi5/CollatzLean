@@ -2,6 +2,7 @@ import CollatzLean.CollatzSecondLayer2.Arithmetic
 import CollatzLean.CollatzSecondLayer2.AffineTransport
 import CollatzLean.CollatzSecondLayer2.DirectAffineTransport
 import CollatzLean.CollatzSecondLayer2.InfiniteOrbit
+import CollatzLean.CollatzSecondLayer2.PeriodicExponent
 import CollatzLean.CollatzSecondLayer2.FutureMinimum
 import CollatzLean.CollatzSecondLayer2.FirstCrossing
 import CollatzLean.CollatzSecondLayer2.FirstCrossingPolynomial
