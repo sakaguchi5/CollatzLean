@@ -29,6 +29,7 @@ import CollatzLean.CollatzSecondLayer2.CaptureCountRefinement
 import CollatzLean.CollatzSecondLayer2.LongPlateauRefinement
 import CollatzLean.CollatzSecondLayer2.FirstDeferredSubsequenceClassification
 import CollatzLean.CollatzSecondLayer2.FirstDeferredRefinement
+import CollatzLean.CollatzSecondLayer2.EventuallySynchronizedRefinement
 import CollatzLean.CollatzSecondLayer2.NormalizationRefinement
 import CollatzLean.CollatzSecondLayer2.RefinedPositiveReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
@@ -65,6 +66,13 @@ first-deferred側は、次の四段階を実定理として証明する。
 3. super-polynomial no-critical条件からlong synchronized plateauを構成する。
 4. 任意のfirst-deferred towerを前三種類の部分towerへ無条件に分類する。
 
-したがってrefined還元が入力に取る局所証明義務は、eventual-sync towerをactualな
-anchored meanderへ送る`EventuallySynchronizedTowerToMeanderPrinciple`だけである。
+eventual-sync側も、同期後の指数周期性と十分大きいfuture-minimumを使って
+actual anchored one-sided meanderへ送る実定理として証明する。
+
+したがってrefined還元は局所証明義務を入力に取らない無条件定理であり、最終第三枝には
+
+* `CriticalCaptureTowerData`
+* `LongSynchronizedPlateauTowerData`
+
+だけが残る。
 -/

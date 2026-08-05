@@ -7,7 +7,8 @@ import CollatzLean.CollatzSecondLayer2.NormalizationOutcomeSplit
 refinement後に残す二種類の正対象を定義する。
 
 このファイルは対象の定義だけを担当する。first-deferred towerの分類と構成は
-`FirstDeferredRefinement`で証明する。
+`FirstDeferredRefinement`、eventual-sync towerのmeander化は
+`EventuallySynchronizedRefinement`で証明する。
 -/
 
 namespace CollatzSecondLayer2
@@ -28,6 +29,52 @@ structure CriticalCaptureInFirstDeferred
   /-- capture直後は収縮側ではない。等号も含めて局所分類を初等的に保つ。 -/
   afterNoncontracting :
     2 ^ O.windowTwoSteps (start + time + 1) q ≤ 3 ^ q
+
+namespace CriticalCaptureInFirstDeferred
+
+/-- critical captureが使うwindow長は正。 -/
+theorem windowLength_pos
+    {O : OddOrbit} {start q : ℕ}
+    {D₀ : O.WindowDifferenceData start q}
+    {F : O.FiniteCaptureNormalizationData D₀}
+    (C : CriticalCaptureInFirstDeferred F) :
+    0 < q := by
+  have hlt :
+      O.value (start + C.time) <
+        O.value (start + C.time + q) :=
+    OddOrbit.WindowDifferenceData.value_lt
+      C.captured.toWindowDifferenceData
+  have hqne : q ≠ 0 := by
+    intro hzero
+    subst q
+    simp at hlt
+  exact Nat.pos_of_ne_zero hqne
+
+/--
+critical capture直後は実際にはstrictな膨張側にある。
+`afterNoncontracting`の等号は、有効な正長指数語で`2^H = 3^q`が不可能なため排除される。
+-/
+theorem afterExpanding
+    {O : OddOrbit} {start q : ℕ}
+    {D₀ : O.WindowDifferenceData start q}
+    {F : O.FiniteCaptureNormalizationData D₀}
+    (C : CriticalCaptureInFirstDeferred F) :
+    2 ^ O.windowTwoSteps (start + C.time + 1) q < 3 ^ q := by
+  have hq : 0 < q := C.windowLength_pos
+  have hnonempty :
+      O.segmentWord (start + C.time + 1) q ≠ [] :=
+    segmentWord_nonempty_of_length_pos hq
+  have hvalid :
+      Valid (O.segmentWord (start + C.time + 1) q) :=
+    (O.runs_segment (start + C.time + 1) q).valid
+  have hne :
+      2 ^ O.windowTwoSteps (start + C.time + 1) q ≠ 3 ^ q := by
+    simpa [OddOrbit.windowTwoSteps, oddSteps] using
+      twoPow_ne_threePow_of_valid_nonempty hvalid hnonempty
+  have hle := C.afterNoncontracting
+  omega
+
+end CriticalCaptureInFirstDeferred
 
 /-- 一つの有限normalization中にある連続synchronized plateau。 -/
 structure SynchronizedPlateauInFirstDeferred
@@ -112,12 +159,5 @@ def HasRefinedNormalizationObstructionTower
     (hGap : TwoThreeGapPolynomialBound) : Prop :=
   ∃ O : OddOrbit,
     O.Unbounded ∧ HasRefinedNormalizationObstructionTowerOn hGap O
-
-/-- eventual-sync towerからactual anchored meanderを抽出する局所証明義務。 -/
-def EventuallySynchronizedTowerToMeanderPrinciple : Prop :=
-  ∀ (hGap : TwoThreeGapPolynomialBound) (O : OddOrbit),
-    ∀ D : StandardNormalizationGeneratedObstructionTowerData hGap O,
-      EventuallySynchronizedNormalizationTowerData D →
-        Nonempty (AnchoredOneSidedMeanderData O)
 
 end CollatzSecondLayer2

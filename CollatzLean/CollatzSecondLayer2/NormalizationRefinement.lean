@@ -1,26 +1,27 @@
 import CollatzLean.CollatzSecondLayer2.FirstDeferredRefinement
+import CollatzLean.CollatzSecondLayer2.EventuallySynchronizedRefinement
 
 /-!
-# normalization obstructionのrefinement
+# normalization obstructionの無条件refinement
 
 標準normalization towerは既に無条件で
 
 * first-deferred tower
 * eventual-sync tower
 
-へ分解される。first-deferred側は`firstDeferredTower_refinement`で実際に証明済みであり、
-外部の局所証明義務を入力に取らない。残る入力は、eventual-sync towerをactualな
-anchored meanderへ送る`EventuallySynchronizedTowerToMeanderPrinciple`だけである。
+へ分解される。
+
+first-deferred側は`firstDeferredTower_refinement`、eventual-sync側は
+`eventuallySynchronizedTower_to_meander`でどちらも実際に証明済みである。
+したがってrefined還元は局所証明義務を入力に取らない。
 -/
 
 namespace CollatzSecondLayer2
 
 /--
-標準normalization towerを既存二枝と残余二構造へ送る。
-first-deferred側は実定理、eventual-sync側だけを局所原理として受け取る。
+標準normalization towerを既存二枝と残余二構造へ無条件に送る。
 -/
 theorem standardNormalization_refinement
-    (hSync : EventuallySynchronizedTowerToMeanderPrinciple)
     (hGap : TwoThreeGapPolynomialBound)
     (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
@@ -41,11 +42,10 @@ theorem standardNormalization_refinement
         ⟨RefinedNormalizationObstructionTowerData.longSynchronizedPlateau
           (Classical.choice hPlateau)⟩)
   · rcases hEventually with ⟨E⟩
-    exact Or.inl (hSync hGap O D E)
+    exact Or.inl (eventuallySynchronizedTower_to_meander E)
 
 /-- 既存二対象を除外した文脈では、standard towerは残余二構造へ入る。 -/
 theorem standardNormalization_residual_of_exclusions
-    (hSync : EventuallySynchronizedTowerToMeanderPrinciple)
     (hGap : TwoThreeGapPolynomialBound)
     (hPow : PolynomialBelowTwoPower)
     {O : OddOrbit}
@@ -54,7 +54,7 @@ theorem standardNormalization_residual_of_exclusions
     (D : StandardNormalizationGeneratedObstructionTowerData hGap O) :
     Nonempty (RefinedNormalizationObstructionTowerData hGap O) := by
   rcases standardNormalization_refinement
-      hSync hGap hPow D with hM | hS | hR
+      hGap hPow D with hM | hS | hR
   · exact False.elim (hMeander hM)
   · exact False.elim (hSpecial hS)
   · exact hR
