@@ -38,6 +38,7 @@ import CollatzLean.CollatzSecondLayer2.NoCriticalDiscountedSpecialC3
 import CollatzLean.CollatzSecondLayer2.FirstCriticalTransition
 import CollatzLean.CollatzSecondLayer2.FinalPositiveReduction
 import CollatzLean.CollatzSecondLayer2.FirstCriticalTerminalRefinement
+import CollatzLean.CollatzSecondLayer2.ShortPositiveShadowExclusion
 import CollatzLean.CollatzSecondLayer2.FinalTerminalReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
 
@@ -96,13 +97,31 @@ first-critical枝は従来の診断三枝
 * `CaptureDenseTransitionTowerData`
 * `TerminalSpecialC3TransitionTowerData`
 
-に加え、terminalまで解析した最終三枝
+を経由し、terminalまで解析した互換三枝
 
 * `DeepLowerReplayTerminalTowerData`
 * `ShortPositiveShadowTerminalTowerData`
 * `TerminalSpecialC3TransitionTowerData`
 
-へ無条件に分かれる。
+へ分かれる。
+
+さらにsigned replayの符号保存により
+`ShortPositiveShadowTerminalTowerData`は無条件に排除されるため、
+first-critical枝の最終形は
+
+* `DeepLowerReplayTerminalTowerData`
+* `TerminalSpecialC3TransitionTowerData`
+
+の二枝である。
+
+したがって非有界odd-only軌道のterminal展開済み最終対象は
+
+* anchored one-sided meander
+* Special C3 obstruction
+* deep lower-replay terminal
+* terminal Special C3
+
+の四対象まで縮約される。
 
 既存の`CriticalCaptureTowerData`、`LongSynchronizedPlateauTowerData`、
 `RefinedNormalizationObstructionTowerData`は互換APIおよび中間診断対象として残す。

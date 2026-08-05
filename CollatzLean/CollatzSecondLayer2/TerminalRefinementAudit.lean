@@ -27,10 +27,26 @@ namespace CollatzSecondLayer2
 #check firstCriticalTerminal_classification
 #check firstCriticalTerminal_outcome
 
+-- short positive-shadow排除
+#check CollatzFirstLayer.ExpWord.Runs.signedReplay_finish_neg
+#check CollatzFirstLayer.ExpWord.Runs.predecessorShadow_neg_of_canonical_run
+#check FirstCriticalTransitionTowerData.shortPositiveShadowTerminalAt_impossible
+#check shortPositiveShadowTerminalTower_impossible
+#check FirstCriticalTransitionTowerData.terminal_dichotomy_at
+#check firstCriticalTerminal_dichotomy
+#check FirstCriticalReducedTerminalOutcomeTowerData
+#check firstCriticalReducedTerminal_outcome
+
 #check unboundedOrbit_final_terminal_pentachotomy_on
 #check HasDeepLowerReplayTerminalTower
 #check HasShortPositiveShadowTerminalTower
 #check unbounded_odd_orbit_final_terminal_pentachotomy
 #check no_unbounded_odd_orbit_of_final_terminal_exclusions
+
+-- positive-shadow除去後の最終四分岐
+#check no_HasShortPositiveShadowTerminalTower
+#check unboundedOrbit_final_terminal_quadrichotomy_on
+#check unbounded_odd_orbit_final_terminal_quadrichotomy
+#check no_unbounded_odd_orbit_of_reduced_terminal_exclusions
 
 end CollatzSecondLayer2
