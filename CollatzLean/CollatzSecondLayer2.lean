@@ -33,6 +33,10 @@ import CollatzLean.CollatzSecondLayer2.FirstDeferredRefinement
 import CollatzLean.CollatzSecondLayer2.EventuallySynchronizedRefinement
 import CollatzLean.CollatzSecondLayer2.NormalizationRefinement
 import CollatzLean.CollatzSecondLayer2.RefinedPositiveReduction
+import CollatzLean.CollatzSecondLayer2.ContractingWindowBounds
+import CollatzLean.CollatzSecondLayer2.NoCriticalDiscountedSpecialC3
+import CollatzLean.CollatzSecondLayer2.FirstCriticalTransition
+import CollatzLean.CollatzSecondLayer2.FinalPositiveReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
 
 /-!
@@ -66,23 +70,32 @@ mathlibの漸近定理からLean内で証明済みである。
 * `FirstDeferredNormalizationTowerData`
 * `EventuallySynchronizedNormalizationTowerData`
 
-へ分解される。
+へ分解される。eventual-sync側は周期指数tailを生むため直接矛盾する。
 
-first-deferred側は、次の四段階を実定理として証明する。
+first-deferred側では、従来のlong plateauを最終対象にせず、その生成元である
+super-polynomial no-critical towerからscaled endpoint上界付きterminal Special C3を
+構成する。persistent critical側は各項の最初のcritical時刻をcanonicalに選び直す。
 
-1. polynomial terminalからPolynomial Special C3 towerを構成する。
-2. no-critical条件からcapture数をcritical shellで抑える。
-3. super-polynomial no-critical条件からlong synchronized plateauを構成する。
-4. 任意のfirst-deferred towerを前三種類の部分towerへ無条件に分類する。
+## 最終三分岐
 
-eventual-sync側は同期後の指数周期性から膨張する周期指数tailを抽出し、
-第一層の有限アフィン反復排除によって直接矛盾へ送る。
+`TwoThreeGapPolynomialBound`のもとで、非有界odd-only軌道は無条件に
 
-したがってstandard normalization towerからmeander枝は新たに生成されず、
-refined還元は局所証明義務を入力に取らない無条件定理となる。最終第三枝には
+* `AnchoredOneSidedMeanderData`
+* `SpecialC3ObstructionTowerData`
+  * `PolynomialSpecialC3TowerData`
+  * `DiscountedSpecialC3TowerData`
+* `FirstCriticalTransitionTowerData`
 
-* `CriticalCaptureTowerData`
-* `LongSynchronizedPlateauTowerData`
+へ還元される。
 
-だけが残る。
+first-critical枝はさらに
+
+* `LargeExpandingDefectTransitionTowerData`
+* `CaptureDenseTransitionTowerData`
+* `TerminalSpecialC3TransitionTowerData`
+
+へ無条件に分かれる。terminal Special C3は中央枝へ吸収せず、独立した内部枝として残す。
+
+既存の`CriticalCaptureTowerData`、`LongSynchronizedPlateauTowerData`、
+`RefinedNormalizationObstructionTowerData`は互換APIおよび中間診断対象として残す。
 -/

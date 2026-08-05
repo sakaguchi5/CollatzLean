@@ -3,9 +3,8 @@ import CollatzLean.CollatzSecondLayer2
 /-!
 # CollatzSecondLayer2公開API監査
 
-既存raw三分岐、source-preserving強化三分岐、無条件outcome分解、
-first-deferred四段階refinement、eventual-syncの直接排除、
-および固定多項式指数優越を内蔵したrefined三分岐を監査する。
+既存raw/refined APIに加え、no-critical枝のdiscounted Special C3化、
+first-critical transition三分岐、および最終三分岐・五分岐を監査する。
 -/
 
 namespace CollatzSecondLayer2
@@ -68,48 +67,76 @@ namespace CollatzSecondLayer2
 #check EventuallySynchronizedNormalizationTowerData
 #check standardNormalization_outcomeTower_dichotomy
 
--- first-deferred四段階refinement
+-- 既存first-deferred refinement
 #check PolynomialTerminalFirstDeferredTowerData
 #check PolynomialTerminalFirstDeferredTowerData.toPolynomialSpecialC3Tower
 #check NoCriticalCaptureInFirstDeferred
 #check OddOrbit.FiniteCaptureNormalizationData.twoPow_captureCount_lt_succ
 #check FirstDeferredNormalizationTowerData.twoPow_captureCount_lt_windowLength_succ
-#check OddOrbit.FiniteCaptureNormalizationData.exists_synchronizedPlateau_of_mul_le_terminalTime
 #check SuperPolynomialNoCriticalFirstDeferredTowerData
 #check SuperPolynomialNoCriticalFirstDeferredTowerData.toLongSynchronizedPlateauTower
 #check firstDeferred_subsequence_classification
 #check firstDeferredTower_refinement
 
--- critical captureのstrict派生事実
-#check CriticalCaptureInFirstDeferred.windowLength_pos
-#check CriticalCaptureInFirstDeferred.afterExpanding
-
--- eventual-syncの周期情報付きmeander化と直接排除
-#check ExpWord.expanding_append
-#check OddOrbit.segmentWord_add_period_eq
-#check firstCrossing_length_le_of_exponent_period
-#check meanderAt_of_exponent_period_of_large_futureMinimum
-#check OddOrbit.InfiniteCaptureNormalizationData.exponent_period_at_synchronizedTail
+-- eventual-sync直接排除
 #check PeriodicAnchoredOneSidedMeanderData
-#check EventuallySynchronizedNormalizationTowerData.toPeriodicAnchoredOneSidedMeanderData
-#check EventuallySynchronizedNormalizationTowerData.toAnchoredOneSidedMeanderData
 #check EventuallySynchronizedNormalizationTowerData.impossible
-#check eventuallySynchronizedTower_to_meander
 #check eventuallySynchronizedTower_impossible
-#check EventuallySynchronizedTowerToMeanderPrinciple
-#check eventuallySynchronizedTowerToMeanderPrinciple
 #check EventuallySynchronizedTowerExclusionPrinciple
 #check eventuallySynchronizedTowerExclusionPrinciple
 
--- 最終残余二構造と無条件refined還元
+-- no-critical contracting定量評価
+#check ExpWord.twoPow_oddSteps_mul_affineConst_le
+#check OddOrbit.WindowDifferenceData.depth_unique
+#check OddOrbit.WindowDifferenceData.twoPow_length_mul_gap_lt_threePow
+#check OddOrbit.SynchronizedWindowAt.nextDepth_add_exponent_eq
+#check OddOrbit.FiniteCaptureNormalizationData.synchronizedInterval_depth_balance
+#check OddOrbit.FiniteCaptureNormalizationData.synchronizedPlateau_length_lt_windowLength
+#check FirstDeferredNormalizationTowerData.no_plateau_ge_windowLength_of_noCritical
+#check FirstDeferredNormalizationTowerData.terminalTime_lt_windowLength_mul_succ
+#check FirstDeferredNormalizationTowerData.terminalEndpoint_scaled_le_of_noCritical
+
+-- Special C3中央枝
+#check DiscountedSpecialC3TowerData
+#check SpecialC3ObstructionTowerData
+#check PolynomialSpecialC3TowerData.toDiscounted
+#check SuperPolynomialNoCriticalFirstDeferredTowerData.toDiscountedSpecialC3Tower
+#check HasSpecialC3ObstructionTower
+
+-- first-critical transitionと内部三枝
+#check CriticalCaptureAtTime
+#check FirstCriticalTransitionTowerData
+#check FirstCriticalTransitionTowerData.firstCritical
+#check FirstCriticalTransitionTowerData.noCriticalBefore
+#check FirstCriticalTransitionTowerData.postCriticalWord_expanding
+#check FirstCriticalTransitionTowerData.shortOrNextCapture_of_smallDefect
+#check LargeExpandingDefectTransitionTowerData
+#check CaptureDenseTransitionTowerData
+#check TerminalSpecialC3TransitionTowerData
+#check FirstCriticalTransitionOutcomeTowerData
+#check firstCriticalTransitionTowerOfPersistent
+#check firstCriticalTransition_classification
+#check firstCriticalTransition_outcome
+
+-- 最終三分岐・五分岐
+#check firstDeferredTower_final_refinement
+#check standardNormalization_final_refinement
+#check unboundedOrbit_final_positive_trichotomy_on
+#check unboundedOrbit_final_positive_pentachotomy_on
+#check HasFirstCriticalTransitionTower
+#check HasLargeExpandingDefectTransitionTower
+#check HasCaptureDenseTransitionTower
+#check HasTerminalSpecialC3TransitionTower
+#check unbounded_odd_orbit_final_positive_trichotomy
+#check unbounded_odd_orbit_final_positive_pentachotomy
+#check no_unbounded_odd_orbit_of_final_positive_exclusions
+
+-- 互換refined API
 #check CriticalCaptureTowerData
 #check LongSynchronizedPlateauTowerData
 #check RefinedNormalizationObstructionTowerData
 #check standardNormalization_refinement
-#check standardNormalization_residual_of_exclusions
 #check unboundedOrbit_refined_positive_trichotomy_on
 #check unboundedOrbit_refined_positive_quadrichotomy_on
-#check unbounded_odd_orbit_refined_positive_trichotomy
-#check no_unbounded_odd_orbit_of_refined_positive_exclusions
 
 end CollatzSecondLayer2
