@@ -17,3 +17,4 @@ import CollatzLean.CollatzFirstLayer.TwoAdicShell
 
 import CollatzLean.CollatzFirstLayer.ReplayDescent
 import CollatzLean.CollatzFirstLayer.SignedReplay
+import CollatzLean.CollatzFirstLayer.ShadowReanchoring
