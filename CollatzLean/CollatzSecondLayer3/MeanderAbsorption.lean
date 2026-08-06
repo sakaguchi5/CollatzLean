@@ -1,13 +1,14 @@
 import CollatzLean.CollatzExternal.LopezStoll
 import CollatzLean.CollatzSecondLayer3.GenericObstructions
+import CollatzLean.CollatzSecondLayer3.FutureMinimumGenericReduction
 import CollatzLean.CollatzSecondLayer3.FinalTerminalReduction
 
 /-!
 # 臨界meanderの最終吸収
 
-López–Stoll密度入力と、densityからprepared normalizationへ接続する
-project-specific bridgeを明示的に分離する。最終還元は生成履歴を持たない
-Special C3 / deep lower-replayの二対象だけを返す。
+future-minimumからのordered normalizationを直接用いることで、
+López–Stoll密度を使わずにone-sided meanderをgeneric最終二対象へ吸収する。
+従来の密度入力付きAPIは互換用として残す。
 -/
 
 namespace CollatzSecondLayer3
@@ -18,7 +19,7 @@ open CollatzCore
 
 /--
 López–Stoll臨界密度からone-sided meanderをgeneric最終二対象へ吸収する
-正確なbridge statement。外部密度のodd-only翻訳とは別に監査できる。
+bridge statement。実際にはfuture-minimum構造だけで証明できる。
 -/
 def CriticalMeanderAbsorptionPrinciple : Prop :=
   ∀ O : OddOrbit,
@@ -26,6 +27,14 @@ def CriticalMeanderAbsorptionPrinciple : Prop :=
       CriticalExponentDensityAt O M.anchor →
         Nonempty (GenericSpecialC3TowerData O) ∨
         Nonempty (GenericDeepLowerReplayTowerData O)
+
+/-- Critical meander absorption principleは密度入力を使わずに成立する。 -/
+theorem criticalMeanderAbsorptionPrinciple :
+    CriticalMeanderAbsorptionPrinciple := by
+  intro O M _hDensity
+  exact
+    futureMinimum_generic_obstruction_dichotomy
+      O M.unbounded M.anchor M.futureMinimum
 
 /-- 現行三分岐をsource-independent三分岐へ忘却する。 -/
 theorem unboundedOrbit_generic_trichotomy_on
@@ -43,7 +52,7 @@ theorem unboundedOrbit_generic_trichotomy_on
   · rcases hD with ⟨D⟩
     exact Or.inr (Or.inr ⟨D.toGeneric⟩)
 
-/-- 密度bridgeによりmeanderを吸収した最終二分岐。 -/
+/-- 密度bridgeによりmeanderを吸収した従来互換の最終二分岐。 -/
 theorem unboundedOrbit_generic_dichotomy_on
     (hGap : TwoThreeGapPolynomialBound)
     (hDensity : LopezStollCriticalDensityPrinciple)
@@ -71,5 +80,18 @@ theorem no_unbounded_odd_orbit_of_generic_exclusions
       hGap hDensity hAbsorb O hU with hS | hD
   · exact hSpecial ⟨O, hU, hS⟩
   · exact hDeep ⟨O, hU, hD⟩
+
+/--
+外部gap・密度・meander bridgeを一切使わない直接排除形。
+残る二つのgeneric obstructionを排除すれば非有界軌道は存在しない。
+-/
+theorem no_unbounded_odd_orbit_of_generic_exclusions_direct
+    (hSpecial : ¬ HasGenericSpecialC3Tower)
+    (hDeep : ¬ HasGenericDeepLowerReplayTower) :
+    ¬ HasUnboundedOddOrbit := by
+  intro hU
+  rcases unboundedOrbit_generic_dichotomy_direct hU with hS | hD
+  · exact hSpecial hS
+  · exact hDeep hD
 
 end CollatzSecondLayer3

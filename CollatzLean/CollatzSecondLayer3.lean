@@ -29,4 +29,7 @@ import CollatzLean.CollatzSecondLayer3.UnifiedSpecialC3Obstruction
 import CollatzLean.CollatzSecondLayer3.FinalTerminalReduction
 
 import CollatzLean.CollatzSecondLayer3.GenericObstructions
+import CollatzLean.CollatzSecondLayer3.OrderedPeriodicTailExclusion
+import CollatzLean.CollatzSecondLayer3.FutureMinimumTerminalDichotomy
+import CollatzLean.CollatzSecondLayer3.FutureMinimumGenericReduction
 import CollatzLean.CollatzSecondLayer3.MeanderAbsorption
