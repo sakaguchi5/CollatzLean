@@ -1,4 +1,4 @@
-import CollatzLean.CollatzSecondLayer3.FutureMinimumTerminalDichotomy
+import CollatzLean.CollatzSecondLayer3.FutureMinimumDeepLowerReplay
 import CollatzLean.CollatzSupport.CofinalSelection
 
 /-!
@@ -8,6 +8,9 @@ import CollatzLean.CollatzSupport.CofinalSelection
 Special C3がcofinalなら部分列を選び、endpointがある固定多項式以下でcofinalか否かで
 polynomial / superPolynomial profileへ分類する。
 Special C3がcofinalでなければ、十分後の全項がdeep lower replayとなる。
+
+最終generic二分岐は、生成履歴付きtowerとcoherent towerを経由して構成する。
+従来のterminal family APIも互換用として残す。
 -/
 
 namespace CollatzSecondLayer3
@@ -130,6 +133,7 @@ end FutureMinimumTerminalFamilyData
 
 /--
 非有界軌道の任意のfuture-minimumはgeneric最終二対象の一方を生成する。
+このAPIは生成履歴付き第1層とcoherent第2層を経由してgenericへ忘却する。
 -/
 theorem futureMinimum_generic_obstruction_dichotomy
     (O : OddOrbit)
@@ -138,8 +142,9 @@ theorem futureMinimum_generic_obstruction_dichotomy
     (hmin : O.FutureMinimumAt anchor) :
     Nonempty (GenericSpecialC3TowerData O) ∨
       Nonempty (GenericDeepLowerReplayTowerData O) := by
-  let F := futureMinimumTerminalFamily O hU anchor hmin
-  exact F.toGenericTowerDichotomy
+  exact
+    futureMinimum_generic_obstruction_dichotomy_via_history
+      O hU anchor hmin
 
 /-- 非有界軌道は外部密度やBaker入力なしでgeneric二対象へ落ちる。 -/
 theorem unboundedOrbit_generic_dichotomy_direct_on
