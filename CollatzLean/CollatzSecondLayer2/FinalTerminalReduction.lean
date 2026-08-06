@@ -1,5 +1,5 @@
 import CollatzLean.CollatzSecondLayer2.FinalPositiveReduction
-import CollatzLean.CollatzSecondLayer2.ShortPositiveShadowExclusion
+import CollatzLean.CollatzSecondLayer2.UnifiedSpecialC3Obstruction
 
 /-!
 # 最終正還元：first-critical枝をterminal枝へ展開
@@ -13,14 +13,18 @@ import CollatzLean.CollatzSecondLayer2.ShortPositiveShadowExclusion
 へ展開する従来の五分岐を残す。
 
 さらにsigned replayの符号保存によりshort positive-shadow枝を排除し、
-最終対象を
+terminal Special C3をSpecial C3中央枝のcritical-terminal形へ吸収する。
+
+最終対象は
 
 * anchored one-sided meander
-* Special C3 obstruction
+* unified Special C3 obstruction
+  * polynomial
+  * discounted
+  * critical-terminal
 * deep lower-replay terminal
-* terminal Special C3
 
-の四枝へ縮約する。
+の三枝となる。
 -/
 
 namespace CollatzSecondLayer2
@@ -154,5 +158,59 @@ theorem no_unbounded_odd_orbit_of_reduced_terminal_exclusions
   · exact hSpecial hS
   · exact hDeep hD
   · exact hTerminal hT
+
+
+/-- 非有界軌道上の統合済みSpecial C3 obstruction。 -/
+def HasFinalSpecialC3ObstructionTower : Prop :=
+  ∃ O : OddOrbit,
+    O.Unbounded ∧
+      Nonempty (UnifiedSpecialC3ObstructionTowerData O)
+
+/--
+terminal Special C3を統合中央枝へ吸収した、一つの非有界軌道の最終三分岐。
+-/
+theorem unboundedOrbit_final_terminal_trichotomy_on
+    (hGap : TwoThreeGapPolynomialBound)
+    (O : OddOrbit)
+    (hU : O.Unbounded) :
+    Nonempty (AnchoredOneSidedMeanderData O) ∨
+      Nonempty (UnifiedSpecialC3ObstructionTowerData O) ∨
+      Nonempty (DeepLowerReplayTerminalTowerData hGap O) := by
+  rcases unboundedOrbit_final_terminal_quadrichotomy_on
+      hGap O hU with hM | hSpecial | hDeep | hTerminal
+  · exact Or.inl hM
+  · rcases hSpecial with ⟨S⟩
+    exact Or.inr (Or.inl ⟨S.toUnified⟩)
+  · exact Or.inr (Or.inr hDeep)
+  · rcases hTerminal with ⟨T⟩
+    exact Or.inr (Or.inl ⟨T.toUnifiedObstruction⟩)
+
+/-- terminal Special C3吸収後の非有界odd-only軌道の最終三分岐。 -/
+theorem unbounded_odd_orbit_final_terminal_trichotomy
+    (hGap : TwoThreeGapPolynomialBound) :
+    HasUnboundedOddOrbit →
+      HasAnchoredOneSidedMeander ∨
+      HasFinalSpecialC3ObstructionTower ∨
+      HasDeepLowerReplayTerminalTower hGap := by
+  rintro ⟨O, hU⟩
+  rcases unboundedOrbit_final_terminal_trichotomy_on
+      hGap O hU with hM | hSpecial | hDeep
+  · exact Or.inl ⟨O, hM⟩
+  · exact Or.inr (Or.inl ⟨O, hU, hSpecial⟩)
+  · exact Or.inr (Or.inr ⟨O, hU, hDeep⟩)
+
+/-- 最終三対象を排除すれば非有界odd-only軌道は存在しない。 -/
+theorem no_unbounded_odd_orbit_of_final_three_exclusions
+    (hGap : TwoThreeGapPolynomialBound)
+    (hMeander : ¬ HasAnchoredOneSidedMeander)
+    (hSpecial : ¬ HasFinalSpecialC3ObstructionTower)
+    (hDeep : ¬ HasDeepLowerReplayTerminalTower hGap) :
+    ¬ HasUnboundedOddOrbit := by
+  intro hU
+  rcases unbounded_odd_orbit_final_terminal_trichotomy
+      hGap hU with hM | hS | hD
+  · exact hMeander hM
+  · exact hSpecial hS
+  · exact hDeep hD
 
 end CollatzSecondLayer2

@@ -39,6 +39,7 @@ import CollatzLean.CollatzSecondLayer2.FirstCriticalTransition
 import CollatzLean.CollatzSecondLayer2.FinalPositiveReduction
 import CollatzLean.CollatzSecondLayer2.FirstCriticalTerminalRefinement
 import CollatzLean.CollatzSecondLayer2.ShortPositiveShadowExclusion
+import CollatzLean.CollatzSecondLayer2.UnifiedSpecialC3Obstruction
 import CollatzLean.CollatzSecondLayer2.FinalTerminalReduction
 --import CollatzLean.CollatzSecondLayer2.Reduction
 
@@ -79,49 +80,22 @@ first-deferred側では、従来のlong plateauを最終対象にせず、その
 super-polynomial no-critical towerからscaled endpoint上界付きterminal Special C3を
 構成する。persistent critical側は各項の最初のcritical時刻をcanonicalに選び直す。
 
-## 最終三分岐
+## terminal展開後の最終三分岐
 
-`TwoThreeGapPolynomialBound`のもとで、非有界odd-only軌道は無条件に
+`TwoThreeGapPolynomialBound`のもとで、非有界odd-only軌道は最終的に
 
 * `AnchoredOneSidedMeanderData`
-* `SpecialC3ObstructionTowerData`
+* `UnifiedSpecialC3ObstructionTowerData`
   * `PolynomialSpecialC3TowerData`
   * `DiscountedSpecialC3TowerData`
-* `FirstCriticalTransitionTowerData`
-
-へ還元される。
-
-first-critical枝は従来の診断三枝
-
-* `LargeExpandingDefectTransitionTowerData`
-* `CaptureDenseTransitionTowerData`
-* `TerminalSpecialC3TransitionTowerData`
-
-を経由し、terminalまで解析した互換三枝
-
+  * `CriticalTerminalSpecialC3TowerData`
 * `DeepLowerReplayTerminalTowerData`
-* `ShortPositiveShadowTerminalTowerData`
-* `TerminalSpecialC3TransitionTowerData`
 
-へ分かれる。
+の三対象へ還元される。
 
-さらにsigned replayの符号保存により
-`ShortPositiveShadowTerminalTowerData`は無条件に排除されるため、
-first-critical枝の最終形は
-
-* `DeepLowerReplayTerminalTowerData`
-* `TerminalSpecialC3TransitionTowerData`
-
-の二枝である。
-
-したがって非有界odd-only軌道のterminal展開済み最終対象は
-
-* anchored one-sided meander
-* Special C3 obstruction
-* deep lower-replay terminal
-* terminal Special C3
-
-の四対象まで縮約される。
+first-critical terminalに現れる`TerminalSpecialC3TransitionTowerData`は、
+生成履歴を忘れた`CriticalTerminalSpecialC3TowerData`へ移され、
+独立した最終枝には残らない。
 
 既存の`CriticalCaptureTowerData`、`LongSynchronizedPlateauTowerData`、
 `RefinedNormalizationObstructionTowerData`は互換APIおよび中間診断対象として残す。

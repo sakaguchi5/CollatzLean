@@ -43,10 +43,22 @@ namespace CollatzSecondLayer2
 #check unbounded_odd_orbit_final_terminal_pentachotomy
 #check no_unbounded_odd_orbit_of_final_terminal_exclusions
 
--- positive-shadow除去後の最終四分岐
+-- positive-shadow除去後の互換四分岐
 #check no_HasShortPositiveShadowTerminalTower
 #check unboundedOrbit_final_terminal_quadrichotomy_on
 #check unbounded_odd_orbit_final_terminal_quadrichotomy
 #check no_unbounded_odd_orbit_of_reduced_terminal_exclusions
+
+-- terminal Special C3を中央枝へ吸収した最終三分岐
+#check CriticalTerminalSpecialC3TowerData
+#check UnifiedSpecialC3ObstructionTowerData
+#check HasUnifiedSpecialC3ObstructionTower
+#check SpecialC3ObstructionTowerData.toUnified
+#check TerminalSpecialC3TransitionTowerData.toCriticalTerminalSpecialC3Tower
+#check TerminalSpecialC3TransitionTowerData.toUnifiedObstruction
+#check HasFinalSpecialC3ObstructionTower
+#check unboundedOrbit_final_terminal_trichotomy_on
+#check unbounded_odd_orbit_final_terminal_trichotomy
+#check no_unbounded_odd_orbit_of_final_three_exclusions
 
 end CollatzSecondLayer2
