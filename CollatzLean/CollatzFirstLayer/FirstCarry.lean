@@ -50,7 +50,6 @@ lemma oddPart_eq_twoPow_mul_of_lt
     exact Nat.pow_pos (by omega)
   exact Nat.mul_left_cancel hpow_pos hc
 
-
 /--
 完全2進分解において、一方の指数が他方より真に小さくなることはない。
 小さい側の奇数部分が偶数になってしまうためである。
@@ -73,7 +72,6 @@ lemma exactTwoFactor_exponent_not_lt
     exact even_two_pow_succ_mul_nat r v
   exact odd_even_false_nat hu heu
 
-
 /--
 完全2進分解における2冪指数は一意である。
 -/
@@ -87,7 +85,6 @@ theorem exactTwoFactor_exponent_unique
   have hba : ¬b < a :=
     exactTwoFactor_exponent_not_lt hb ha
   omega
-
 
 /--
 2冪指数が一致する二つの完全2進分解では、奇数部分も一致する。
@@ -108,7 +105,6 @@ lemma exactTwoFactor_oddPart_unique_of_exponent_eq
     (Nat.pow_pos (by omega : 0 < (2 : ℕ)))
     hpow
 
-
 /--
 自然数の完全2進分解は一意である。
 同じ正の自然数を2冪と奇数部分に分けた二つの表示は、
@@ -124,6 +120,7 @@ theorem exactTwoFactor_unique
   have huv : u = v :=
     exactTwoFactor_oddPart_unique_of_exponent_eq ha hb hab
   exact ⟨hab, huv⟩
+
 /--
 下側の深さが差の深さより大きい場合、上側の次値は差の深さで正確に止まる。
 -/
@@ -179,7 +176,6 @@ def first_carry_equal_data
   refine
     { quotient := (a + 3 * u) / 2
       equation := ?_ }
-  -- ここではゴールがPropなのでOddの存在証明を分解できる。
   rcases hu with ⟨ku, rfl⟩
   rcases ha with ⟨ka, rfl⟩
   have hdiv :
@@ -216,7 +212,6 @@ theorem first_carry_equal
     ∃ c : ℕ, 3 * y + 1 = 2 ^ (d + 1) * c := by
   let C := first_carry_equal_data hxy hu hx ha
   exact ⟨C.quotient, C.equation⟩
-
 
 /-- first-carryの二分岐を一つにまとめた定理。 -/
 theorem first_carry_split

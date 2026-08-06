@@ -143,14 +143,12 @@ theorem runs_replay_of_gap_depth_gt_twoSteps
     rw [show D - twoSteps w = r by rfl, hs, pow_succ]
     ring
 
-
 /-- 初期差深さが語の総2除算数を超える場合、残りの差深さは正である。 -/
 lemma replay_endpoint_depth_pos
     {w : ExpWord} {D : ℕ}
     (hdepth : twoSteps w < D) :
     0 < D - twoSteps w := by
   omega
-
 
 /--
 同期replay型の終点差は、`u`が奇数なら完全2進分解を持つ。
@@ -167,7 +165,6 @@ theorem replay_endpoint_exact_difference
   exact
     (show Odd (3 ^ oddSteps w) by
       exact (show Odd (3 : ℕ) by decide).pow).mul hu
-
 
 /--
 初期差深さ`D`が語の総2除算数より大きい間は、同じ語をreplayできる。

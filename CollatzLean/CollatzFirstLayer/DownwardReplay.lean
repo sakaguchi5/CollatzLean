@@ -42,7 +42,6 @@ lemma residueModulus_cons_eq
   rw [show e + twoSteps w + 1 = e + (twoSteps w + 1) by omega]
   rw [pow_add]
 
-
 /--
 residue modulusの任意の自然数倍は偶数である。
 -/
@@ -53,7 +52,6 @@ lemma residueModulus_mul_even
   rw [pow_succ]
   refine ⟨2 ^ twoSteps w * k, ?_⟩
   ring
-
 
 /--
 奇数を「非負部分と偶数部分の和」に分解したとき、
@@ -74,7 +72,6 @@ private lemma odd_of_eq_add_even
     omega
   refine ⟨a - b, ?_⟩
   omega
-
 
 /--
 cons runの先頭ステップからreplay幅を取り除く。
@@ -145,7 +142,6 @@ lemma replay_head_down
     exact odd_of_eq_add_even hy hshiftEven hydecomp
   exact ⟨y', hydecomp, hstep', hyOdd⟩
 
-
 /--
 consで増えた1回のodd stepを、tail側のreplay幅へ移す。
 -/
@@ -159,7 +155,6 @@ lemma replay_finish_width_cons
   rw [hfinish]
   simp only [oddSteps_cons, pow_succ]
   ring
-
 
 /--
 実際のrunからreplay幅を取り除く一般定理。
