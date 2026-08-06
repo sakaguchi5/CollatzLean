@@ -7,8 +7,11 @@ import CollatzLean.CollatzSecondLayer3.FinalTerminalReduction
 # 臨界meanderの最終吸収
 
 future-minimumからのordered normalizationを直接用いることで、
-López–Stoll密度を使わずにone-sided meanderをgeneric最終二対象へ吸収する。
-従来の密度入力付きAPIは互換用として残す。
+López–Stoll密度を使わずにone-sided meanderをgeneric最終対象へ吸収する。
+従来の密度入力付きAPIとgeneric二分岐APIは互換用として残す。
+
+現行のdirect還元ではdeep lower-replay source towerが排除済みなので、
+非有界軌道はsource-preserving Special C3 tower、従ってgeneric Special C3 towerを生成する。
 -/
 
 namespace CollatzSecondLayer3
@@ -82,16 +85,24 @@ theorem no_unbounded_odd_orbit_of_generic_exclusions
   · exact hDeep ⟨O, hU, hD⟩
 
 /--
-外部gap・密度・meander bridgeを一切使わない直接排除形。
-残る二つのgeneric obstructionを排除すれば非有界軌道は存在しない。
+外部gap・密度・meander bridgeを使わないgeneric単一対象排除形。
+generic Special C3 towerを排除すれば非有界odd-only軌道は存在しない。
+-/
+theorem no_unbounded_odd_orbit_of_genericSpecialC3_exclusion_direct
+    (hSpecial : ¬ HasGenericSpecialC3Tower) :
+    ¬ HasUnboundedOddOrbit := by
+  intro hU
+  exact hSpecial
+    (unboundedOrbit_genericSpecialC3Tower_direct hU)
+
+/--
+従来互換のdirect二対象排除形。
+deep lower-replay排除仮定は不要になったが、既存利用箇所のため引数を残す。
 -/
 theorem no_unbounded_odd_orbit_of_generic_exclusions_direct
     (hSpecial : ¬ HasGenericSpecialC3Tower)
-    (hDeep : ¬ HasGenericDeepLowerReplayTower) :
-    ¬ HasUnboundedOddOrbit := by
-  intro hU
-  rcases unboundedOrbit_generic_dichotomy_direct hU with hS | hD
-  · exact hSpecial hS
-  · exact hDeep hD
+    (_hDeep : ¬ HasGenericDeepLowerReplayTower) :
+    ¬ HasUnboundedOddOrbit :=
+  no_unbounded_odd_orbit_of_genericSpecialC3_exclusion_direct hSpecial
 
 end CollatzSecondLayer3
