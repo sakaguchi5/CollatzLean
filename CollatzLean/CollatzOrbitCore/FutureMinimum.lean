@@ -10,7 +10,7 @@ import Mathlib.Data.Finset.Basic
 旧SecondLayerのmoving compactnessより前に必要だった基礎を独立に再構成する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -301,4 +301,4 @@ theorem values_eventually_large
 end FutureMinimumSequence
 
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzCore

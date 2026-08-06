@@ -4,7 +4,11 @@ import CollatzLean.CollatzSecondLayer3.NormalizationRefinement
 # source-preserving normalization refinementを使う精密正還元
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 theorem unboundedOrbit_refined_positive_trichotomy_on
     (hGap : TwoThreeGapPolynomialBound)
@@ -63,4 +67,4 @@ theorem no_unbounded_odd_orbit_of_refined_positive_exclusions
   · exact hSpecial hS
   · exact hRefined hR
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

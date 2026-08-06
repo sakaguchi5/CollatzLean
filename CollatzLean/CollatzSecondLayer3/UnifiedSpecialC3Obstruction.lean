@@ -20,7 +20,11 @@ no-critical側の構成定理とterminal側の構成定理を互いにimportさ�
 import依存は一方向のままである。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /--
 first-critical terminalに由来するsuper-polynomial Special C3 tower。
@@ -270,4 +274,4 @@ noncomputable def toUnifiedObstruction
 
 end TerminalSpecialC3TransitionTowerData
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

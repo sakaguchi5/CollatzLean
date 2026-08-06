@@ -1,4 +1,5 @@
 import CollatzLean.CollatzSecondLayer3.FirstCriticalTransition
+import CollatzLean.CollatzFirstLayer.ReplayDescent
 import CollatzLean.CollatzSecondLayer3.ContractingWindowBounds
 import CollatzLean.CollatzFirstLayer.DownwardReplay
 import Mathlib.Data.Finset.Max
@@ -20,7 +21,11 @@ positive-shadow枝のshort性は、最後のcapture後にq^2段以上captureが�
 terminal quotientが正になることから従う。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -89,85 +94,7 @@ private theorem three_mul_threePow_lt_basePow_sub_two
     _ ≤ (2 ^ H) ^ (q - 2) :=
       pow_le_pow_left' hbase (q - 2)
 
-namespace CanonicalReplayCoordinate
 
-/--
-一段lower runにもcanonical replay座標を付ける。
-そのquotientは元のquotientからexactに1減る。
--/
-noncomputable def lowerRunReplayCoordinate
-    {w : ExpWord} {X Y : ℕ}
-    (C : CanonicalReplayCoordinate w X Y)
-    (L : LowerNaturalRunReplayData w X Y)
-    (hpos : 0 < C.quotient) :
-    CanonicalReplayCoordinate w L.lowerStart L.lowerFinish := by
-  let q := C.quotient - 1
-  have hq : C.quotient = q + 1 := by
-    dsimp [q]
-    omega
-  refine
-    { quotient := q
-      start_eq := ?_
-      finish_eq := ?_ }
-  · have hsum :
-        canonicalStart w + residueModulus w * q + residueModulus w =
-          L.lowerStart + residueModulus w := by
-      calc
-        canonicalStart w + residueModulus w * q + residueModulus w
-            = canonicalStart w + residueModulus w * (q + 1) := by
-                ring
-        _ = canonicalStart w +
-              residueModulus w * C.quotient := by
-                rw [hq]
-        _ = X := C.start_eq.symm
-        _ = L.lowerStart + residueModulus w := L.start_step
-    exact (Nat.add_right_cancel hsum).symm
-  · let width := 2 * 3 ^ oddSteps w
-    have hsum :
-        canonicalEnd w + width * q + width =
-          L.lowerFinish + width := by
-      calc
-        canonicalEnd w + width * q + width
-            = canonicalEnd w + width * (q + 1) := by
-                ring
-        _ = canonicalEnd w + width * C.quotient := by
-                rw [hq]
-        _ = Y := by
-                simpa [width] using C.finish_eq.symm
-        _ = L.lowerFinish + width := by
-                simpa [width] using L.finish_step
-    exact (Nat.add_right_cancel hsum).symm
-
-@[simp] theorem lowerRunReplayCoordinate_quotient
-    {w : ExpWord} {X Y : ℕ}
-    (C : CanonicalReplayCoordinate w X Y)
-    (L : LowerNaturalRunReplayData w X Y)
-    (hpos : 0 < C.quotient) :
-    (lowerRunReplayCoordinate C L hpos).quotient =
-      C.quotient - 1 := by
-  rfl
-
-/-- canonicalに選んだ一段lower runへ適用する短縮版。 -/
-noncomputable def lowerNaturalRunReplayCoordinate
-    {w : ExpWord} {X Y : ℕ}
-    (C : CanonicalReplayCoordinate w X Y)
-    (hRun : Runs w X Y)
-    (hpos : 0 < C.quotient) :
-    CanonicalReplayCoordinate w
-      (C.lowerNaturalRunReplay hRun hpos).lowerStart
-      (C.lowerNaturalRunReplay hRun hpos).lowerFinish :=
-  lowerRunReplayCoordinate C (C.lowerNaturalRunReplay hRun hpos) hpos
-
-@[simp] theorem lowerNaturalRunReplayCoordinate_quotient
-    {w : ExpWord} {X Y : ℕ}
-    (C : CanonicalReplayCoordinate w X Y)
-    (hRun : Runs w X Y)
-    (hpos : 0 < C.quotient) :
-    (lowerNaturalRunReplayCoordinate C hRun hpos).quotient =
-      C.quotient - 1 := by
-  rfl
-
-end CanonicalReplayCoordinate
 
 namespace FirstCriticalTransitionTowerData
 
@@ -214,8 +141,9 @@ noncomputable def terminalPacket
     hsourceStart,
     Nat.add_assoc
   ] using
-    (R.firstDeferred.data (R.select j)).terminalPacket
+    OddOrbit.FiniteCaptureNormalizationData.terminalPacket
       (R.firstDeferred.windowLength_pos (R.select j))
+        (R.firstDeferred.data (R.select j))
 
 noncomputable def terminalDeferred
     {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
@@ -494,7 +422,7 @@ theorem postCaptureExponent_periodic_of_noCaptureBeforeSquare
     apply hNoCapture (k + 1 + t)
     · omega
     · omega
-  let S := F.synchronized_of_not_captured
+  let S := OddOrbit.FiniteCaptureNormalizationData.synchronized_of_not_captured F
     (k + 1 + t) htime hNo
   have h := S.upperExponent_eq_lower
   simpa [
@@ -542,7 +470,7 @@ theorem postCaptureBlockWord_eq_of_periodic
           (R.windowLength j)
           (by omega)
       have hshift :=
-        O.segmentWord_add_period_eq_of_range
+        OddOrbit.segmentWord_add_period_eq_of_range O
           hperiod
           (n * R.windowLength j)
           (R.windowLength j)
@@ -1238,7 +1166,7 @@ private theorem exists_lastCapture
           (O.CapturedWindowAt (R.start j + t) (R.windowLength j)) := by
   classical
   let S :=
-    O.windowCaptureTimesBefore
+    OddOrbit.windowCaptureTimesBefore O
       (R.start j) (R.windowLength j) (R.terminalTime j)
   have hcritical :
       R.firstCriticalTime j = (R.firstCritical j).time :=
@@ -1598,4 +1526,4 @@ theorem firstCriticalTerminal_outcome
   · exact ⟨.shortPositiveShadow (Classical.choice hP)⟩
   · exact ⟨.terminalSpecialC3 (Classical.choice hS)⟩
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

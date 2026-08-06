@@ -1,12 +1,16 @@
 import CollatzLean.CollatzSupport.Arithmetic
 import CollatzLean.CollatzOrbitCore.Crossing
-
+import CollatzLean.CollatzExternal.TwoThreeGap
 
 /-!
 # Baker型gapによるfirst-crossingの多項式評価
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -168,4 +172,4 @@ theorem futureMinimum_firstCrossing_endpoint_polynomial
       Nat.add_le_add (Nat.mul_le_mul_left K hpowA) hp
     _ = (K + 1) * (p + 1) ^ (A + 1) := by ring
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

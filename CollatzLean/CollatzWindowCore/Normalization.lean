@@ -10,7 +10,7 @@ ordered q-windowを一段ずつfirst-carry分類し、
 captureではwindow総指数が下降し、synchronizedでは保存される軌道をまとめる。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -210,4 +210,4 @@ theorem captureNormalizationOutcome_nonempty
     | deferred D => exact False.elim (hdefer ⟨t, ⟨D⟩⟩)
 
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzCore

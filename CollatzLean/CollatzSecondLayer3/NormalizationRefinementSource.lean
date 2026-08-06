@@ -12,7 +12,11 @@ raw対象として残す。一方、後段のrefinementではprepared familyが�
 忘却写像と、強化版を使う無条件三分岐を証明する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /--
 標準polynomial preparationから実際に構成されたnormalization obstruction tower。
@@ -169,4 +173,4 @@ theorem standardNormalization_implies_raw
   rintro ⟨O, hU, ⟨D⟩⟩
   exact ⟨O, hU, ⟨D.forget⟩⟩
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

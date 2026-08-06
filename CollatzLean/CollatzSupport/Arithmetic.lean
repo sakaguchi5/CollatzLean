@@ -9,7 +9,7 @@ import Mathlib.Tactic.Ring
 一方、2と3の相対gapに対するBaker型下界だけは明示的な算術入力として隔離する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSupport
 
 open Filter Asymptotics
 
@@ -91,18 +91,6 @@ theorem polynomialBelowTwoPower : PolynomialBelowTwoPower := by
     lt_of_lt_of_le hstrict hscale
   exact_mod_cast hreal
 
-/--
-`2^H-3^p`が`3^p`に対して逆多項式以上であるという、
-2と3専用のBaker型入力。
--/
-def TwoThreeGapPolynomialBound : Prop :=
-  ∃ K A : ℕ,
-    0 < K ∧
-    ∀ p H : ℕ,
-      0 < p →
-      3 ^ p < 2 ^ H →
-      3 ^ p ≤ K * (p + 1) ^ A * (2 ^ H - 3 ^ p)
-
 /-- `2^q ≤ 3^q`。 -/
 theorem twoPow_le_threePow (q : ℕ) : 2 ^ q ≤ 3 ^ q := by
   induction q with
@@ -163,4 +151,4 @@ theorem start_le_polynomial_of_gap_bound
         length_mul_gap_polynomial_le p K A g
   exact Nat.le_of_mul_le_mul_left hchain hg
 
-end CollatzSecondLayer2
+end CollatzSupport

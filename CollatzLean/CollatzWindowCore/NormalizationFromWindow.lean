@@ -14,7 +14,7 @@ import Mathlib.Tactic.Linarith
 のどちらかを構成する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -392,4 +392,4 @@ theorem captureNormalizationFromWindowOutcome_nonempty
       (infiniteCaptureNormalizationData_of_no_deferred D₀ hDeferred)⟩
 
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzCore

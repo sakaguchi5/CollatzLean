@@ -12,7 +12,11 @@ import CollatzLean.CollatzSecondLayer3.NormalizationRefinementFacts
 二種類のtowerへ無条件に分解する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /-- 狭義単調な自然数列は各添字以上に進む。 -/
 private theorem strictMono_index_le
@@ -276,4 +280,4 @@ theorem standardNormalization_outcomeTower_dichotomy
         eventuallySynchronized := hsync
       }⟩
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

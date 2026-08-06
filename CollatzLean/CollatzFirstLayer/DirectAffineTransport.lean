@@ -8,7 +8,7 @@ import CollatzLean.CollatzFirstLayer.AffineTransport
 ここではtotal項とaffine定数全体を、同じ係数で直接抑える。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzFirstLayer
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -84,4 +84,4 @@ theorem directAffineTransportBound
       _ ≤ (3 ^ oddSteps w + affineConst w) * 2 ^ twoSteps w :=
         Nat.mul_le_mul_left _ hpow
 
-end CollatzSecondLayer2
+end CollatzFirstLayer

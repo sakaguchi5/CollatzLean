@@ -13,7 +13,11 @@ future-minimumからfirst-crossing終点までの正差を完全2進分解し、
 準備後のq-window終点も同じ長さの固定多項式以下にする。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -153,6 +157,131 @@ structure PolynomialPreparedFullWindowFamily
         (F.minima.index j + offset j + F.crossingLength j) ≤
       K * (F.crossingLength j + 1) ^ A
 
+/--
+first crossing始点のpolynomial boundから、
+first crossing終点の`+1`を一段大きいpolynomialへ吸収する。
+-/
+private theorem firstCrossing_endpoint_add_one_polynomial
+    {O : OddOrbit}
+    {F : MovingFirstCrossingData O}
+    {K A j : ℕ}
+    (hstartj :
+      O.value (F.minima.index j) ≤
+        K * (F.crossingLength j + 1) ^ A) :
+    O.value (F.minima.index j + F.crossingLength j) + 1 ≤
+      (K + 1) * (F.crossingLength j + 1) ^ (A + 1) := by
+  let n := F.minima.index j
+  let p := F.crossingLength j
+  have hend :
+      O.value (n + p) ≤ O.value n + p :=
+    firstCrossing_endpoint_le_start_add_length (F.crossing j)
+  have hpowA :
+      (p + 1) ^ A ≤ (p + 1) ^ (A + 1) :=
+    Nat.pow_le_pow_right (by omega) (by omega)
+  have hpbase :
+      p + 1 ≤ (p + 1) ^ (A + 1) := by
+    have h :=
+      Nat.pow_le_pow_right
+        (by omega : 0 < p + 1)
+        (by omega : 1 ≤ A + 1)
+    simpa using h
+  calc
+    O.value (n + p) + 1
+        ≤ O.value n + p + 1 := by
+            omega
+    _ ≤ K * (p + 1) ^ A + (p + 1) := by
+          simpa [n, p, Nat.add_assoc] using
+            Nat.add_le_add_right hstartj (p + 1)
+    _ ≤ K * (p + 1) ^ (A + 1) +
+          (p + 1) ^ (A + 1) := by
+          exact Nat.add_le_add
+            (Nat.mul_le_mul_left K hpowA)
+            hpbase
+    _ = (K + 1) * (p + 1) ^ (A + 1) := by
+          ring
+
+/--
+moving full-window preparationのboundary終点値を、
+`4^boundaryLength`倍のfirst crossing終点値で評価する。
+-/
+private theorem movingFullWindow_endpoint_le_fourPow_mul
+    {O : OddOrbit}
+    (F : MovingFirstCrossingData O)
+    (j : ℕ) :
+    O.value
+        (F.minima.index j +
+          (movingFullWindowPreparation F j).boundaryLength +
+          F.crossingLength j)
+      ≤
+        4 ^ (movingFullWindowPreparation F j).boundaryLength *
+          (O.value (F.minima.index j + F.crossingLength j) + 1) := by
+  let n := F.minima.index j
+  let p := F.crossingLength j
+  let S := movingFullWindowPreparation F j
+  let k := S.boundaryLength
+  have htail :=
+    OddOrbit.value_add_one_le_fourPow_mul O (n + p) k
+  have hindex :
+      F.minima.index j +
+            (movingFullWindowPreparation F j).boundaryLength +
+            F.crossingLength j =
+        n + p + k := by
+    dsimp [n, p, k, S]
+    omega
+  rw [hindex]
+  calc
+    O.value (n + p + k)
+        ≤ O.value (n + p + k) + 1 := by
+            omega
+    _ ≤ 4 ^ k * (O.value (n + p) + 1) := by
+          simpa [Nat.add_assoc] using htail
+
+/--
+boundaryの二次上界とfirst crossing終点のpolynomial boundを合成し、
+prepared endpointを指数`A+3`のpolynomialで評価する。
+-/
+private theorem movingFullWindow_endpoint_polynomial
+    {O : OddOrbit}
+    (F : MovingFirstCrossingData O)
+    (j K A : ℕ)
+    (hy :
+      O.value (F.minima.index j + F.crossingLength j) + 1 ≤
+        (K + 1) * (F.crossingLength j + 1) ^ (A + 1)) :
+    O.value
+        (F.minima.index j +
+          (movingFullWindowPreparation F j).boundaryLength +
+          F.crossingLength j)
+      ≤
+        (K + 1) * (F.crossingLength j + 1) ^ (A + 3) := by
+  let p := F.crossingLength j
+  let S := movingFullWindowPreparation F j
+  let k := S.boundaryLength
+  have htransport :=
+    movingFullWindow_endpoint_le_fourPow_mul F j
+  have hfour : 4 ^ k ≤ p ^ 2 := by
+    simpa [k, p, S] using
+      movingFullWindow_fourPow_boundary_le_sq F j
+  have hp2 : p ^ 2 ≤ (p + 1) ^ 2 := by
+    ring_nf
+    nlinarith
+  calc
+    O.value
+        (F.minima.index j +
+          (movingFullWindowPreparation F j).boundaryLength +
+          F.crossingLength j)
+        ≤ 4 ^ k *
+            (O.value (F.minima.index j + F.crossingLength j) + 1) := by
+              simpa [k, p, S] using htransport
+    _ ≤ p ^ 2 *
+          ((K + 1) * (p + 1) ^ (A + 1)) :=
+      Nat.mul_le_mul hfour (by simpa [p] using hy)
+    _ ≤ (p + 1) ^ 2 *
+          ((K + 1) * (p + 1) ^ (A + 1)) :=
+      Nat.mul_le_mul_right _ hp2
+    _ = (K + 1) * (p + 1) ^ (A + 3) := by
+      rw [show A + 3 = 2 + (A + 1) by omega, pow_add]
+      ring
+
 /-- Baker型gap入力から標準polynomial prepared familyを構成する。 -/
 noncomputable def polynomialPreparedFullWindowFamily
     {O : OddOrbit}
@@ -160,79 +289,38 @@ noncomputable def polynomialPreparedFullWindowFamily
     (F : MovingFirstCrossingData O) :
     PolynomialPreparedFullWindowFamily F := by
   classical
-  let hex := futureMinimum_firstCrossing_start_polynomial hGap
+  let hex :=
+    futureMinimum_firstCrossing_start_polynomial hGap
   let K := Classical.choose hex
   let hexA := Classical.choose_spec hex
   let A := Classical.choose hexA
   have hstart := Classical.choose_spec hexA
   refine
-    { offset := fun j => (movingFullWindowPreparation F j).boundaryLength
-      packet := fun j => (movingFullWindowPreparation F j).packet
+    { offset := fun j =>
+        (movingFullWindowPreparation F j).boundaryLength
+      packet := fun j =>
+        (movingFullWindowPreparation F j).packet
       K := K + 1
       A := A + 3
       endpointBound := ?_ }
   intro j
-  let n := F.minima.index j
-  let p := F.crossingLength j
-  let S := movingFullWindowPreparation F j
-  let k := S.boundaryLength
-  have hstartj : O.value n ≤ K * (p + 1) ^ A :=
-    hstart O n p (F.minima.futureMinimum j) (F.crossing j)
-  have hend : O.value (n + p) ≤ O.value n + p :=
-    firstCrossing_endpoint_le_start_add_length (F.crossing j)
-  have htail := O.value_add_one_le_fourPow_mul (n + p) k
-  have hfour : 4 ^ k ≤ p ^ 2 := by
-    simpa [k, p, S] using movingFullWindow_fourPow_boundary_le_sq F j
-  have hpowA : (p + 1) ^ A ≤ (p + 1) ^ (A + 1) :=
-    Nat.pow_le_pow_right (by omega) (by omega)
-  have hpbase : p + 1 ≤ (p + 1) ^ (A + 1) := by
-    have h := Nat.pow_le_pow_right
-      (by omega : 0 < p + 1)
-      (by omega : 1 ≤ A + 1)
-    simpa using h
-  have hy : O.value (n + p) + 1 ≤
-      (K + 1) * (p + 1) ^ (A + 1) := by
-    calc
-      O.value (n + p) + 1
-          ≤ O.value n + p + 1 := by
-            omega
-      _ ≤ K * (p + 1) ^ A + (p + 1) := by
-            simpa [Nat.add_assoc] using
-              Nat.add_le_add_right hstartj (p + 1)
-      _ ≤ K * (p + 1) ^ (A + 1) +
-            (p + 1) ^ (A + 1) := by
-            exact Nat.add_le_add
-              (Nat.mul_le_mul_left K hpowA)
-              hpbase
-      _ = (K + 1) * (p + 1) ^ (A + 1) := by
-            ring
-  have hp2 : p ^ 2 ≤ (p + 1) ^ 2 := by
-    nlinarith
-  calc
-    O.value (F.minima.index j +
-        (movingFullWindowPreparation F j).boundaryLength +
-        F.crossingLength j)
-        ≤ O.value (n + p + k) + 1 := by
-          have hindex :
-              F.minima.index j +
-                    (movingFullWindowPreparation F j).boundaryLength +
-                    F.crossingLength j =
-                n + p + k := by
-            dsimp [n, p, k, S]
-            omega
-          rw [hindex]
-          omega
-    _ ≤ 4 ^ k * (O.value (n + p) + 1) := by
-      simpa [Nat.add_assoc] using htail
-    _ ≤ p ^ 2 *
-          ((K + 1) * (p + 1) ^ (A + 1)) :=
-      Nat.mul_le_mul hfour hy
-    _ ≤ (p + 1) ^ 2 *
-          ((K + 1) * (p + 1) ^ (A + 1)) :=
-      Nat.mul_le_mul_right _ hp2
-    _ = (K + 1) * (p + 1) ^ (A + 3) := by
-      rw [show A + 3 = 2 + (A + 1) by omega, pow_add]
-      ring
+  have hstartj :
+      O.value (F.minima.index j) ≤
+        K * (F.crossingLength j + 1) ^ A :=
+    hstart
+      O
+      (F.minima.index j)
+      (F.crossingLength j)
+      (F.minima.futureMinimum j)
+      (F.crossing j)
+  have hy :
+      O.value
+          (F.minima.index j + F.crossingLength j) + 1
+        ≤
+          (K + 1) *
+            (F.crossingLength j + 1) ^ (A + 1) :=
+    firstCrossing_endpoint_add_one_polynomial hstartj
+  exact movingFullWindow_endpoint_polynomial F j K A hy
 
 namespace PolynomialPreparedFullWindowFamily
 
@@ -331,4 +419,4 @@ theorem eventually_capture_or_specialC3
   · exact ⟨Sum.inr hSpecial⟩
 
 end PolynomialPreparedFullWindowFamily
-end CollatzSecondLayer2
+end CollatzSecondLayer3

@@ -8,7 +8,11 @@ terminal deferred三分岐と指数優越によってPolynomial Special C3 tower
 指数優越はLean内定理`polynomialBelowTwoPower`から自動的に使用する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -89,10 +93,14 @@ noncomputable def terminalOutcome
     (T : FirstDeferredNormalizationTowerData D)
     (j : ℕ) :
     DeferredPreparedWindowOutcome
-      ((T.data j).terminalPacket (T.windowLength_pos j)) :=
-  Classical.choice
+      (OddOrbit.FiniteCaptureNormalizationData.terminalPacket
+        (T.windowLength_pos j)
+        (T.data j)) := by
+  classical
+  exact Classical.choice
     (firstDeferredTerminalOutcome_nonempty
-      (T.windowLength_pos j) (T.data j))
+      (T.windowLength_pos j)
+      (T.data j))
 
 /-- polynomial準備familyの開始位置はcrossing開始位置とoffsetの和。 -/
 theorem polynomialPreparedFullWindowFamily_start
@@ -118,7 +126,9 @@ theorem terminalEndpoint_large_or_special
           (T.windowLength j)) := by
   have h :=
     DeferredPreparedWindowOutcome.endpoint_large_or_special
-      ((T.data j).terminalPacket (T.windowLength_pos j))
+      (OddOrbit.FiniteCaptureNormalizationData.terminalPacket
+        (T.windowLength_pos j)
+        (T.data j))
       (T.terminalOutcome j)
   simpa [
     terminalEndpoint,
@@ -457,4 +467,4 @@ noncomputable def toPolynomialSpecialC3Tower
 
 end PolynomialTerminalFirstDeferredTowerData
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

@@ -9,7 +9,7 @@ capture正規化が最初のdeferred carryへ到達した時点で必要とな�
 移動q-window上に直接定義する。旧SecondLayerのterminal packetには依存しない。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -125,4 +125,4 @@ def HasSpecialC3On (O : OddOrbit) : Prop :=
 def HasSpecialC3 : Prop :=
   ∃ O : OddOrbit, O.Unbounded ∧ HasSpecialC3On O
 
-end CollatzSecondLayer2
+end CollatzCore

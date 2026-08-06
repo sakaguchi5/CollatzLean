@@ -1,3 +1,4 @@
+import CollatzLean.CollatzSupport.CofinalSelection
 import CollatzLean.CollatzSecondLayer3.LongPlateauRefinement
 
 /-!
@@ -13,68 +14,22 @@ first-deferred towerをPolynomial Special C3 / critical capture / long plateau�
 実際にrefineする。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
 
-/-- Propが任意に遠い添字で成立すること。 -/
-def Persistently (P : ℕ → Prop) : Prop :=
-  ∀ N : ℕ, ∃ j : ℕ, N ≤ j ∧ P j
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
+
+/-- 任意に遠い添字で命題が成立すること。 -/
+abbrev Persistently := CollatzSupport.Cofinally
 
 namespace Persistently
 
-/-- persistentなPropを満たす添字を狭義単調に選ぶ。 -/
-noncomputable def select
-    (P : ℕ → Prop)
-    (h : Persistently P) : ℕ → ℕ
-  | 0 => Classical.choose (h 0)
-  | n + 1 => Classical.choose (h (select P h n + 1))
-
-/-- 選択添字は要求下限以上。 -/
-theorem select_ge
-    (P : ℕ → Prop)
-    (h : Persistently P) :
-    ∀ n : ℕ, n ≤ select P h n := by
-  intro n
-  induction n with
-  | zero => omega
-  | succ n ih =>
-      have hs := Classical.choose_spec (h (select P h n + 1))
-      have hstep : select P h n + 1 ≤ select P h (n + 1) := by
-        simpa [select] using hs.1
-      omega
-
-/-- 選択列は狭義単調。 -/
-theorem select_strict
-    (P : ℕ → Prop)
-    (h : Persistently P) :
-    StrictMono (select P h) := by
-  apply strictMono_nat_of_lt_succ
-  intro n
-  have hs := Classical.choose_spec (h (select P h n + 1))
-  have hstep : select P h n + 1 ≤ select P h (n + 1) := by
-    simpa [select] using hs.1
-  omega
-
-/-- 選択添字ではPropが成立する。 -/
-theorem select_spec
-    (P : ℕ → Prop)
-    (h : Persistently P)
-    (n : ℕ) :
-    P (select P h n) := by
-  cases n with
-  | zero =>
-      simpa [select] using (Classical.choose_spec (h 0)).2
-  | succ n =>
-      simpa [select] using
-        (Classical.choose_spec (h (select P h n + 1))).2
-
-/-- persistentでなければ十分後にPropは成立しない。 -/
-theorem eventually_not_of_not
-    (P : ℕ → Prop)
-    (h : ¬ Persistently P) :
-    ∃ N : ℕ, ∀ j : ℕ, N ≤ j → ¬ P j := by
-  unfold Persistently at h
-  push Not at h
-  exact h
+noncomputable abbrev select := CollatzSupport.Cofinally.select
+abbrev select_ge := CollatzSupport.Cofinally.select_ge
+abbrev select_strict := CollatzSupport.Cofinally.select_strict
+abbrev select_spec := CollatzSupport.Cofinally.select_spec
+abbrev eventually_not_of_not := CollatzSupport.Cofinally.eventually_not_of_not
 
 end Persistently
 
@@ -146,13 +101,23 @@ theorem terminalSuperPolynomial_of_not_persistent
     ∀ K A : ℕ, ∃ N : ℕ, ∀ j : ℕ, N ≤ j →
       K * (T.windowLength j + 1) ^ A < T.terminalEndpoint j := by
   intro K A
-  unfold HasPersistentPolynomialTerminalBound Persistently at h
+  unfold HasPersistentPolynomialTerminalBound at h
   push Not at h
-  obtain ⟨N, hN⟩ := h K A
+  let P : ℕ → Prop := fun j =>
+    T.terminalEndpoint j ≤
+      K * (T.windowLength j + 1) ^ A
+  have hNotCofinally : ¬ CollatzSupport.Cofinally P := by
+    simpa [P] using h K A
+  obtain ⟨N, hN⟩ :=
+    CollatzSupport.Cofinally.eventually_not_of_not
+      P hNotCofinally
   refine ⟨N, ?_⟩
   intro j hj
-  have hnot := hN j hj
-  omega
+  have hnot :
+      ¬ T.terminalEndpoint j ≤
+        K * (T.windowLength j + 1) ^ A := by
+    simpa [P] using hN j hj
+  exact Nat.lt_of_not_ge hnot
 
 /--
 critical captureが十分後に存在しないなら、
@@ -196,7 +161,7 @@ theorem shifted_terminalSuperPolynomial_of_not_persistent
           T.terminalEndpoint (Nshift + j) := by
   intro K A
   obtain ⟨Npoly, hNpoly⟩ :=
-    CollatzSecondLayer2.terminalSuperPolynomial_of_not_persistent
+    CollatzSecondLayer3.terminalSuperPolynomial_of_not_persistent
       T hPolynomial K A
   refine ⟨Npoly, ?_⟩
   intro j hj
@@ -265,4 +230,4 @@ theorem firstDeferred_subsequence_classification
         ⟨superPolynomialNoCriticalOfExclusions
           T hPolynomial hCritical⟩)
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

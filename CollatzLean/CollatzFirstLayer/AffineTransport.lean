@@ -9,7 +9,7 @@ import CollatzLean.CollatzFirstLayer.Affine
 affine定数の全`+1`寄与を`length * C * 2^H`以下に評価する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzFirstLayer
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -138,4 +138,4 @@ theorem endpoint_le_polynomial_of_transport
       rw [show B + A + D = B + (A + D) by omega, pow_add]
       ring
 
-end CollatzSecondLayer2
+end CollatzFirstLayer

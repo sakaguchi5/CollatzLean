@@ -27,3 +27,6 @@ import CollatzLean.CollatzSecondLayer3.FirstCriticalTerminalRefinement
 import CollatzLean.CollatzSecondLayer3.ShortPositiveShadowExclusion
 import CollatzLean.CollatzSecondLayer3.UnifiedSpecialC3Obstruction
 import CollatzLean.CollatzSecondLayer3.FinalTerminalReduction
+
+import CollatzLean.CollatzSecondLayer3.GenericObstructions
+import CollatzLean.CollatzSecondLayer3.MeanderAbsorption

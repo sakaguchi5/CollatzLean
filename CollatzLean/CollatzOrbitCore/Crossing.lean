@@ -12,7 +12,7 @@ import Mathlib.Tactic.Linarith
 first-crossing長が無限大へ進むことを証明する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -355,4 +355,4 @@ noncomputable def movingFirstCrossingData_of_no_meander
       crossing := hp
       lengths_tend_to_infinity := htend }
 
-end CollatzSecondLayer2
+end CollatzCore

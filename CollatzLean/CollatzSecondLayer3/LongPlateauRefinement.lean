@@ -9,7 +9,11 @@ critical captureがないfinite normalizationではcapture数が対数的に抑�
 したがってterminal endpointが全固定多項式を超えるtowerでは、plateau長が無限大へ進む。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -54,7 +58,7 @@ noncomputable def synchronizedPlateauOfNoCaptureInterval
     have hkt : k < F.terminalTime :=
       lt_of_lt_of_le hkright hinside
     have S :=
-      F.synchronized_of_not_captured
+      synchronized_of_not_captured F
         k hkt hNo
     simpa [k, Nat.add_assoc] using S
 
@@ -104,7 +108,7 @@ theorem exists_captured_in_block_of_no_long_plateau
     rcases hCaptured with ⟨C⟩
     exact isEmptyElim C
   let P :=
-    F.synchronizedPlateauOfNoCaptureInterval
+    synchronizedPlateauOfNoCaptureInterval F
       (r * L)
       L
       (by
@@ -131,15 +135,15 @@ theorem blockNumber_le_windowCaptureCountBefore
     (L : ℕ)
     (hblockCapture :
       ∀ r : ℕ,
-        r < F.captureCount + 1 →
+        r < captureCount F + 1 →
         ∃ k : ℕ,
           r * L ≤ k ∧
           k < (r + 1) * L ∧
           Nonempty
             (O.CapturedWindowAt (start + k) q)) :
     ∀ r : ℕ,
-      r ≤ F.captureCount + 1 →
-      r ≤ O.windowCaptureCountBefore
+      r ≤ captureCount F + 1 →
+      r ≤ windowCaptureCountBefore O
         start q (r * L) := by
   intro r
   induction r with
@@ -149,17 +153,17 @@ theorem blockNumber_le_windowCaptureCountBefore
   | succ r ih =>
       intro hr
       have hrlt :
-          r < F.captureCount + 1 := by
+          r < captureCount F + 1 := by
         omega
       have hprev :
           r ≤
-            O.windowCaptureCountBefore
+            windowCaptureCountBefore O
               start q (r * L) :=
         ih (by omega)
       obtain ⟨k, hkleft, hkright, hcap⟩ :=
         hblockCapture r hrlt
       have hincrease :=
-        O.windowCaptureCountBefore_add_one_le_of_captured
+        windowCaptureCountBefore_add_one_le_of_captured O
           start q
           hkleft
           hkright
@@ -176,10 +180,10 @@ theorem windowCaptureCountBefore_le_captureCount_of_le_terminalTime
     (F : O.FiniteCaptureNormalizationData D₀)
     {t : ℕ}
     (ht : t ≤ F.terminalTime) :
-    O.windowCaptureCountBefore start q t ≤
-      F.captureCount := by
+    windowCaptureCountBefore O start q t ≤
+      captureCount F := by
   have hmono :=
-    O.windowCaptureCountBefore_mono
+    windowCaptureCountBefore_mono O
       start q ht
   simpa [captureCount] using hmono
 
@@ -193,7 +197,7 @@ theorem exists_synchronizedPlateau_of_mul_le_terminalTime
     (F : O.FiniteCaptureNormalizationData D₀)
     (M : ℕ)
     (hTime :
-      (F.captureCount + 1) * (M + 1) ≤
+      (captureCount F + 1) * (M + 1) ≤
         F.terminalTime) :
     ∃ P : SynchronizedPlateauInFirstDeferred F,
       M < P.length := by
@@ -201,12 +205,12 @@ theorem exists_synchronizedPlateau_of_mul_le_terminalTime
   by_contra hNoPlateau
   let L := M + 1
   have hTimeL :
-      (F.captureCount + 1) * L ≤
+      (captureCount F + 1) * L ≤
         F.terminalTime := by
     simpa [L] using hTime
   have hblockCapture :
       ∀ r : ℕ,
-        r < F.captureCount + 1 →
+        r < captureCount F + 1 →
         ∃ k : ℕ,
           r * L ≤ k ∧
           k < (r + 1) * L ∧
@@ -214,7 +218,7 @@ theorem exists_synchronizedPlateau_of_mul_le_terminalTime
             (O.CapturedWindowAt (start + k) q) := by
     intro r hr
     have hrle :
-        r + 1 ≤ F.captureCount + 1 := by
+        r + 1 ≤ captureCount F + 1 := by
       omega
     have hend :
         (r + 1) * L ≤ F.terminalTime := by
@@ -226,26 +230,26 @@ theorem exists_synchronizedPlateau_of_mul_le_terminalTime
           F.terminalTime := by
       simpa [L] using hend
     simpa [L] using
-      F.exists_captured_in_block_of_no_long_plateau
+      exists_captured_in_block_of_no_long_plateau F
         M r hend' hNoPlateau
   have hmany :
-      F.captureCount + 1 ≤
-        O.windowCaptureCountBefore
+      captureCount F + 1 ≤
+        windowCaptureCountBefore O
           start q
-          ((F.captureCount + 1) * L) := by
+          ((captureCount F + 1) * L) := by
     exact
-      F.blockNumber_le_windowCaptureCountBefore
+      blockNumber_le_windowCaptureCountBefore F
         L
         hblockCapture
-        (F.captureCount + 1)
+        (captureCount F + 1)
         le_rfl
   have hprefix :
-      O.windowCaptureCountBefore
+      windowCaptureCountBefore O
           start q
-          ((F.captureCount + 1) * L) ≤
-        F.captureCount := by
+          ((captureCount F + 1) * L) ≤
+        captureCount F := by
     exact
-      F.windowCaptureCountBefore_le_captureCount_of_le_terminalTime
+      windowCaptureCountBefore_le_captureCount_of_le_terminalTime F
         hTimeL
   omega
 
@@ -274,14 +278,14 @@ theorem terminalEndpoint_le_polynomial_of_noCritical_noLongPlateau
             (polynomialPreparedFullWindowFamily hGap D.crossing).A) := by
   let F := T.data j
   let q := T.windowLength j
-  let C := F.captureCount
+  let C := OddOrbit.FiniteCaptureNormalizationData.captureCount F
   let L := M + 1
   let P := polynomialPreparedFullWindowFamily hGap D.crossing
   have htime : F.terminalTime < (C + 1) * L := by
     by_contra hnot
     have hle : (C + 1) * L ≤ F.terminalTime := Nat.le_of_not_gt hnot
     exact hNoPlateau
-      (F.exists_synchronizedPlateau_of_mul_le_terminalTime M
+      (OddOrbit.FiniteCaptureNormalizationData.exists_synchronizedPlateau_of_mul_le_terminalTime F M
         (by simpa [C, L] using hle))
   have hcount : 2 ^ C < q + 1 := by
     simpa [F, C, q] using
@@ -329,7 +333,7 @@ theorem terminalEndpoint_le_polynomial_of_noCritical_noLongPlateau
         exact Nat.add_le_add_left hbasePos _
       _ = (P.K + 1) * (q + 1) ^ P.A := by ring
   have horbit :=
-    O.value_add_one_le_fourPow_mul
+    OddOrbit.value_add_one_le_fourPow_mul O
       (T.start j + q) F.terminalTime
   have hterminalOne :
       T.terminalEndpoint j + 1 ≤
@@ -512,4 +516,4 @@ noncomputable def toLongSynchronizedPlateauTower
 
 end SuperPolynomialNoCriticalFirstDeferredTowerData
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

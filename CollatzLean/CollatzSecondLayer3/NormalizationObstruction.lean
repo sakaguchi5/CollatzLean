@@ -17,7 +17,11 @@ persistent captureの各選択項と、そこから実際に構成されたnorma
 を実データとして持つ。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /-- persistent captureから実際に生成されたnormalization tower。 -/
 structure NormalizationGeneratedObstructionTowerData (O : OddOrbit) where
@@ -79,4 +83,4 @@ noncomputable def toNormalizationGeneratedObstructionTower
   source := P.normalizationTower h
 
 end PolynomialPreparedFullWindowFamily
-end CollatzSecondLayer2
+end CollatzSecondLayer3

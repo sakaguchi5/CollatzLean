@@ -16,7 +16,7 @@ import CollatzLean.CollatzFirstLayer.DownwardReplay
 へ完全分類する。旧SecondLayerのpacket分岐を、actual moving window上へ直接移した形である。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -162,4 +162,4 @@ theorem preparedWindowAnalysis_nonempty
           (C.lowerNaturalRunReplay P.run hqpos))⟩
 
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzCore

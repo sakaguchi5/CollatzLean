@@ -9,7 +9,7 @@ import CollatzLean.CollatzWindowCore.Analysis
 差深さへ初めて到達する直前を選び、`PreparedWindowPacket`を自動構成する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -229,4 +229,4 @@ theorem orderedWindowAnalysis_nonempty
   exact preparedWindowAnalysis_nonempty (prepareWindow D hq).packet
 
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzCore

@@ -11,7 +11,7 @@ q-windowの総2除算数を真に減らし、synchronized carryが保存する�
 これはcapture正規化に用いる自然数単調量である。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -255,4 +255,4 @@ end SynchronizedWindowAt
 
 
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzCore

@@ -15,7 +15,11 @@ one-sided meanderへ送っていた。この構成を周期情報付きで保存
 直接矛盾となる。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -53,7 +57,7 @@ theorem segmentWord_add_period_eq
   | zero =>
       simp
   | succ m ih =>
-      simp only [segmentWord_succ]
+      simp only [OddOrbit.segmentWord_succ]
       rw [hperiod t]
       have htail := ih (t + 1)
       simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using htail
@@ -97,7 +101,7 @@ theorem firstCrossing_length_le_of_exponent_period
       O.segmentWord (anchor + q) (p - q) =
         O.segmentWord anchor (p - q) := by
     simpa using
-      O.segmentWord_add_period_eq hperiod 0 (p - q)
+      OddOrbit.segmentWord_add_period_eq O hperiod 0 (p - q)
   have hsuffixExpanding :
       Expanding (O.segmentWord (anchor + q) (p - q)) := by
     rw [hshift]
@@ -211,7 +215,7 @@ noncomputable def toPeriodicAnchoredOneSidedMeanderData
         O.exponent (synchronizedStart + t + q) =
           O.exponent (synchronizedStart + t) := by
     intro t
-    have h := I.exponent_period_at_synchronizedTail t
+    have h := OddOrbit.InfiniteCaptureNormalizationData.exponent_period_at_synchronizedTail I t
     simpa [
       synchronizedStart,
       start,
@@ -364,4 +368,4 @@ theorem eventuallySynchronizedTowerExclusionPrinciple :
   intro hGap O D T
   exact eventuallySynchronizedTower_impossible T
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

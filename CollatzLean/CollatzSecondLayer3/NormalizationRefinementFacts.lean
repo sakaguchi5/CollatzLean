@@ -11,7 +11,11 @@ window総指数の下降量がcapture gapとexactに一致することを証明�
 Special C3の三枝へ直接分類する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -269,8 +273,10 @@ theorem firstDeferredTerminalOutcome_nonempty
     {D₀ : O.WindowDifferenceData start q}
     (hq : 0 < q)
     (F : O.FiniteCaptureNormalizationData D₀) :
-    Nonempty (DeferredPreparedWindowOutcome (F.terminalPacket hq)) := by
-  let P := F.terminalPacket hq
+    Nonempty
+      (DeferredPreparedWindowOutcome
+        (OddOrbit.FiniteCaptureNormalizationData.terminalPacket hq F)) := by
+  let P := OddOrbit.FiniteCaptureNormalizationData.terminalPacket hq F
   let C := P.replayCoordinate
   by_cases hq0 : C.quotient = 0
   · have hstart :
@@ -318,4 +324,4 @@ theorem DeferredPreparedWindowOutcome.endpoint_large_or_special
   | special S =>
       exact Or.inr ⟨S⟩
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

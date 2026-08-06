@@ -10,7 +10,11 @@ persistent captureから実際に構成されたnormalization towerを第三対�
 固定多項式の指数優越はLean内定理`polynomialBelowTwoPower`として使用する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /-- persistent captureから第三の正対象を得る。 -/
 theorem persistentCapture_to_normalizationObstruction
@@ -91,4 +95,4 @@ theorem no_unbounded_odd_orbit_of_positive_exclusions
   · exact hSpecial h
   · exact hNormalization h
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

@@ -11,7 +11,7 @@ import Mathlib.Tactic.Ring
 このファイルは無限軌道固有の薄い適用層だけを担当する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -118,4 +118,4 @@ theorem no_expanding_periodic_exponent_tail
   simpa [hend] using hrun
 
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzCore

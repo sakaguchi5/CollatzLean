@@ -10,7 +10,10 @@ capture正規化区間の輸送係数と開始値がwindow長に対して多項�
 `endpoint_le_polynomial_of_transport`からendpoint多項式上界を自動生成する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -94,4 +97,4 @@ theorem persistentCapture_or_specialC3
   R.toPolynomialPreparedRefinementSequence.persistentCapture_or_specialC3
 
 end TransportPreparedRefinementSequence
-end CollatzSecondLayer2
+end CollatzSecondLayer3

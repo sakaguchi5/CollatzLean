@@ -7,7 +7,7 @@ import CollatzLean.CollatzFirstLayer.Orbit
 `ExpWord.Runs` だけを用いて無限odd-only軌道を再構成する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -106,4 +106,4 @@ end OddOrbit
 def HasUnboundedOddOrbit : Prop :=
   ∃ O : OddOrbit, O.Unbounded
 
-end CollatzSecondLayer2
+end CollatzCore

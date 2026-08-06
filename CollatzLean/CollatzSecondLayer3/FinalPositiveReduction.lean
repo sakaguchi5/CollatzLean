@@ -5,7 +5,11 @@ import CollatzLean.CollatzSecondLayer3.EventuallySynchronizedRefinement
 # 最終正還元：Special C3中央枝とfirst critical transition枝
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 theorem firstDeferredTower_final_refinement
     (hGap : TwoThreeGapPolynomialBound)
@@ -134,4 +138,4 @@ theorem no_unbounded_odd_orbit_of_final_positive_exclusions
   · exact hSpecial hS
   · exact hCritical hC
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

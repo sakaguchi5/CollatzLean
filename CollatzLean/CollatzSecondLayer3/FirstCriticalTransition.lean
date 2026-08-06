@@ -5,7 +5,11 @@ import CollatzLean.CollatzOrbitCore.PeriodicExponent
 # first critical transition towerの三分岐
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -90,7 +94,7 @@ noncomputable def firstCritical
 noncomputable def firstCriticalTime
     {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
     (R : FirstCriticalTransitionTowerData hGap O) (j : ℕ) : ℕ :=
-  CollatzSecondLayer2.firstCriticalTime _ (R.criticalExists j)
+  CollatzSecondLayer3.firstCriticalTime _ (R.criticalExists j)
 
 @[simp] theorem firstCritical_time_eq
     {hGap : TwoThreeGapPolynomialBound} {O : OddOrbit}
@@ -269,7 +273,7 @@ theorem segmentWord_add_period_eq_of_range
   | zero => simp
   | succ m ih =>
       intro hbound
-      simp only [segmentWord_succ]
+      simp only [OddOrbit.segmentWord_succ]
       rw [hperiod t (by omega)]
       have htail := ih (t + 1) (by omega)
       simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using htail
@@ -356,7 +360,7 @@ theorem postCriticalExponent_periodic_of_noCaptureBeforeSquare
     apply hNoCapture
     · omega
     · omega
-  let S := F.synchronized_of_not_captured
+  let S := OddOrbit.FiniteCaptureNormalizationData.synchronized_of_not_captured F
     (R.firstCriticalTime j + 1 + t) htime hNo
   have h := S.upperExponent_eq_lower
   simpa [F, q, postCriticalStart, FirstCriticalTransitionTowerData.start,
@@ -384,7 +388,7 @@ theorem postCriticalBlockWord_eq_of_periodic
       have hnq : (n + 1) * R.windowLength j ≤
           R.windowLength j * R.windowLength j :=
         Nat.mul_le_mul_right (R.windowLength j) (by omega)
-      have hshift := O.segmentWord_add_period_eq_of_range hperiod
+      have hshift := OddOrbit.segmentWord_add_period_eq_of_range O hperiod
         (n * R.windowLength j) (R.windowLength j)
         (by simpa [Nat.succ_mul] using hnq)
       have hprev := ih (by omega)
@@ -572,4 +576,4 @@ theorem firstCriticalTransition_outcome
   · exact ⟨.captureDenseTransition (Classical.choice hD)⟩
   · exact ⟨.terminalSpecialC3 (Classical.choice hS)⟩
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

@@ -1,4 +1,5 @@
 import CollatzLean.CollatzSecondLayer3.LongPlateauRefinement
+import CollatzLean.CollatzFirstLayer.Basic
 import Mathlib.Tactic.Linarith
 
 /-!
@@ -12,7 +13,11 @@ no-critical normalization中のsynchronized plateau長をwindow長未満に抑�
 この評価からterminal時刻とterminal endpointのscaled polynomial上界を得る。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -211,7 +216,8 @@ theorem nextDepth_add_exponent_eq
         have h := S.upperNext_eq
         simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using h
       oddPart_odd := (show Odd (3 : ℕ) by decide).mul S.oddPart_odd }
-  have hdepth : Dnext.depth = E.depth := Dnext.depth_unique E
+  have hdepth : Dnext.depth = E.depth :=
+    OddOrbit.WindowDifferenceData.depth_unique Dnext E
   have hle : O.exponent i ≤ S.depth := Nat.le_of_lt S.synchronized
   dsimp [E] at hdepth
   omega
@@ -277,7 +283,7 @@ theorem twoPow_mul_value_add_one_le_threePow
 theorem twoPow_full_mul_value_le_threePow_full
     (O : OddOrbit) (i : ℕ) {r q : ℕ} (hrq : r ≤ q) :
     2 ^ q * O.value (i + r) ≤ 3 ^ q * (O.value i + 1) := by
-  have hbase := O.twoPow_mul_value_add_one_le_threePow i r
+  have hbase := OddOrbit.twoPow_mul_value_add_one_le_threePow O i r
   have h23 : 2 ^ (q - r) ≤ 3 ^ (q - r) := twoPow_le_threePow (q - r)
   have hpowTwo : 2 ^ q = 2 ^ (q - r) * 2 ^ r := by
     rw [← pow_add, Nat.sub_add_cancel hrq]
@@ -325,12 +331,14 @@ theorem synchronizedStep_depth_balance
       (F.difference a ha).depth := by
   let Dstart := F.difference a ha
   let Dnext := F.difference (a + 1) haNext
-  have hSdepth : S.depth = Dstart.depth :=
-    S.toWindowDifferenceData.depth_unique Dstart
-  have hnext :
-      Dnext.depth + O.exponent (start + a) = S.depth := by
+  have hSdepth : S.depth = Dstart.depth := by
+    exact
+      OddOrbit.WindowDifferenceData.depth_unique
+        S.toWindowDifferenceData
+        Dstart
+  have hnext : Dnext.depth + O.exponent (start + a) = S.depth := by
     simpa [Dnext, Nat.add_assoc] using
-      S.nextDepth_add_exponent_eq Dnext
+      OddOrbit.SynchronizedWindowAt.nextDepth_add_exponent_eq S Dnext
   calc
     O.exponent (start + a) + Dnext.depth
         = Dnext.depth + O.exponent (start + a) := by
@@ -372,16 +380,16 @@ theorem synchronizedInterval_depth_balance
       have ha : a ≤ F.terminalTime := by omega
       have haNext : a + 1 ≤ F.terminalTime := by omega
       have htailInside : a + 1 + L ≤ F.terminalTime := by omega
-      have htailSync := O.synchronizedInterval_tail
+      have htailSync := synchronizedInterval_tail O
         (start := start) (q := q) (a := a) (L := L) hsync
       have htail := ih (a := a + 1) htailInside htailSync
-      have hstep := F.synchronizedStep_depth_balance a ha haNext
+      have hstep := synchronizedStep_depth_balance F a ha haNext
         (hsync 0 (Nat.zero_lt_succ L))
-      rw [O.windowTwoSteps_succ_eq (start + a) L]
+      rw [windowTwoSteps_succ_eq O (start + a) L]
       have hi : start + a + 1 = start + (a + 1) := by omega
       have he : a + (L + 1) = a + 1 + L := by omega
       rw [hi]
-      have hdepth := F.difference_depth_eq_of_index_eq hinside htailInside he
+      have hdepth := difference_depth_eq_of_index_eq F hinside htailInside he
       rw [hdepth]
       omega
 
@@ -395,7 +403,7 @@ theorem synchronizedPlateau_length_lt_windowLength
   have hoff : P.offset ≤ F.terminalTime :=
     le_trans (Nat.le_add_right P.offset P.length) P.inside
   let Dstart := F.difference P.offset hoff
-  have hbalance := F.synchronizedInterval_depth_balance
+  have hbalance := synchronizedInterval_depth_balance F
     P.offset P.length P.inside P.synchronized
   have hvalid := (O.runs_segment (start + P.offset) P.length).valid
   have hlenSteps : P.length ≤ O.windowTwoSteps (start + P.offset) P.length := by
@@ -412,7 +420,7 @@ theorem synchronizedPlateau_length_lt_windowLength
       omega
     simpa only [Nat.mul_one] using
       Nat.mul_le_mul_left (2 ^ Dstart.depth) hoddPos
-  have hgap := Dstart.twoPow_length_mul_gap_lt_threePow hcontract
+  have hgap := OddOrbit.WindowDifferenceData.twoPow_length_mul_gap_lt_threePow Dstart hcontract
   have hpow : 2 ^ (q + P.length) < 3 ^ q := by
     calc
       2 ^ (q + P.length) ≤ 2 ^ (q + Dstart.depth) :=
@@ -448,7 +456,7 @@ theorem no_plateau_ge_windowLength_of_noCritical
   rintro ⟨P, hlength⟩
   have hoffset_le_terminal : P.offset ≤ (T.data j).terminalTime :=
     le_trans (Nat.le_add_right P.offset P.length) P.inside
-  have hcontract := (T.data j).contracting_at_of_noCritical
+  have hcontract := OddOrbit.FiniteCaptureNormalizationData.contracting_at_of_noCritical (T.data j)
     (by
       simpa [FirstDeferredNormalizationTowerData.start,
         FirstDeferredNormalizationTowerData.windowLength,
@@ -457,7 +465,8 @@ theorem no_plateau_ge_windowLength_of_noCritical
         PolynomialPreparedFullWindowFamily.start] using
         D.initial_threePow_lt_twoPow (T.select j))
     hNoCritical P.offset hoffset_le_terminal
-  have hlt := (T.data j).synchronizedPlateau_length_lt_windowLength P
+  have hlt := OddOrbit.FiniteCaptureNormalizationData.synchronizedPlateau_length_lt_windowLength
+    (T.data j) P
     (by simpa [FirstDeferredNormalizationTowerData.start] using hcontract)
   exact (Nat.not_lt_of_ge hlength) hlt
 
@@ -467,17 +476,20 @@ theorem terminalTime_lt_captureSucc_mul_windowLength
     {D : StandardNormalizationGeneratedObstructionTowerData hGap O}
     (T : FirstDeferredNormalizationTowerData D) (j : ℕ)
     (hNoCritical : NoCriticalCaptureInFirstDeferred (T.data j)) :
-    T.terminalTime j < ((T.data j).captureCount + 1) * T.windowLength j := by
+    T.terminalTime j < (OddOrbit.FiniteCaptureNormalizationData.captureCount
+     (T.data j) + 1) * T.windowLength j := by
   let q := T.windowLength j
   have hq : 0 < q := by simpa [q] using T.windowLength_pos j
   by_contra hnot
-  have htime : ((T.data j).captureCount + 1) * ((q - 1) + 1) ≤
+  have htime : (OddOrbit.FiniteCaptureNormalizationData.captureCount
+    (T.data j) + 1) * ((q - 1) + 1) ≤
       (T.data j).terminalTime := by
     rw [Nat.sub_add_cancel hq]
     simpa [q, FirstDeferredNormalizationTowerData.terminalTime] using
       Nat.le_of_not_gt hnot
   obtain ⟨P, hP⟩ :=
-    (T.data j).exists_synchronizedPlateau_of_mul_le_terminalTime (q - 1) htime
+    OddOrbit.FiniteCaptureNormalizationData.exists_synchronizedPlateau_of_mul_le_terminalTime
+      (T.data j) (q - 1) htime
   apply T.no_plateau_ge_windowLength_of_noCritical j hNoCritical
   refine ⟨P, ?_⟩
   have hlength : (q - 1) + 1 ≤ P.length := Nat.succ_le_of_lt hP
@@ -499,7 +511,7 @@ theorem terminalTime_lt_windowLength_mul_succ
     (T : FirstDeferredNormalizationTowerData D) (j : ℕ)
     (hNoCritical : NoCriticalCaptureInFirstDeferred (T.data j)) :
     T.terminalTime j < T.windowLength j * (T.windowLength j + 1) := by
-  let C := (T.data j).captureCount
+  let C := OddOrbit.FiniteCaptureNormalizationData.captureCount (T.data j)
   let q := T.windowLength j
   have hcount : 2 ^ C < q + 1 := by
     simpa [C, q] using T.twoPow_captureCount_lt_windowLength_succ j hNoCritical
@@ -538,7 +550,8 @@ theorem contracting_at_of_noCritical
   let F := T.data j
   have htF : t ≤ F.terminalTime := by
     simpa [F, FirstDeferredNormalizationTowerData.terminalTime] using ht
-  have h := F.contracting_at_of_noCritical (T.initial_contracting j)
+  have h := OddOrbit.FiniteCaptureNormalizationData.contracting_at_of_noCritical
+    F (T.initial_contracting j)
     hNoCritical t htF
   simpa [F, FirstDeferredNormalizationTowerData.start,
     FirstDeferredNormalizationTowerData.windowLength,
@@ -564,7 +577,7 @@ theorem scaled_value_add_windowLength_le
   have hcontract : 3 ^ q < 2 ^ O.windowTwoSteps (T.start j + t) q := by
     simpa [q] using T.contracting_at_of_noCritical j t hNoCritical ht
   have hgap : 2 ^ q * (2 ^ Dt.depth * Dt.oddPart) < 3 ^ q := by
-    apply Dt.twoPow_length_mul_gap_lt_threePow
+    apply OddOrbit.WindowDifferenceData.twoPow_length_mul_gap_lt_threePow Dt
     simpa [Dt, F, q, FirstDeferredNormalizationTowerData.start,
       FirstDeferredNormalizationTowerData.windowLength,
       StandardNormalizationGeneratedObstructionTowerData.start,
@@ -578,20 +591,26 @@ theorem scaled_value_add_windowLength_le
       StandardNormalizationGeneratedObstructionTowerData.windowLength,
       PolynomialPreparedFullWindowFamily.start, Nat.add_assoc] using Dt.difference
   rw [hdifference]
+  ring_nf
+  have hgap_le :
+      2 ^ q * (2 ^ Dt.depth * Dt.oddPart) ≤ 3 ^ q :=
+    Nat.le_of_lt hgap
   calc
-    2 ^ T.windowLength j *
-        (O.value (T.start j + t) +
-          2 ^ Dt.depth * Dt.oddPart)
+    O.value (T.start j + t) * 2 ^ T.windowLength j +
+        Dt.oddPart * 2 ^ T.windowLength j * 2 ^ Dt.depth
         =
-      2 ^ q * O.value (T.start j + t) +
+      O.value (T.start j + t) * 2 ^ q +
         2 ^ q * (2 ^ Dt.depth * Dt.oddPart) := by
           dsimp [q]
           ring
     _ ≤
-      2 ^ q * O.value (T.start j + t) + 3 ^ q := by
-          exact Nat.add_le_add_left (Nat.le_of_lt hgap) _
+      O.value (T.start j + t) * 2 ^ q +
+        3 ^ q := by
+          exact Nat.add_le_add_left
+            hgap_le
+            (O.value (T.start j + t) * 2 ^ q)
     _ =
-      2 ^ T.windowLength j * O.value (T.start j + t) +
+      O.value (T.start j + t) * 2 ^ T.windowLength j +
         3 ^ T.windowLength j := by
           rfl
 
@@ -605,9 +624,9 @@ theorem scaled_value_mul_step
     A * xₙ₁
         ≤ A * xₙ + B := hstep
     _ ≤ (A * x₀ + n * B) + B := by
-        exact Nat.add_le_add_right hprev B
+          exact Nat.add_le_add_right hprev B
     _ = A * x₀ + (n + 1) * B := by
-        ring
+          ring
 
 /-- q刻みのscaled endpoint recurrence。 -/
 theorem scaled_value_add_mul_windowLength_le
@@ -679,7 +698,7 @@ theorem terminalEndpoint_scaled_le_of_noCritical
   rw [hendpointIndex] at hjump
   have hresidue : 2 ^ q * O.value (T.start j + r) ≤
       3 ^ q * (O.value (T.start j) + 1) := by
-    simpa [q] using O.twoPow_full_mul_value_le_threePow_full (T.start j) hrq.le
+    simpa [q] using OddOrbit.twoPow_full_mul_value_le_threePow_full O (T.start j) hrq.le
   have hinitialLt : O.value (T.start j) < O.value (T.start j + q) := by
     let D0 := (T.data j).difference 0 (by simp)
     simpa [D0, q, FirstDeferredNormalizationTowerData.start,
@@ -728,4 +747,4 @@ theorem terminalEndpoint_scaled_le_of_noCritical
 
 end FirstDeferredNormalizationTowerData
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

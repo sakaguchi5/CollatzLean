@@ -14,3 +14,6 @@ import CollatzLean.CollatzFirstLayer.DownwardReplay
 import CollatzLean.CollatzFirstLayer.AffineTransport
 import CollatzLean.CollatzFirstLayer.DirectAffineTransport
 import CollatzLean.CollatzFirstLayer.TwoAdicShell
+
+import CollatzLean.CollatzFirstLayer.ReplayDescent
+import CollatzLean.CollatzFirstLayer.SignedReplay

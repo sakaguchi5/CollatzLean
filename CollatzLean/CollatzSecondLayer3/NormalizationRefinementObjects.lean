@@ -11,7 +11,11 @@ refinement後に残す二種類の正対象を定義する。
 `EventuallySynchronizedRefinement`で証明する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -160,4 +164,4 @@ def HasRefinedNormalizationObstructionTower
   ∃ O : OddOrbit,
     O.Unbounded ∧ HasRefinedNormalizationObstructionTowerOn hGap O
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

@@ -10,7 +10,10 @@ endpointがwindow長に対して一様に多項式小なら、lower natural repl
 positive predecessor shadowは十分後には起こらない。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -22,7 +25,7 @@ structure PolynomialPreparedWindowSequence (O : OddOrbit) where
   start : ℕ → ℕ
   length : ℕ → ℕ
   start_strict : StrictMono start
-  packet : ∀ j : ℕ, PreparedWindowPacket O (start j) (length j)
+  packet : ∀ j : ℕ, OddOrbit.PreparedWindowPacket O (start j) (length j)
   K : ℕ
   A : ℕ
   endpointBound : ∀ j : ℕ,
@@ -53,7 +56,7 @@ theorem eventually_no_lowerNaturalReplay
     Nat.le_of_lt (hJ j hj)
   have hlarge :
       2 * 3 ^ S.length j < O.value (S.start j + S.length j) :=
-    PreparedWindowAlternative.endpoint_gt_two_mul_threePow_of_lowerReplay
+    OddOrbit.PreparedWindowAlternative.endpoint_gt_two_mul_threePow_of_lowerReplay
       (S.packet j) L
   have hsmall :
       O.value (S.start j + S.length j) < 2 * 3 ^ S.length j := by
@@ -78,7 +81,7 @@ theorem eventually_no_positivePredecessorShadow
     Nat.le_of_lt (hJ j hj)
   have hlarge :
       2 * 3 ^ S.length j < O.value (S.start j + S.length j) :=
-    PreparedWindowAlternative.endpoint_gt_two_mul_threePow_of_positiveShadow
+    OddOrbit.PreparedWindowAlternative.endpoint_gt_two_mul_threePow_of_positiveShadow
       (S.packet j) hq hshadow
   have hsmall :
       O.value (S.start j + S.length j) < 2 * 3 ^ S.length j := by
@@ -94,7 +97,7 @@ theorem eventually_capture_or_specialC3
     (S : PolynomialPreparedWindowSequence O) :
     ∃ J : ℕ, ∀ j : ℕ, J ≤ j →
       Nonempty
-        (CapturedWindowAt O (S.start j) (S.length j) ⊕
+        (OddOrbit.CapturedWindowAt O (S.start j) (S.length j) ⊕
           SpecialC3At O (S.start j) (S.length j)) := by
   obtain ⟨J₁, hLower⟩ := S.eventually_no_lowerNaturalReplay
   obtain ⟨J₂, hPositive⟩ := S.eventually_no_positivePredecessorShadow
@@ -102,7 +105,7 @@ theorem eventually_capture_or_specialC3
   intro j hj
   have hj₁ : J₁ ≤ j := le_trans (le_max_left _ _) hj
   have hj₂ : J₂ ≤ j := le_trans (le_max_right _ _) hj
-  rcases preparedWindowAnalysis_nonempty (S.packet j) with ⟨hAlt | hSpecial⟩
+  rcases OddOrbit.preparedWindowAnalysis_nonempty (S.packet j) with ⟨hAlt | hSpecial⟩
   · cases hAlt with
     | captured hcap => exact ⟨Sum.inl hcap⟩
     | lowerNaturalReplay hReplay =>
@@ -113,4 +116,4 @@ theorem eventually_capture_or_specialC3
 
 end PolynomialPreparedWindowSequence
 end OddOrbit
-end CollatzSecondLayer2
+end CollatzSecondLayer3

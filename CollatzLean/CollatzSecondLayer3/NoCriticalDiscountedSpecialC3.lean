@@ -15,7 +15,11 @@ Polynomial Special C3とdiscounted Special C3を、共通の中央枝
 `SpecialC3ObstructionTowerData`へまとめる。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -274,4 +278,4 @@ noncomputable def toDiscountedSpecialC3Tower
 
 end SuperPolynomialNoCriticalFirstDeferredTowerData
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

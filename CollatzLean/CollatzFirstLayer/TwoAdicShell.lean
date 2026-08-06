@@ -9,7 +9,7 @@ import CollatzLean.CollatzFirstLayer.CarrySynchronization
 関係をcaptureで直接使える形へ加工する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzFirstLayer
 
 open CollatzFirstLayer
 
@@ -99,4 +99,4 @@ theorem three_le_exponent_of_depth_eq_two
 
 end OneShellData
 
-end CollatzSecondLayer2
+end CollatzFirstLayer

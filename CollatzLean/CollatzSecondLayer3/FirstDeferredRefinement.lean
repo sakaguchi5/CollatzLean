@@ -14,7 +14,11 @@ first-deferred towerのrefinementは、次の四段階の実定理として構�
 固定多項式の指数優越はLean内定理として閉じているため、外部入力には取らない。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /--
 first-deferred towerをPolynomial Special C3 / critical capture / long plateauへ
@@ -37,4 +41,4 @@ theorem firstDeferredTower_refinement
     exact Or.inr
       (Or.inr ⟨S.toLongSynchronizedPlateauTower⟩)
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

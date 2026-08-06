@@ -5,7 +5,11 @@ import CollatzLean.CollatzSecondLayer3.EventuallySynchronizedRefinement
 # normalization obstructionの無条件refinement
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 theorem standardNormalization_refinement
     (hGap : TwoThreeGapPolynomialBound)
@@ -38,4 +42,4 @@ theorem standardNormalization_residual_of_exclusions
   · exact False.elim (hSpecial hS)
   · exact hR
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

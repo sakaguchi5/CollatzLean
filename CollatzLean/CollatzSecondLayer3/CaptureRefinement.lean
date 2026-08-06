@@ -9,7 +9,10 @@ moving first-crossing列の内部に構成された一様多項式小prepared wi
 persistent captureまたはSpecial C3 refinementへ分ける。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -44,7 +47,7 @@ namespace PolynomialPreparedRefinementSequence
 def toWindowSequence
     {O : OddOrbit} {F : MovingFirstCrossingData O}
     (R : PolynomialPreparedRefinementSequence F) :
-    O.PolynomialPreparedWindowSequence where
+    OddOrbit.PolynomialPreparedWindowSequence O where
   start := fun j => F.minima.index (R.select j) + R.offset j
   length := R.length
   start_strict := R.start_strict
@@ -155,4 +158,4 @@ theorem persistentCapture_or_specialC3
     }⟩
 
 end PolynomialPreparedRefinementSequence
-end CollatzSecondLayer2
+end CollatzSecondLayer3

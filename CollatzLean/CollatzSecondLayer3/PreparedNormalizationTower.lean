@@ -13,7 +13,11 @@ import CollatzLean.CollatzSecondLayer3.PositiveObjects
 のいずれかを実データとして選択する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /-- persistent capture項とそのnormalization outcomeを束ねたtower。 -/
 structure PreparedCaptureNormalizationTowerData
@@ -61,4 +65,4 @@ noncomputable def PolynomialPreparedFullWindowFamily.normalizationTower
       P.persistentCaptureSelect_ge h j
     exact le_trans hj hsel
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

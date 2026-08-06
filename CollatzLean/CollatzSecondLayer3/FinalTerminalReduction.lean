@@ -27,7 +27,11 @@ terminal Special C3をSpecial C3中央枝のcritical-terminal形へ吸収する�
 の三枝となる。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 /-- 一つの非有界軌道に対するterminal展開済み最終五分岐。 -/
 theorem unboundedOrbit_final_terminal_pentachotomy_on
@@ -213,4 +217,4 @@ theorem no_unbounded_odd_orbit_of_final_three_exclusions
   · exact hSpecial hS
   · exact hDeep hD
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3

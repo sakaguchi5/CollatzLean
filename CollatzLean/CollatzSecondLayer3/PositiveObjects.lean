@@ -6,7 +6,11 @@ import CollatzLean.CollatzSecondLayer3.PositivePreparation
 補集合をフィールドに持たず、それぞれ単独で研究・排除できる数学対象を定義する。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -197,4 +201,4 @@ theorem persistentCapture_or_polynomialSpecialC3
         omega)
 
 end PolynomialPreparedFullWindowFamily
-end CollatzSecondLayer2
+end CollatzSecondLayer3

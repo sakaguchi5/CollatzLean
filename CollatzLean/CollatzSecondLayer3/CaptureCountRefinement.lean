@@ -17,7 +17,11 @@ critical shellを横断するcaptureがなければ全時刻で収縮側に残�
 初期critical shell上端と合わせて`2^captureCount < q+1`を得る。
 -/
 
-namespace CollatzSecondLayer2
+namespace CollatzSecondLayer3
+
+open CollatzSupport
+open CollatzExternal
+open CollatzCore
 
 open CollatzFirstLayer
 open CollatzFirstLayer.ExpWord
@@ -52,13 +56,13 @@ noncomputable def windowCaptureTimesBefore
 noncomputable def windowCaptureCountBefore
     (O : OddOrbit)
     (start q t : ℕ) : ℕ :=
-  (O.windowCaptureTimesBefore start q t).card
+  (windowCaptureTimesBefore O start q t).card
 
 @[simp]
 theorem windowCaptureCountBefore_zero
     (O : OddOrbit)
     (start q : ℕ) :
-    O.windowCaptureCountBefore start q 0 = 0 := by
+    windowCaptureCountBefore O start q 0 = 0 := by
   simp [
     windowCaptureCountBefore,
     windowCaptureTimesBefore
@@ -69,8 +73,8 @@ theorem windowCaptureCountBefore_succ_of_captured
     (O : OddOrbit)
     (start q t : ℕ)
     (h : Nonempty (O.CapturedWindowAt (start + t) q)) :
-    O.windowCaptureCountBefore start q (t + 1) =
-      O.windowCaptureCountBefore start q t + 1 := by
+    windowCaptureCountBefore O start q (t + 1) =
+      windowCaptureCountBefore O start q t + 1 := by
   classical
   unfold windowCaptureCountBefore
   unfold windowCaptureTimesBefore
@@ -86,8 +90,8 @@ theorem windowCaptureCountBefore_succ_of_not_captured
     (O : OddOrbit)
     (start q t : ℕ)
     (h : ¬ Nonempty (O.CapturedWindowAt (start + t) q)) :
-    O.windowCaptureCountBefore start q (t + 1) =
-      O.windowCaptureCountBefore start q t := by
+    windowCaptureCountBefore O start q (t + 1) =
+      windowCaptureCountBefore O start q t := by
   classical
   unfold windowCaptureCountBefore
   unfold windowCaptureTimesBefore
@@ -99,18 +103,18 @@ theorem windowCaptureCountBefore_succ_of_not_captured
 theorem windowCaptureCountBefore_le_succ
     (O : OddOrbit)
     (start q t : ℕ) :
-    O.windowCaptureCountBefore start q t ≤
-      O.windowCaptureCountBefore start q (t + 1) := by
+    windowCaptureCountBefore O start q t ≤
+      windowCaptureCountBefore O start q (t + 1) := by
   classical
   by_cases h :
       Nonempty (O.CapturedWindowAt (start + t) q)
   · rw [
-      O.windowCaptureCountBefore_succ_of_captured
+      windowCaptureCountBefore_succ_of_captured O
         start q t h
     ]
     omega
   · rw [
-      O.windowCaptureCountBefore_succ_of_not_captured
+      windowCaptureCountBefore_succ_of_not_captured O
         start q t h
     ]
 
@@ -120,8 +124,8 @@ theorem windowCaptureCountBefore_mono
     (start q : ℕ)
     {a b : ℕ}
     (hab : a ≤ b) :
-    O.windowCaptureCountBefore start q a ≤
-      O.windowCaptureCountBefore start q b := by
+    windowCaptureCountBefore O start q a ≤
+      windowCaptureCountBefore O start q b := by
   classical
   apply Finset.card_le_card
   intro k hk
@@ -143,15 +147,15 @@ theorem windowCaptureCountBefore_add_one_le_of_captured
     (hak : a ≤ k)
     (hkb : k < b)
     (hcap : Nonempty (O.CapturedWindowAt (start + k) q)) :
-    O.windowCaptureCountBefore start q a + 1 ≤
-      O.windowCaptureCountBefore start q b := by
+    windowCaptureCountBefore O start q a + 1 ≤
+      windowCaptureCountBefore O start q b := by
   have hleft :=
-    O.windowCaptureCountBefore_mono start q hak
+    windowCaptureCountBefore_mono O start q hak
   have hstep :=
-    O.windowCaptureCountBefore_succ_of_captured
+    windowCaptureCountBefore_succ_of_captured O
       start q k hcap
   have hright :=
-    O.windowCaptureCountBefore_mono
+    windowCaptureCountBefore_mono O
       start q
       (show k + 1 ≤ b by omega)
   omega
@@ -177,7 +181,7 @@ noncomputable def captureCount
     {O : OddOrbit} {start q : ℕ}
     {D₀ : O.WindowDifferenceData start q}
     (F : O.FiniteCaptureNormalizationData D₀) : ℕ :=
-  O.windowCaptureCountBefore start q F.terminalTime
+  windowCaptureCountBefore O start q F.terminalTime
 
 /-- terminal以前でcaptureでなければsynchronized。 -/
 noncomputable def synchronized_of_not_captured
@@ -207,7 +211,7 @@ theorem windowTwoSteps_add_captureCountBefore_le
     (F : O.FiniteCaptureNormalizationData D₀) :
     ∀ t : ℕ, t ≤ F.terminalTime →
       O.windowTwoSteps (start + t) q +
-          O.windowCaptureCountBefore start q t ≤
+          windowCaptureCountBefore O start q t ≤
         O.windowTwoSteps start q := by
   intro t ht
   induction t with
@@ -227,11 +231,11 @@ theorem windowTwoSteps_add_captureCountBefore_le
           simpa [Nat.add_assoc] using
             C.windowTwoSteps_strict_decrease
         have hcount :=
-          O.windowCaptureCountBefore_succ_of_captured
+          windowCaptureCountBefore_succ_of_captured O
             start q t ⟨C⟩
         omega
       · let S :=
-          F.synchronized_of_not_captured
+          synchronized_of_not_captured F
             t htlt hcap
         have heq :
             O.windowTwoSteps (start + (t + 1)) q =
@@ -239,7 +243,7 @@ theorem windowTwoSteps_add_captureCountBefore_le
           simpa [Nat.add_assoc] using
             S.windowTwoSteps_eq
         have hcount :=
-          O.windowCaptureCountBefore_succ_of_not_captured
+          windowCaptureCountBefore_succ_of_not_captured O
             start q t hcap
         omega
 
@@ -304,18 +308,18 @@ theorem twoPow_captureCount_lt_succ
         (q + 1) * 3 ^ q)
     (hNoCritical :
       NoCriticalCaptureInFirstDeferred F) :
-    2 ^ F.captureCount < q + 1 := by
+    2 ^ captureCount F < q + 1 := by
   let H₀ :=
     O.windowTwoSteps start q
   let H₁ :=
     O.windowTwoSteps
       (start + F.terminalTime) q
   let C :=
-    F.captureCount
+    captureCount F
   have hcontract :
       3 ^ q < 2 ^ H₁ := by
     simpa [H₁] using
-      F.contracting_at_of_noCritical
+      contracting_at_of_noCritical F
         hInitialLower
         hNoCritical
         F.terminalTime
@@ -328,7 +332,7 @@ theorem twoPow_captureCount_lt_succ
       C,
       captureCount
     ] using
-      F.windowTwoSteps_add_captureCountBefore_le
+      windowTwoSteps_add_captureCountBefore_le F
         F.terminalTime
         le_rfl
   have hpowC :
@@ -371,10 +375,9 @@ theorem twoPow_captureCount_lt_windowLength_succ
     (j : ℕ)
     (hNoCritical :
       NoCriticalCaptureInFirstDeferred (T.data j)) :
-    2 ^ (T.data j).captureCount <
+    2 ^ OddOrbit.FiniteCaptureNormalizationData.captureCount (T.data j) <
       T.windowLength j + 1 := by
-  apply
-    (T.data j).twoPow_captureCount_lt_succ
+  apply OddOrbit.FiniteCaptureNormalizationData.twoPow_captureCount_lt_succ (T.data j)
   · simpa [
       FirstDeferredNormalizationTowerData.start,
       FirstDeferredNormalizationTowerData.windowLength,
@@ -395,4 +398,4 @@ theorem twoPow_captureCount_lt_windowLength_succ
 
 end FirstDeferredNormalizationTowerData
 
-end CollatzSecondLayer2
+end CollatzSecondLayer3
