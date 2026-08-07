@@ -52,12 +52,14 @@ import CollatzLean.CollatzSecondLayer3.SourcePreservingSpecialC3Reduction
 import CollatzLean.CollatzSecondLayer3.FutureMinimumGenericReduction
 import CollatzLean.CollatzSecondLayer3.MeanderAbsorption
 
--- 発散反例排除の新主経路。
--- Constant terminal排除を唯一の残存数学入力とし、全長さterminal escapeから
--- exponent tail定数化を経て非有界odd-only軌道を排除する。
+-- 発散反例排除のall-length主経路。
 import CollatzLean.CollatzSecondLayer3.FutureMinimumAllLengths
 import CollatzLean.CollatzSecondLayer3.ConstantTerminalObstruction
 import CollatzLean.CollatzSecondLayer3.TerminalEscapeExponent
 import CollatzLean.CollatzSecondLayer3.UnboundedConstantReduction
 import CollatzLean.CollatzSecondLayer3.ConstantTerminalLegacyBridge
+
+-- Constant terminalをさらにT=0 future-minimum high-event towerへ縮約する。
+import CollatzLean.CollatzSecondLayer3.FutureMinimumHighEvent
+import CollatzLean.CollatzSecondLayer3.FirstCrossingHighConnector
 import CollatzLean.CollatzSecondLayer3.ConstantTerminalMain

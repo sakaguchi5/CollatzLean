@@ -1,35 +1,49 @@
 import CollatzLean.CollatzSecondLayer3.UnboundedConstantReduction
 import CollatzLean.CollatzSecondLayer3.ConstantTerminalLegacyBridge
+import CollatzLean.CollatzSecondLayer3.FutureMinimumHighEvent
 
 /-!
 # 発散反例排除の新しい主入口
 
+大型リファクタ後のall-length議論に加え、Constant terminalはさらに
+`terminalTime = 0`のfuture-minimum high-event towerまで縮約できる。
+
 主経路：
 
 `Unbounded odd orbit`
-  → fixed future-minimum上の全正長first-deferred系
-  → Constant terminal familyが無ければterminal timeが全長さで無限遠へ逃げる
-  → tail最小exponentを十分大きい全shiftへ複製
-  → exponent tail eventually constant
-  → 非有界性に矛盾
+  → standard future-minimum
+  → high exponent positions occur cofinally
+  → sufficiently far high-event windows are Special C3
+  → first-deferred terminalTime = 0
+  → T=0 Constant terminal family
 
-従って残る数学的核心はConstant terminal familyの排除一つである。
-既存のConstant nested解析は`ConstantTerminalLegacyBridge`から再利用する。
+従って現在の最も鋭い発散側主目標は、future-minimum high-event towerの不存在である。
+Constant terminal排除原理を証明すれば、この主目標も直ちに従う。
 -/
 
 namespace CollatzSecondLayer3
 
 /--
-現在の大型リファクタ後に残る唯一の発散側exclusion target。
-この命題を証明すれば`no_unbounded_odd_orbit_of_constantTerminal_exclusion`が直ちに使える。
+現在の大型リファクタ後に残る最も鋭い発散側exclusion target。
+非有界軌道なら必ずこのtowerが存在するため、これを排除すれば発散反例は存在しない。
 -/
-def ConstantTerminalMainTarget : Prop :=
-  ConstantTerminalExclusionPrinciple
+def FutureMinimumHighEventExclusionPrinciple : Prop :=
+  ¬ HasFutureMinimumHighEventTower
 
-/-- Constant terminal主目標を閉じれば発散odd-only反例は存在しない。 -/
+/-- 現在の主目標。 -/
+def ConstantTerminalMainTarget : Prop :=
+  FutureMinimumHighEventExclusionPrinciple
+
+/-- 従来のConstant terminal排除原理は新しいhigh-event主目標を含意する。 -/
+theorem mainTarget_of_constantTerminal_exclusion
+    (hConstant : ConstantTerminalExclusionPrinciple) :
+    ConstantTerminalMainTarget := by
+  exact no_highEventTower_of_constantTerminal_exclusion hConstant
+
+/-- high-event主目標を閉じれば発散odd-only反例は存在しない。 -/
 theorem no_unbounded_odd_orbit_of_mainTarget
     (hMain : ConstantTerminalMainTarget) :
     ¬ CollatzCore.HasUnboundedOddOrbit :=
-  no_unbounded_odd_orbit_of_constantTerminal_exclusion hMain
+  no_unbounded_odd_orbit_of_highEvent_exclusion hMain
 
 end CollatzSecondLayer3
