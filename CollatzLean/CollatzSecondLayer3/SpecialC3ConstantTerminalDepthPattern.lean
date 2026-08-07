@@ -549,7 +549,7 @@ theorem fixedDepthPatternSubsequence
     Nonempty (ConstantTerminalFixedDepthPatternData F) := by
   classical
   obtain ⟨P, hP⟩ :=
-    cofinally_constant_of_fintype F.nested.depthPattern
+    cofinally_constant_of_finite F.nested.depthPattern
   let select : ℕ → ℕ :=
     Cofinally.select (fun n => F.nested.depthPattern n = P) hP
   exact ⟨{

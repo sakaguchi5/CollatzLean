@@ -66,12 +66,13 @@ theorem cofinally_constant_of_bounded_nat_sequence :
         · simpa [shifted] using heq
 
 /-- 任意の有限型値列にはcofinal定数部分列が存在する。 -/
-theorem cofinally_constant_of_fintype
+theorem cofinally_constant_of_finite
     {α : Type*}
-    [Fintype α]
+    [Finite α]
     (a : ℕ → α) :
     ∃ x : α, Cofinally (fun n => a n = x) := by
   classical
+  letI : Fintype α := Fintype.ofFinite α
   let e : α ≃ Fin (Fintype.card α) := Fintype.equivFin α
   let code : ℕ → ℕ := fun n => (e (a n)).val
   have hBound : ∀ n : ℕ, code n ≤ Fintype.card α := by
@@ -80,7 +81,7 @@ theorem cofinally_constant_of_fintype
   obtain ⟨v, hv⟩ :=
     cofinally_constant_of_bounded_nat_sequence
       (Fintype.card α) code hBound
-  obtain ⟨n₀, _hn₀, hv₀⟩ := hv 0
+  obtain ⟨n₀, hn₀, hv₀⟩ := hv 0
   have hvlt : v < Fintype.card α := by
     have hlt := (e (a n₀)).isLt
     have hvEq : (e (a n₀)).val = v := by
@@ -93,7 +94,6 @@ theorem cofinally_constant_of_fintype
   obtain ⟨n, hn, hcode⟩ := hv N
   refine ⟨n, hn, ?_⟩
   apply e.injective
-  change e (a n) = e x
   rw [show e x = (⟨v, hvlt⟩ : Fin (Fintype.card α)) by
     simp [x]]
   apply Fin.ext
@@ -141,7 +141,7 @@ theorem carryKind_certificate
         (O.CapturedWindowAt
           (R.anchor + t.1)
           (D.selectedLength n))
-  · simpa [carryKind, hCaptured] using hCaptured
+  · simp only [carryKind, hCaptured, ↓reduceDIte]
   · have ht :
         t.1 < R.terminalTime (D.selectedIndex n) := by
       change t.1 < R.terminalTime (D.terminal.select n)
@@ -193,7 +193,7 @@ theorem fixedCarryPatternSubsequence_nonempty
     Nonempty (ConstantTerminalFixedCarryPatternData D) := by
   classical
   obtain ⟨P, hP⟩ :=
-    cofinally_constant_of_fintype D.carryPattern
+    cofinally_constant_of_finite D.carryPattern
   let select : ℕ → ℕ :=
     Cofinally.select (fun n => D.carryPattern n = P) hP
   exact ⟨{
