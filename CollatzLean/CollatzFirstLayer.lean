@@ -20,5 +20,6 @@ import CollatzLean.CollatzFirstLayer.SignedReplay
 import CollatzLean.CollatzFirstLayer.ShadowReanchoring
 import CollatzLean.CollatzFirstLayer.NegativeShadowIteration
 import CollatzLean.CollatzFirstLayer.NegativeShadowAlignment
+import CollatzLean.CollatzFirstLayer.NegativeShadowCriticalBoundary
 import CollatzLean.CollatzFirstLayer.CommonWordDifference
 import CollatzLean.CollatzFirstLayer.SignedCommonWordDivisibility
