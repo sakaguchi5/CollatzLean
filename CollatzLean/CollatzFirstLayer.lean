@@ -18,3 +18,5 @@ import CollatzLean.CollatzFirstLayer.TwoAdicShell
 import CollatzLean.CollatzFirstLayer.ReplayDescent
 import CollatzLean.CollatzFirstLayer.SignedReplay
 import CollatzLean.CollatzFirstLayer.ShadowReanchoring
+import CollatzLean.CollatzFirstLayer.NegativeShadowIteration
+import CollatzLean.CollatzFirstLayer.CommonWordDifference
