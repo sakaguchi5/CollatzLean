@@ -2,6 +2,7 @@ import CollatzLean.CollatzSecondLayer3.ActualReturn.AdjacentState
 import CollatzLean.CollatzSecondLayer3.ActualReturn.AdjacentExpandingReturn
 import CollatzLean.CollatzSecondLayer3.ActualReturn.AdjacentContractingReturn
 import CollatzLean.CollatzSecondLayer3.ActualReturn.Valuation
+import CollatzLean.CollatzSecondLayer3.ActualReturn.AssetReconnect
 
 /-!
 # compatibility shim: actual-return 旧入口
@@ -15,6 +16,9 @@ import CollatzLean.CollatzSecondLayer3.ActualReturn.Valuation
 の二枝を公開する。
 
 旧 first-crossing arithmetic / valuation API は局所補題供給源として引き続き保持する。
+さらに `AssetReconnect` で、旧 Exact/Late・sharp affine・valuation 資産を
+adjacent-return 二枝へ再接続する。
+
 新規コードでは `CollatzLean.CollatzSecondLayer3.ActualReturn.Main` または
 必要な個別モジュールを直接 import する。
 -/
