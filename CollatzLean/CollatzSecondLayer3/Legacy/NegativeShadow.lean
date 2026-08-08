@@ -1,0 +1,20 @@
+import CollatzLean.CollatzSecondLayer3.SpecialC3ShadowTower
+import CollatzLean.CollatzSecondLayer3.SpecialC3AlignmentBasics
+import CollatzLean.CollatzSecondLayer3.SpecialC3IntervalSubsequence
+import CollatzLean.CollatzSecondLayer3.SpecialC3OverlapCommonSegment
+import CollatzLean.CollatzSecondLayer3.SpecialC3AlignmentPropagation
+import CollatzLean.CollatzSecondLayer3.SpecialC3TransportedCollision
+import CollatzLean.CollatzSecondLayer3.SpecialC3CriticalOverlapAlignment
+import CollatzLean.CollatzSecondLayer3.SpecialC3TerminalGeometry
+import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalNested
+import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalCarryPattern
+import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalFirstCarry
+import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalSuffixTransport
+import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalDepthPattern
+import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalEndpointSplit
+/-!
+# legacy negative-shadow / alignment umbrella
+
+negative shadow は主矛盾源から降格し、actual-return extraction や局所 alignment の
+補助 API としてのみ保持する。
+-/

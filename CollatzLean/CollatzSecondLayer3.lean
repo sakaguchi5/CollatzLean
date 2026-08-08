@@ -1,71 +1,25 @@
-import CollatzLean.CollatzSecondLayer3.PolynomialCrossing
-import CollatzLean.CollatzSecondLayer3.AlternativeExclusion
-import CollatzLean.CollatzSecondLayer3.CaptureRefinement
-import CollatzLean.CollatzSecondLayer3.TransportRefinement
-import CollatzLean.CollatzSecondLayer3.PositivePreparation
-import CollatzLean.CollatzSecondLayer3.PositiveObjects
-import CollatzLean.CollatzSecondLayer3.PreparedNormalizationTower
-import CollatzLean.CollatzSecondLayer3.NormalizationObstruction
-import CollatzLean.CollatzSecondLayer3.PositiveReduction
-import CollatzLean.CollatzSecondLayer3.NormalizationRefinementSource
-import CollatzLean.CollatzSecondLayer3.NormalizationRefinementFacts
-import CollatzLean.CollatzSecondLayer3.NormalizationOutcomeSplit
-import CollatzLean.CollatzSecondLayer3.NormalizationRefinementObjects
-import CollatzLean.CollatzSecondLayer3.PolynomialTerminalRefinement
-import CollatzLean.CollatzSecondLayer3.CaptureCountRefinement
-import CollatzLean.CollatzSecondLayer3.LongPlateauRefinement
-import CollatzLean.CollatzSecondLayer3.FirstDeferredSubsequenceClassification
-import CollatzLean.CollatzSecondLayer3.FirstDeferredRefinement
-import CollatzLean.CollatzSecondLayer3.EventuallySynchronizedRefinement
-import CollatzLean.CollatzSecondLayer3.NormalizationRefinement
-import CollatzLean.CollatzSecondLayer3.RefinedPositiveReduction
-import CollatzLean.CollatzSecondLayer3.ContractingWindowBounds
-import CollatzLean.CollatzSecondLayer3.NoCriticalDiscountedSpecialC3
-import CollatzLean.CollatzSecondLayer3.FirstCriticalTransition
-import CollatzLean.CollatzSecondLayer3.FinalPositiveReduction
-import CollatzLean.CollatzSecondLayer3.FirstCriticalTerminalRefinement
-import CollatzLean.CollatzSecondLayer3.ShortPositiveShadowExclusion
-import CollatzLean.CollatzSecondLayer3.UnifiedSpecialC3Obstruction
-import CollatzLean.CollatzSecondLayer3.FinalTerminalReduction
+import CollatzLean.CollatzSecondLayer3.ActualReturn.Main
+import CollatzLean.CollatzSecondLayer3.Legacy.SpecialC3
+import CollatzLean.CollatzSecondLayer3.Legacy.NegativeShadow
+import CollatzLean.CollatzSecondLayer3.Legacy.Terminal
+/-!
+# CollatzSecondLayer3
 
--- 旧Special C3 / negative-shadow解析。
--- 現在は主矛盾源ではなく、局所alignment・legacy reduction用として保持する。
-import CollatzLean.CollatzSecondLayer3.GenericObstructions
-import CollatzLean.CollatzSecondLayer3.OrderedPeriodicTailExclusion
-import CollatzLean.CollatzSecondLayer3.FutureMinimumTerminalDichotomy
-import CollatzLean.CollatzSecondLayer3.FutureMinimumDeepLowerReplay
-import CollatzLean.CollatzSecondLayer3.DeepLowerReplayExclusion
-import CollatzLean.CollatzSecondLayer3.FutureMinimumSpecialC3
-import CollatzLean.CollatzSecondLayer3.SpecialC3ShadowTower
-import CollatzLean.CollatzSecondLayer3.SpecialC3AlignmentBasics
-import CollatzLean.CollatzSecondLayer3.SpecialC3IntervalSubsequence
-import CollatzLean.CollatzSecondLayer3.SpecialC3OverlapCommonSegment
-import CollatzLean.CollatzSecondLayer3.SpecialC3AlignmentPropagation
-import CollatzLean.CollatzSecondLayer3.SpecialC3TransportedCollision
-import CollatzLean.CollatzSecondLayer3.SpecialC3CriticalOverlapAlignment
-import CollatzLean.CollatzSecondLayer3.SpecialC3TerminalGeometry
-import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalNested
-import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalCarryPattern
-import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalFirstCarry
-import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalSuffixTransport
-import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalDepthPattern
-import CollatzLean.CollatzSecondLayer3.SpecialC3ConstantTerminalEndpointSplit
-import CollatzLean.CollatzSecondLayer3.SourcePreservingSpecialC3Reduction
-import CollatzLean.CollatzSecondLayer3.FutureMinimumGenericReduction
-import CollatzLean.CollatzSecondLayer3.MeanderAbsorption
+発散側の正本入口を actual-return 二局所枝へ移す。
 
--- 発散反例排除のall-length標準形。
-import CollatzLean.CollatzSecondLayer3.FutureMinimumAllLengths
-import CollatzLean.CollatzSecondLayer3.ConstantTerminalObstruction
-import CollatzLean.CollatzSecondLayer3.TerminalEscapeExponent
-import CollatzLean.CollatzSecondLayer3.UnboundedConstantReduction
-import CollatzLean.CollatzSecondLayer3.ConstantTerminalLegacyBridge
+主経路:
 
--- T=0 future-minimum high-event標準形。
-import CollatzLean.CollatzSecondLayer3.FutureMinimumHighEvent
-import CollatzLean.CollatzSecondLayer3.FirstCrossingHighConnector
+`HasUnboundedOddOrbit`
+  → actual-return extraction
+  → `r < p` を well-founded descent に吸収
+  → `ExactAdjacency` または `LateNextMinimum`
+  → 二枝排除
+  → `¬ HasUnboundedOddOrbit`
 
--- negative shadow降格後のactual-orbit研究核。
-import CollatzLean.CollatzSecondLayer3.ActualReturnCore
+旧 Special C3 / negative-shadow / Constant terminal 群は `Legacy` umbrella の裏で
+互換 API として保持する。
+-/
 
-import CollatzLean.CollatzSecondLayer3.ConstantTerminalMain
+-- 発散側の新しい正本。
+
+-- 旧証明経路は互換 API として保持。
