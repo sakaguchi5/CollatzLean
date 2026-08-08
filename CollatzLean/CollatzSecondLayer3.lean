@@ -28,6 +28,8 @@ import CollatzLean.CollatzSecondLayer3.ShortPositiveShadowExclusion
 import CollatzLean.CollatzSecondLayer3.UnifiedSpecialC3Obstruction
 import CollatzLean.CollatzSecondLayer3.FinalTerminalReduction
 
+-- 旧Special C3 / negative-shadow解析。
+-- 現在は主矛盾源ではなく、局所alignment・legacy reduction用として保持する。
 import CollatzLean.CollatzSecondLayer3.GenericObstructions
 import CollatzLean.CollatzSecondLayer3.OrderedPeriodicTailExclusion
 import CollatzLean.CollatzSecondLayer3.FutureMinimumTerminalDichotomy
@@ -52,14 +54,18 @@ import CollatzLean.CollatzSecondLayer3.SourcePreservingSpecialC3Reduction
 import CollatzLean.CollatzSecondLayer3.FutureMinimumGenericReduction
 import CollatzLean.CollatzSecondLayer3.MeanderAbsorption
 
--- 発散反例排除のall-length主経路。
+-- 発散反例排除のall-length標準形。
 import CollatzLean.CollatzSecondLayer3.FutureMinimumAllLengths
 import CollatzLean.CollatzSecondLayer3.ConstantTerminalObstruction
 import CollatzLean.CollatzSecondLayer3.TerminalEscapeExponent
 import CollatzLean.CollatzSecondLayer3.UnboundedConstantReduction
 import CollatzLean.CollatzSecondLayer3.ConstantTerminalLegacyBridge
 
--- Constant terminalをさらにT=0 future-minimum high-event towerへ縮約する。
+-- T=0 future-minimum high-event標準形。
 import CollatzLean.CollatzSecondLayer3.FutureMinimumHighEvent
 import CollatzLean.CollatzSecondLayer3.FirstCrossingHighConnector
+
+-- negative shadow降格後のactual-orbit研究核。
+import CollatzLean.CollatzSecondLayer3.ActualReturnCore
+
 import CollatzLean.CollatzSecondLayer3.ConstantTerminalMain
