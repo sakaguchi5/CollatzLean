@@ -2,24 +2,24 @@ import CollatzLean.CollatzSecondLayer3.ActualReturn.Main
 import CollatzLean.CollatzSecondLayer3.Legacy.SpecialC3
 import CollatzLean.CollatzSecondLayer3.Legacy.NegativeShadow
 import CollatzLean.CollatzSecondLayer3.Legacy.Terminal
+
 /-!
 # CollatzSecondLayer3
 
-発散側の正本入口を actual-return 二局所枝へ移す。
+発散側の正本入口を標準 future-minimum の隣接 actual-return 二局所枝へ移す。
 
 主経路:
 
 `HasUnboundedOddOrbit`
-  → actual-return extraction
-  → `r < p` を well-founded descent に吸収
-  → `ExactAdjacency` または `LateNextMinimum`
+  → consecutive standard future minima
+  → determinant sign dichotomy
+  → `AdjacentExpandingReturn` または `AdjacentContractingReturn`
   → 二枝排除
   → `¬ HasUnboundedOddOrbit`
+
+この reduction は first crossing の存在を要求しないため、one-sided meander も
+Adjacent Expanding Return 側の内部に自動的に含まれる。
 
 旧 Special C3 / negative-shadow / Constant terminal 群は `Legacy` umbrella の裏で
 互換 API として保持する。
 -/
-
--- 発散側の新しい正本。
-
--- 旧証明経路は互換 API として保持。

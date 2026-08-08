@@ -5,11 +5,12 @@ import CollatzLean.CollatzSecondLayer3.ActualReturn.Dichotomy
 
 最終的な数学目標は二つだけ。
 
-1. ExactAdjacency tower の排除
-2. LateNextMinimum tower の排除
+1. Adjacent Expanding Return tower の排除
+2. Adjacent Contracting Return tower の排除
 
-`ActualReturnDichotomyPrinciple` が閉じれば、この二局所整数枝の排除だけで
-非有界 odd-only 軌道を完全排除できる。
+first crossing・meander・Special C3・terminal normalization は最終 reduction の
+公開分岐には現れない。標準 future-minimum の隣接区間の determinant 符号だけで
+無条件に二分岐する。
 -/
 
 namespace CollatzSecondLayer3
@@ -18,19 +19,19 @@ open CollatzCore
 
 /-- リファクタ後の発散側最終目標。 -/
 def ActualReturnMainTarget : Prop :=
-  ExactAdjacencyExclusionPrinciple ∧
-    LateNextMinimumExclusionPrinciple
+  AdjacentExpandingReturnExclusionPrinciple ∧
+    AdjacentContractingReturnExclusionPrinciple
 
 /--
-actual-return 二分岐 reduction と二局所枝排除から、非有界 odd-only 軌道を排除する。
+二つの隣接-return局所整数枝を排除すれば、非有界 odd-only 軌道は存在しない。
+reduction theorem は Lean 内で無条件に証明済みなので追加仮定を取らない。
 -/
 theorem no_unbounded_odd_orbit_of_actualReturnMain
-    (hReduce : ActualReturnDichotomyPrinciple)
     (hMain : ActualReturnMainTarget) :
     ¬ HasUnboundedOddOrbit := by
-  rintro ⟨O, hU⟩
-  rcases hReduce O hU with hExact | hLate
-  · exact hMain.1 ⟨O, hExact⟩
-  · exact hMain.2 ⟨O, hLate⟩
+  intro hU
+  rcases unbounded_odd_orbit_adjacentReturn_dichotomy hU with hExp | hCon
+  · exact hMain.1 hExp
+  · exact hMain.2 hCon
 
 end CollatzSecondLayer3
