@@ -4,12 +4,12 @@ import CollatzLean.Collatz.OneStep.Carry
 import CollatzLean.Collatz.FiniteOrbit.Comparison
 
 /-!
-# canonical contracting chain の gap-depth dichotomy
+# canonical 収縮連鎖の gap-depth 二分岐
 
-bounded depth では shallow future minimum が隣接2点ごとに必ず現れる。
-unbounded depth では valuation triangle を start-lower / equal-cancellation /
-next-lower に分類し、aligned exponent-1 run の差深さ輸送から
-captured / deferred / synchronized high-event 構造へ接続する。
+gap depth が有界なら、浅い future minimum が隣接2点ごとに必ず現れる。
+gap depth が非有界なら、valuation triangle を start-lower / equal-cancellation /
+next-lower に分類し、整列した exponent-1 run の差深さ輸送から
+captured / deferred / synchronized high-event の構造へ接続する。
 -/
 
 namespace Collatz
@@ -17,25 +17,25 @@ namespace AdjacentReturn
 
 namespace CanonicalContractingChain
 
-/-- chain 第 n gap depth。 -/
+/-- chain の第 n gap depth。 -/
 def gapDepth {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) : ℕ :=
   (C.valuationData n).gapDepth
 
-/-- chain 第 n start `+1` depth。 -/
+/-- chain の第 n start の `+1` depth。 -/
 def startDepth {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) : ℕ :=
   (C.valuationData n).startDepth
 
-/-- gap depths が M 以下で一様有界。 -/
+/-- gap depth が M 以下で一様に有界。 -/
 def GapDepthBounded
     {O : OddOrbit} (C : CanonicalContractingChain O) (M : ℕ) : Prop :=
   ∀ n : ℕ, C.gapDepth n ≤ M
 
-/-- gap depths が非有界。 -/
+/-- gap depth が非有界。 -/
 def GapDepthUnbounded
     {O : OddOrbit} (C : CanonicalContractingChain O) : Prop :=
   ∀ M : ℕ, ∃ n : ℕ, M < C.gapDepth n
 
-/-- bounded / unbounded の完全二分岐。 -/
+/-- 有界 / 非有界の完全二分岐。 -/
 theorem gapDepth_bounded_or_unbounded
     {O : OddOrbit} (C : CanonicalContractingChain O) :
     (∃ M : ℕ, C.GapDepthBounded M) ∨ C.GapDepthUnbounded := by
@@ -51,7 +51,7 @@ theorem gapDepth_bounded_or_unbounded
     push Not at hnot
     exact hnot
 
-/-- 一つの valuation triangle の局所三分岐。 -/
+/-- 一つの valuation triangle に対する局所三分岐。 -/
 inductive LocalGapDepthOutcome
     {O : OddOrbit} {R : State O} (V : State.ValuationData R) : Type
   | startLower
@@ -64,7 +64,7 @@ inductive LocalGapDepthOutcome
       (depth_lt : V.nextDepth < V.startDepth)
       (gap_eq : V.gapDepth = V.nextDepth)
 
-/-- valuation triangle を local three-way outcome へ分類。 -/
+/-- valuation triangle を局所三分岐へ分類する。 -/
 def classifyLocalGapDepth
     {O : OddOrbit} {R : State O}
     (V : State.ValuationData R) : LocalGapDepthOutcome V := by
@@ -82,7 +82,7 @@ def classifyLocalGapDepth
         LocalGapDepthOutcome.nextLower hCA
           (V.gapDepth_eq_nextDepth_of_lt hCA)
 
-/-- bounded gap depth なら隣接する二つの future-minimum depth の少なくとも一方は shallow。 -/
+/-- gap depth が有界なら、隣接する二つの future-minimum depth の少なくとも一方は浅い。 -/
 theorem shallow_pair_of_gapDepth_bounded
     {O : OddOrbit} (C : CanonicalContractingChain O)
     {M : ℕ} (hB : C.GapDepthBounded M) (n : ℕ) :
@@ -104,7 +104,7 @@ theorem shallow_pair_of_gapDepth_bounded
       rw [← heq]
       exact hgap
 
-/-- bounded branch is syndetically shallow: n or n+1 start depth is ≤ M。 -/
+/-- 有界枝では浅い start が間隔1以内で現れ、n または n+1 の start depth が M 以下になる。 -/
 theorem syndetic_shallow_of_gapDepth_bounded
     {O : OddOrbit} (C : CanonicalContractingChain O)
     {M : ℕ} (hB : C.GapDepthBounded M) (n : ℕ) :
@@ -117,7 +117,7 @@ theorem syndetic_shallow_of_gapDepth_bounded
     rw [← hcoh]
     exact h
 
-/-- chain state start の canonical first-high data。 -/
+/-- chain state の start における canonical first-high データ。 -/
 noncomputable def startFirstHigh
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     OddOrbit.FutureMinimumFirstHighData
@@ -125,13 +125,13 @@ noncomputable def startFirstHigh
   OddOrbit.FutureMinimumFirstHighData.firstHigh
     O (C.state n).startIndex
 
-/-- chain state next future-minimum の first-high data。 -/
+/-- chain state の次 future minimum における first-high データ。 -/
 noncomputable def nextFirstHigh
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     OddOrbit.FutureMinimumFirstHighData (O := O) (C.state n).nextIndex :=
   OddOrbit.FutureMinimumFirstHighData.firstHigh O (C.state n).nextIndex
 
-/-- shallow start では first high が M 未満に来て、その exponent も M 以下。 -/
+/-- 浅い start では first high が M 未満で現れ、その exponent も M 以下。 -/
 theorem shallow_firstHigh_control
     {O : OddOrbit} (C : CanonicalContractingChain O)
     {M n : ℕ}
@@ -182,8 +182,8 @@ theorem shallow_firstHigh_control
 
 
 /--
-bounded branch: arbitrarily long first crossings still occur at shallow starts。
-したがって finite early-high type の後ろに arbitrarily long expanding continuation が残る。
+有界枝でも、浅い start 上に任意に長い first crossing が現れる。
+したがって有限種類の early-high 型の後ろに、任意に長い expanding continuation が残る。
 -/
 theorem arbitrarily_long_shallow_firstCrossing_of_gapDepth_bounded
     {O : OddOrbit} (C : CanonicalContractingChain O)
@@ -202,7 +202,7 @@ theorem arbitrarily_long_shallow_firstCrossing_of_gapDepth_bounded
     intro F
     exact hJ (J + 1) (by omega) F
 
-/-- equal cancellation itself splits into deep synchronization or moderate cancellation。 -/
+/-- equal cancellation は、深い同期または中程度の cancellation に分かれる。 -/
 theorem equalCancellation_huge_or_moderate
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ)
     (hEq : (C.valuationData n).startDepth =
@@ -213,7 +213,7 @@ theorem equalCancellation_huge_or_moderate
         2 * (C.valuationData n).startDepth := by
   omega
 
-/-- moderate equal cancellation with a large gap forces a large start depth too。 -/
+/-- 中程度の equal cancellation で gap が大きければ、start depth も大きくなる。 -/
 theorem startDepth_large_of_equal_moderate_largeGap
     {O : OddOrbit} (C : CanonicalContractingChain O) (n M : ℕ)
     (_hEq : (C.valuationData n).startDepth =
@@ -225,7 +225,7 @@ theorem startDepth_large_of_equal_moderate_largeGap
     M < 2 * (C.valuationData n).startDepth := by
   omega
 
-/-- a segment whose exponents are all 1 equals a replicate-one word。 -/
+/-- 指数がすべて1の segment は、1を反復した word と一致する。 -/
 private theorem segment_eq_replicate_one
     (O : OddOrbit) {start L : ℕ}
     (hones : ∀ k : ℕ, k < L → O.exponent (start + k) = 1) :
@@ -248,7 +248,7 @@ private theorem segment_eq_replicate_one
       rfl
 
 /--
-aligned exponent-1 run of length L transports an initial gap depth E to E-L exactly。
+長さ L の整列した exponent-1 run は、初期 gap depth E を正確に E-L へ輸送する。
 -/
 theorem aligned_oneRun_gapFactor
     {O : OddOrbit} {R : State O}
@@ -320,7 +320,7 @@ theorem aligned_oneRun_gapFactor
     exact (show Odd (3 : ℕ) by decide).pow
   exact hthreeOdd.mul V.gapFactor.2
 
-/-- startDepth < nextDepth branch: first divergence is a depth-1 captured event。 -/
+/-- startDepth < nextDepth 枝では、最初の分岐は depth 1 の captured event になる。 -/
 theorem startLower_firstDivergence_captured
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ)
     (hAC : (C.valuationData n).startDepth <
@@ -431,7 +431,7 @@ theorem startLower_firstDivergence_captured
   · simpa [Hx, L] using Hx.high
   · simpa [Hy, Hx, L] using hUpperOne
 
-/-- nextDepth < startDepth branch: first divergence is the deferred orientation。 -/
+/-- nextDepth < startDepth 枝では、最初の分岐は deferred 向きになる。 -/
 theorem nextLower_firstDivergence_deferred
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ)
     (hCA : (C.valuationData n).nextDepth <
@@ -533,7 +533,7 @@ theorem nextLower_firstDivergence_deferred
   · simpa using hq
 
 /--
-equal-depth cancellation が `E ≥ 2A` まで深ければ first high step 自体も synchronized。
+equal-depth cancellation が `E ≥ 2A` まで深ければ、first high step 自体も synchronized になる。
 -/
 theorem equalDepth_hugeGap_firstHigh_synchronized
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ)
@@ -667,8 +667,8 @@ theorem equalDepth_hugeGap_firstHigh_synchronized
   simpa [e, e₂, L] using heq
 
 
-/-- equal-depth huge-gap synchronization leaves
-  a strictly positive residual depth after the first high。 -/
+/-- equal-depth の huge-gap 同期では、first high 後にも
+  正の residual depth が残る。 -/
 theorem equalDepth_hugeGap_residualDepth_pos
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ)
     (hEq : (C.valuationData n).startDepth =
@@ -693,7 +693,7 @@ theorem equalDepth_hugeGap_residualDepth_pos
   dsimp [V, H] at hEq hHuge hDepth heLe ⊢
   omega
 
-/-- unbounded branch supplies arbitrarily large local three-way witnesses。 -/
+/-- 非有界枝では、任意に大きい gap depth を持つ局所三分岐の証人が得られる。 -/
 theorem arbitrarily_large_local_outcome
     {O : OddOrbit} (C : CanonicalContractingChain O)
     (hU : C.GapDepthUnbounded) (M : ℕ) :

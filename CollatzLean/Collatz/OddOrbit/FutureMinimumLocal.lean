@@ -3,20 +3,20 @@ import CollatzLean.Collatz.OddOrbit.FutureMinimumArithmetic
 import CollatzLean.Collatz.Word.Geometry
 
 /-!
-# future minimum の局所 barrier / exponent cone / first high
+# future minimum の局所 barrier・exponent cone・first high
 
-future minimum からの actual dynamics に対して、
-* barrier を割る一段は high exponent である
-* offset t の exponent は t+1 以下
-* value+1 depth は最初の high offset + 1 と一致
-* first-high prefix は coefficient-expanding
+future minimum からの実際の dynamics に対して、
+* barrier を割る一段は high exponent であること
+* offset t の exponent は t+1 以下であること
+* value+1 depth は最初の high offset + 1 と一致すること
+* first-high prefix は coefficient-expanding であること
 を有限局所 API としてまとめる。
 -/
 
 namespace Collatz
 namespace OddOrbit
 
-/-- 一段が barrier `X` 以上に残るための exact inequality。 -/
+/-- 一段後も barrier `X` 以上に残るための正確な不等式。 -/
 theorem step_stays_above_barrier_iff
     {X delta e y : ℕ}
     (he : 2 ≤ e)
@@ -45,7 +45,7 @@ theorem step_stays_above_barrier_iff
       omega
     exact Nat.le_of_mul_le_mul_left hmul (Nat.pow_pos (by omega))
 
-/-- barrier を初めて下へ割る一段の exponent は少なくとも2。 -/
+/-- barrier を下へ割る一段の exponent は少なくとも2。 -/
 theorem exponent_two_le_of_step_descends_below
     {X x e y : ℕ}
     (hx : X ≤ x)
@@ -60,7 +60,7 @@ theorem exponent_two_le_of_step_descends_below
   · norm_num at hstep
     omega
 
-/-- any odd-only orbit grows by at most a factor 2 per odd step。 -/
+/-- 任意の odd-only 軌道は、1 odd step あたり高々2倍しか増加しない。 -/
 theorem value_add_le_twoPow_mul
     (O : OddOrbit) (n : ℕ) :
     ∀ t : ℕ,
@@ -104,7 +104,7 @@ theorem value_add_le_twoPow_mul
           rw [pow_succ]
           ring
 
-/-- unbounded future minimum is at least3。 -/
+/-- 非有界軌道上の future minimum の値は3以上。 -/
 theorem FutureMinimumAt.three_le_value
     {O : OddOrbit} {n : ℕ}
     (hmin : O.FutureMinimumAt n) (hU : O.Unbounded) :
@@ -122,7 +122,7 @@ theorem FutureMinimumAt.three_le_value
   rcases hodd with ⟨k, hk⟩
   omega
 
-/-- future minimum exponent cone: offset t の actual exponent は t+1 以下。 -/
+/-- future minimum の exponent cone：offset t の実際の exponent は t+1 以下。 -/
 theorem FutureMinimumAt.exponent_le_offset_add_one
     {O : OddOrbit} {n : ℕ}
     (hmin : O.FutureMinimumAt n) (hU : O.Unbounded) :
@@ -172,7 +172,7 @@ theorem FutureMinimumAt.exponent_le_offset_add_one
         _ ≤ 2 ^ t * O.value n := Nat.mul_le_mul hpowOne hsource3
     omega
 
-/-- length L の exponent-1 run transports `value+1` exactly。 -/
+/-- 長さ L の exponent-1 run は `value+1` を正確に輸送する。 -/
 theorem value_add_one_scaled_of_one_run
     (O : OddOrbit) :
     ∀ {start L : ℕ},
@@ -221,7 +221,7 @@ theorem value_add_one_scaled_of_one_run
               rw [pow_succ]
               ring
 
-/-- future minimum 以後の最初の high exponent。 -/
+/-- future minimum 以後に現れる最初の high exponent。 -/
 structure FutureMinimumFirstHighData
     {O : OddOrbit} (n : ℕ) where
   offset : ℕ
@@ -231,7 +231,7 @@ structure FutureMinimumFirstHighData
 
 namespace FutureMinimumFirstHighData
 
-/-- first high data can always be selected。 -/
+/-- 最初の high event のデータは常に選択できる。 -/
 noncomputable def firstHigh
     (O : OddOrbit) (n : ℕ) :
     FutureMinimumFirstHighData (O := O) n := by
@@ -271,7 +271,7 @@ noncomputable def firstHigh
   unfold HighExponentAt at hnotHigh
   omega
 
-/-- source `+1` depth equals first-high offset + 1。 -/
+/-- source の `+1` depth は first-high offset + 1 に等しい。 -/
 theorem depth_eq_offset_add_one
     {O : OddOrbit} {n A u : ℕ}
     (H : FutureMinimumFirstHighData (O := O) n)
@@ -283,7 +283,7 @@ theorem depth_eq_offset_add_one
       H.beforeHigh_one H.high
   exact TwoAdic.exponent_unique hA hv
 
-/-- first high exponent is at most the source `+1` depth。 -/
+/-- first high exponent は source の `+1` depth 以下。 -/
 theorem highExponent_le_depth
     {O : OddOrbit} {n A u : ℕ}
     (hmin : O.FutureMinimumAt n) (hU : O.Unbounded)
@@ -294,7 +294,7 @@ theorem highExponent_le_depth
   have hdepth := H.depth_eq_offset_add_one hA
   omega
 
-/-- first high step の reduced exact equation。 -/
+/-- first high step の簡約された正確な方程式。 -/
 theorem reducedEquation
     {O : OddOrbit} {n : ℕ}
     (H : FutureMinimumFirstHighData (O := O) n) :
@@ -380,7 +380,7 @@ private theorem twoSteps_segment_of_all_one
       rw [O.segment_succ]
       simp [Word.twoSteps_cons, hfirst, ih htail,Nat.add_comm]
 
-/-- first-high prefix の total two-steps。 -/
+/-- first-high prefix の total two-step 数。 -/
 theorem firstHighPrefix_twoSteps
     {O : OddOrbit} {n : ℕ}
     (H : FutureMinimumFirstHighData (O := O) n) :
@@ -421,7 +421,7 @@ theorem firstHighPrefix_twoSteps
   simp
 
 /--
-future minimum の first-high prefix is necessarily coefficient-expanding。
+future minimum の first-high prefix は必ず coefficient-expanding である。
 -/
 theorem prefixExpanding
     {O : OddOrbit} {n : ℕ}

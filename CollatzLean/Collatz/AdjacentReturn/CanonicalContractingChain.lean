@@ -3,17 +3,17 @@ import CollatzLean.Collatz.AdjacentReturn.CanonicalLate
 import CollatzLean.Collatz.Canonical.CylinderDynamics
 
 /-!
-# canonical contracting chain
+# canonical 収縮連鎖
 
-eventually-all-contracting tail を十分先へ shift し、各 full block が canonical、
-各 first crossing も canonical、valuation が coherent である連続 chain として保持する。
-さらに固定 source からの cumulative nested actual words を構成する。
+最終的に全区間が収縮する tail を十分先へずらし、各 full block が canonical、
+各 first crossing も canonical、valuation も整合する連続 chain として保持する。
+さらに固定 source からの累積した入れ子状の実際の word を構成する。
 -/
 
 namespace Collatz
 namespace AdjacentReturn
 
-/-- tail 上の任意 first-crossing family。 -/
+/-- tail 上の任意の first-crossing family。 -/
 structure EventuallyContractingFirstCrossingFamily
     {O : OddOrbit} (D : EventuallyContractingTailData O) where
   crossing : ∀ n : ℕ, FirstCrossingData (D.state n)
@@ -29,7 +29,7 @@ def toTower
     intro n
     simpa using F.crossing n
 
-/-- tail 上の first-crossing lengths は無限大へ進む。 -/
+/-- tail 上の first-crossing の長さは無限大へ進む。 -/
 theorem lengths_tend_to_infinity
     {O : OddOrbit} {D : EventuallyContractingTailData O}
     (F : EventuallyContractingFirstCrossingFamily D) :
@@ -48,7 +48,7 @@ end EventuallyContractingFirstCrossingFamily
 
 namespace EventuallyContractingTailData
 
-/-- tail には全項を同時に選んだ first-crossing family が存在する。 -/
+/-- tail には全項の first crossing を同時に選んだ family が存在する。 -/
 noncomputable def firstCrossingFamily
     {O : OddOrbit} (D : EventuallyContractingTailData O) :
     EventuallyContractingFirstCrossingFamily D := by
@@ -59,8 +59,8 @@ noncomputable def firstCrossingFamily
 end EventuallyContractingTailData
 
 /--
-十分先へ shift した canonical contracting chain。
-full block / first crossing / valuation を同時に保持する。
+十分先へずらした canonical 収縮連鎖。
+full block・first crossing・valuation を同時に保持する。
 -/
 structure CanonicalContractingChain (O : OddOrbit) where
   tail : EventuallyContractingTailData O
@@ -78,29 +78,29 @@ structure CanonicalContractingChain (O : OddOrbit) where
 
 namespace CanonicalContractingChain
 
-/-- chain 第 n adjacent state。 -/
+/-- chain の第 n adjacent state。 -/
 def state {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     State O :=
   C.tail.state (C.shift + n)
 
-/-- chain block data。 -/
+/-- chain の block データ。 -/
 theorem blockData {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     CanonicalContractingBlockData (C.state n) := by
   simpa [state] using C.block n
 
-/-- chain valuation data。 -/
+/-- chain の valuation データ。 -/
 def valuationData {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     State.ValuationData (C.state n) := by
   simpa [state] using C.valuation n
 
-/-- consecutive chain states connect exactly。 -/
+/-- 連続する chain state は正確に接続する。 -/
 theorem nextValue_eq_next_startValue
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     (C.state n).nextValue = (C.state (n + 1)).startValue := by
   have h := C.tail.nextValue_eq_next_startValue (C.shift + n)
   simpa [state, Nat.add_assoc] using h
 
-/-- chain の valuation depths are coherent across adjacent blocks。 -/
+/-- chain の valuation depth は隣接 block 間で整合する。 -/
 theorem valuationDepth_coherent
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     (C.valuationData n).nextDepth =
@@ -120,7 +120,7 @@ theorem valuationDepth_coherent
   exact TwoAdic.exponent_unique V.nextFactor hW
 
 
-/-- chain 上の任意 first-crossing length も無限大へ進む。 -/
+/-- chain 上の任意の first-crossing 長も無限大へ進む。 -/
 theorem firstCrossing_lengths_tend_to_infinity
     {O : OddOrbit} (C : CanonicalContractingChain O) :
     ∀ M : ℕ, ∃ J : ℕ, ∀ n : ℕ, J ≤ n →
@@ -138,26 +138,26 @@ theorem firstCrossing_lengths_tend_to_infinity
   rw [hEq]
   exact hchosen
 
-/-- chain future-minimum depths are at least2。 -/
+/-- chain の future-minimum depth は2以上。 -/
 theorem startDepth_two_le
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     2 ≤ (C.valuationData n).startDepth :=
   (C.valuationData n).startDepth_two_le
 
-/-- chain gap depths are at least2。 -/
+/-- chain の gap depth は2以上。 -/
 theorem gapDepth_two_le
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     2 ≤ (C.valuationData n).gapDepth :=
   (C.valuationData n).gapDepth_two_le
 
-/-- chain adjacent value gaps are positive multiples of4。 -/
+/-- chain の adjacent 値差は4の正の倍数。 -/
 theorem valueGap_four_dvd
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     ∃ q : ℕ, (C.state n).valueGap = 4 * q :=
   (C.state n).valueGap_four_dvd
 
-/-- full block is canonical actual run。 -/
-theorem blockRunsfirstCrossingEndpoint_eq_canonicalEnd
+/-- full block は canonical な実際の run である。 -/
+theorem blockRuns
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     Word.Runs
       (C.state n).word
@@ -167,7 +167,7 @@ theorem blockRunsfirstCrossingEndpoint_eq_canonicalEnd
     (C.state n).realizes
     (O.value_odd (C.state n).nextIndex)
 
-/-- first crossing canonical endpoint も actual endpoint と一致。 -/
+/-- first crossing の canonical endpoint も実際の endpoint と一致する。 -/
 theorem firstCrossingEndpoint_eq_canonicalEnd
     {O : OddOrbit} (C : CanonicalContractingChain O)
     (n : ℕ)
@@ -189,7 +189,7 @@ theorem firstCrossingEndpoint_eq_canonicalEnd
   rw [hq] at hfinish
   simpa using hfinish
 
-/-- each canonical first crossing is a genuine positive-return C3-type finite run。 -/
+/-- 各 canonical first crossing は真の正 return を持つ C3 型有限 run である。 -/
 theorem firstCrossing_positive_canonical
     {O : OddOrbit} (C : CanonicalContractingChain O)
     (n : ℕ) (F : FirstCrossingData (C.state n)) :
@@ -201,7 +201,7 @@ theorem firstCrossing_positive_canonical
   refine ⟨?_, firstCrossingEndpoint_eq_canonicalEnd C n F, F.start_lt_endpoint⟩
   simpa [state] using C.firstCrossingCanonical n F
 
-/-- each chain block satisfies the strict future-minimum corridor。 -/
+/-- chain の各 block は狭義の future-minimum corridor を満たす。 -/
 theorem corridor
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     2 * ((C.state n).nextValue + 1) <
@@ -209,11 +209,11 @@ theorem corridor
   (C.state n).two_mul_nextValue_add_one_lt_three_mul_startValue_add_one
     (C.blockData n).contracting
 
-/-- fixed source of cumulative nested chain。 -/
+/-- 累積入れ子 chain の固定 source。 -/
 def source {O : OddOrbit} (C : CanonicalContractingChain O) : ℕ :=
   (C.state 0).startValue
 
-/-- first n adjacent blocks concatenated。 -/
+/-- 先頭 n 個の adjacent block を連結した word。 -/
 def cumulativeWord {O : OddOrbit} (C : CanonicalContractingChain O) :
     ℕ → Collatz.Word
   | 0 => []
@@ -228,7 +228,7 @@ def cumulativeWord {O : OddOrbit} (C : CanonicalContractingChain O) :
     C.cumulativeWord (n + 1) =
       C.cumulativeWord n ++ (C.state n).word := rfl
 
-/-- cumulative word gives an actual run from the fixed first source。 -/
+/-- 累積 word は固定された最初の source からの実際の run を与える。 -/
 theorem cumulativeRuns
     {O : OddOrbit} (C : CanonicalContractingChain O) :
     ∀ n : ℕ,
@@ -242,11 +242,11 @@ theorem cumulativeRuns
       simpa [source] using Word.Runs.nil C.source
   | succ n ih =>
       rw [cumulativeWord_succ]
-      have h := ih.append (blockRunsfirstCrossingEndpoint_eq_canonicalEnd C n)
+      have h := ih.append (blockRuns C n)
       rw [C.nextValue_eq_next_startValue n] at h
       exact h
 
-/-- cumulative nested word length is at least the number of blocks。 -/
+/-- 累積入れ子 word の長さは block 数以上。 -/
 theorem cumulativeWord_length_ge
     {O : OddOrbit} (C : CanonicalContractingChain O) :
     ∀ n : ℕ, n ≤ (C.cumulativeWord n).length := by
@@ -259,7 +259,7 @@ theorem cumulativeWord_length_ge
       rw [(C.state n).word_length]
       omega
 
-/-- cumulative nested word consumes at least n total two-steps。 -/
+/-- 累積入れ子 word は少なくとも n 個の total two-step を消費する。 -/
 theorem cumulativeWord_twoSteps_ge
     {O : OddOrbit} (C : CanonicalContractingChain O) (n : ℕ) :
     n ≤ (C.cumulativeWord n).twoSteps := by
@@ -278,7 +278,7 @@ private theorem nat_lt_twoPow_succ (n : ℕ) : n < 2 ^ (n + 1) := by
       have hpowPos : 0 < 2 ^ (n + 1) := Nat.pow_pos (by omega)
       omega
 
-/-- once block count exceeds the fixed source, cumulative words are canonical too。 -/
+/-- block 数が固定 source 以上になれば、累積 word も canonical になる。 -/
 theorem cumulativeStart_eq_canonical_of_source_le
     {O : OddOrbit} (C : CanonicalContractingChain O)
     (n : ℕ) (hn : C.source ≤ n) :
@@ -302,7 +302,7 @@ theorem cumulativeStart_eq_canonical_of_source_le
   exact (C.cumulativeRuns n).realizes.eq_canonicalStart_of_lt_modulus
     (O.value_odd (C.state n).startIndex) hlt
 
-/-- cumulative canonical endpoint is the nth chain future minimum。 -/
+/-- 累積 word の canonical endpoint は chain の第 n future minimum である。 -/
 theorem cumulativeEnd_eq_canonical_of_source_le
     {O : OddOrbit} (C : CanonicalContractingChain O)
     (n : ℕ) (hn : C.source ≤ n) :
@@ -323,7 +323,7 @@ theorem cumulativeEnd_eq_canonical_of_source_le
   simpa using hfinish
 
 /--
-Baker input のもと eventually-contracting tail から canonical chain を構成。
+Baker 入力のもと、最終的に全区間が収縮する tail から canonical chain を構成する。
 -/
 noncomputable def ofEventuallyContractingTail
     {O : OddOrbit}

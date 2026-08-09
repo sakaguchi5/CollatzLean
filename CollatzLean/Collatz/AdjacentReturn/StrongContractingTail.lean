@@ -2,11 +2,11 @@ import CollatzLean.Collatz.AdjacentReturn.Dichotomy
 import CollatzLean.Collatz.AdjacentReturn.Valuation
 
 /-!
-# eventually contracting tail
+# 最終的に全区間が収縮する tail
 
-`dichotomy_on` の contracting 側で実際には得られている
-「十分後のすべての adjacent return が contracting」という情報を
-弱い cofinal selector へ落とさず保持する。
+`dichotomy_on` の収縮側で実際には得られている
+「十分後のすべての adjacent return が収縮する」という情報を
+弱い cofinal selector へ落とさず、そのまま保持する。
 -/
 
 namespace Collatz
@@ -16,7 +16,7 @@ open Selection
 
 /--
 標準 future-minimum 列上で、ある cutoff 以後の全 adjacent return が
-contracting であるという強い tail data。
+収縮するという強い tail データ。
 -/
 structure EventuallyContractingTailData (O : OddOrbit) where
   unbounded : O.Unbounded
@@ -33,13 +33,13 @@ def state {O : OddOrbit} (D : EventuallyContractingTailData O) (n : ℕ) :
     State O :=
   ⟨D.unbounded, D.minima, D.standard, D.cutoff + n⟩
 
-/-- tail の各 state は contracting。 -/
+/-- tail の各 state は収縮する。 -/
 theorem state_contracting
     {O : OddOrbit} (D : EventuallyContractingTailData O) (n : ℕ) :
     (D.state n).IsContracting := by
   exact D.contracting (D.cutoff + n) (by omega)
 
-/-- 連続 tail を既存 ContractingTower API へ埋め込む。 -/
+/-- 連続 tail を既存の `ContractingTower` API へ埋め込む。 -/
 def toContractingTower
     {O : OddOrbit} (D : EventuallyContractingTailData O) :
     ContractingTower O where
@@ -58,21 +58,21 @@ def toContractingTower
     {O : OddOrbit} (D : EventuallyContractingTailData O) (n : ℕ) :
     (D.toContractingTower.tower_at n) = D.state n := rfl
 
-/-- consecutive tail では state n の next index が state (n+1) の start index。 -/
+/-- 連続 tail では state n の next index が state (n+1) の start index と一致する。 -/
 theorem nextIndex_eq_next_startIndex
     {O : OddOrbit} (D : EventuallyContractingTailData O) (n : ℕ) :
     (D.state n).nextIndex = (D.state (n + 1)).startIndex := by
   unfold State.nextIndex State.startIndex state
   congr 1
 
-/-- consecutive tail では next value と次 state の start value が一致。 -/
+/-- 連続 tail では next value と次 state の start value が一致する。 -/
 theorem nextValue_eq_next_startValue
     {O : OddOrbit} (D : EventuallyContractingTailData O) (n : ℕ) :
     (D.state n).nextValue = (D.state (n + 1)).startValue := by
   unfold State.nextValue State.startValue
   rw [D.nextIndex_eq_next_startIndex n]
 
-/-- consecutive tail では next future-minimum depth と次 start depth が一致。 -/
+/-- 連続 tail では next future-minimum depth と次 start depth が一致する。 -/
 theorem valuation_nextDepth_eq_next_startDepth
     {O : OddOrbit} (D : EventuallyContractingTailData O)
     (n : ℕ)
@@ -93,13 +93,13 @@ theorem valuation_nextDepth_eq_next_startDepth
 
 end EventuallyContractingTailData
 
-/-- strengthened contracting side の存在命題。 -/
+/-- 強化された収縮側 tail の存在命題。 -/
 def HasEventuallyContractingTail : Prop :=
   ∃ O : OddOrbit, Nonempty (EventuallyContractingTailData O)
 
 /--
-非有界 odd orbit は expanding cofinal tower か、eventually-all-contracting tail を持つ。
-既存 `dichotomy_on` より contracting 側を強く保持する。
+非有界 odd orbit は expanding cofinal tower か、最終的に全区間が収縮する tail を持つ。
+既存 `dichotomy_on` より収縮側の情報を強く保持する。
 -/
 theorem dichotomy_on_strong
     (O : OddOrbit) (hU : O.Unbounded) :
@@ -139,7 +139,7 @@ theorem dichotomy_on_strong
     · exact False.elim (hnotE hExp)
     · exact hCon
 
-/-- strengthened global dichotomy。 -/
+/-- 強化された大域二分岐。 -/
 theorem dichotomy_strong :
     HasUnboundedOddOrbit →
       HasExpandingTower ∨ HasEventuallyContractingTail := by

@@ -4,10 +4,10 @@ import CollatzLean.Collatz.AdjacentReturn.FirstCrossingBridge
 import CollatzLean.Collatz.Canonical.Replay
 
 /-!
-# contracting full block の sharp arithmetic と eventual canonical 化
+# 収縮 full block の sharp 算術と最終的な canonical 化
 
-first crossing だけでなく adjacent contracting block 全体に対して
-値差 slack と Baker 型 bound を使い、十分長い block の actual start/end が
+first crossing だけでなく adjacent の収縮 block 全体に対して
+値差 slack と Baker 型 bound を使い、十分長い block の実際の start/end が
 canonical start/end そのものになることを示す。
 -/
 
@@ -16,7 +16,7 @@ namespace AdjacentReturn
 
 namespace State
 
-/-- contracting full block では adjacent 値差も `3*Δ < length`。 -/
+/-- 収縮 full block では adjacent 値差も `3*Δ < length` を満たす。 -/
 theorem three_mul_valueGap_lt_length
     {O : OddOrbit} (R : State O) (hC : R.IsContracting) :
     3 * R.valueGap < R.length := by
@@ -40,11 +40,11 @@ theorem three_mul_valueGap_lt_length
     (Nat.mul_lt_mul_right
       (Nat.pow_pos (by omega : 0 < (2 : ℕ)))).mp hchain
 
-/-- full block return slack `length - 3*valueGap`。 -/
+/-- full block の return slack `length - 3*valueGap`。 -/
 def fullReturnSlack {O : OddOrbit} (R : State O) : ℕ :=
   R.length - 3 * R.valueGap
 
-/-- contracting full block の full slack は正。 -/
+/-- 収縮 full block の full slack は正。 -/
 theorem fullReturnSlack_pos
     {O : OddOrbit} (R : State O) (hC : R.IsContracting) :
     0 < R.fullReturnSlack := by
@@ -52,7 +52,7 @@ theorem fullReturnSlack_pos
   exact Nat.sub_pos_of_lt (R.three_mul_valueGap_lt_length hC)
 
 /--
-contracting identity と all-suffix sharp bound から
+収縮恒等式と all-suffix sharp bound から
 `3*g*start < slack*2^H`。
 -/
 theorem three_mul_contractingGap_mul_start_lt_slack_twoPow
@@ -82,7 +82,7 @@ theorem three_mul_contractingGap_mul_start_lt_slack_twoPow
   rw [hlhs, hrhs] at hsharp
   omega
 
-/-- Baker 入力から full block start の polynomial bound を得る。 -/
+/-- Baker 入力から full block の start に対する多項式上界を得る。 -/
 theorem startValue_polynomial_bound
     (hGap : External.TwoThreeGapPolynomialBound) :
     ∃ K A : ℕ,
@@ -180,7 +180,7 @@ theorem startValue_polynomial_bound
         ring
   exact lt_of_lt_of_le hraw hcoarse
 
-/-- sufficiently long contracting full block has start below its canonical modulus. -/
+/-- 十分長い収縮 full block では start が canonical modulus より小さい。 -/
 theorem startValue_lt_residueModulus_eventually_by_length
     (hGap : External.TwoThreeGapPolynomialBound) :
     ∃ N : ℕ,
@@ -213,7 +213,7 @@ theorem startValue_lt_residueModulus_eventually_by_length
     _ = R.word.residueModulus := by
       simp [Word.residueModulus, State.totalExponent]
 
-/-- sufficiently long contracting full block starts at its canonical start. -/
+/-- 十分長い収縮 full block は canonical start そのものから始まる。 -/
 theorem startValue_eq_canonicalStart_eventually_by_length
     (hGap : External.TwoThreeGapPolynomialBound) :
     ∃ N : ℕ,
@@ -229,7 +229,7 @@ theorem startValue_eq_canonicalStart_eventually_by_length
   exact R.realizes.eq_canonicalStart_of_lt_modulus
     (O.value_odd R.nextIndex) (hN O R hC hlen)
 
-/-- sufficiently long contracting full block also ends at its canonical end. -/
+/-- 十分長い収縮 full block は canonical end そのもので終わる。 -/
 theorem nextValue_eq_canonicalEnd_eventually_by_length
     (hGap : External.TwoThreeGapPolynomialBound) :
     ∃ N : ℕ,
@@ -252,7 +252,7 @@ theorem nextValue_eq_canonicalEnd_eventually_by_length
   rw [hq] at hfinish
   simpa using hfinish
 
-/-- contracting adjacent future minima satisfy a strict multiplicative corridor. -/
+/-- 収縮する隣接 future minimum は狭義の乗法 corridor を満たす。 -/
 theorem two_mul_nextValue_add_one_lt_three_mul_startValue_add_one
     {O : OddOrbit} (R : State O) (hC : R.IsContracting) :
     2 * (R.nextValue + 1) < 3 * (R.startValue + 1) := by
@@ -289,7 +289,7 @@ theorem two_mul_nextValue_add_one_lt_three_mul_startValue_add_one
 
 end State
 
-/-- eventually canonical な contracting block のまとめ。 -/
+/-- 十分後に canonical となる収縮 block のまとめ。 -/
 structure CanonicalContractingBlockData
     {O : OddOrbit} (R : State O) : Prop where
   contracting : R.IsContracting
@@ -300,7 +300,7 @@ structure CanonicalContractingBlockData
 
 namespace EventuallyContractingTailData
 
-/-- eventually contracting tail の full block lengths は無限大へ進む。 -/
+/-- 最終的に全区間が収縮する tail では full block の長さが無限大へ進む。 -/
 theorem lengths_tend_to_infinity
     {O : OddOrbit} (D : EventuallyContractingTailData O) :
     ∀ M : ℕ, ∃ J : ℕ, ∀ n : ℕ, J ≤ n →
@@ -320,7 +320,7 @@ theorem lengths_tend_to_infinity
     lt_of_lt_of_le hcross hle
   simpa [T] using hfull
 
-/-- Baker 入力のもと tail の全 sufficiently late full block は canonical。 -/
+/-- Baker 入力のもと、tail の十分後の全 full block は canonical になる。 -/
 theorem blocks_eventually_canonical
     {O : OddOrbit} (D : EventuallyContractingTailData O)
     (hGap : External.TwoThreeGapPolynomialBound) :
