@@ -14,11 +14,13 @@ import CollatzLean.Collatz.Word.SharpAffine
 import CollatzLean.Collatz.Word.Periodic
 import CollatzLean.Collatz.OneStep.Carry
 import CollatzLean.Collatz.FiniteOrbit.Runs
+import CollatzLean.Collatz.FiniteOrbit.Reconstruction
 import CollatzLean.Collatz.FiniteOrbit.Comparison
 import CollatzLean.Collatz.FiniteOrbit.Trajectory
 import CollatzLean.Collatz.Canonical.Residue
 import CollatzLean.Collatz.Canonical.Runs
 import CollatzLean.Collatz.Canonical.Replay
+import CollatzLean.Collatz.Canonical.Cylinder
 import CollatzLean.Collatz.OddOrbit.Basic
 import CollatzLean.Collatz.OddOrbit.Periodic
 import CollatzLean.Collatz.OddOrbit.HighExponent
