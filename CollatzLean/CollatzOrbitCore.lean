@@ -1,4 +1,0 @@
-import CollatzLean.CollatzOrbitCore.InfiniteOrbit
-import CollatzLean.CollatzOrbitCore.PeriodicExponent
-import CollatzLean.CollatzOrbitCore.FutureMinimum
-import CollatzLean.CollatzOrbitCore.Crossing

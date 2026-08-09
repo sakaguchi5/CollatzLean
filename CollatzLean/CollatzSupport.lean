@@ -1,2 +1,0 @@
-import CollatzLean.CollatzSupport.CofinalSelection
-import CollatzLean.CollatzSupport.Arithmetic

@@ -1,6 +1,1 @@
-import CollatzLean.CollatzSupport
-import CollatzLean.CollatzExternal
-import CollatzLean.CollatzFirstLayer
-import CollatzLean.CollatzOrbitCore
-import CollatzLean.CollatzWindowCore
-import CollatzLean.CollatzSecondLayer3
+import CollatzLean.Collatz
