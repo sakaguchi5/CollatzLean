@@ -5,6 +5,7 @@ import CollatzLean.Collatz.Word.SharpAffine
 # adjacent returnのsharp bounds
 
 0a503cで再接続されていたprefix/suffix affine資産を、新State APIへ移す。
+prefix側の一部はExpanding枝に依存するが、suffix側のtail boundは標準adjacent geometryだけで成立する。
 -/
 
 namespace Collatz
@@ -70,24 +71,13 @@ theorem affineConstant_le_length_mul_threePow_pred
   have h := (R.properPrefixesExpanding hE).affineConst_le_sharp
   simpa [affineConstant, R.word_length] using h
 
-/-- expanding枝の長さ2以上tailはall-suffix contracting。 -/
-theorem tail_allSuffixesContracting
-    {O : OddOrbit} (R : State O) (_hE : R.IsExpanding)
-    (hlen : 1 < R.length) :
-    (O.segment (R.startIndex + 1) (R.length - 1)).AllSuffixesContracting := by
-  apply allSuffixesContracting_segment O
-  intro k hk
-  have hkWhole : k + 1 < R.length := by omega
-  have hs := R.properSuffix_contracting (k := k + 1) (by omega) hkWhole
-  have hindex : R.startIndex + (k + 1) = R.startIndex + 1 + k := by omega
-  have hlenEq : R.length - (k + 1) = (R.length - 1) - k := by omega
-  rw [hindex, hlenEq] at hs
-  exact hs
-
-/-- expanding枝のsuffix側sharp affine budget。 -/
+/--
+長さ2以上の標準adjacent returnに対するsuffix側sharp affine budget。
+先頭指数が1であることとtailのall-suffix contractingだけを用い、枝には依存しない。
+`3B < 3^r + (r-1) * 2^H`。
+-/
 theorem three_mul_affineConstant_lt_threePow_add_tail_twoPow
-    {O : OddOrbit} (R : State O) (hE : R.IsExpanding)
-    (hlen : 1 < R.length) :
+    {O : OddOrbit} (R : State O) (hlen : 1 < R.length) :
     3 * R.affineConstant <
       3 ^ R.length + (R.length - 1) * 2 ^ R.totalExponent := by
   let tail : Collatz.Word := O.segment (R.startIndex + 1) (R.length - 1)
@@ -98,7 +88,7 @@ theorem three_mul_affineConstant_lt_threePow_add_tail_twoPow
     simp at hlen0
     omega
   have htailAll : tail.AllSuffixesContracting := by
-    simpa [tail] using R.tail_allSuffixesContracting hE hlen
+    simpa [tail] using R.tail_allSuffixesContracting hlen
   have htailBound : 3 * tail.affineConst < tail.length * 2 ^ tail.twoSteps :=
     htailAll.three_mul_affineConst_lt htailNe
   have hword := R.word_eq_startExponent_cons_tail

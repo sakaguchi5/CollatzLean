@@ -5,6 +5,8 @@ import CollatzLean.Collatz.AdjacentReturn.Bounds
 
 `Nat.find`で値をAPIへ固定せず、first-crossing証人を明示Typeデータとして保持する。
 同じadjacent word内のFirstCrossing長は一意なので、このデータは実質的に最小長を表す。
+Stateが既に持つfuture-minimum性・非有界性・標準隣接性は再保持せず、
+FirstCrossingDataはfirst-crossing固有のlength/crossing情報だけを追加する。
 -/
 
 namespace Collatz
@@ -94,22 +96,11 @@ def affine
     {O : OddOrbit} {R : State O} (F : FirstCrossingData R) : ℕ :=
   Word.affineConst (R.word.take F.length)
 
-/-- first crossingの開始点はfuture minimum。 -/
-theorem futureMinimum
-    {O : OddOrbit} {R : State O} (_F : FirstCrossingData R) :
-    O.FutureMinimumAt R.startIndex :=
-  R.minima.minimum R.index
-
-/-- 非有界性。 -/
-theorem unbounded
-    {O : OddOrbit} {R : State O} (_F : FirstCrossingData R) : O.Unbounded :=
-  R.unbounded
-
-/-- first-crossing endpointは開始値以上。 -/
+/-- Stateのfuture-minimum性によりfirst-crossing endpointは開始値以上。 -/
 theorem start_le_endpoint
     {O : OddOrbit} {R : State O} (F : FirstCrossingData R) :
     R.startValue ≤ F.endpointValue := by
-  exact F.futureMinimum.le_segment_end F.length
+  exact R.startFutureMinimum.le_segment_end F.length
 
 /-- 非有界軌道ではfirst-crossing endpointは開始値より真に大きい。 -/
 theorem start_lt_endpoint

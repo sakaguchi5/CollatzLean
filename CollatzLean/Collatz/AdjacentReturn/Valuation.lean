@@ -6,6 +6,7 @@ import CollatzLean.Collatz.TwoAdic.Valuation
 
 `A = v2(x+1)`, `C = v2(y+1)`, `D = v2(y-x)`を
 選択関数ではなく明示Typeデータとして保持する。
+future-minimum性はStateの公開APIから取得する。
 -/
 
 namespace Collatz
@@ -38,14 +39,14 @@ namespace ValuationData
 theorem startDepth_two_le
     {O : OddOrbit} {R : State O} (V : ValuationData R) :
     2 ≤ V.startDepth := by
-  exact (R.minima.minimum R.index).value_add_one_depth_two_le
+  exact R.startFutureMinimum.value_add_one_depth_two_le
     R.unbounded V.startFactor
 
 /-- next future-minimumの`y+1` depthも2以上。 -/
 theorem nextDepth_two_le
     {O : OddOrbit} {R : State O} (V : ValuationData R) :
     2 ≤ V.nextDepth := by
-  exact (R.minima.minimum (R.index + 1)).value_add_one_depth_two_le
+  exact R.nextFutureMinimum.value_add_one_depth_two_le
     R.unbounded V.nextFactor
 
 /-- `A<C`なら`D=A`。 -/

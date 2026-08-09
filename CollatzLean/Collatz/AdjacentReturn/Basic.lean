@@ -6,7 +6,7 @@ import CollatzLean.Collatz.Word.Geometry
 
 標準列を選ぶ操作と、選択済み隣接区間の有限解析を分離する。
 `State`自身の全projectionはcomputableである。
-標準tail-minimum列の隣接性もState/Towerに明示保存する。
+標準tail-minimum列の隣接性をState/Towerに保持し、start/nextのfuture-minimum性をState APIとして明示する。
 -/
 
 namespace Collatz
@@ -26,6 +26,18 @@ def startIndex {O : OddOrbit} (R : State O) : ℕ := R.minima.index R.index
 
 /-- next future-minimum位置。 -/
 def nextIndex {O : OddOrbit} (R : State O) : ℕ := R.minima.index (R.index + 1)
+
+/-- current位置はfuture minimum。 -/
+theorem startFutureMinimum
+    {O : OddOrbit} (R : State O) :
+    O.FutureMinimumAt R.startIndex :=
+  R.minima.minimum R.index
+
+/-- next位置もfuture minimum。 -/
+theorem nextFutureMinimum
+    {O : OddOrbit} (R : State O) :
+    O.FutureMinimumAt R.nextIndex :=
+  R.minima.minimum (R.index + 1)
 
 /-- 隣接位置差。 -/
 def length {O : OddOrbit} (R : State O) : ℕ := R.nextIndex - R.startIndex

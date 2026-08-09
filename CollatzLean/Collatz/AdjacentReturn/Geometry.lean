@@ -7,6 +7,7 @@ import CollatzLean.Collatz.OddOrbit.FutureMinimumArithmetic
 
 標準future-minimum列の隣接性を使い、任意の真の内部位置から次minimumまでの
 actual suffixがcontractingであることをState APIへ戻す。
+このsuffix geometryはExpanding/Contractingの枝に依存しない。
 -/
 
 namespace Collatz
@@ -62,12 +63,12 @@ theorem word_eq_prefix_append_suffix
 /-- current future minimumのactual exponentは1。 -/
 theorem startExponent_eq_one
     {O : OddOrbit} (R : State O) : O.exponent R.startIndex = 1 := by
-  exact (R.minima.minimum R.index).exponent_eq_one R.unbounded
+  exact R.startFutureMinimum.exponent_eq_one R.unbounded
 
 /-- next future minimumのactual exponentも1。 -/
 theorem nextExponent_eq_one
     {O : OddOrbit} (R : State O) : O.exponent R.nextIndex = 1 := by
-  exact (R.minima.minimum (R.index + 1)).exponent_eq_one R.unbounded
+  exact R.nextFutureMinimum.exponent_eq_one R.unbounded
 
 /-- 隣接future-minimum値差は4の正倍数。 -/
 theorem valueGap_four_dvd
@@ -133,6 +134,35 @@ theorem properSuffix_contracting
   apply hrun.contracting_of_start_gt_end hvalid hneWord
   rw [hend]
   exact hdec
+
+/--
+任意の真のproper suffixでは、そのsuffix自身の全非空suffixもcontracting。
+標準future-minimumの隣接性だけを用い、枝には依存しない。
+-/
+theorem properSuffix_allSuffixesContracting
+    {O : OddOrbit} (R : State O) {k : ℕ}
+    (hkPos : 0 < k) (hkLt : k < R.length) :
+    (O.segment (R.startIndex + k) (R.length - k)).AllSuffixesContracting := by
+  apply allSuffixesContracting_segment O
+  intro j hj
+  have hkjPos : 0 < k + j := by omega
+  have hkjLt : k + j < R.length := by omega
+  have hs := R.properSuffix_contracting
+    (k := k + j) hkjPos hkjLt
+  have hindex : R.startIndex + (k + j) = R.startIndex + k + j := by omega
+  have hlen : R.length - (k + j) = (R.length - k) - j := by omega
+  rw [hindex, hlen] at hs
+  exact hs
+
+/--
+長さ2以上の標準adjacent returnでは、先頭を除いたactual tailの
+全非空suffixがcontracting。枝には依存しない。
+-/
+theorem tail_allSuffixesContracting
+    {O : OddOrbit} (R : State O) (hlen : 1 < R.length) :
+    (O.segment (R.startIndex + 1) (R.length - 1)).AllSuffixesContracting := by
+  exact R.properSuffix_allSuffixesContracting
+    (k := 1) (by omega) hlen
 
 /-- 正長隣接wordを先頭exponentとactual tailへ分解する。 -/
 theorem word_eq_startExponent_cons_tail
