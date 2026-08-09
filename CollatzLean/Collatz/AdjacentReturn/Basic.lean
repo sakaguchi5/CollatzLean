@@ -1,4 +1,4 @@
-import CollatzLean.Collatz.OddOrbit.Selection
+import CollatzLean.Collatz.OddOrbit.StandardFutureMinimum
 import CollatzLean.Collatz.Word.Geometry
 
 /-!
@@ -6,15 +6,17 @@ import CollatzLean.Collatz.Word.Geometry
 
 標準列を選ぶ操作と、選択済み隣接区間の有限解析を分離する。
 `State`自身の全projectionはcomputableである。
+標準tail-minimum列の隣接性もState/Towerに明示保存する。
 -/
 
 namespace Collatz
 namespace AdjacentReturn
 
-/-- 選択済みfuture-minimum列上の一つの隣接return。 -/
+/-- 選択済み標準future-minimum列上の一つの隣接return。 -/
 structure State (O : OddOrbit) where
   unbounded : O.Unbounded
   minima : O.FutureMinima
+  standard : minima.IsStandard
   index : ℕ
 
 namespace State
@@ -178,19 +180,29 @@ end State
 structure ExpandingTower (O : OddOrbit) where
   unbounded : O.Unbounded
   minima : O.FutureMinima
+  standard : minima.IsStandard
   select : ℕ → ℕ
   select_strict : StrictMono select
-  expanding : ∀ n, (State.mk unbounded minima (select n)).IsExpanding
+  expanding : ∀ n, (State.mk unbounded minima standard (select n)).IsExpanding
 
 namespace ExpandingTower
 
 /-- tower第n項。 -/
 def tower_at {O : OddOrbit} (T : ExpandingTower O) (n : ℕ) : State O :=
-  ⟨T.unbounded, T.minima, T.select n⟩
+  ⟨T.unbounded, T.minima, T.standard, T.select n⟩
 
 /-- 第n項はexpanding。 -/
 theorem at_expanding {O : OddOrbit} (T : ExpandingTower O) (n : ℕ) :
     (T.tower_at n).IsExpanding := T.expanding n
+
+/-- strict selectorは添字自身以上。 -/
+theorem select_ge {O : OddOrbit} (T : ExpandingTower O) (n : ℕ) :
+    n ≤ T.select n := by
+  induction n with
+  | zero => exact Nat.zero_le _
+  | succ n ih =>
+      have hlt := T.select_strict (Nat.lt_succ_self n)
+      exact Nat.succ_le_of_lt (lt_of_le_of_lt ih hlt)
 
 end ExpandingTower
 
@@ -198,19 +210,29 @@ end ExpandingTower
 structure ContractingTower (O : OddOrbit) where
   unbounded : O.Unbounded
   minima : O.FutureMinima
+  standard : minima.IsStandard
   select : ℕ → ℕ
   select_strict : StrictMono select
-  contracting : ∀ n, (State.mk unbounded minima (select n)).IsContracting
+  contracting : ∀ n, (State.mk unbounded minima standard (select n)).IsContracting
 
 namespace ContractingTower
 
 /-- tower第n項。 -/
 def tower_at {O : OddOrbit} (T : ContractingTower O) (n : ℕ) : State O :=
-  ⟨T.unbounded, T.minima, T.select n⟩
+  ⟨T.unbounded, T.minima, T.standard, T.select n⟩
 
 /-- 第n項はcontracting。 -/
 theorem at_contracting {O : OddOrbit} (T : ContractingTower O) (n : ℕ) :
     (T.tower_at n).IsContracting := T.contracting n
+
+/-- strict selectorは添字自身以上。 -/
+theorem select_ge {O : OddOrbit} (T : ContractingTower O) (n : ℕ) :
+    n ≤ T.select n := by
+  induction n with
+  | zero => exact Nat.zero_le _
+  | succ n ih =>
+      have hlt := T.select_strict (Nat.lt_succ_self n)
+      exact Nat.succ_le_of_lt (lt_of_le_of_lt ih hlt)
 
 end ContractingTower
 

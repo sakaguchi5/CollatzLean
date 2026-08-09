@@ -1,4 +1,5 @@
 import CollatzLean.Collatz.AdjacentReturn.Basic
+import CollatzLean.Collatz.OddOrbit.StandardSelection
 import CollatzLean.Collatz.Selection.Cofinal
 
 /-!
@@ -16,13 +17,17 @@ theorem dichotomy_on
     Nonempty (ExpandingTower O) ∨ Nonempty (ContractingTower O) := by
   classical
   let S : O.FutureMinima := OddOrbit.Selection.futureMinima O hU
-  let E : ℕ → Prop := fun j => (State.mk hU S j).IsExpanding
+  have hS : S.IsStandard := by
+    dsimp [S]
+    exact OddOrbit.Selection.futureMinima_isStandard O hU
+  let E : ℕ → Prop := fun j => (State.mk hU S hS j).IsExpanding
   by_cases hE : Cofinal E
   · left
     let s : ℕ → ℕ := Cofinal.select E hE
     refine ⟨{
       unbounded := hU
       minima := S
+      standard := hS
       select := s
       select_strict := ?_
       expanding := ?_
@@ -31,14 +36,14 @@ theorem dichotomy_on
     · intro n
       exact Cofinal.select_spec E hE n
   · obtain ⟨N, hN⟩ := Cofinal.eventually_not_of_not E hE
-    let C : ℕ → Prop := fun j => (State.mk hU S j).IsContracting
+    let C : ℕ → Prop := fun j => (State.mk hU S hS j).IsContracting
     have hC : Cofinal C := by
       intro M
       let j := max M N
       have hjM : M ≤ j := le_max_left _ _
       have hjN : N ≤ j := le_max_right _ _
       have hnotE : ¬ E j := hN j hjN
-      let R : State O := ⟨hU, S, j⟩
+      let R : State O := ⟨hU, S, hS, j⟩
       rcases R.expanding_or_contracting with hExp | hCon
       · exact False.elim (hnotE hExp)
       · exact ⟨j, hjM, hCon⟩
@@ -47,6 +52,7 @@ theorem dichotomy_on
     refine ⟨{
       unbounded := hU
       minima := S
+      standard := hS
       select := s
       select_strict := ?_
       contracting := ?_
