@@ -31,6 +31,7 @@ import CollatzLean.Collatz.OddOrbit.Selection
 import CollatzLean.Collatz.OddOrbit.StandardFutureMinimum
 import CollatzLean.Collatz.OddOrbit.StandardSelection
 import CollatzLean.Collatz.OddOrbit.FutureMinimumArithmetic
+import CollatzLean.Collatz.OddOrbit.FutureMinimumLocal
 import CollatzLean.Collatz.Selection.Cofinal
 import CollatzLean.Collatz.AdjacentReturn.Basic
 import CollatzLean.Collatz.AdjacentReturn.Geometry
@@ -43,4 +44,8 @@ import CollatzLean.Collatz.AdjacentReturn.FirstCrossingBridge
 import CollatzLean.Collatz.AdjacentReturn.CanonicalLate
 import CollatzLean.Collatz.AdjacentReturn.CanonicalLatePacket
 import CollatzLean.Collatz.AdjacentReturn.Dichotomy
+import CollatzLean.Collatz.AdjacentReturn.StrongContractingTail
+import CollatzLean.Collatz.AdjacentReturn.FullBlockCanonical
+import CollatzLean.Collatz.AdjacentReturn.CanonicalContractingChain
+import CollatzLean.Collatz.AdjacentReturn.GapDepthDichotomy
 import CollatzLean.Collatz.Main
