@@ -5,6 +5,10 @@ import CollatzLean.Collatz.TwoAdic.Factorization
 
 二つの奇数値の差深さとlower側のactual指数だけから、
 synchronized / captured / deferredを分類する。
+
+有限入力から得られる分類値はcomputableに構成する。
+Prop上の奇偶証明からType値を選択せず、captured odd partとdeferred quotientを
+入力値の明示式として定義する。
 -/
 
 namespace Collatz
@@ -34,36 +38,99 @@ inductive CarryOutcome
       (quotient : ℕ)
       (extraFactor : 3 * y + 1 = 2 ^ (d + 1) * quotient)
 
+/-- captured枝でupper側に残る明示odd part。 -/
+def capturedOddPart (d e a u : ℕ) : ℕ :=
+  2 ^ (e - d) * a + 3 * u
+
+/-- `d < e`なら明示odd partでupper側はdepth `d`にexactに止まる。 -/
+theorem capturedExactFactor
+    {x y d e a u : ℕ}
+    (hde : d < e)
+    (hxy : y = x + 2 ^ d * u)
+    (hu : Odd u)
+    (hx : 3 * x + 1 = 2 ^ e * a) :
+    ExactFactor (3 * y + 1) d (capturedOddPart d e a u) := by
+  have hgap : 0 < e - d :=
+    Nat.sub_pos_of_lt hde
+  have he : e = d + (e - d) := by
+    omega
+  have hpow :
+      2 ^ e = 2 ^ d * 2 ^ (e - d) := by
+    calc
+      2 ^ e = 2 ^ (d + (e - d)) := by
+        rw [← he]
+      _ = 2 ^ d * 2 ^ (e - d) := by
+        rw [pow_add]
+  constructor
+  · unfold capturedOddPart
+    calc
+      3 * y + 1 =
+          (3 * x + 1) + 3 * 2 ^ d * u := by
+        rw [hxy]
+        ring
+      _ = 2 ^ e * a + 3 * 2 ^ d * u := by
+        rw [hx]
+      _ = 2 ^ d * (2 ^ (e - d) * a + 3 * u) := by
+        rw [hpow]
+        ring
+  · obtain ⟨s, hs⟩ : ∃ s : ℕ, e - d = s + 1 :=
+      ⟨e - d - 1, by omega⟩
+    have hEven : Even (2 ^ (e - d) * a) := by
+      rw [hs]
+      exact even_two_pow_succ_mul s a
+    have hOdd : Odd (3 * u) :=
+      (show Odd (3 : ℕ) by decide).mul hu
+    rcases hEven with ⟨ke, hke⟩
+    rcases hOdd with ⟨ko, hko⟩
+    refine ⟨ke + ko, ?_⟩
+    unfold capturedOddPart
+    rw [hke, hko]
+    ring
+
+/-- deferred枝で追加carry後に残る明示quotient。 -/
+def deferredQuotient (a u : ℕ) : ℕ :=
+  (a + 3 * u) / 2
+
+/-- `d=e`なら明示quotientで少なくとも1bit追加carryする。 -/
+theorem deferredExtraFactor
+    {x y d a u : ℕ}
+    (hxy : y = x + 2 ^ d * u)
+    (hu : Odd u)
+    (hx : 3 * x + 1 = 2 ^ d * a)
+    (ha : Odd a) :
+    3 * y + 1 = 2 ^ (d + 1) * deferredQuotient a u := by
+  rcases ha with ⟨ka, hka⟩
+  rcases hu with ⟨ku, hku⟩
+  let q := ka + 3 * ku + 2
+  have hsum : a + 3 * u = 2 * q := by
+    dsimp [q]
+    rw [hka, hku]
+    ring
+  have hquot : deferredQuotient a u = q := by
+    unfold deferredQuotient
+    rw [hsum]
+    simp
+  calc
+    3 * y + 1 = (3 * x + 1) + 3 * 2 ^ d * u := by
+      rw [hxy]
+      ring
+    _ = 2 ^ d * a + 3 * 2 ^ d * u := by rw [hx]
+    _ = 2 ^ d * (a + 3 * u) := by ring
+    _ = 2 ^ d * (2 * q) := by rw [hsum]
+    _ = 2 ^ (d + 1) * deferredQuotient a u := by
+      rw [pow_succ, hquot]
+      ring
+
 /-- lower指数が差深さより大きい場合、upper側は差深さでexactに止まる。 -/
 theorem captured_of_depth_lt
     {x y d r a u : ℕ}
     (hr : 0 < r)
     (hxy : y = x + 2 ^ d * u)
     (hu : Odd u)
-    (hx : 3 * x + 1 = 2 ^ (d + r) * a)
-    (ha : Odd a) :
+    (hx : 3 * x + 1 = 2 ^ (d + r) * a) :
     ∃ b : ℕ, ExactFactor (3 * y + 1) d b := by
-  cases r with
-  | zero => simp at hr
-  | succ s =>
-      rcases hu with ⟨ku, rfl⟩
-      rcases ha with ⟨ka, rfl⟩
-      let b := 2 ^ (s + 1) * (2 * ka + 1) + 3 * (2 * ku + 1)
-      refine ⟨b, ?_, ?_⟩
-      · unfold b
-        calc
-          3 * y + 1
-              = (3 * x + 1) + 3 * 2 ^ d * (2 * ku + 1) := by rw [hxy]; ring
-          _ = 2 ^ (d + (s + 1)) * (2 * ka + 1) +
-                3 * 2 ^ d * (2 * ku + 1) := by rw [hx]
-          _ = 2 ^ d *
-                (2 ^ (s + 1) * (2 * ka + 1) + 3 * (2 * ku + 1)) := by
-                  rw [pow_add]
-                  ring
-      · refine ⟨2 ^ s * (2 * ka + 1) + 3 * ku + 1, ?_⟩
-        unfold b
-        rw [pow_succ]
-        ring
+  refine ⟨capturedOddPart d (d + r) a u, ?_⟩
+  apply capturedExactFactor (by omega) hxy hu hx
 
 /-- lower指数と差深さが一致するとupper側に追加carryが起こる。 -/
 theorem deferred_of_depth_eq
@@ -73,16 +140,7 @@ theorem deferred_of_depth_eq
     (hx : 3 * x + 1 = 2 ^ d * a)
     (ha : Odd a) :
     ∃ c : ℕ, 3 * y + 1 = 2 ^ (d + 1) * c := by
-  rcases hu with ⟨ku, rfl⟩
-  rcases ha with ⟨ka, rfl⟩
-  refine ⟨ka + 3 * ku + 2, ?_⟩
-  calc
-    3 * y + 1
-        = (3 * x + 1) + 3 * 2 ^ d * (2 * ku + 1) := by rw [hxy]; ring
-    _ = 2 ^ d * (2 * ka + 1) + 3 * 2 ^ d * (2 * ku + 1) := by rw [hx]
-    _ = 2 ^ (d + 1) * (ka + 3 * ku + 2) := by
-      rw [pow_succ]
-      ring
+  exact ⟨deferredQuotient a u, deferredExtraFactor hxy hu hx ha⟩
 
 /-- `e < d`ならupper側も指数`e`でexactに止まる。 -/
 def synchronized_of_depth_lt
@@ -119,40 +177,28 @@ def synchronized_of_depth_lt
       rw [hd, pow_add]
       ring
 
-/-- first-carryを三枝へ分類する。結果はProp上の存在ではなく明示的なType値。 -/
-noncomputable def classify
+/-- first-carryをcomputableな明示Type値として三枝へ分類する。 -/
+def classify
     {x y d e a u : ℕ}
     (hxy : y = x + 2 ^ d * u)
     (hu : Odd u)
     (hx : 3 * x + 1 = 2 ^ e * a)
     (ha : Odd a) :
     CarryOutcome x y d e a u := by
-  classical
   by_cases hed : e < d
   · exact CarryOutcome.synchronized
       (synchronized_of_depth_lt hed hxy hu hx ha)
   · by_cases hde : d < e
-    · let r := e - d
-      have hr : 0 < r := by
-        dsimp [r]
-        omega
-      have he : e = d + r := by
-        dsimp [r]
-        omega
-      have hex := captured_of_depth_lt
-        (r := r) hr hxy hu (by simpa [he] using hx) ha
-      let b := Classical.choose hex
-      have hb := Classical.choose_spec hex
-      exact CarryOutcome.captured hde b hb
-    · have hEq : d = e := by
-        omega
+    · exact CarryOutcome.captured
+        hde
+        (capturedOddPart d e a u)
+        (capturedExactFactor hde hxy hu hx)
+    · have hEq : d = e := by omega
       subst e
-      have hex := deferred_of_depth_eq hxy hu hx ha
-      let c := Classical.choose hex
-      have hc := Classical.choose_spec hex
-      exact CarryOutcome.deferred rfl c hc
-
-
+      exact CarryOutcome.deferred
+        rfl
+        (deferredQuotient a u)
+        (deferredExtraFactor hxy hu hx ha)
 
 /-- 同じ開始値の一段完全分解は一意。 -/
 theorem next_unique
