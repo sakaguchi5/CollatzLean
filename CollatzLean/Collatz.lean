@@ -22,6 +22,7 @@ import CollatzLean.Collatz.Canonical.Runs
 import CollatzLean.Collatz.Canonical.Replay
 import CollatzLean.Collatz.Canonical.Cylinder
 import CollatzLean.Collatz.Canonical.CylinderDerived
+import CollatzLean.Collatz.Canonical.CylinderDynamics
 import CollatzLean.Collatz.OddOrbit.Basic
 import CollatzLean.Collatz.OddOrbit.Periodic
 import CollatzLean.Collatz.OddOrbit.HighExponent
@@ -40,5 +41,6 @@ import CollatzLean.Collatz.AdjacentReturn.FirstCrossingArithmetic
 import CollatzLean.Collatz.AdjacentReturn.FirstHigh
 import CollatzLean.Collatz.AdjacentReturn.FirstCrossingBridge
 import CollatzLean.Collatz.AdjacentReturn.CanonicalLate
+import CollatzLean.Collatz.AdjacentReturn.CanonicalLatePacket
 import CollatzLean.Collatz.AdjacentReturn.Dichotomy
 import CollatzLean.Collatz.Main
