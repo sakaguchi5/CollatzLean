@@ -1,83 +1,114 @@
 import CollatzLean.Collatz.External.TwoThreeGap
 
-set_option linter.style.nativeDecide false
-set_option exponentiation.threshold 312
 /-!
-# 2と3のgapに対するeffective外部入力
+# 2と3のgapに対するEllison型明示入力
 
-既存の `TwoThreeGapPolynomialBound` は定数の存在だけを保持するため、
-「十分大きい」側は閉じられても、その cutoff 未満をLean内で有限確認するための
-具体的な境界を取り出せない。
+`TwoThreeGapPolynomialBound` は十分大きい指数でのBaker型gapを与えるが、
+このファイルでは positive replay quotient を全長で閉じるため、
+Ellison の2冪・3冪に対する明示評価の算術帰結を外部入力として採用する。
 
-ここでは外部超越数論入力を一段だけeffectiveにし、
-`p >= 197` では `p <= 2^H - 3^p` が成立することを明示的に要求する。
-`p < 197` 側は外部仮定にせず、このファイル内で有限計算により検証する。
+外部入力として保留するのは `H >= 28` の部分だけである。
+`H < 28` では contracting 条件から自動的に `p < 18` となり、
+残る `Fin 18 × Fin 28` の有限箱はLean内で直接検証する。
 
-`197` は外部入力と有限検証を接続するための公開 cutoff であり、
-このファイルより上のCollatz構造には依存しない。
+Ellison評価そのものの形式化は後回しにし、ここでは
+Collatz語に依存しない純粋な2冪・3冪命題として隔離する。
 -/
 
 namespace Collatz
 namespace External
 
 /--
-既存のBaker型多項式gap入力に、明示cutoff以後の線形gapを加えたeffective package。
+Ellison の明示的2-3 gap評価から使用する算術帰結。
 
-`linear_from_197` は純粋な2冪・3冪命題であり、Collatz語には依存しない。
+`H >= 28` かつ `3^p < 2^H` なら、正のgap `2^H - 3^p` は
+少なくとも `H` 以上であるとする。
+この命題の外部数学的証明は後で形式化する。
+-/
+def EllisonTwoThreeGapBound : Prop :=
+  ∀ p H : ℕ,
+    28 ≤ H →
+    3 ^ p < 2 ^ H →
+      H ≤ 2 ^ H - 3 ^ p
+
+/--
+CORE positive quotient 排除に使うeffective 2-3 gap package。
+未証明の外部入力はEllison型明示評価だけに限定する。
 -/
 structure TwoThreeEffectiveGapInput : Prop where
-  polynomial : TwoThreeGapPolynomialBound
-  linear_from_197 :
-    ∀ p H : ℕ,
-      197 ≤ p →
-      3 ^ p < 2 ^ H →
-        p ≤ 2 ^ H - 3 ^ p
+  ellison : EllisonTwoThreeGapBound
 
-/-- `p < 197`, `H < 312` の有限領域では線形gapが直接成立する。 -/
+/-- `p < 18`, `H < 28` の有限箱では線形gapが直接成立する。 -/
 private theorem twoThreeGap_ge_exponent_small_box :
-    ∀ p : Fin 197,
-    ∀ H : Fin 312,
+    ∀ p : Fin 18,
+    ∀ H : Fin 28,
       3 ^ p.1 < 2 ^ H.1 →
         p.1 ≤ 2 ^ H.1 - 3 ^ p.1 := by
-  native_decide
+  decide
+
+/-- contracting なら指数側でも `p < H`。 -/
+theorem exponent_lt_twoExponent_of_contracting
+    {p H : ℕ}
+    (hcontract : 3 ^ p < 2 ^ H) :
+    p < H := by
+  by_contra hnot
+  have hHle : H ≤ p := by omega
+  have htwoMono : 2 ^ H ≤ 2 ^ p :=
+    Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hHle
+  have htwoThree : 2 ^ p ≤ 3 ^ p :=
+    Arithmetic.twoPow_le_threePow p
+  omega
+
+/-- `H < 28` の contracting pair では自動的に `p < 18`。 -/
+theorem exponent_lt_eighteen_of_twoExponent_lt_28
+    {p H : ℕ}
+    (hH : H < 28)
+    (hcontract : 3 ^ p < 2 ^ H) :
+    p < 18 := by
+  by_contra hnot
+  have hp : 18 ≤ p := by omega
+  have hHle : H ≤ 27 := by omega
+  have hthreeMono : 3 ^ 18 ≤ 3 ^ p :=
+    Nat.pow_le_pow_right (by omega : 0 < (3 : ℕ)) hp
+  have htwoMono : 2 ^ H ≤ 2 ^ 27 :=
+    Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hHle
+  have hfixed : 2 ^ 27 < 3 ^ 18 := by
+    decide
+  omega
 
 /--
-`p < 197` では `H` に上限を仮定せず線形gapが成立する。
-`H < 312` は有限計算、`312 <= H` は単調性と固定数値評価で処理する。
+`H < 28` では外部入力なしで線形gapが成立する。
+contracting から `p < 18` を得て、小さな有限箱へ落とす。
 -/
-theorem twoThreeGap_ge_exponent_below_197
+theorem twoThreeGap_ge_exponent_below_28
     {p H : ℕ}
-    (hp : p < 197)
+    (hH : H < 28)
     (hcontract : 3 ^ p < 2 ^ H) :
     p ≤ 2 ^ H - 3 ^ p := by
-  by_cases hH : H < 312
-  · let pf : Fin 197 := ⟨p, hp⟩
-    let Hf : Fin 312 := ⟨H, hH⟩
-    have h := twoThreeGap_ge_exponent_small_box pf Hf
-    simpa [pf, Hf] using h hcontract
-  · have hpLe : p ≤ 196 := by omega
-    have hHLe : 312 ≤ H := by omega
-    have hthree : 3 ^ p ≤ 3 ^ 196 :=
-      Nat.pow_le_pow_right (by omega : 0 < (3 : ℕ)) hpLe
-    have htwo : 2 ^ 312 ≤ 2 ^ H :=
-      Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hHLe
-    have hfixed : 196 + 3 ^ 196 < 2 ^ 312 := by
-      decide
-    have hsum : p + 3 ^ p ≤ 2 ^ H := by
-      omega
-    omega
+  have hp : p < 18 :=
+    exponent_lt_eighteen_of_twoExponent_lt_28 hH hcontract
+  let pf : Fin 18 := ⟨p, hp⟩
+  let Hf : Fin 28 := ⟨H, hH⟩
+  have h := twoThreeGap_ge_exponent_small_box pf Hf
+  simpa [pf, Hf] using h hcontract
 
 /--
-effective外部入力とLean内有限検証を合わせると、全指数で線形gapが成立する。
+Ellison型外部入力とLean内有限検証を合わせると、
+全 contracting exponent pair で `p <= 2^H - 3^p` が成立する。
 -/
 theorem twoThreeGap_ge_exponent
     (hGap : TwoThreeEffectiveGapInput)
     {p H : ℕ}
     (hcontract : 3 ^ p < 2 ^ H) :
     p ≤ 2 ^ H - 3 ^ p := by
-  by_cases hp : p < 197
-  · exact twoThreeGap_ge_exponent_below_197 hp hcontract
-  · exact hGap.linear_from_197 p H (by omega) hcontract
+  by_cases hH : H < 28
+  · exact twoThreeGap_ge_exponent_below_28 hH hcontract
+  · have hH28 : 28 ≤ H := by omega
+    have hpH : p < H :=
+      exponent_lt_twoExponent_of_contracting hcontract
+    have hEllison : H ≤ 2 ^ H - 3 ^ p :=
+      hGap.ellison p H hH28 hcontract
+    omega
 
 end External
 end Collatz

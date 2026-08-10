@@ -11,8 +11,9 @@ import CollatzLean.Collatz.External.TwoThreeEffectiveGap
 
 を強制する。
 
-ここではeffectiveな2-3 gap入力により、全長で `p <= g` を得る。
-したがって positive quotient `j > 0` は長さに関係なくCOREを満たし、
+ここではEllison型2-3 gap外部入力とLean内有限検証により、
+全 contracting prepend-one word で `p <= g` を得る。
+したがって positive replay quotient `j > 0` は長さに関係なくCOREを満たし、
 `PrependOneCorePrinciple` に残る未解決枝は `j = 0` だけになる。
 -/
 
@@ -20,7 +21,7 @@ namespace Collatz
 namespace Word
 
 /--
-effective gap入力のもとでは、contracting prepend-one word のgapは
+Ellison型gap入力のもとでは、contracting prepend-one word のgapは
 全長で odd-step 数以上になる。
 -/
 theorem prependOne_contractingGap_ge_oddSteps
@@ -42,7 +43,7 @@ theorem prependOne_contractingGap_ge_oddSteps
   simpa [Word.contractingGap] using h
 
 /--
-effective gap入力のもとでは、任意の positive replay quotient がCOREを満たす。
+Ellison型gap入力のもとでは、任意の positive replay quotient がCOREを満たす。
 `j=1,2` に限らず `j>0` 全体を一括で閉じる。
 -/
 theorem prependOneCore_positive
@@ -76,31 +77,32 @@ theorem prependOneCore_positive
         nlinarith
   exact prependOneCore_of_gap_length hvne hC hAll hlarge
 
-/-- effective gap入力のもとで quotient `1` 枝は全長で閉じる。 -/
-theorem prependOneCoreOnePrinciple_of_effective_gap
+/-- Ellison型gap入力のもとで quotient `1` 枝は全長で閉じる。 -/
+theorem prependOneCoreOnePrinciple_of_ellison
     (hGap : External.TwoThreeEffectiveGapInput) :
     PrependOneCoreOnePrinciple := by
   intro v boundary hvne _hvalid hC hAll _D
   exact prependOneCore_positive hGap hvne hC hAll (by omega)
 
-/-- effective gap入力のもとで quotient `2` 枝も全長で閉じる。 -/
-theorem prependOneCoreTwoPrinciple_of_effective_gap
+/-- Ellison型gap入力のもとで quotient `2` 枝も全長で閉じる。 -/
+theorem prependOneCoreTwoPrinciple_of_ellison
     (hGap : External.TwoThreeEffectiveGapInput) :
     PrependOneCoreTwoPrinciple := by
   intro v boundary hvne _hvalid hC hAll _D
   exact prependOneCore_positive hGap hvne hC hAll (by omega)
 
 /--
-effective gap入力のもとでは、元のCORE原理に必要なのは quotient `0` 枝だけ。
+Ellison型gap入力のもとでは、元のCORE原理に必要なのは quotient `0` 枝だけ。
 -/
-theorem prependOneCorePrinciple_of_effective_gap_zero
+theorem prependOneCorePrinciple_of_ellison_zero
     (hGap : External.TwoThreeEffectiveGapInput)
     (hZero : PrependOneCoreZeroPrinciple) :
     PrependOneCorePrinciple := by
   exact prependOneCorePrinciple_of_three_branches
     hZero
-    (prependOneCoreOnePrinciple_of_effective_gap hGap)
-    (prependOneCoreTwoPrinciple_of_effective_gap hGap)
+    (prependOneCoreOnePrinciple_of_ellison hGap)
+    (prependOneCoreTwoPrinciple_of_ellison hGap)
+
 
 end Word
 end Collatz

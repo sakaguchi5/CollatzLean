@@ -88,7 +88,7 @@ theorem PrependOneReplayData.zero_canonicalStart_mod_three
 全 nonempty suffix が contracting なら affine constant は sharp に小さい。
 各 affine term に対応する suffix の contracting 性を帰納的に足し合わせる。
 -/
-theorem AllSuffixesContracting.three_mul_affineConst_lt
+theorem AllSuffixesContracting.three_mul_affineConst_lt_oddSteps
     {v : Collatz.Word}
     (hvne : v ≠ [])
     (hAll : Word.AllSuffixesContracting v) :
@@ -174,7 +174,7 @@ theorem prependOneCore_of_gap_length
   have hAffine :
       3 * B < Word.oddSteps v * A := by
     simpa [A, B] using
-      (Word.AllSuffixesContracting.three_mul_affineConst_lt hvne hAll)
+      (Word.AllSuffixesContracting.three_mul_affineConst_lt_oddSteps hvne hAll)
   have hAffineBudget :
       affineBudget ≤ A * (Word.oddSteps v + 1) := by
     dsimp [affineBudget]
