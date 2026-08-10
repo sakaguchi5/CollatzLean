@@ -5,7 +5,7 @@ import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.ExactLate
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Primitive
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Barrier
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Canonical
-import CollatzLean.Collatz.AdjacentReturn.CanonicalContractingChain
+import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.CanonicalBridge
 
 /-!
 # 非有界反例から二整数問題への最終境界
@@ -38,6 +38,13 @@ def HasExpandingIntegerTower : Prop :=
 /-- eventually-contracting 側の純整数 obstruction が存在する。 -/
 def HasContractingIntegerChain : Prop :=
   Nonempty ContractingIntegerChain
+
+/--
+canonical shift 後の Exact/Late core と canonical refinement が
+同一 pure core 上に存在する。
+-/
+def HasCanonicalExactLateContractingIntegerChain : Prop :=
+  Nonempty CanonicalExactLateContractingIntegerChain
 
 /-- expanding obstruction は共通連続 chain を保持する。 -/
 theorem expanding_has_adjacentIntegerChain
@@ -83,6 +90,28 @@ theorem unbounded_to_expandingInteger_or_canonicalContracting
   · rcases hC with ⟨D⟩
     right
     exact ⟨O, ⟨CanonicalContractingChain.ofEventuallyContractingTail D hGap⟩⟩
+
+/--
+Baker 型 gap 入力のもとでは、収縮側 actual tail を canonical shift した後、
+同じ shifted state 列から Exact/Late core と canonical refinement を同時に構成できる。
+
+この theorem が `CanonicalBridge` の Global への実接続点である。
+-/
+theorem unbounded_to_expanding_or_canonicalExactLate
+    (hGap : External.TwoThreeGapPolynomialBound) :
+    HasUnboundedOddOrbit →
+      HasExpandingIntegerTower ∨
+        HasCanonicalExactLateContractingIntegerChain := by
+  rintro ⟨O, hU⟩
+  rcases dichotomy_on_strong O hU with hE | hC
+  · rcases hE with ⟨T⟩
+    exact Or.inl ⟨ExpandingIntegerTower.ofTower T⟩
+  · rcases hC with ⟨D⟩
+    let K : CanonicalContractingChain O :=
+      CanonicalContractingChain.ofEventuallyContractingTail D hGap
+    exact
+      Or.inr
+        ⟨K.toCanonicalExactLateContractingIntegerChain⟩
 
 /-- 二整数問題の双方を排除すれば非有界反例は存在しない。 -/
 theorem no_unbounded_of_no_integer_obstructions
@@ -250,15 +279,18 @@ theorem barrierExpanding_has_core
   exact ⟨R.core⟩
 
 /--
-各 refinement の供給 theorem が得られた時点で、Exact/Late 完備の二整数分岐を
-barrier expanding / fully-refined contracting 分岐へそのまま持ち上げる。
+各 refinement の供給 theorem が得られた時点で、Baker/canonical を
+actual contracting tail から内部供給しながら
+barrier expanding / fully-refined contracting 分岐へ持ち上げる。
 
 `hExpBarrier` は計算検証などの backward barrier 層、
-`hConPrimitive` は Late/Coprime 層、`hConCanonical` は Baker/canonical 層を
-それぞれ独立に供給するためのインターフェースである。
+`hConPrimitive` は Late/Coprime 層を独立に供給する。
+canonical 層は `hGap` と `CanonicalBridge` から自動供給されるため、
+外部 `hConCanonical` provider は不要。
 -/
 theorem unbounded_to_refined_integer_dichotomy
     {bound : ℕ}
+    (hGap : External.TwoThreeGapPolynomialBound)
     (hExpBarrier :
       ∀ T : ExpandingIntegerTower,
         ReverseBarrier bound T.chain)
@@ -270,15 +302,12 @@ theorem unbounded_to_refined_integer_dichotomy
       ∀ n : ℕ,
       ∀ L : LateBlockArithmeticData (C.block n),
         L.crossing = C.firstCrossing n →
-          Nonempty (PrimitiveLateConstraintData L))
-    (hConCanonical :
-      ∀ C : ContractingIntegerChain,
-        CanonicalIntegerRefinement C) :
+          Nonempty (PrimitiveLateConstraintData L)) :
     HasUnboundedOddOrbit →
       HasBarrierExpandingIntegerTower bound ∨
         HasRefinedContractingIntegerChain bound := by
   intro hU
-  rcases unbounded_to_expanding_or_exactLateContracting hU with hE | hC
+  rcases unbounded_to_expanding_or_canonicalExactLate hGap hU with hE | hC
   · rcases hE with ⟨T⟩
     left
     exact ⟨⟨T, hExpBarrier T⟩⟩
@@ -286,10 +315,10 @@ theorem unbounded_to_refined_integer_dichotomy
     right
     exact
       ⟨{
-        core := C
-        barrier := hConBarrier C.core
-        primitiveLate := hConPrimitive C.core
-        canonical := hConCanonical C.core
+        core := C.core
+        barrier := hConBarrier C.core.core
+        primitiveLate := hConPrimitive C.core.core
+        canonical := C.canonical
       }⟩
 
 end IntegerObstruction
