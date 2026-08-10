@@ -1,4 +1,5 @@
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.FirstCrossing
+import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Chain
 import CollatzLean.Collatz.AdjacentReturn.StrongContractingTail
 import CollatzLean.Collatz.AdjacentReturn.FullBlockCanonical
 import CollatzLean.Collatz.AdjacentReturn.FirstCrossingBridge
@@ -92,11 +93,10 @@ end ContractingBlockArithmetic
 valuation triangle と first-crossing 長の発散も保持する。
 -/
 structure ContractingIntegerChain where
+  chain : AdjacentIntegerChain
   block : ℕ → ContractingBlockArithmetic
-  connects :
-    ∀ n : ℕ,
-      (block n).base.startValue + (block n).base.valueGap =
-        (block (n + 1)).base.startValue
+  block_base_eq :
+    ∀ n : ℕ, (block n).base = chain.block n
   startDepth : ℕ → ℕ
   startOddPart : ℕ → ℕ
   nextDepth : ℕ → ℕ
@@ -143,6 +143,21 @@ structure ContractingIntegerChain where
 
 namespace ContractingIntegerChain
 
+/-- branch 固有 block の接続は共通 `AdjacentIntegerChain` から従う。 -/
+theorem connects
+    (C : ContractingIntegerChain) (n : ℕ) :
+    (C.block n).base.startValue + (C.block n).base.valueGap =
+      (C.block (n + 1)).base.startValue := by
+  rw [C.block_base_eq n, C.block_base_eq (n + 1)]
+  exact C.chain.connects n
+
+/-- 共通 chain の全 block は contracting。 -/
+theorem chain_contracting
+    (C : ContractingIntegerChain) (n : ℕ) :
+    (C.chain.block n).word.Contracting := by
+  rw [← C.block_base_eq n]
+  exact (C.block n).contracting
+
 /-- eventually-all-contracting tail から純算術 chain を作る。 -/
 noncomputable def ofEventuallyContractingTail
     {O : OddOrbit} (D : EventuallyContractingTailData O) :
@@ -160,10 +175,13 @@ noncomputable def ofEventuallyContractingTail
       simpa [T] using G n
   }
   refine {
+    chain :=
+      AdjacentIntegerChain.ofStandardFutureMinimaFrom
+        D.unbounded D.minima D.standard D.cutoff
     block := fun n =>
       ContractingBlockArithmetic.ofState
         (D.state n) (D.state_contracting n)
-    connects := ?_
+    block_base_eq := ?_
     startDepth := fun n => (V n).startDepth
     startOddPart := fun n => (V n).startOddPart
     nextDepth := fun n => (V n).nextDepth
@@ -183,11 +201,7 @@ noncomputable def ofEventuallyContractingTail
     firstCrossing_lengths_tend_to_infinity := ?_
   }
   · intro n
-    change
-      (D.state n).startValue + (D.state n).valueGap =
-        (D.state (n + 1)).startValue
-    rw [← (D.state n).nextValue_eq_startValue_add_valueGap]
-    exact D.nextValue_eq_next_startValue n
+    rfl
   · intro n
     change
       TwoAdic.ExactFactor

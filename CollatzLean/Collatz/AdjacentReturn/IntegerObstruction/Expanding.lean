@@ -1,4 +1,4 @@
-import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Basic
+import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Chain
 import CollatzLean.Collatz.Selection.Cofinal
 
 /-!
@@ -175,28 +175,73 @@ theorem totalExponent_unique_of_length
       totalExponent_not_lt_of_length
         hr h₂low h₁high h21)
 
-/-- expanding cofinal tower を純算術 tower に落としたもの。 -/
+/--
+expanding が cofinal に現れる連続整数 chain。
+
+`chain` は標準 adjacent return を一つも落とさず保持し、
+`select` はその中の expanding block を選ぶ。
+-/
 structure ExpandingIntegerTower where
+  chain : AdjacentIntegerChain
+  select : ℕ → ℕ
+  select_strict : StrictMono select
   block : ℕ → ExpandingBlockArithmetic
-  startValue_strict :
-    StrictMono (fun n => (block n).base.startValue)
+  block_base_eq :
+    ∀ n : ℕ, (block n).base = chain.block (select n)
 
 namespace ExpandingIntegerTower
 
-/-- 実際の expanding tower から純算術 tower を作る。 -/
+/-- strict selector は添字自身以上。 -/
+theorem select_ge
+    (T : ExpandingIntegerTower) (n : ℕ) :
+    n ≤ T.select n := by
+  induction n with
+  | zero => exact Nat.zero_le _
+  | succ n ih =>
+      have hlt := T.select_strict (Nat.lt_succ_self n)
+      exact Nat.succ_le_of_lt (lt_of_le_of_lt ih hlt)
+
+/-- selected block は共通 chain 上でも expanding。 -/
+theorem selected_expanding
+    (T : ExpandingIntegerTower) (n : ℕ) :
+    (T.chain.block (T.select n)).word.Expanding := by
+  rw [← T.block_base_eq n]
+  exact (T.block n).expanding
+
+/-- 共通 chain 上で expanding block は cofinal に現れる。 -/
+theorem cofinal_expanding
+    (T : ExpandingIntegerTower) :
+    Selection.Cofinal
+      (fun j => (T.chain.block j).word.Expanding) := by
+  intro N
+  refine ⟨T.select N, T.select_ge N, ?_⟩
+  exact T.selected_expanding N
+
+/-- selected start value は狭義単調。 -/
+theorem startValue_strict
+    (T : ExpandingIntegerTower) :
+    StrictMono (fun n => (T.block n).base.startValue) := by
+  intro a b hab
+  dsimp
+  rw [T.block_base_eq a, T.block_base_eq b]
+  exact T.chain.startValue_strict (T.select_strict hab)
+
+/-- 実際の expanding tower から、連続 chain を保った純算術 tower を作る。 -/
 def ofTower
     {O : OddOrbit} (T : ExpandingTower O) : ExpandingIntegerTower := by
   refine {
+    chain :=
+      AdjacentIntegerChain.ofStandardFutureMinima
+        T.unbounded T.minima T.standard
+    select := T.select
+    select_strict := T.select_strict
     block := fun n =>
       ExpandingBlockArithmetic.ofState
         (T.tower_at n) (T.at_expanding n)
-    startValue_strict := ?_
+    block_base_eq := ?_
   }
-  intro a b hab
-  change
-    O.value (T.minima.index (T.select a)) <
-      O.value (T.minima.index (T.select b))
-  exact T.minima.value_strict (T.select_strict hab)
+  intro n
+  rfl
 
 /-- expanding block 長が一様有界。 -/
 def LengthsBounded (T : ExpandingIntegerTower) : Prop :=

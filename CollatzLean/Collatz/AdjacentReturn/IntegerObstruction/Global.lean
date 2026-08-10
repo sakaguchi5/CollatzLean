@@ -13,6 +13,16 @@ namespace Collatz
 namespace AdjacentReturn
 namespace IntegerObstruction
 
+/-- 標準 adjacent return の連続純整数 chain が存在する。 -/
+def HasAdjacentIntegerChain : Prop :=
+  Nonempty AdjacentIntegerChain
+
+/-- 非有界 odd 軌道から、分岐前の共通連続整数 chain を得る。 -/
+theorem unbounded_to_adjacentIntegerChain :
+    HasUnboundedOddOrbit → HasAdjacentIntegerChain := by
+  rintro ⟨O, hU⟩
+  exact ⟨AdjacentIntegerChain.ofUnboundedOrbit O hU⟩
+
 /-- expanding 側の純整数 obstruction が存在する。 -/
 def HasExpandingIntegerTower : Prop :=
   Nonempty ExpandingIntegerTower
@@ -20,6 +30,20 @@ def HasExpandingIntegerTower : Prop :=
 /-- eventually-contracting 側の純整数 obstruction が存在する。 -/
 def HasContractingIntegerChain : Prop :=
   Nonempty ContractingIntegerChain
+
+/-- expanding obstruction は共通連続 chain を保持する。 -/
+theorem expanding_has_adjacentIntegerChain
+    (hE : HasExpandingIntegerTower) :
+    HasAdjacentIntegerChain := by
+  rcases hE with ⟨T⟩
+  exact ⟨T.chain⟩
+
+/-- contracting obstruction も共通連続 chain を保持する。 -/
+theorem contracting_has_adjacentIntegerChain
+    (hC : HasContractingIntegerChain) :
+    HasAdjacentIntegerChain := by
+  rcases hC with ⟨C⟩
+  exact ⟨C.chain⟩
 
 /--
 非有界 odd 軌道は、拡大型整数 tower か、

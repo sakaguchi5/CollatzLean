@@ -1,4 +1,5 @@
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Basic
+import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Chain
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Expanding
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.FirstCrossing
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Contracting
