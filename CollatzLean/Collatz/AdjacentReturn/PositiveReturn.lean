@@ -1,0 +1,6 @@
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.Core
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.Cumulative
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.ReplayProfile
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.BiCanonical
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.Valuation
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.FiniteState
