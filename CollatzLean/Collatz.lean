@@ -1,5 +1,6 @@
 import CollatzLean.Collatz.Arithmetic.Growth
 import CollatzLean.Collatz.External.TwoThreeGap
+import CollatzLean.Collatz.External.TwoThreeEffectiveGap
 import CollatzLean.Collatz.TwoAdic.Factorization
 import CollatzLean.Collatz.TwoAdic.Valuation
 import CollatzLean.Collatz.Word.Basic
@@ -25,6 +26,7 @@ import CollatzLean.Collatz.Canonical.CylinderDerived
 import CollatzLean.Collatz.Canonical.CylinderDynamics
 import CollatzLean.Collatz.Canonical.FirstCrossingReduction
 import CollatzLean.Collatz.Canonical.PrependOneCoreBranches
+import CollatzLean.Collatz.Canonical.PrependOneCorePositiveElimination
 import CollatzLean.Collatz.OddOrbit.Basic
 import CollatzLean.Collatz.OddOrbit.Periodic
 import CollatzLean.Collatz.OddOrbit.HighExponent
