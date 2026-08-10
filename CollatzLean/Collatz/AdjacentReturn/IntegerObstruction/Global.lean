@@ -6,6 +6,7 @@ import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Primitive
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Barrier
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Canonical
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.CanonicalBridge
+import CollatzLean.Collatz.Canonical.FirstCrossingReduction
 
 /-!
 # 非有界反例から二整数問題への最終境界
@@ -320,6 +321,78 @@ theorem unbounded_to_refined_integer_dichotomy
         primitiveLate := hConPrimitive C.core.core
         canonical := C.canonical
       }⟩
+
+/--
+CORE が成立すれば canonical Exact/Late contracting obstruction は存在しない。
+
+canonical refinement された first crossing は正の return gap を持つ一方、
+CORE reduction は同じ canonical first crossing が非上昇であることを強制する。
+Exact/Late のどちらであるかは使わない。
+-/
+theorem no_canonicalExactLateContracting_of_core
+    (hCore : Word.PrependOneCorePrinciple) :
+    ¬ HasCanonicalExactLateContractingIntegerChain := by
+  rintro ⟨C⟩
+  let n := C.canonical.cutoff
+  let F := C.core.core.firstCrossing n
+  have hcanonical : CanonicalFirstCrossingArithmeticData F := by
+    dsimp [F, n]
+    exact C.canonical.crossingCanonical C.canonical.cutoff le_rfl
+  have htakeValid :
+      ((C.core.core.block n).base.word.take F.length).Valid := by
+    have hfull :
+        (((C.core.core.block n).base.word.take F.length) ++
+            ((C.core.core.block n).base.word.drop F.length)).Valid := by
+      rw [List.take_append_drop]
+      exact (C.core.core.block n).base.word_valid
+    exact hfull.prefix
+  have hvalid : F.word.Valid := by
+    rw [F.word_eq_take]
+    exact htakeValid
+  have hleWord :
+      F.length ≤ (C.core.core.block n).base.word.length := by
+    rw [(C.core.core.block n).base.word_length]
+    exact F.le_block
+  have hwordLength : F.word.length = F.length := by
+    rw [F.word_eq_take, List.length_take]
+    exact Nat.min_eq_left hleWord
+  have hlen : 1 < F.word.length := by
+    rw [hwordLength]
+    omega
+  have hdescent : F.word.canonicalEnd ≤ F.word.canonicalStart :=
+    Word.FirstCrossing.canonicalEnd_le_canonicalStart_of_core
+      hCore hvalid F.crossing hlen
+  have hendpointLeStart :
+      F.endpointValue ≤ (C.core.core.block n).base.startValue := by
+    rw [hcanonical.endpoint_eq, hcanonical.start_eq]
+    exact hdescent
+  have hendpoint := F.endpoint_eq_start_add_gap
+  have hgap := F.returnGap_pos
+  omega
+
+/--
+Baker 型 gap 入力と CORE があれば contracting 側は完全に消え、
+非有界反例は expanding integer tower にしか残らない。
+-/
+theorem unbounded_to_expandingInteger_of_core
+    (hGap : External.TwoThreeGapPolynomialBound)
+    (hCore : Word.PrependOneCorePrinciple) :
+    HasUnboundedOddOrbit → HasExpandingIntegerTower := by
+  intro hU
+  rcases unbounded_to_expanding_or_canonicalExactLate hGap hU with hE | hC
+  · exact hE
+  · exact False.elim (no_canonicalExactLateContracting_of_core hCore hC)
+
+/--
+CORE が成立し expanding integer tower も排除できれば、非有界反例は存在しない。
+-/
+theorem no_unbounded_of_core_and_no_expanding
+    (hGap : External.TwoThreeGapPolynomialBound)
+    (hCore : Word.PrependOneCorePrinciple)
+    (hExpanding : ¬ HasExpandingIntegerTower) :
+    ¬ HasUnboundedOddOrbit := by
+  intro hU
+  exact hExpanding (unbounded_to_expandingInteger_of_core hGap hCore hU)
 
 end IntegerObstruction
 end AdjacentReturn
