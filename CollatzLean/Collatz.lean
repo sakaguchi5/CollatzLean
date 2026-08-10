@@ -27,6 +27,7 @@ import CollatzLean.Collatz.Canonical.CylinderDynamics
 import CollatzLean.Collatz.Canonical.FirstCrossingReduction
 import CollatzLean.Collatz.Canonical.PrependOneCoreBranches
 import CollatzLean.Collatz.Canonical.PrependOneCorePositiveElimination
+import CollatzLean.Collatz.Canonical.PrependOneCoreZeroObstruction
 import CollatzLean.Collatz.OddOrbit.Basic
 import CollatzLean.Collatz.OddOrbit.Periodic
 import CollatzLean.Collatz.OddOrbit.HighExponent
