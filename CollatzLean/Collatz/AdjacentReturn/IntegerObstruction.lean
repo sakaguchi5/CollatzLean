@@ -4,6 +4,7 @@ import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Expanding
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.FirstCrossing
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Contracting
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Late
+import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.ExactLate
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Primitive
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Barrier
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Canonical
