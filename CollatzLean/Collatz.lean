@@ -48,4 +48,5 @@ import CollatzLean.Collatz.AdjacentReturn.StrongContractingTail
 import CollatzLean.Collatz.AdjacentReturn.FullBlockCanonical
 import CollatzLean.Collatz.AdjacentReturn.CanonicalContractingChain
 import CollatzLean.Collatz.AdjacentReturn.GapDepthDichotomy
+import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction
 import CollatzLean.Collatz.Main
