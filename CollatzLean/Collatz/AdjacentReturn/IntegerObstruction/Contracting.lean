@@ -86,6 +86,11 @@ def ofState
     rw [← R.nextValue_eq_startValue_add_valueGap]
     exact R.two_mul_nextValue_add_one_lt_three_mul_startValue_add_one hC
 
+/-- full block の multiplicative contracting gap。 -/
+def fullGap
+    (C : ContractingBlockArithmetic) : ℕ :=
+  2 ^ C.base.totalExponent - 3 ^ C.base.length
+
 end ContractingBlockArithmetic
 
 /--
