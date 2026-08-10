@@ -339,10 +339,12 @@ theorem no_canonicalExactLateContracting_of_core
     dsimp [F, n]
     exact C.canonical.crossingCanonical C.canonical.cutoff le_rfl
   have htakeValid :
-      ((C.core.core.block n).base.word.take F.length).Valid := by
+      Word.Valid
+        ((C.core.core.block n).base.word.take F.length) := by
     have hfull :
-        (((C.core.core.block n).base.word.take F.length) ++
-            ((C.core.core.block n).base.word.drop F.length)).Valid := by
+        Word.Valid
+          (((C.core.core.block n).base.word.take F.length) ++
+            ((C.core.core.block n).base.word.drop F.length)) := by
       rw [List.take_append_drop]
       exact (C.core.core.block n).base.word_valid
     exact hfull.prefix
@@ -358,6 +360,7 @@ theorem no_canonicalExactLateContracting_of_core
     exact Nat.min_eq_left hleWord
   have hlen : 1 < F.word.length := by
     rw [hwordLength]
+    have h13 := F.thirteen_le_length
     omega
   have hdescent : F.word.canonicalEnd ≤ F.word.canonicalStart :=
     Word.FirstCrossing.canonicalEnd_le_canonicalStart_of_core

@@ -24,6 +24,7 @@ import CollatzLean.Collatz.Canonical.Cylinder
 import CollatzLean.Collatz.Canonical.CylinderDerived
 import CollatzLean.Collatz.Canonical.CylinderDynamics
 import CollatzLean.Collatz.Canonical.FirstCrossingReduction
+import CollatzLean.Collatz.Canonical.PrependOneCoreBranches
 import CollatzLean.Collatz.OddOrbit.Basic
 import CollatzLean.Collatz.OddOrbit.Periodic
 import CollatzLean.Collatz.OddOrbit.HighExponent
