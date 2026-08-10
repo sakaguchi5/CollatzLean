@@ -13,7 +13,7 @@ import CollatzLean.Collatz.AdjacentReturn.CanonicalContractingChain
 今後の正本を expanding / eventually-contracting の二整数問題に固定する。
 細かい枝はこの二つの解集合への追加条件として扱う。
 
-さらに Exact/Late・primitive・backward-barrier・canonical の各 refinement を
+さらに Exact/Late・endpoint floor・primitive・backward-barrier・canonical の各 refinement を
 依存関係を保ったまま積み上げるための最終インターフェースを置く。
 -/
 
@@ -98,7 +98,8 @@ theorem no_unbounded_of_no_integer_obstructions
 Exact/Late 完備の contracting integer chain に
 Late primitive・barrier・canonical の全 refinement を積んだ最終対象。
 
-`core.lateData` により Late 項では実際の `LateBlockArithmeticData` が必ず存在するため、
+`core.lateWitness` により Late 項では actual endpoint floor を含む
+同一の finite witness が必ず存在する。
 `primitiveLate` は空虚な全称条件にはならない。
 各追加条件の出自は別ファイルに分離し、この structure は合流点だけを担う。
 -/
@@ -148,6 +149,42 @@ theorem late_has_primitiveConstraint
   exact ⟨L, hL, R.primitiveLate n L hL⟩
 
 /--
+Late 項では、actual endpoint floor と primitive constraint を
+同じ finite data 上で同時に得る。
+-/
+theorem late_has_floor_and_primitiveConstraint
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound)
+    (n : ℕ)
+    (hLate : R.core.core.LateAt n) :
+    ∃ L : LateBlockArithmeticData (R.core.core.block n),
+      L.crossing = R.core.core.firstCrossing n ∧
+      LateSuffixEndpointFloorData L ∧
+      Nonempty (PrimitiveLateConstraintData L) := by
+  let W := R.core.lateWitness n hLate
+  exact
+    ⟨W.data, W.crossing_eq, W.floor,
+      R.primitiveLate n W.data W.crossing_eq⟩
+
+/-- Late 項では actual floor により return gap は少なくとも6。 -/
+theorem late_six_le_returnGap
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound)
+    (n : ℕ)
+    (hLate : R.core.core.LateAt n) :
+    6 ≤ (R.core.core.firstCrossing n).returnGap :=
+  R.core.late_six_le_returnGap n hLate
+
+/-- Late 項では actual floor により first-crossing length は少なくとも19。 -/
+theorem late_nineteen_le_crossingLength
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound)
+    (n : ℕ)
+    (hLate : R.core.core.LateAt n) :
+    19 ≤ (R.core.core.firstCrossing n).length :=
+  R.core.late_nineteen_le_crossingLength n hLate
+
+/--
 Late 項では commutator identity と primitive / 2-adic constraint を
 同じ finite data 上で同時に得る。
 -/
@@ -164,6 +201,27 @@ theorem late_has_commutator_and_primitiveConstraint
       Nonempty (PrimitiveLateConstraintData L) := by
   obtain ⟨L, hL, hP⟩ := R.late_has_primitiveConstraint n hLate
   exact ⟨L, hL, L.commutator_balance, hP⟩
+
+/--
+Late 項では endpoint floor・commutator identity・primitive constraint を
+同じ finite data 上で同時に得る。
+-/
+theorem late_has_floor_commutator_and_primitiveConstraint
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound)
+    (n : ℕ)
+    (hLate : R.core.core.LateAt n) :
+    ∃ L : LateBlockArithmeticData (R.core.core.block n),
+      L.crossing = R.core.core.firstCrossing n ∧
+      LateSuffixEndpointFloorData L ∧
+      L.suffixGap * L.crossing.affine =
+        L.crossing.multiplicativeGap * L.suffix.affineConst +
+          L.commutatorCore ∧
+      Nonempty (PrimitiveLateConstraintData L) := by
+  let W := R.core.lateWitness n hLate
+  exact
+    ⟨W.data, W.crossing_eq, W.floor, W.data.commutator_balance,
+      R.primitiveLate n W.data W.crossing_eq⟩
 
 end RefinedContractingIntegerChain
 

@@ -7,13 +7,14 @@ import CollatzLean.Collatz.AdjacentReturn.StrongContractingTail
 
 `ContractingIntegerChain` の各 first crossing を Exact / Late に完全分解する。
 さらに actual eventually-contracting tail から得られる整数 chain については、
-Late の各項に対応する `LateBlockArithmeticData` を必ず供給する。
+Late の各項に対応する `LateBlockArithmeticData` と actual endpoint floor を
+同一 witness 上で必ず供給する。
 
 これにより
 
 P_C
   -> Exact または Late
-  -> Late なら exact commutator data
+  -> Late なら exact commutator data + endpoint floor
   -> primitive / 2-adic refinement
 
 という圧縮線の Exact / Late 接続部分を非空虚に固定する。
@@ -118,7 +119,7 @@ def ofActualFirstCrossing
       O.realizesSegment
         (R.startIndex + F.length)
         (R.length - F.length)
-    have hlengthLe :F.length ≤ R.length := by
+    have hlengthLe : F.length ≤ R.length := by
       exact Nat.le_of_lt hLate
     have hindex :
         R.startIndex + F.length + (R.length - F.length) =
@@ -165,21 +166,137 @@ def ofActualFirstCrossing
 
 end LateBlockArithmeticData
 
+namespace LateSuffixEndpointFloorData
+
+/--
+actual Late first crossing から suffix の future-minimum floor を純有限データへ移す。
+この constructor の外では `OddOrbit` を保持しない。
+-/
+theorem ofActualFirstCrossing
+    {O : OddOrbit} {R : State O}
+    (hC : R.IsContracting)
+    (F : FirstCrossingData R)
+    (hLate : F.IsLate) :
+    LateSuffixEndpointFloorData
+      (LateBlockArithmeticData.ofActualFirstCrossing hC F hLate) := by
+  let L : LateBlockArithmeticData
+      (ContractingBlockArithmetic.ofState R hC) :=
+    LateBlockArithmeticData.ofActualFirstCrossing hC F hLate
+  change LateSuffixEndpointFloorData L
+  refine {
+    peak_odd := ?_
+    prefixFloor := ?_
+  }
+  · change Odd F.endpointValue
+    unfold FirstCrossingData.endpointValue
+    exact O.value_odd _
+  · intro k hkPos hkLe
+    let S : Collatz.Word :=
+      O.segment
+        (R.startIndex + F.length)
+        (R.length - F.length)
+    have hSuffix : L.suffix = S := by
+      rfl
+    have hkLeS : k ≤ S.length := by
+      simpa [hSuffix] using hkLe
+    have hkLeQ : k ≤ R.length - F.length := by
+      simpa [S] using hkLeS
+    have htake :
+        S.take k =
+          O.segment (R.startIndex + F.length) k := by
+      exact O.segment_take_of_le hkLeQ
+    let y : ℕ :=
+      O.value (R.startIndex + F.length + k)
+    refine ⟨y, ?_, ?_⟩
+    · rw [hSuffix, htake]
+      change
+        Word.Runs
+          (O.segment (R.startIndex + F.length) k)
+          F.endpointValue
+          y
+      simpa [y, FirstCrossingData.endpointValue, Nat.add_assoc] using
+        O.runsSegment (R.startIndex + F.length) k
+    · change R.startValue + R.valueGap ≤ y
+      rw [← R.nextValue_eq_startValue_add_valueGap]
+      have hfloor :=
+        R.nextValue_le_positiveEndpoint
+          (F.length + k) (by omega)
+      simpa [y, Nat.add_assoc] using hfloor
+
+end LateSuffixEndpointFloorData
+
+/--
+Late 項の arithmetic data と actual future-minimum floor を
+同一の finite witness 上で保持する。
+-/
+structure LateArithmeticWitness
+    (C : ContractingBlockArithmetic)
+    (F : FirstCrossingArithmeticData C.base) where
+  data : LateBlockArithmeticData C
+  crossing_eq : data.crossing = F
+  floor : LateSuffixEndpointFloorData data
+
+namespace LateArithmeticWitness
+
+/-- witness の return gap は actual floor により少なくとも6。 -/
+theorem six_le_returnGap
+    {C : ContractingBlockArithmetic}
+    {F : FirstCrossingArithmeticData C.base}
+    (W : LateArithmeticWitness C F) :
+    6 ≤ W.data.crossing.returnGap :=
+  W.floor.six_le_returnGap
+
+/-- witness の first-crossing length は少なくとも19。 -/
+theorem nineteen_le_crossingLength
+    {C : ContractingBlockArithmetic}
+    {F : FirstCrossingArithmeticData C.base}
+    (W : LateArithmeticWitness C F) :
+    19 ≤ W.data.crossing.length :=
+  W.floor.nineteen_le_crossingLength
+
+end LateArithmeticWitness
+
 /--
 P_C の Exact / Late 情報を非空虚にした純整数 obstruction。
 
 `core` は従来の contracting 整数 chain。
-`lateData` により Late 項では対応する有限 suffix data が必ず存在する。
+`lateWitness` により Late 項では対応する finite suffix arithmetic と
+actual future-minimum endpoint floor が同一 witness 上で必ず存在する。
 -/
 structure ExactLateContractingIntegerChain where
   core : ContractingIntegerChain
-  lateData :
+  lateWitness :
     ∀ n : ℕ,
       core.LateAt n →
-        ∃ L : LateBlockArithmeticData (core.block n),
-          L.crossing = core.firstCrossing n
+        LateArithmeticWitness
+          (core.block n)
+          (core.firstCrossing n)
 
 namespace ExactLateContractingIntegerChain
+
+/--
+従来 API 互換の Late data accessor。
+内部では floor 付き `lateWitness` を正本とする。
+-/
+theorem lateData
+    (C : ExactLateContractingIntegerChain)
+    (n : ℕ)
+    (hLate : C.core.LateAt n) :
+    ∃ L : LateBlockArithmeticData (C.core.block n),
+      L.crossing = C.core.firstCrossing n := by
+  let W := C.lateWitness n hLate
+  exact ⟨W.data, W.crossing_eq⟩
+
+/-- Late 項では同じ arithmetic witness 上で endpoint floor も得られる。 -/
+theorem lateFloorData
+    (C : ExactLateContractingIntegerChain)
+    (n : ℕ)
+    (hLate : C.core.LateAt n) :
+    ∃ L : LateBlockArithmeticData (C.core.block n),
+      L.crossing = C.core.firstCrossing n ∧
+        LateSuffixEndpointFloorData L := by
+  let W := C.lateWitness n hLate
+  exact ⟨W.data, W.crossing_eq, W.floor⟩
 
 /-- Exact/Late 完備 obstruction から従来の contracting core を忘却する。 -/
 theorem has_core
@@ -197,6 +314,37 @@ theorem exact_or_lateData
   · exact Or.inl hExact
   · exact Or.inr (C.lateData n hLate)
 
+/-- Exact 項または、floor 付き Late witness への完全分解。 -/
+theorem exact_or_lateFloorData
+    (C : ExactLateContractingIntegerChain) (n : ℕ) :
+    C.core.ExactAt n ∨
+      ∃ L : LateBlockArithmeticData (C.core.block n),
+        L.crossing = C.core.firstCrossing n ∧
+          LateSuffixEndpointFloorData L := by
+  rcases C.core.exact_or_late n with hExact | hLate
+  · exact Or.inl hExact
+  · exact Or.inr (C.lateFloorData n hLate)
+
+/-- Late 項では actual floor により return gap は少なくとも6。 -/
+theorem late_six_le_returnGap
+    (C : ExactLateContractingIntegerChain)
+    (n : ℕ)
+    (hLate : C.core.LateAt n) :
+    6 ≤ (C.core.firstCrossing n).returnGap := by
+  let W := C.lateWitness n hLate
+  rw [← W.crossing_eq]
+  exact W.floor.six_le_returnGap
+
+/-- Late 項では first-crossing length は少なくとも19。 -/
+theorem late_nineteen_le_crossingLength
+    (C : ExactLateContractingIntegerChain)
+    (n : ℕ)
+    (hLate : C.core.LateAt n) :
+    19 ≤ (C.core.firstCrossing n).length := by
+  let W := C.lateWitness n hLate
+  rw [← W.crossing_eq]
+  exact W.floor.nineteen_le_crossingLength
+
 /-- Late 項では exact commutator identity を持つ有限データが必ず存在する。 -/
 theorem late_has_commutator
     (C : ExactLateContractingIntegerChain) (n : ℕ)
@@ -208,6 +356,20 @@ theorem late_has_commutator
           L.commutatorCore := by
   obtain ⟨L, hL⟩ := C.lateData n hLate
   exact ⟨L, hL, L.commutator_balance⟩
+
+/-- Late 項では floor と commutator identity を同じ有限データ上で得る。 -/
+theorem late_has_floor_and_commutator
+    (C : ExactLateContractingIntegerChain) (n : ℕ)
+    (hLate : C.core.LateAt n) :
+    ∃ L : LateBlockArithmeticData (C.core.block n),
+      L.crossing = C.core.firstCrossing n ∧
+      LateSuffixEndpointFloorData L ∧
+      L.suffixGap * L.crossing.affine =
+        L.crossing.multiplicativeGap * L.suffix.affineConst +
+          L.commutatorCore := by
+  let W := C.lateWitness n hLate
+  exact
+    ⟨W.data, W.crossing_eq, W.floor, W.data.commutator_balance⟩
 
 /-- Late 条件は Late data の存在と同値。 -/
 theorem lateAt_iff_exists_lateData
@@ -236,7 +398,7 @@ noncomputable def ofEventuallyContractingTail
     ContractingIntegerChain.ofEventuallyContractingTail D
   refine {
     core := C
-    lateData := ?_
+    lateWitness := ?_
   }
   intro n hLate
   have hCrossingLength :
@@ -257,11 +419,22 @@ noncomputable def ofEventuallyContractingTail
     exact
       LateBlockArithmeticData.ofActualFirstCrossing
         (D.state_contracting n) (G n) hLateActual
-  refine ⟨L, ?_⟩
-  change
-    FirstCrossingArithmeticData.ofFirstCrossing (G n) =
-      C.firstCrossing n
-  rfl
+  refine {
+    data := L
+    crossing_eq := ?_
+    floor := ?_
+  }
+  · change
+      FirstCrossingArithmeticData.ofFirstCrossing (G n) =
+        C.firstCrossing n
+    rfl
+  · change
+      LateSuffixEndpointFloorData
+        (LateBlockArithmeticData.ofActualFirstCrossing
+          (D.state_contracting n) (G n) hLateActual)
+    exact
+      LateSuffixEndpointFloorData.ofActualFirstCrossing
+        (D.state_contracting n) (G n) hLateActual
 
 end ExactLateContractingIntegerChain
 

@@ -6,6 +6,9 @@ import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Contracting
 contracting adjacent block の first crossing が block 終端より手前で終わる場合に、
 残り suffix と first-crossing peak / adjacent endpoint の差を純整数データとして保持する。
 
+actual future-minimum 性から得る endpoint floor も純有限データとして定義し、
+actual constructor の境界を越えた後は OddOrbit を保持しない。
+
 この層では Baker 型 gap 下界や計算検証境界を仮定しない。
 -/
 
@@ -77,6 +80,27 @@ theorem valueGap_add_peakDrop
     C.base.valueGap + L.peakDrop = L.crossing.returnGap := by
   unfold peakDrop
   exact Nat.add_sub_of_le (Nat.le_of_lt L.valueGap_lt_returnGap)
+
+/-- Late では adjacent gap 4 と正の peak drop から return gap は少なくとも5。 -/
+theorem five_le_returnGap
+    {C : ContractingBlockArithmetic}
+    (L : LateBlockArithmeticData C) :
+    5 ≤ L.crossing.returnGap := by
+  have hgap : 4 ≤ C.base.valueGap :=
+    C.base.four_le_valueGap
+  have hdrop : 0 < L.peakDrop :=
+    L.peakDrop_pos
+  rw [← L.valueGap_add_peakDrop]
+  omega
+
+/-- Late では first-crossing length は少なくとも16。 -/
+theorem sixteen_le_crossingLength
+    {C : ContractingBlockArithmetic}
+    (L : LateBlockArithmeticData C) :
+    16 ≤ L.crossing.length := by
+  have hret := L.five_le_returnGap
+  have hsharp := L.crossing.three_mul_returnGap_lt_length
+  omega
 
 /-- Late suffix 全体は contracting。 -/
 theorem suffix_contracting
@@ -197,6 +221,115 @@ theorem commutatorCore_pos
   omega
 
 end LateBlockArithmeticData
+
+/--
+Late suffix の各 positive prefix endpoint が adjacent endpoint 以上に残ること。
+
+`peak_odd` も actual constructor の境界で保存する。これにより
+peak drop の parity を pure finite data 側だけで利用できる。
+-/
+structure LateSuffixEndpointFloorData
+    {C : ContractingBlockArithmetic}
+    (L : LateBlockArithmeticData C) : Prop where
+  peak_odd : Odd L.crossing.endpointValue
+  prefixFloor :
+    ∀ k : ℕ,
+      0 < k →
+      k ≤ L.suffix.length →
+        ∃ y : ℕ,
+          Word.Runs
+            (L.suffix.take k)
+            L.crossing.endpointValue
+            y ∧
+          C.base.nextValue ≤ y
+
+namespace LateSuffixEndpointFloorData
+
+/-- floor data があれば suffix の各 positive prefix endpoint を明示的に取れる。 -/
+theorem exists_prefix_endpoint
+    {C : ContractingBlockArithmetic}
+    {L : LateBlockArithmeticData C}
+    (D : LateSuffixEndpointFloorData L)
+    {k : ℕ}
+    (hkPos : 0 < k)
+    (hkLe : k ≤ L.suffix.length) :
+    ∃ y : ℕ,
+      Word.Runs
+        (L.suffix.take k)
+        L.crossing.endpointValue
+        y ∧
+      C.base.nextValue ≤ y :=
+  D.prefixFloor k hkPos hkLe
+
+/-- peak と adjacent endpoint はとも奇数なので peak drop は偶数。 -/
+theorem peakDrop_even
+    {C : ContractingBlockArithmetic}
+    {L : LateBlockArithmeticData C}
+    (D : LateSuffixEndpointFloorData L) :
+    Even L.peakDrop := by
+  have hpeak :
+      L.crossing.endpointValue =
+        C.base.nextValue + L.peakDrop := by
+    unfold BlockArithmeticData.nextValue
+    rw [L.crossing.endpoint_eq_start_add_gap]
+    rw [← L.valueGap_add_peakDrop]
+    ring
+  have hnextLePeak :
+      C.base.nextValue ≤ L.crossing.endpointValue := by
+    omega
+  rcases D.peak_odd with ⟨a, ha⟩
+  rcases C.base.next_odd with ⟨b, hb⟩
+  have hb' :
+      C.base.nextValue = 2 * b + 1 := by
+    change
+      C.base.startValue + C.base.valueGap =
+        2 * b + 1
+    exact hb
+  have hba : b ≤ a := by
+    rw [hb', ha] at hnextLePeak
+    omega
+  have hdrop :
+      L.peakDrop = 2 * (a - b) := by
+    rw [ha, hb'] at hpeak
+    omega
+  refine ⟨a - b, ?_⟩
+  omega
+
+/-- 正の偶数である peak drop は少なくとも2。 -/
+theorem two_le_peakDrop
+    {C : ContractingBlockArithmetic}
+    {L : LateBlockArithmeticData C}
+    (D : LateSuffixEndpointFloorData L) :
+    2 ≤ L.peakDrop := by
+  have hpos := L.peakDrop_pos
+  rcases D.peakDrop_even with ⟨q, hq⟩
+  omega
+
+/-- actual floor を保持した Late data では return gap は少なくとも6。 -/
+theorem six_le_returnGap
+    {C : ContractingBlockArithmetic}
+    {L : LateBlockArithmeticData C}
+    (D : LateSuffixEndpointFloorData L) :
+    6 ≤ L.crossing.returnGap := by
+  have hgap : 4 ≤ C.base.valueGap :=
+    C.base.four_le_valueGap
+  have hdrop : 2 ≤ L.peakDrop :=
+    D.two_le_peakDrop
+  rw [← L.valueGap_add_peakDrop]
+  omega
+
+/-- actual floor を保持した Late data では first-crossing length は少なくとも19。 -/
+theorem nineteen_le_crossingLength
+    {C : ContractingBlockArithmetic}
+    {L : LateBlockArithmeticData C}
+    (D : LateSuffixEndpointFloorData L) :
+    19 ≤ L.crossing.length := by
+  have hret := D.six_le_returnGap
+  have hsharp := L.crossing.three_mul_returnGap_lt_length
+  omega
+
+end LateSuffixEndpointFloorData
+
 end IntegerObstruction
 end AdjacentReturn
 end Collatz

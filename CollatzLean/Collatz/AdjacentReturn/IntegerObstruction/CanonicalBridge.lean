@@ -5,73 +5,13 @@ import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.ExactLate
 /-!
 # canonical actual chain と integer obstruction の bridge
 
-現在の `IntegerObstruction` 正本から既存 `CanonicalLatePacket` machinery を
-再利用する変換と、actual `CanonicalContractingChain` が供給する finite canonical data をまとめる。
+pure な `CanonicalLateArithmeticData -> CanonicalLatePacket` 変換は
+`IntegerObstruction/Canonical.lean` に置き、このファイルでは
+actual `CanonicalContractingChain` が供給する finite canonical data だけを扱う。
 -/
 
 namespace Collatz
 namespace AdjacentReturn
-namespace IntegerObstruction
-
-namespace CanonicalLateArithmeticData
-
-/-- canonical Late integer data は既存 finite `CanonicalLatePacket` を与える。 -/
-theorem toCanonicalLatePacket
-    {C : ContractingBlockArithmetic}
-    {L : LateBlockArithmeticData C}
-    (K : CanonicalLateArithmeticData L) :
-    CanonicalLatePacket L.crossing.word L.suffix := by
-  refine {
-    valid := ?_
-    crossing := L.crossing.crossing
-    suffix_nonempty := L.suffix_nonempty
-    suffix_allSuffixesContracting := L.suffix_allSuffixesContracting
-    zeroDigit := K.zeroDigit
-    source_lt_endpoint := ?_
-    endpoint_lt_peak := ?_
-  }
-  · rw [← L.word_eq_crossing_append_suffix]
-    exact C.base.word_valid
-  · rw [← K.crossingCanonical.start_eq, ← K.fullEnd_eq]
-    have hgap := C.base.valueGap_pos
-    omega
-  · rw [← K.fullEnd_eq, ← K.crossingCanonical.endpoint_eq]
-    rw [L.crossing.endpoint_eq_start_add_gap]
-    exact
-      Nat.add_lt_add_left
-        L.valueGap_lt_returnGap
-        C.base.startValue
-
-/-- bridge 後の packet source は integer block start と一致する。 -/
-theorem packet_source_eq_startValue
-    {C : ContractingBlockArithmetic}
-    {L : LateBlockArithmeticData C}
-    (K : CanonicalLateArithmeticData L) :
-    K.toCanonicalLatePacket.source = C.base.startValue := by
-  unfold CanonicalLatePacket.source
-  exact K.crossingCanonical.start_eq.symm
-
-/-- bridge 後の packet peak は first-crossing endpoint と一致する。 -/
-theorem packet_peak_eq_crossingEndpoint
-    {C : ContractingBlockArithmetic}
-    {L : LateBlockArithmeticData C}
-    (K : CanonicalLateArithmeticData L) :
-    K.toCanonicalLatePacket.peak = L.crossing.endpointValue := by
-  unfold CanonicalLatePacket.peak
-  exact K.crossingCanonical.endpoint_eq.symm
-
-/-- bridge 後の packet endpoint は adjacent endpoint と一致する。 -/
-theorem packet_endpoint_eq_nextValue
-    {C : ContractingBlockArithmetic}
-    {L : LateBlockArithmeticData C}
-    (K : CanonicalLateArithmeticData L) :
-    K.toCanonicalLatePacket.endpoint = C.base.nextValue := by
-  unfold CanonicalLatePacket.endpoint BlockArithmeticData.nextValue
-  exact K.fullEnd_eq.symm
-
-end CanonicalLateArithmeticData
-
-end IntegerObstruction
 
 namespace CanonicalContractingChain
 
