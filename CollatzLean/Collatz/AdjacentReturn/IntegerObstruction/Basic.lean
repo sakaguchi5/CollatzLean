@@ -106,7 +106,114 @@ theorem firstExponent_eq_one (B : BlockArithmeticData) :
   rw [B.word_eq_one_cons_tail]
   rfl
 
+/--
+長さ2以上なら標準 adjacent return の tail は非空。
+-/
+theorem tail_ne_nil_of_length_two_le
+    (B : BlockArithmeticData)
+    (hlen : 1 < B.length) :
+    B.tail ≠ [] := by
+  apply List.ne_nil_of_length_pos
+  rw [B.tail_length]
+  omega
+
+
+/--
+長さ2以上なら標準 adjacent return の tail 全体は contracting。
+-/
+theorem tail_contracting_of_length_two_le
+    (B : BlockArithmeticData)
+    (hlen : 1 < B.length) :
+    B.tail.Contracting := by
+  have htailNe : B.tail ≠ [] :=
+    tail_ne_nil_of_length_two_le B hlen
+  exact
+    (B.tail_allSuffixesContracting hlen).whole htailNe
+
+
+/--
+標準 adjacent return の total exponent は
+tail の twoSteps に最初の1段を加えたもの。
+-/
+theorem totalExponent_eq_tail_twoSteps_add_one
+    (B : BlockArithmeticData) :
+    B.totalExponent = B.tail.twoSteps + 1 := by
+  calc
+    B.totalExponent = B.word.twoSteps :=
+      B.totalExponent_eq
+    _ = Word.twoSteps (1 :: B.tail) := by
+      rw [B.word_eq_one_cons_tail]
+    _ = B.tail.twoSteps + 1 := by
+      simp [Word.twoSteps, Nat.add_comm]
+
+
+/--
+長さ2以上なら contracting tail から
+
+`3^(r-1) < 2^(tail.twoSteps)`
+
+を得る。
+-/
+theorem threePow_pred_lt_tail_twoPow
+    (B : BlockArithmeticData)
+    (hlen : 1 < B.length) :
+    3 ^ (B.length - 1) < 2 ^ B.tail.twoSteps := by
+  have htailC :
+      B.tail.Contracting :=
+    tail_contracting_of_length_two_le B hlen
+  unfold Word.Contracting at htailC
+  simpa [Word.oddSteps, B.tail_length] using htailC
+
+
+/--
+長さ2以上の標準 adjacent return の純算術 block では、枝に依存せず
+
+`2 * 3^(r-1) < 2^H`。
+-/
+theorem two_mul_threePow_pred_lt_twoPow
+    (B : BlockArithmeticData)
+    (hlen : 1 < B.length) :
+    2 * 3 ^ (B.length - 1) < 2 ^ B.totalExponent := by
+  have htail :
+      3 ^ (B.length - 1) < 2 ^ B.tail.twoSteps :=
+    threePow_pred_lt_tail_twoPow B hlen
+  have hH :
+      B.totalExponent = B.tail.twoSteps + 1 :=
+    totalExponent_eq_tail_twoSteps_add_one B
+  have hscaled :
+      2 * 3 ^ (B.length - 1) <
+        2 * 2 ^ B.tail.twoSteps := by
+    exact
+      (Nat.mul_lt_mul_left
+        (by omega : 0 < (2 : ℕ))).2 htail
+  rw [hH, pow_succ]
+  simpa [
+    Nat.mul_assoc,
+    Nat.mul_comm,
+    Nat.mul_left_comm
+  ] using hscaled
+
 end BlockArithmeticData
 end IntegerObstruction
+
+namespace State
+
+/--
+長さ2以上の標準 adjacent return では、Expanding/Contracting の枝に依存せず
+`2 * 3^(r-1) < 2^H`。
+-/
+theorem two_mul_threePow_pred_lt_twoPow
+    {O : OddOrbit} (R : State O)
+    (hlen : 1 < R.length) :
+    2 * 3 ^ (R.length - 1) < 2 ^ R.totalExponent := by
+  let B := IntegerObstruction.BlockArithmeticData.ofState R
+  have hBlen : 1 < B.length := by
+    change 1 < R.length
+    exact hlen
+  have h := B.two_mul_threePow_pred_lt_twoPow hBlen
+  change 2 * 3 ^ (R.length - 1) < 2 ^ R.totalExponent at h
+  exact h
+
+end State
 end AdjacentReturn
 end Collatz

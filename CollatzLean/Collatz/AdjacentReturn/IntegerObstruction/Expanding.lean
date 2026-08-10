@@ -13,36 +13,6 @@ namespace AdjacentReturn
 
 namespace State
 
-/--
-長さ2以上の expanding adjacent return では
-`2 * 3^(r-1) < 2^H`。
--/
-theorem expanding_two_mul_threePow_pred_lt_twoPow
-    {O : OddOrbit} (R : State O) (_hE : R.IsExpanding)
-    (hlen : 1 < R.length) :
-    2 * 3 ^ (R.length - 1) < 2 ^ R.totalExponent := by
-  let tail : Collatz.Word :=
-    O.segment (R.startIndex + 1) (R.length - 1)
-  have htailC : tail.Contracting := by
-    simpa [tail] using
-      R.properSuffix_contracting (k := 1) (by omega) hlen
-  have hword := R.word_eq_startExponent_cons_tail
-  have hword' : R.word = 1 :: tail := by
-    simpa [tail, R.startExponent_eq_one] using hword
-  have hH : R.totalExponent = tail.twoSteps + 1 := by
-    unfold State.totalExponent
-    rw [hword']
-    simp [Word.twoSteps, Nat.add_comm]
-  have htail :
-      3 ^ (R.length - 1) < 2 ^ tail.twoSteps := by
-    have h := htailC
-    unfold Word.Contracting at h
-    simpa [tail, Word.oddSteps] using h
-  have hscaled :=
-    (Nat.mul_lt_mul_left (by omega : 0 < (2 : ℕ))).2 htail
-  rw [hH, pow_succ]
-  simpa [Nat.mul_assoc, Nat.mul_comm, Nat.mul_left_comm] using hscaled
-
 /-- expanding adjacent return の上側 `2^H < 3^r`。 -/
 theorem expanding_twoPow_lt_threePow
     {O : OddOrbit} (R : State O) (hE : R.IsExpanding) :
@@ -61,9 +31,6 @@ structure ExpandingBlockArithmetic where
   base : BlockArithmeticData
   expanding : base.word.Expanding
   properPrefixesExpanding : base.word.ProperPrefixesExpanding
-  lowerBand :
-    1 < base.length →
-      2 * 3 ^ (base.length - 1) < 2 ^ base.totalExponent
   upperBand :
     2 ^ base.totalExponent < 3 ^ base.length
   affinePrefixBound :
@@ -77,6 +44,16 @@ structure ExpandingBlockArithmetic where
 
 namespace ExpandingBlockArithmetic
 
+/--
+長さ2以上なら lower band は expanding 固有条件ではなく、
+基礎の adjacent 算術だけから従う。
+-/
+theorem lowerBand
+    (E : ExpandingBlockArithmetic)
+    (hlen : 1 < E.base.length) :
+    2 * 3 ^ (E.base.length - 1) < 2 ^ E.base.totalExponent :=
+  E.base.two_mul_threePow_pred_lt_twoPow hlen
+
 /-- 実際の expanding adjacent state から純算術 package を作る。 -/
 def ofState
     {O : OddOrbit} (R : State O) (hE : R.IsExpanding) :
@@ -86,7 +63,6 @@ def ofState
     base := B
     expanding := ?_
     properPrefixesExpanding := ?_
-    lowerBand := ?_
     upperBand := ?_
     affinePrefixBound := ?_
     affineSuffixBound := ?_
@@ -95,9 +71,6 @@ def ofState
     exact hE
   · change R.word.ProperPrefixesExpanding
     exact R.properPrefixesExpanding hE
-  · intro hlen
-    change 2 * 3 ^ (R.length - 1) < 2 ^ R.totalExponent
-    exact R.expanding_two_mul_threePow_pred_lt_twoPow hE hlen
   · change 2 ^ R.totalExponent < 3 ^ R.length
     exact R.expanding_twoPow_lt_threePow hE
   · change R.affineConstant ≤ R.length * 3 ^ (R.length - 1)
