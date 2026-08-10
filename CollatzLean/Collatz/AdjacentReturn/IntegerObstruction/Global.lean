@@ -1,6 +1,7 @@
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Expanding
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Contracting
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Late
+import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.ExactLate
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Primitive
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Barrier
 import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction.Canonical
@@ -12,7 +13,7 @@ import CollatzLean.Collatz.AdjacentReturn.CanonicalContractingChain
 今後の正本を expanding / eventually-contracting の二整数問題に固定する。
 細かい枝はこの二つの解集合への追加条件として扱う。
 
-さらに Late / primitive / backward-barrier / canonical の各 refinement を
+さらに Exact/Late・primitive・backward-barrier・canonical の各 refinement を
 依存関係を保ったまま積み上げるための最終インターフェースを置く。
 -/
 
@@ -94,31 +95,93 @@ theorem no_unbounded_of_no_integer_obstructions
   · exact hC hCon
 
 /--
-contracting integer chain に Late primitive・barrier・canonical の全 refinement を積んだ最終対象。
+Exact/Late 完備の contracting integer chain に
+Late primitive・barrier・canonical の全 refinement を積んだ最終対象。
 
+`core.lateData` により Late 項では実際の `LateBlockArithmeticData` が必ず存在するため、
+`primitiveLate` は空虚な全称条件にはならない。
 各追加条件の出自は別ファイルに分離し、この structure は合流点だけを担う。
 -/
 structure RefinedContractingIntegerChain (bound : ℕ) where
-  core : ContractingIntegerChain
-  barrier : ReverseBarrier bound core.chain
+  core : ExactLateContractingIntegerChain
+  barrier : ReverseBarrier bound core.core.chain
   primitiveLate :
     ∀ n : ℕ,
-    ∀ L : LateBlockArithmeticData (core.block n),
-      L.crossing = core.firstCrossing n →
+    ∀ L : LateBlockArithmeticData (core.core.block n),
+      L.crossing = core.core.firstCrossing n →
         Nonempty (PrimitiveLateConstraintData L)
-  canonical : CanonicalIntegerRefinement core
+  canonical : CanonicalIntegerRefinement core.core
 
 /-- 全 refinement を持つ contracting obstruction が存在すること。 -/
 def HasRefinedContractingIntegerChain (bound : ℕ) : Prop :=
   Nonempty (RefinedContractingIntegerChain bound)
 
-/-- refined contracting obstruction は元の core obstruction を忘却できる。 -/
+namespace RefinedContractingIntegerChain
+
+/-- refined obstruction から Exact/Late 完備 core を忘却する。 -/
+theorem has_exactLate_core
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound) :
+    Nonempty ExactLateContractingIntegerChain :=
+  ⟨R.core⟩
+
+/-- refined obstruction から従来の contracting core を忘却する。 -/
+theorem has_contracting_core
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound) :
+    Nonempty ContractingIntegerChain :=
+  ⟨R.core.core⟩
+
+/--
+Late 項では、実際の Late finite data と primitive / 2-adic constraint が
+同時に存在する。
+-/
+theorem late_has_primitiveConstraint
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound)
+    (n : ℕ)
+    (hLate : R.core.core.LateAt n) :
+    ∃ L : LateBlockArithmeticData (R.core.core.block n),
+      L.crossing = R.core.core.firstCrossing n ∧
+        Nonempty (PrimitiveLateConstraintData L) := by
+  obtain ⟨L, hL⟩ := R.core.lateData n hLate
+  exact ⟨L, hL, R.primitiveLate n L hL⟩
+
+/--
+Late 項では commutator identity と primitive / 2-adic constraint を
+同じ finite data 上で同時に得る。
+-/
+theorem late_has_commutator_and_primitiveConstraint
+    {bound : ℕ}
+    (R : RefinedContractingIntegerChain bound)
+    (n : ℕ)
+    (hLate : R.core.core.LateAt n) :
+    ∃ L : LateBlockArithmeticData (R.core.core.block n),
+      L.crossing = R.core.core.firstCrossing n ∧
+      L.suffixGap * L.crossing.affine =
+        L.crossing.multiplicativeGap * L.suffix.affineConst +
+          L.commutatorCore ∧
+      Nonempty (PrimitiveLateConstraintData L) := by
+  obtain ⟨L, hL, hP⟩ := R.late_has_primitiveConstraint n hLate
+  exact ⟨L, hL, L.commutator_balance, hP⟩
+
+end RefinedContractingIntegerChain
+
+/-- refined contracting obstruction は Exact/Late 完備 core を忘却できる。 -/
+theorem refinedContracting_has_exactLate_core
+    {bound : ℕ}
+    (h : HasRefinedContractingIntegerChain bound) :
+    HasExactLateContractingIntegerChain := by
+  rcases h with ⟨R⟩
+  exact ⟨R.core⟩
+
+/-- refined contracting obstruction は従来の core obstruction も忘却できる。 -/
 theorem refinedContracting_has_core
     {bound : ℕ}
     (h : HasRefinedContractingIntegerChain bound) :
     HasContractingIntegerChain := by
   rcases h with ⟨R⟩
-  exact ⟨R.core⟩
+  exact ⟨R.core.core⟩
 
 /-- barrier expanding obstruction は元の expanding obstruction を忘却できる。 -/
 theorem barrierExpanding_has_core
@@ -129,7 +192,7 @@ theorem barrierExpanding_has_core
   exact ⟨R.core⟩
 
 /--
-各 refinement の供給 theorem が得られた時点で、既存の二整数分岐を
+各 refinement の供給 theorem が得られた時点で、Exact/Late 完備の二整数分岐を
 barrier expanding / fully-refined contracting 分岐へそのまま持ち上げる。
 
 `hExpBarrier` は計算検証などの backward barrier 層、
@@ -157,7 +220,7 @@ theorem unbounded_to_refined_integer_dichotomy
       HasBarrierExpandingIntegerTower bound ∨
         HasRefinedContractingIntegerChain bound := by
   intro hU
-  rcases unbounded_to_integer_dichotomy hU with hE | hC
+  rcases unbounded_to_expanding_or_exactLateContracting hU with hE | hC
   · rcases hE with ⟨T⟩
     left
     exact ⟨⟨T, hExpBarrier T⟩⟩
@@ -166,9 +229,9 @@ theorem unbounded_to_refined_integer_dichotomy
     exact
       ⟨{
         core := C
-        barrier := hConBarrier C
-        primitiveLate := hConPrimitive C
-        canonical := hConCanonical C
+        barrier := hConBarrier C.core
+        primitiveLate := hConPrimitive C.core
+        canonical := hConCanonical C.core
       }⟩
 
 end IntegerObstruction
