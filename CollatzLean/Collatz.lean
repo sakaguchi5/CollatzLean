@@ -29,6 +29,7 @@ import CollatzLean.Collatz.Canonical.PrependOneCoreBranches
 import CollatzLean.Collatz.Canonical.PrependOneCorePositiveElimination
 import CollatzLean.Collatz.Canonical.PrependOneCoreZeroObstruction
 import CollatzLean.Collatz.Canonical.PrependOneCoreZeroNearResonance
+import CollatzLean.Collatz.Canonical.PrependOneCoreZeroPolynomialBound
 import CollatzLean.Collatz.OddOrbit.Basic
 import CollatzLean.Collatz.OddOrbit.Periodic
 import CollatzLean.Collatz.OddOrbit.HighExponent
