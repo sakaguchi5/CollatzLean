@@ -50,11 +50,18 @@ theorem prefix_canonical_of_start_lt_modulus
     {O : OddOrbit} (C : CanonicalChain O) (n k : ℕ)
     (hsmall :
       (C.state n).startValue <
-        Word.residueModulus ((C.firstCrossing n).prefixWord k)) :
+        Word.residueModulus
+          (FirstCrossingData.prefixWord
+            (C.firstCrossing n) k)) :
     (C.state n).startValue =
-        Word.canonicalStart ((C.firstCrossing n).prefixWord k) ∧
-      (C.firstCrossing n).boundaryValue k =
-        Word.canonicalEnd ((C.firstCrossing n).prefixWord k) := by
+        Word.canonicalStart
+          (FirstCrossingData.prefixWord
+            (C.firstCrossing n) k) ∧
+      FirstCrossingData.boundaryValue
+          (C.firstCrossing n) k =
+        Word.canonicalEnd
+          (FirstCrossingData.prefixWord
+            (C.firstCrossing n) k) := by
   let F := C.firstCrossing n
   let U := FirstCrossingData.prefixWord F k
   have hreal :
@@ -92,12 +99,18 @@ theorem biCanonicalCut_of_bounds
     (hkLt : k < (C.firstCrossing n).length)
     (hprefix :
       (C.state n).startValue <
-        Word.residueModulus ((C.firstCrossing n).prefixWord k))
+        Word.residueModulus
+          (FirstCrossingData.prefixWord
+            (C.firstCrossing n) k))
     (hsuffix :
       (C.firstCrossing n).endpointValue <
-        2 * 3 ^ ((C.firstCrossing n).suffixWord k).oddSteps) :
+        2 * 3 ^
+          (FirstCrossingData.suffixWord
+            (C.firstCrossing n) k).oddSteps) :
     BiCanonicalCutData (C.firstCrossing n) k := by
-  have hpre := C.prefix_canonical_of_start_lt_modulus n k hprefix
+  have hpre :=
+    C.prefix_canonical_of_start_lt_modulus
+      n k hprefix
   have hsuf :=
     C.suffix_canonical_of_endpoint_lt
       n k (Nat.le_of_lt hkLt) hsuffix
@@ -115,8 +128,12 @@ theorem biCanonical_boundary_identity
     {O : OddOrbit} {C : CanonicalChain O}
     {n k : ℕ}
     (D : BiCanonicalCutData (C.firstCrossing n) k) :
-    Word.canonicalEnd ((C.firstCrossing n).prefixWord k) =
-      Word.canonicalStart ((C.firstCrossing n).suffixWord k) := by
+    Word.canonicalEnd
+        (FirstCrossingData.prefixWord
+          (C.firstCrossing n) k) =
+      Word.canonicalStart
+        (FirstCrossingData.suffixWord
+          (C.firstCrossing n) k) := by
   rw [← D.prefixEnd_eq, D.suffixStart_eq]
 
 /-- bi-canonical cut の suffix は元 first crossing と同じ canonical endpoint を持つ。 -/
@@ -124,7 +141,9 @@ theorem biCanonical_suffix_same_endpoint
     {O : OddOrbit} {C : CanonicalChain O}
     {n k : ℕ}
     (D : BiCanonicalCutData (C.firstCrossing n) k) :
-    Word.canonicalEnd ((C.firstCrossing n).suffixWord k) =
+    Word.canonicalEnd
+        (FirstCrossingData.suffixWord
+          (C.firstCrossing n) k) =
       Word.canonicalEnd (C.word n) := by
   rw [← D.suffixEnd_eq, ← C.endpoint_eq_canonicalEnd n]
 
