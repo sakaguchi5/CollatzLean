@@ -4,3 +4,6 @@ import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.ReplayProfile
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.BiCanonical
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.Valuation
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.FiniteState
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.FirstOvershoot
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.NaturalZeroReplay
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.FirstOvershootSaturation
