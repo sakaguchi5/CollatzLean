@@ -8,3 +8,4 @@ import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.FirstOvershoot
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.NaturalZeroReplay
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.FirstOvershootSaturation
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.NaturalZeroReplayArithmetic
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.BidirectionalDecoder
