@@ -14,3 +14,5 @@ import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.BackwardDecoder
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.CommonCorridorSeparation
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.BidirectionalStrengthening
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.NaturalCoordinateBoundedReduction
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroPacket
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroBranches

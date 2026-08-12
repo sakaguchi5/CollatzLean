@@ -59,4 +59,5 @@ import CollatzLean.Collatz.AdjacentReturn.IntegerObstruction
 import CollatzLean.Collatz.Canonical.PrependOneCoreZeroAdjacentBridge
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.Global
+import CollatzLean.Collatz.AdjacentReturn.ContractingEndpointClosure
 import CollatzLean.Collatz.Main
