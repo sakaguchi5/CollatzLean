@@ -21,3 +21,4 @@ import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroOddPar
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2InnerReplay
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2Budget
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2ZeroDecoder
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2CenteredTrajectory
