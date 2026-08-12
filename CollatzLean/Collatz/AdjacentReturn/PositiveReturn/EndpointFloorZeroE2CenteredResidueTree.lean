@@ -1,6 +1,5 @@
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2CenteredSmallBand
 
-set_option linter.style.emptyLine false
 /-!
 # E2 ZERO centered trajectory の forward residue tree
 
@@ -296,6 +295,296 @@ theorem prefixExponent_one
   rw [D.prefixExponent_zero, D.forwardExponent_zero_eq_one] at h
   omega
 
+
+
+/-- `x % m = r` から標準的な residue 表現を得る。 -/
+private theorem exists_eq_mul_add_of_mod_eq
+    {x m r : ℕ}
+    (hmod : x % m = r) :
+    ∃ q : ℕ, x = m * q + r := by
+  refine ⟨x / m, ?_⟩
+  have h := Nat.mod_add_div x m
+  rw [hmod] at h
+  omega
+
+/--
+forward prefix の pure state。
+
+depth `k` まで進んだ時点で
+
+- cumulative exponent が `K`
+- affine constant が `A`
+
+であることだけを保持する。
+-/
+structure ForwardPrefixStateAt
+    (D : E2ZeroCenteredTrajectoryData)
+    (k K A : ℕ) : Prop where
+  exponent_eq :
+    D.prefixExponent k = K
+  affine_eq :
+    D.forwardAffine k = A
+
+/-- depth 0 の初期 state。 -/
+theorem forwardPrefixState_zero
+    (D : E2ZeroCenteredTrajectoryData) :
+    ForwardPrefixStateAt D 0 0 0 := by
+  exact {
+    exponent_eq := D.prefixExponent_zero
+    affine_eq := rfl
+  }
+
+/--
+state を一段 forward に進める一般 transition。
+
+`(k,K,A) --e--> (k+1, K+e, 3*A+2^K)`。
+-/
+theorem ForwardPrefixStateAt.step
+    {D : E2ZeroCenteredTrajectoryData}
+    {k K A e : ℕ}
+    (S : ForwardPrefixStateAt D k K A)
+    (hk : k < D.length)
+    (he : D.forwardExponent k = e) :
+    ForwardPrefixStateAt
+      D
+      (k + 1)
+      (K + e)
+      (3 * A + 2 ^ K) := by
+  constructor
+  · rw [
+      D.prefixExponent_succ hk,
+      S.exponent_eq,
+      he
+    ]
+  · rw [
+      D.forwardAffine_succ,
+      S.affine_eq,
+      S.exponent_eq
+    ]
+
+/-- 最初の exponent `1` を入れた depth 1 state。 -/
+theorem forwardPrefixState_one
+    (D : E2ZeroCenteredTrajectoryData) :
+    ForwardPrefixStateAt D 1 1 1 := by
+  have h7 := D.seven_le_length
+  have h :=
+    D.forwardPrefixState_zero.step
+      (by omega)
+      D.forwardExponent_zero_eq_one
+  norm_num at h
+  exact h
+
+/--
+expanding 条件だけから next exponent を一般に上から抑える。
+
+`3^(k+3) ≤ 2^(3+K+E)` なら、
+actual next exponent は `E` 未満。
+-/
+theorem ForwardPrefixStateAt.nextExponent_lt
+    {D : E2ZeroCenteredTrajectoryData}
+    {k K A E : ℕ}
+    (S : ForwardPrefixStateAt D k K A)
+    (hk : k + 1 < D.length)
+    (hThreshold :
+      3 ^ (k + 3) ≤
+        2 ^ (3 + K + E)) :
+    D.forwardExponent k < E := by
+  have hk0 : k < D.length := by
+    omega
+  have hExp :=
+    D.prefix_expanding (k + 1) hk
+  have hK :=
+    D.prefixExponent_succ (k := k) hk0
+  rw [hK, S.exponent_eq] at hExp
+  have hExp' :
+      2 ^ (3 + K + D.forwardExponent k) <
+        3 ^ (k + 3) := by
+    simpa [
+      Nat.add_assoc,
+      Nat.add_comm,
+      Nat.add_left_comm
+    ] using hExp
+  by_contra hnot
+  have hE :
+      E ≤ D.forwardExponent k := by
+    omega
+  have hpow :
+      2 ^ (3 + K + E) ≤
+        2 ^ (3 + K + D.forwardExponent k) :=
+    Nat.pow_le_pow_right
+      (by omega : 0 < (2 : ℕ))
+      (by omega)
+  omega
+
+/--
+prefix state `(k,K,A)` から full level の一般 2-adic residue を得る。
+
+exact prefix equation
+`18*3^k*L + A = 2^K + 2^(K+1)*q + 5*3^k`
+を2で割った中心量 `C` を
+
+`2*C + A = 2^K + 5*3^k`
+
+で与える。
+
+さらに
+`C ≡ 3^(k+2)*r (mod 2^K)`
+なら、odd coefficient `3^(k+2)` を cancel して
+`L ≡ r (mod 2^K)`。
+-/
+theorem ForwardPrefixStateAt.fullLevel_modEq
+    {D : E2ZeroCenteredTrajectoryData}
+    {k K A C r : ℕ}
+    (S : ForwardPrefixStateAt D k K A)
+    (hk : k ≤ D.length)
+    (hCenter :
+      2 * C + A =
+        2 ^ K + 5 * 3 ^ k)
+    (hResidue :
+      C ≡ 3 ^ (k + 2) * r [MOD 2 ^ K]) :
+    D.fullLevel ≡ r [MOD 2 ^ K] := by
+  obtain ⟨q, hEq⟩ :=
+    D.exists_fullLevel_prefixResidueEquation hk
+  rw [
+    S.exponent_eq,
+    S.affine_eq
+  ] at hEq
+  have hCoef :
+      18 * 3 ^ k =
+        2 * 3 ^ (k + 2) := by
+    rw [pow_add]
+    norm_num
+    ring
+  have hPow :
+      2 ^ (K + 1) =
+        2 * 2 ^ K := by
+    rw [pow_succ]
+    ring
+  rw [hCoef, hPow] at hEq
+  have hHalf :
+      3 ^ (k + 2) * D.fullLevel =
+        C + 2 ^ K * q := by
+    nlinarith [hEq, hCenter]
+  have hLeft :
+      3 ^ (k + 2) * D.fullLevel ≡
+        C [MOD 2 ^ K] := by
+    change
+      (3 ^ (k + 2) * D.fullLevel) % 2 ^ K =
+        C % 2 ^ K
+    rw [hHalf]
+    simp [Nat.add_mod]
+  have hCombined :
+      3 ^ (k + 2) * D.fullLevel ≡
+        3 ^ (k + 2) * r [MOD 2 ^ K] :=
+    hLeft.trans hResidue
+  have hCop :
+      Nat.Coprime
+        (3 ^ (k + 2))
+        (2 ^ K) :=
+    (by decide : Nat.Coprime 3 2).pow
+      (k + 2) K
+  have hCop' :
+      (2 ^ K).gcd (3 ^ (k + 2)) = 1 := by
+    simpa [Nat.Coprime] using hCop.symm
+  exact
+    Nat.ModEq.cancel_left_of_coprime
+      hCop' hCombined
+
+/--
+prefix state から standard residue 表現
+`L = 2^K*q+r` を直接得る。
+-/
+theorem ForwardPrefixStateAt.exists_fullLevel_eq
+    {D : E2ZeroCenteredTrajectoryData}
+    {k K A C r : ℕ}
+    (S : ForwardPrefixStateAt D k K A)
+    (hk : k ≤ D.length)
+    (hr : r < 2 ^ K)
+    (hCenter :
+      2 * C + A =
+        2 ^ K + 5 * 3 ^ k)
+    (hResidue :
+      C ≡ 3 ^ (k + 2) * r [MOD 2 ^ K]) :
+    ∃ q : ℕ,
+      D.fullLevel = 2 ^ K * q + r := by
+  have hmodEq :=
+    S.fullLevel_modEq hk hCenter hResidue
+  have hmod :
+      D.fullLevel % 2 ^ K = r := by
+    simpa only [
+      Nat.ModEq,
+      Nat.mod_eq_of_lt hr
+    ] using hmodEq
+  exact exists_eq_mul_add_of_mod_eq hmod
+
+/-- prefix `11` の state。 -/
+private theorem forwardPrefixState_11
+    (D : E2ZeroCenteredTrajectoryData)
+    (h1 : D.forwardExponent 1 = 1) :
+    ForwardPrefixStateAt D 2 2 5 := by
+  have h7 := D.seven_le_length
+  have h :=
+    D.forwardPrefixState_one.step
+      (by omega)
+      h1
+  norm_num at h
+  exact h
+
+/-- prefix `12` の state。 -/
+private theorem forwardPrefixState_12
+    (D : E2ZeroCenteredTrajectoryData)
+    (h1 : D.forwardExponent 1 = 2) :
+    ForwardPrefixStateAt D 2 3 5 := by
+  have h7 := D.seven_le_length
+  have h :=
+    D.forwardPrefixState_one.step
+      (by omega)
+      h1
+  norm_num at h
+  exact h
+
+/-- prefix `111` の state。 -/
+private theorem forwardPrefixState_111
+    (D : E2ZeroCenteredTrajectoryData)
+    (h1 : D.forwardExponent 1 = 1)
+    (h2 : D.forwardExponent 2 = 1) :
+    ForwardPrefixStateAt D 3 3 19 := by
+  have h7 := D.seven_le_length
+  have h :=
+    (D.forwardPrefixState_11 h1).step
+      (by omega)
+      h2
+  norm_num at h
+  exact h
+
+/-- prefix `112` の state。 -/
+private theorem forwardPrefixState_112
+    (D : E2ZeroCenteredTrajectoryData)
+    (h1 : D.forwardExponent 1 = 1)
+    (h2 : D.forwardExponent 2 = 2) :
+    ForwardPrefixStateAt D 3 4 19 := by
+  have h7 := D.seven_le_length
+  have h :=
+    (D.forwardPrefixState_11 h1).step
+      (by omega)
+      h2
+  norm_num at h
+  exact h
+
+/-- prefix `121` の state。 -/
+private theorem forwardPrefixState_121
+    (D : E2ZeroCenteredTrajectoryData)
+    (h1 : D.forwardExponent 1 = 2)
+    (h2 : D.forwardExponent 2 = 1) :
+    ForwardPrefixStateAt D 3 4 23 := by
+  have h7 := D.seven_le_length
+  have h :=
+    (D.forwardPrefixState_12 h1).step
+      (by omega)
+      h2
+  norm_num at h
+  exact h
+
 /--
 最初の3 exponent は
 
@@ -312,158 +601,57 @@ theorem thirdForwardPattern
     (D.forwardExponent 1 = 2 ∧
       D.forwardExponent 2 = 1) := by
   have h7 := D.seven_le_length
-  have h1cases :
-      D.forwardExponent 1 = 1 ∨
-        D.forwardExponent 1 = 2 := by
-    simpa [forwardExponent] using
-      D.secondBackwardExponent_one_or_two
-  have he2Pos :
-      0 < D.forwardExponent 2 :=
+  have he1Pos :
+      0 < D.forwardExponent 1 :=
     D.forwardExponent_pos (by omega)
-  have hK1 :
-      D.prefixExponent 1 = 1 :=
-    D.prefixExponent_one
-  have hK2 :
-      D.prefixExponent 2 =
-        D.prefixExponent 1 +
-          D.forwardExponent 1 := by
-    simpa using
-      D.prefixExponent_succ (k := 1) (by omega)
-  have hK3 :
-      D.prefixExponent 3 =
-        D.prefixExponent 2 +
-          D.forwardExponent 2 := by
-    simpa using
-      D.prefixExponent_succ (k := 2) (by omega)
-  have hExp0 :=
-    D.prefix_expanding 3 (by omega)
-  have hExp :
-      2 ^ (3 + D.prefixExponent 3) < 243 := by
-    norm_num at hExp0
-    exact hExp0
-  have hK3le :
-      D.prefixExponent 3 ≤ 4 := by
-    by_contra hnot
-    have hge :
-        5 ≤ D.prefixExponent 3 := by
-      omega
-    have hpow :
-        256 ≤
-          2 ^ (3 + D.prefixExponent 3) := by
-      have h :
-          2 ^ 8 ≤
-            2 ^ (3 + D.prefixExponent 3) :=
-        Nat.pow_le_pow_right
-          (by omega : 0 < (2 : ℕ))
-          (by omega)
-      norm_num at h ⊢
-      exact h
-    omega
-  rcases h1cases with h11 | h12
-  · have hK2eq :
-        D.prefixExponent 2 = 2 := by
-      rw [hK1, h11] at hK2
-      norm_num at hK2
-      exact hK2
-    have he2le :
-        D.forwardExponent 2 ≤ 2 := by
-      rw [hK2eq] at hK3
-      omega
-    by_cases he2 :
+  have he1Lt :
+      D.forwardExponent 1 < 3 :=
+    D.forwardPrefixState_one.nextExponent_lt
+      (E := 3)
+      (by omega)
+      (by norm_num)
+  by_cases h11 :
+      D.forwardExponent 1 = 1
+  · have S2 :=
+      D.forwardPrefixState_11 h11
+    have he2Pos :
+        0 < D.forwardExponent 2 :=
+      D.forwardExponent_pos (by omega)
+    have he2Lt :
+        D.forwardExponent 2 < 3 :=
+      S2.nextExponent_lt
+        (E := 3)
+        (by omega)
+        (by norm_num)
+    by_cases h21 :
         D.forwardExponent 2 = 1
-    · exact Or.inl ⟨h11, he2⟩
-    · have he22 :
+    · exact Or.inl ⟨h11, h21⟩
+    · have h22 :
           D.forwardExponent 2 = 2 := by
         omega
-      exact Or.inr (Or.inl ⟨h11, he22⟩)
-  · have hK2eq :
-        D.prefixExponent 2 = 3 := by
-      rw [hK1, h12] at hK2
-      norm_num at hK2
-      exact hK2
-    have he21 :
-        D.forwardExponent 2 = 1 := by
-      rw [hK2eq] at hK3
+      exact
+        Or.inr
+          (Or.inl ⟨h11, h22⟩)
+  · have h12 :
+        D.forwardExponent 1 = 2 := by
       omega
-    exact Or.inr (Or.inr ⟨h12, he21⟩)
-
-/-- `x % m = r` から標準的な residue 表現を得る。 -/
-private theorem exists_eq_mul_add_of_mod_eq
-    {x m r : ℕ}
-    (hmod : x % m = r) :
-    ∃ q : ℕ, x = m * q + r := by
-  refine ⟨x / m, ?_⟩
-  have h := Nat.mod_add_div x m
-  rw [hmod] at h
-  omega
-
-/-- `111` の exact equation から `L ≡ 2 (mod 8)`。 -/
-private theorem fullLevel_mod_eight_eq_two_of_111
-    {L q : ℕ}
-    (h :
-      486 * L + 19 =
-        143 + 16 * q) :
-    L % 8 = 2 := by
-  have hhalf :
-      243 * L =
-        62 + 8 * q := by
-    omega
-  have hmod :
-      243 * L ≡ 243 * 2 [MOD 8] := by
-    rw [hhalf]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-  have hcancel :
-      L ≡ 2 [MOD 8] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `112` の exact equation から `L ≡ 6 (mod 16)`。 -/
-private theorem fullLevel_mod_sixteen_eq_six_of_112
-    {L q : ℕ}
-    (h :
-      486 * L + 19 =
-        151 + 32 * q) :
-    L % 16 = 6 := by
-  have hhalf :
-      243 * L =
-        66 + 16 * q := by
-    omega
-  have hmod :
-      243 * L ≡ 243 * 6 [MOD 16] := by
-    rw [hhalf]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-  have hcancel :
-      L ≡ 6 [MOD 16] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `121` の exact equation から `L ≡ 0 (mod 16)`。 -/
-private theorem fullLevel_mod_sixteen_eq_zero_of_121
-    {L q : ℕ}
-    (h :
-      486 * L + 23 =
-        151 + 32 * q) :
-    L % 16 = 0 := by
-  have hhalf :
-      243 * L =
-        64 + 16 * q := by
-    omega
-  have hmod :
-      243 * L ≡ 243 * 0 [MOD 16] := by
-    rw [hhalf]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-  have hcancel :
-      L ≡ 0 [MOD 16] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-  simpa [Nat.ModEq] using hcancel
+    have S2 :=
+      D.forwardPrefixState_12 h12
+    have he2Pos :
+        0 < D.forwardExponent 2 :=
+      D.forwardExponent_pos (by omega)
+    have he2Lt :
+        D.forwardExponent 2 < 2 :=
+      S2.nextExponent_lt
+        (E := 2)
+        (by omega)
+        (by norm_num)
+    have h21 :
+        D.forwardExponent 2 = 1 := by
+      omega
+    exact
+      Or.inr
+        (Or.inr ⟨h12, h21⟩)
 
 /--
 third step までで full level residue は三状態へ縮む。
@@ -478,290 +666,66 @@ theorem fullLevel_residue_of_thirdStep
     (∃ q : ℕ, D.fullLevel = 16 * q + 6) ∨
     (∃ q : ℕ, D.fullLevel = 16 * q) := by
   have h7 := D.seven_le_length
-  obtain ⟨q, hres⟩ :=
-    D.exists_fullLevel_prefixResidueEquation
-      (k := 3) (by omega)
-  have hK0 :
-      D.prefixExponent 0 = 0 :=
-    D.prefixExponent_zero
-  have hK1 :
-      D.prefixExponent 1 = 1 :=
-    D.prefixExponent_one
-  have hK2 :
-      D.prefixExponent 2 =
-        D.prefixExponent 1 +
-          D.forwardExponent 1 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 1) (by omega)
-  have hK3 :
-      D.prefixExponent 3 =
-        D.prefixExponent 2 +
-          D.forwardExponent 2 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 2) (by omega)
   rcases D.thirdForwardPattern with h111 | hrest
-  · have hP2 :
-        D.prefixExponent 2 = 2 := by
-      calc
-        D.prefixExponent 2
-            =
-          D.prefixExponent 1 +
-            D.forwardExponent 1 := hK2
-        _ = 1 + 1 := by
-          rw [hK1, h111.1]
-        _ = 2 := by
-          norm_num
-    have hP3 :
-        D.prefixExponent 3 = 3 := by
-      calc
-        D.prefixExponent 3
-            =
-          D.prefixExponent 2 +
-            D.forwardExponent 2 := hK3
-        _ = 2 + 1 := by
-          rw [hP2, h111.2]
-        _ = 3 := by
-          norm_num
-    have hEq :
-        486 * D.fullLevel + 19 =
-          143 + 16 * q := by
-      have h := hres
-      simp [
-        forwardAffine,
-        hK0,
-        hK1,
-        hP2,
-        hP3
-      ] at h
-      omega
-    have hmod :
-        D.fullLevel % 8 = 2 :=
-      fullLevel_mod_eight_eq_two_of_111 hEq
-    left
-    exact exists_eq_mul_add_of_mod_eq hmod
+  · have S3 :=
+      D.forwardPrefixState_111
+        h111.1 h111.2
+    have hL :=
+      S3.exists_fullLevel_eq
+        (hk := by omega)
+        (C := 62)
+        (r := 2)
+        (hr := by norm_num)
+        (hCenter := by norm_num)
+        (hResidue := by
+          norm_num [
+            Nat.ModEq,
+            Nat.add_mod,
+            Nat.mul_mod
+          ])
+    norm_num at hL
+    exact Or.inl hL
   · rcases hrest with h112 | h121
-    · have hP2 :
-          D.prefixExponent 2 = 2 := by
-        calc
-          D.prefixExponent 2
-              =
-            D.prefixExponent 1 +
-              D.forwardExponent 1 := hK2
-          _ = 1 + 1 := by
-            rw [hK1, h112.1]
-          _ = 2 := by
-            norm_num
-      have hP3 :
-          D.prefixExponent 3 = 4 := by
-        calc
-          D.prefixExponent 3
-              =
-            D.prefixExponent 2 +
-              D.forwardExponent 2 := hK3
-          _ = 2 + 2 := by
-            rw [hP2, h112.2]
-          _ = 4 := by
-            norm_num
-      have hEq :
-          486 * D.fullLevel + 19 =
-            151 + 32 * q := by
-        have h := hres
-        simp [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at h
-        omega
-      have hmod :
-          D.fullLevel % 16 = 6 :=
-        fullLevel_mod_sixteen_eq_six_of_112 hEq
-      right
-      left
-      exact exists_eq_mul_add_of_mod_eq hmod
-    · have hP2 :
-          D.prefixExponent 2 = 3 := by
-        calc
-          D.prefixExponent 2
-              =
-            D.prefixExponent 1 +
-              D.forwardExponent 1 := hK2
-          _ = 1 + 2 := by
-            rw [hK1, h121.1]
-          _ = 3 := by
-            norm_num
-      have hP3 :
-          D.prefixExponent 3 = 4 := by
-        calc
-          D.prefixExponent 3
-              =
-            D.prefixExponent 2 +
-              D.forwardExponent 2 := hK3
-          _ = 3 + 1 := by
-            rw [hP2, h121.2]
-          _ = 4 := by
-            norm_num
-      have hEq :
-          486 * D.fullLevel + 23 =
-            151 + 32 * q := by
-        have h := hres
-        simp [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at h
-        omega
-      have hmod :
-          D.fullLevel % 16 = 0 :=
-        fullLevel_mod_sixteen_eq_zero_of_121 hEq
-      right
-      right
-      exact exists_eq_mul_add_of_mod_eq hmod
-
-
-/-- `1111` から `L ≡ 2 (mod 16)`。 -/
-private theorem fullLevel_mod_sixteen_eq_two_of_1111
-    {L q : ℕ}
-    (h :
-      729 * L = 178 + 16 * q) :
-    L % 16 = 2 := by
-  have hmod :
-      729 * L ≡ 729 * 2 [MOD 16] := by
-    rw [h]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-
-  have hcancel :
-      L ≡ 2 [MOD 16] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `1112` から `L ≡ 10 (mod 32)`。 -/
-private theorem fullLevel_mod_thirtyTwo_eq_ten_of_1112
-    {L q : ℕ}
-    (h :
-      729 * L = 186 + 32 * q) :
-    L % 32 = 10 := by
-  have hmod :
-      729 * L ≡ 729 * 10 [MOD 32] := by
-    rw [h]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-
-  have hcancel :
-      L ≡ 10 [MOD 32] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `1113` から `L ≡ 26 (mod 64)`。 -/
-private theorem fullLevel_mod_sixtyFour_eq_twentySix_of_1113
-    {L q : ℕ}
-    (h :
-      729 * L = 202 + 64 * q) :
-    L % 64 = 26 := by
-  have hmod :
-      729 * L ≡ 729 * 26 [MOD 64] := by
-    rw [h]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-
-  have hcancel :
-      L ≡ 26 [MOD 64] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `1121` から `L ≡ 6 (mod 32)`。 -/
-private theorem fullLevel_mod_thirtyTwo_eq_six_of_1121
-    {L q : ℕ}
-    (h :
-      729 * L = 182 + 32 * q) :
-    L % 32 = 6 := by
-  have hmod :
-      729 * L ≡ 729 * 6 [MOD 32] := by
-    rw [h]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-
-  have hcancel :
-      L ≡ 6 [MOD 32] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `1122` から `L ≡ 54 (mod 64)`。 -/
-private theorem fullLevel_mod_sixtyFour_eq_fiftyFour_of_1122
-    {L q : ℕ}
-    (h :
-      729 * L = 198 + 64 * q) :
-    L % 64 = 54 := by
-  have hmod :
-      729 * L ≡ 729 * 54 [MOD 64] := by
-    rw [h]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-
-  have hcancel :
-      L ≡ 54 [MOD 64] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `1211` から `L ≡ 16 (mod 32)`。 -/
-private theorem fullLevel_mod_thirtyTwo_eq_sixteen_of_1211
-    {L q : ℕ}
-    (h :
-      729 * L = 176 + 32 * q) :
-    L % 32 = 16 := by
-  have hmod :
-      729 * L ≡ 729 * 16 [MOD 32] := by
-    rw [h]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-
-  have hcancel :
-      L ≡ 16 [MOD 32] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-
-  simpa [Nat.ModEq] using hcancel
-
-
-/-- `1212` から `L ≡ 0 (mod 64)`。 -/
-private theorem fullLevel_mod_sixtyFour_eq_zero_of_1212
-    {L q : ℕ}
-    (h :
-      729 * L = 192 + 64 * q) :
-    L % 64 = 0 := by
-  have hmod :
-      729 * L ≡ 729 * 0 [MOD 64] := by
-    rw [h]
-    norm_num [Nat.ModEq, Nat.add_mod, Nat.mul_mod]
-
-  have hcancel :
-      L ≡ 0 [MOD 64] :=
-    Nat.ModEq.cancel_left_of_coprime
-      (by decide)
-      hmod
-
-  simpa [Nat.ModEq] using hcancel
+    · have S3 :=
+        D.forwardPrefixState_112
+          h112.1 h112.2
+      have hL :=
+        S3.exists_fullLevel_eq
+          (hk := by omega)
+          (C := 66)
+          (r := 6)
+          (hr := by norm_num)
+          (hCenter := by norm_num)
+          (hResidue := by
+            norm_num [
+              Nat.ModEq,
+              Nat.add_mod,
+              Nat.mul_mod
+            ])
+      norm_num at hL
+      exact
+        Or.inr
+          (Or.inl hL)
+    · have S3 :=
+        D.forwardPrefixState_121
+          h121.1 h121.2
+      have hL :=
+        S3.exists_fullLevel_eq
+          (hk := by omega)
+          (C := 64)
+          (r := 0)
+          (hr := by norm_num)
+          (hCenter := by norm_num)
+          (hResidue := by
+            norm_num [
+              Nat.ModEq,
+              Nat.add_mod,
+              Nat.mul_mod
+            ])
+      norm_num at hL
+      exact
+        Or.inr
+          (Or.inr hL)
 
 /--
 fourth exponent までの許容状態。
@@ -789,205 +753,58 @@ theorem fourthForwardPattern
       (D.forwardExponent 3 = 1 ∨
         D.forwardExponent 3 = 2)) := by
   have h7 := D.seven_le_length
-
   have he3Pos :
       0 < D.forwardExponent 3 :=
     D.forwardExponent_pos (by omega)
-
-  have hK1 :
-      D.prefixExponent 1 = 1 :=
-    D.prefixExponent_one
-
-  have hK2 :
-      D.prefixExponent 2 =
-        D.prefixExponent 1 +
-          D.forwardExponent 1 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 1) (by omega)
-
-  have hK3 :
-      D.prefixExponent 3 =
-        D.prefixExponent 2 +
-          D.forwardExponent 2 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 2) (by omega)
-
-  have hK4 :
-      D.prefixExponent 4 =
-        D.prefixExponent 3 +
-          D.forwardExponent 3 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 3) (by omega)
-
-  have hExp0 :=
-    D.prefix_expanding 4 (by omega)
-
-  have hExp :
-      2 ^ (3 + D.prefixExponent 4) < 729 := by
-    norm_num at hExp0
-    exact hExp0
-
-  have hK4le :
-      D.prefixExponent 4 ≤ 6 := by
-    by_contra hnot
-
-    have hge :
-        7 ≤ D.prefixExponent 4 := by
-      omega
-
-    have hpow :
-        1024 ≤
-          2 ^ (3 + D.prefixExponent 4) := by
-      have h :
-          2 ^ 10 ≤
-            2 ^ (3 + D.prefixExponent 4) :=
-        Nat.pow_le_pow_right
-          (by omega : 0 < (2 : ℕ))
-          (by omega)
-      norm_num at h ⊢
-      exact h
-
-    omega
-
   rcases D.thirdForwardPattern with h111 | hrest
-
-  · have hP2 :
-        D.prefixExponent 2 = 2 := by
-      calc
-        D.prefixExponent 2
-            =
-          D.prefixExponent 1 +
-            D.forwardExponent 1 := hK2
-        _ = 1 + 1 := by
-          rw [hK1, h111.1]
-        _ = 2 := by
-          norm_num
-
-    have hP3 :
-        D.prefixExponent 3 = 3 := by
-      calc
-        D.prefixExponent 3
-            =
-          D.prefixExponent 2 +
-            D.forwardExponent 2 := hK3
-        _ = 2 + 1 := by
-          rw [hP2, h111.2]
-        _ = 3 := by
-          norm_num
-
-    have he3le :
-        D.forwardExponent 3 ≤ 3 := by
-      have h := hK4
-      rw [hP3] at h
-      omega
-
+  · have S3 :=
+      D.forwardPrefixState_111
+        h111.1 h111.2
+    have he3Lt :
+        D.forwardExponent 3 < 4 :=
+      S3.nextExponent_lt
+        (E := 4)
+        (by omega)
+        (by norm_num)
     have he3 :
         D.forwardExponent 3 = 1 ∨
         D.forwardExponent 3 = 2 ∨
         D.forwardExponent 3 = 3 := by
-      by_cases h1 : D.forwardExponent 3 = 1
-      · exact Or.inl h1
-      · by_cases h2 : D.forwardExponent 3 = 2
-        · exact Or.inr (Or.inl h2)
-        · have h3 :
-              D.forwardExponent 3 = 3 := by
-            omega
-          exact Or.inr (Or.inr h3)
-
+      omega
     exact
       Or.inl
         ⟨h111.1, h111.2, he3⟩
-
   · rcases hrest with h112 | h121
-
-    · have hP2 :
-          D.prefixExponent 2 = 2 := by
-        calc
-          D.prefixExponent 2
-              =
-            D.prefixExponent 1 +
-              D.forwardExponent 1 := hK2
-          _ = 1 + 1 := by
-            rw [hK1, h112.1]
-          _ = 2 := by
-            norm_num
-
-      have hP3 :
-          D.prefixExponent 3 = 4 := by
-        calc
-          D.prefixExponent 3
-              =
-            D.prefixExponent 2 +
-              D.forwardExponent 2 := hK3
-          _ = 2 + 2 := by
-            rw [hP2, h112.2]
-          _ = 4 := by
-            norm_num
-
-      have he3le :
-          D.forwardExponent 3 ≤ 2 := by
-        have h := hK4
-        rw [hP3] at h
-        omega
-
+    · have S3 :=
+        D.forwardPrefixState_112
+          h112.1 h112.2
+      have he3Lt :
+          D.forwardExponent 3 < 3 :=
+        S3.nextExponent_lt
+          (E := 3)
+          (by omega)
+          (by norm_num)
       have he3 :
           D.forwardExponent 3 = 1 ∨
           D.forwardExponent 3 = 2 := by
-        by_cases h1 : D.forwardExponent 3 = 1
-        · exact Or.inl h1
-        · have h2 :
-              D.forwardExponent 3 = 2 := by
-            omega
-          exact Or.inr h2
-
+        omega
       exact
         Or.inr
           (Or.inl
             ⟨h112.1, h112.2, he3⟩)
-
-    · have hP2 :
-          D.prefixExponent 2 = 3 := by
-        calc
-          D.prefixExponent 2
-              =
-            D.prefixExponent 1 +
-              D.forwardExponent 1 := hK2
-          _ = 1 + 2 := by
-            rw [hK1, h121.1]
-          _ = 3 := by
-            norm_num
-
-      have hP3 :
-          D.prefixExponent 3 = 4 := by
-        calc
-          D.prefixExponent 3
-              =
-            D.prefixExponent 2 +
-              D.forwardExponent 2 := hK3
-          _ = 3 + 1 := by
-            rw [hP2, h121.2]
-          _ = 4 := by
-            norm_num
-
-      have he3le :
-          D.forwardExponent 3 ≤ 2 := by
-        have h := hK4
-        rw [hP3] at h
-        omega
-
+    · have S3 :=
+        D.forwardPrefixState_121
+          h121.1 h121.2
+      have he3Lt :
+          D.forwardExponent 3 < 3 :=
+        S3.nextExponent_lt
+          (E := 3)
+          (by omega)
+          (by norm_num)
       have he3 :
           D.forwardExponent 3 = 1 ∨
           D.forwardExponent 3 = 2 := by
-        by_cases h1 : D.forwardExponent 3 = 1
-        · exact Or.inl h1
-        · have h2 :
-              D.forwardExponent 3 = 2 := by
-            omega
-          exact Or.inr h2
-
+        omega
       exact
         Or.inr
           (Or.inr
@@ -1014,439 +831,194 @@ theorem fullLevel_residue_of_fourthStep
     (∃ q : ℕ, D.fullLevel = 32 * q + 16) ∨
     (∃ q : ℕ, D.fullLevel = 64 * q) := by
   have h7 := D.seven_le_length
-
-  obtain ⟨q, hres⟩ :=
-    D.exists_fullLevel_prefixResidueEquation
-      (k := 4) (by omega)
-
-  have hK0 :
-      D.prefixExponent 0 = 0 :=
-    D.prefixExponent_zero
-
-  have hK1 :
-      D.prefixExponent 1 = 1 :=
-    D.prefixExponent_one
-
-  have hK2 :
-      D.prefixExponent 2 =
-        D.prefixExponent 1 +
-          D.forwardExponent 1 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 1) (by omega)
-
-  have hK3 :
-      D.prefixExponent 3 =
-        D.prefixExponent 2 +
-          D.forwardExponent 2 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 2) (by omega)
-
-  have hK4 :
-      D.prefixExponent 4 =
-        D.prefixExponent 3 +
-          D.forwardExponent 3 := by
-    simpa using
-      D.prefixExponent_succ
-        (k := 3) (by omega)
-
   rcases D.fourthForwardPattern with h111 | hrest
-
-  · rcases h111.2.2 with h1 | h23
-
-    · have hP2 :
-          D.prefixExponent 2 = 2 := by
-        calc
-          D.prefixExponent 2
-              =
-            D.prefixExponent 1 +
-              D.forwardExponent 1 := hK2
-          _ = 1 + 1 := by
-            rw [hK1, h111.1]
-          _ = 2 := by
-            norm_num
-
-      have hP3 :
-          D.prefixExponent 3 = 3 := by
-        calc
-          D.prefixExponent 3
-              =
-            D.prefixExponent 2 +
-              D.forwardExponent 2 := hK3
-          _ = 2 + 1 := by
-            rw [hP2, h111.2.1]
-          _ = 3 := by
-            norm_num
-
-      have hP4 :
-          D.prefixExponent 4 = 4 := by
-        calc
-          D.prefixExponent 4
-              =
-            D.prefixExponent 3 +
-              D.forwardExponent 3 := hK4
-          _ = 3 + 1 := by
-            rw [hP3, h1]
-          _ = 4 := by
-            norm_num
-
-      have hEq := hres
-      rw [hP4] at hEq
-      norm_num [
-        forwardAffine,
-        hK0,
-        hK1,
-        hP2,
-        hP3
-      ] at hEq
-      have hhalf :
-          729 * D.fullLevel =
-            178 + 16 * q := by
-        omega
-      have hmod :
-          D.fullLevel % 16 = 2 :=
-        fullLevel_mod_sixteen_eq_two_of_1111 hhalf
-      exact
-        Or.inl
-          (exists_eq_mul_add_of_mod_eq hmod)
+  · have S3 :=
+      D.forwardPrefixState_111
+        h111.1 h111.2.1
+    rcases h111.2.2 with h1 | h23
+    · have S4 :
+          ForwardPrefixStateAt D 4 4 65 := by
+        have h :=
+          S3.step (by omega) h1
+        norm_num at h
+        exact h
+      have hL :=
+        S4.exists_fullLevel_eq
+          (hk := by omega)
+          (C := 178)
+          (r := 2)
+          (hr := by norm_num)
+          (hCenter := by norm_num)
+          (hResidue := by
+            norm_num [
+              Nat.ModEq,
+              Nat.add_mod,
+              Nat.mul_mod
+            ])
+      norm_num at hL
+      exact Or.inl hL
     · rcases h23 with h2 | h3
-      · have hP2 :
-            D.prefixExponent 2 = 2 := by
-          calc
-            D.prefixExponent 2
-                =
-              D.prefixExponent 1 +
-                D.forwardExponent 1 := hK2
-            _ = 1 + 1 := by
-              rw [hK1, h111.1]
-            _ = 2 := by
-              norm_num
-        have hP3 :
-            D.prefixExponent 3 = 3 := by
-          calc
-            D.prefixExponent 3
-                =
-              D.prefixExponent 2 +
-                D.forwardExponent 2 := hK3
-            _ = 2 + 1 := by
-              rw [hP2, h111.2.1]
-            _ = 3 := by
-              norm_num
-        have hP4 :
-            D.prefixExponent 4 = 5 := by
-          calc
-            D.prefixExponent 4
-                =
-              D.prefixExponent 3 +
-                D.forwardExponent 3 := hK4
-            _ = 3 + 2 := by
-              rw [hP3, h2]
-            _ = 5 := by
-              norm_num
-        have hEq := hres
-        rw [hP4] at hEq
-        norm_num [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at hEq
-        have hhalf :
-            729 * D.fullLevel =
-              186 + 32 * q := by
-          omega
-        have hmod :
-            D.fullLevel % 32 = 10 :=
-          fullLevel_mod_thirtyTwo_eq_ten_of_1112 hhalf
+      · have S4 :
+            ForwardPrefixStateAt D 4 5 65 := by
+          have h :=
+            S3.step (by omega) h2
+          norm_num at h
+          exact h
+        have hL :=
+          S4.exists_fullLevel_eq
+            (hk := by omega)
+            (C := 186)
+            (r := 10)
+            (hr := by norm_num)
+            (hCenter := by norm_num)
+            (hResidue := by
+              norm_num [
+                Nat.ModEq,
+                Nat.add_mod,
+                Nat.mul_mod
+              ])
+        norm_num at hL
         exact
           Or.inr
-            (Or.inl
-              (exists_eq_mul_add_of_mod_eq hmod))
-      · have hP2 :
-            D.prefixExponent 2 = 2 := by
-          calc
-            D.prefixExponent 2
-                =
-              D.prefixExponent 1 +
-                D.forwardExponent 1 := hK2
-            _ = 1 + 1 := by
-              rw [hK1, h111.1]
-            _ = 2 := by
-              norm_num
-        have hP3 :
-            D.prefixExponent 3 = 3 := by
-          calc
-            D.prefixExponent 3
-                =
-              D.prefixExponent 2 +
-                D.forwardExponent 2 := hK3
-            _ = 2 + 1 := by
-              rw [hP2, h111.2.1]
-            _ = 3 := by
-              norm_num
-        have hP4 :
-            D.prefixExponent 4 = 6 := by
-          calc
-            D.prefixExponent 4
-                =
-              D.prefixExponent 3 +
-                D.forwardExponent 3 := hK4
-            _ = 3 + 3 := by
-              rw [hP3, h3]
-            _ = 6 := by
-              norm_num
-        have hEq := hres
-        rw [hP4] at hEq
-        norm_num [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at hEq
-        have hhalf :
-            729 * D.fullLevel =
-              202 + 64 * q := by
-          omega
-        have hmod :
-            D.fullLevel % 64 = 26 :=
-          fullLevel_mod_sixtyFour_eq_twentySix_of_1113 hhalf
+            (Or.inl hL)
+      · have S4 :
+            ForwardPrefixStateAt D 4 6 65 := by
+          have h :=
+            S3.step (by omega) h3
+          norm_num at h
+          exact h
+        have hL :=
+          S4.exists_fullLevel_eq
+            (hk := by omega)
+            (C := 202)
+            (r := 26)
+            (hr := by norm_num)
+            (hCenter := by norm_num)
+            (hResidue := by
+              norm_num [
+                Nat.ModEq,
+                Nat.add_mod,
+                Nat.mul_mod
+              ])
+        norm_num at hL
         exact
           Or.inr
             (Or.inr
-              (Or.inl
-                (exists_eq_mul_add_of_mod_eq hmod)))
+              (Or.inl hL))
   · rcases hrest with h112 | h121
-    · rcases h112.2.2 with h1 | h2
-      · have hP2 :
-            D.prefixExponent 2 = 2 := by
-          calc
-            D.prefixExponent 2
-                =
-              D.prefixExponent 1 +
-                D.forwardExponent 1 := hK2
-            _ = 1 + 1 := by
-              rw [hK1, h112.1]
-            _ = 2 := by
-              norm_num
-        have hP3 :
-            D.prefixExponent 3 = 4 := by
-          calc
-            D.prefixExponent 3
-                =
-              D.prefixExponent 2 +
-                D.forwardExponent 2 := hK3
-            _ = 2 + 2 := by
-              rw [hP2, h112.2.1]
-            _ = 4 := by
-              norm_num
-        have hP4 :
-            D.prefixExponent 4 = 5 := by
-          calc
-            D.prefixExponent 4
-                =
-              D.prefixExponent 3 +
-                D.forwardExponent 3 := hK4
-            _ = 4 + 1 := by
-              rw [hP3, h1]
-            _ = 5 := by
-              norm_num
-        have hEq := hres
-        rw [hP4] at hEq
-        norm_num [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at hEq
-        have hhalf :
-            729 * D.fullLevel =
-              182 + 32 * q := by
-          omega
-        have hmod :
-            D.fullLevel % 32 = 6 :=
-          fullLevel_mod_thirtyTwo_eq_six_of_1121 hhalf
+    · have S3 :=
+        D.forwardPrefixState_112
+          h112.1 h112.2.1
+      rcases h112.2.2 with h1 | h2
+      · have S4 :
+            ForwardPrefixStateAt D 4 5 73 := by
+          have h :=
+            S3.step (by omega) h1
+          norm_num at h
+          exact h
+        have hL :=
+          S4.exists_fullLevel_eq
+            (hk := by omega)
+            (C := 182)
+            (r := 6)
+            (hr := by norm_num)
+            (hCenter := by norm_num)
+            (hResidue := by
+              norm_num [
+                Nat.ModEq,
+                Nat.add_mod,
+                Nat.mul_mod
+              ])
+        norm_num at hL
         exact
           Or.inr
             (Or.inr
               (Or.inr
-                (Or.inl
-                  (exists_eq_mul_add_of_mod_eq hmod))))
-      · have hP2 :
-            D.prefixExponent 2 = 2 := by
-          calc
-            D.prefixExponent 2
-                =
-              D.prefixExponent 1 +
-                D.forwardExponent 1 := hK2
-            _ = 1 + 1 := by
-              rw [hK1, h112.1]
-            _ = 2 := by
-              norm_num
-        have hP3 :
-            D.prefixExponent 3 = 4 := by
-          calc
-            D.prefixExponent 3
-                =
-              D.prefixExponent 2 +
-                D.forwardExponent 2 := hK3
-            _ = 2 + 2 := by
-              rw [hP2, h112.2.1]
-            _ = 4 := by
-              norm_num
-        have hP4 :
-            D.prefixExponent 4 = 6 := by
-          calc
-            D.prefixExponent 4
-                =
-              D.prefixExponent 3 +
-                D.forwardExponent 3 := hK4
-            _ = 4 + 2 := by
-              rw [hP3, h2]
-            _ = 6 := by
-              norm_num
-        have hEq := hres
-        rw [hP4] at hEq
-        norm_num [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at hEq
-        have hhalf :
-            729 * D.fullLevel =
-              198 + 64 * q := by
-          omega
-        have hmod :
-            D.fullLevel % 64 = 54 :=
-          fullLevel_mod_sixtyFour_eq_fiftyFour_of_1122 hhalf
+                (Or.inl hL)))
+      · have S4 :
+            ForwardPrefixStateAt D 4 6 73 := by
+          have h :=
+            S3.step (by omega) h2
+          norm_num at h
+          exact h
+        have hL :=
+          S4.exists_fullLevel_eq
+            (hk := by omega)
+            (C := 198)
+            (r := 54)
+            (hr := by norm_num)
+            (hCenter := by norm_num)
+            (hResidue := by
+              norm_num [
+                Nat.ModEq,
+                Nat.add_mod,
+                Nat.mul_mod
+              ])
+        norm_num at hL
         exact
           Or.inr
             (Or.inr
               (Or.inr
                 (Or.inr
-                  (Or.inl
-                    (exists_eq_mul_add_of_mod_eq hmod)))))
-
-    · rcases h121.2.2 with h1 | h2
-      · have hP2 :
-            D.prefixExponent 2 = 3 := by
-          calc
-            D.prefixExponent 2
-                =
-              D.prefixExponent 1 +
-                D.forwardExponent 1 := hK2
-            _ = 1 + 2 := by
-              rw [hK1, h121.1]
-            _ = 3 := by
-              norm_num
-        have hP3 :
-            D.prefixExponent 3 = 4 := by
-          calc
-            D.prefixExponent 3
-                =
-              D.prefixExponent 2 +
-                D.forwardExponent 2 := hK3
-            _ = 3 + 1 := by
-              rw [hP2, h121.2.1]
-            _ = 4 := by
-              norm_num
-        have hP4 :
-            D.prefixExponent 4 = 5 := by
-          calc
-            D.prefixExponent 4
-                =
-              D.prefixExponent 3 +
-                D.forwardExponent 3 := hK4
-            _ = 4 + 1 := by
-              rw [hP3, h1]
-            _ = 5 := by
-              norm_num
-        have hEq := hres
-        rw [hP4] at hEq
-        norm_num [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at hEq
-        have hhalf :
-            729 * D.fullLevel =
-              176 + 32 * q := by
-          omega
-        have hmod :
-            D.fullLevel % 32 = 16 :=
-          fullLevel_mod_thirtyTwo_eq_sixteen_of_1211 hhalf
+                  (Or.inl hL))))
+    · have S3 :=
+        D.forwardPrefixState_121
+          h121.1 h121.2.1
+      rcases h121.2.2 with h1 | h2
+      · have S4 :
+            ForwardPrefixStateAt D 4 5 85 := by
+          have h :=
+            S3.step (by omega) h1
+          norm_num at h
+          exact h
+        have hL :=
+          S4.exists_fullLevel_eq
+            (hk := by omega)
+            (C := 176)
+            (r := 16)
+            (hr := by norm_num)
+            (hCenter := by norm_num)
+            (hResidue := by
+              norm_num [
+                Nat.ModEq,
+                Nat.add_mod,
+                Nat.mul_mod
+              ])
+        norm_num at hL
         exact
           Or.inr
             (Or.inr
               (Or.inr
                 (Or.inr
                   (Or.inr
-                    (Or.inl
-                      (exists_eq_mul_add_of_mod_eq hmod))))))
-      · have hP2 :
-            D.prefixExponent 2 = 3 := by
-          calc
-            D.prefixExponent 2
-                =
-              D.prefixExponent 1 +
-                D.forwardExponent 1 := hK2
-            _ = 1 + 2 := by
-              rw [hK1, h121.1]
-            _ = 3 := by
-              norm_num
-        have hP3 :
-            D.prefixExponent 3 = 4 := by
-          calc
-            D.prefixExponent 3
-                =
-              D.prefixExponent 2 +
-                D.forwardExponent 2 := hK3
-            _ = 3 + 1 := by
-              rw [hP2, h121.2.1]
-            _ = 4 := by
-              norm_num
-        have hP4 :
-            D.prefixExponent 4 = 6 := by
-          calc
-            D.prefixExponent 4
-                =
-              D.prefixExponent 3 +
-                D.forwardExponent 3 := hK4
-            _ = 4 + 2 := by
-              rw [hP3, h2]
-            _ = 6 := by
-              norm_num
-        have hEq := hres
-        rw [hP4] at hEq
-        norm_num [
-          forwardAffine,
-          hK0,
-          hK1,
-          hP2,
-          hP3
-        ] at hEq
-        have hhalf :
-            729 * D.fullLevel =
-              192 + 64 * q := by
-          omega
-        have hmod :
-            D.fullLevel % 64 = 0 :=
-          fullLevel_mod_sixtyFour_eq_zero_of_1212 hhalf
+                    (Or.inl hL)))))
+      · have S4 :
+            ForwardPrefixStateAt D 4 6 85 := by
+          have h :=
+            S3.step (by omega) h2
+          norm_num at h
+          exact h
+        have hL :=
+          S4.exists_fullLevel_eq
+            (hk := by omega)
+            (C := 192)
+            (r := 0)
+            (hr := by norm_num)
+            (hCenter := by norm_num)
+            (hResidue := by
+              norm_num [
+                Nat.ModEq,
+                Nat.add_mod,
+                Nat.mul_mod
+              ])
+        norm_num at hL
         exact
           Or.inr
             (Or.inr
               (Or.inr
                 (Or.inr
                   (Or.inr
-                    (Or.inr
-                      (exists_eq_mul_add_of_mod_eq hmod))))))
+                    (Or.inr hL)))))
 
 end E2ZeroCenteredTrajectoryData
 end EndpointFloorZero
