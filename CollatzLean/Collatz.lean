@@ -12,6 +12,7 @@ import CollatzLean.Collatz.Word.KernelValuation
 import CollatzLean.Collatz.Word.Geometry
 import CollatzLean.Collatz.Word.Contracting
 import CollatzLean.Collatz.Word.SharpAffine
+import CollatzLean.Collatz.Word.SuffixSlopeProfile
 import CollatzLean.Collatz.Word.Periodic
 import CollatzLean.Collatz.OneStep.Carry
 import CollatzLean.Collatz.FiniteOrbit.Runs
