@@ -20,3 +20,4 @@ import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.WeightedExpandingCylind
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroOddPartBridge
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2InnerReplay
 import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2Budget
+import CollatzLean.Collatz.AdjacentReturn.PositiveReturn.EndpointFloorZeroE2ZeroDecoder
