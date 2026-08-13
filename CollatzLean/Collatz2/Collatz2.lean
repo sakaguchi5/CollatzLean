@@ -26,15 +26,19 @@ import CollatzLean.Collatz2.Global.UnboundedReduction
 import CollatzLean.Collatz2.Native.IntervalReplay
 import CollatzLean.Collatz2.Native.BiCanonical
 import CollatzLean.Collatz2.Native.PrependOneDefect
+import CollatzLean.Collatz2.Native.ReplayDynamics
 
 -- Matrix axis
 import CollatzLean.Collatz2.Matrix.Representation
 import CollatzLean.Collatz2.Matrix.DefectGeometry
 import CollatzLean.Collatz2.Matrix.Commutator
 import CollatzLean.Collatz2.Matrix.FixedPoint
+import CollatzLean.Collatz2.Matrix.CenterTransport
+import CollatzLean.Collatz2.Matrix.ProjectiveDynamics
 
 -- Native / Matrix synthesis
 import CollatzLean.Collatz2.Synthesis.CenterComparison
+import CollatzLean.Collatz2.Synthesis.GlobalCenterEscape
 
 
 
