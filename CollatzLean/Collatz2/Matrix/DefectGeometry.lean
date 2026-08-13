@@ -2,11 +2,10 @@ import CollatzLean.Collatz2.Matrix.Representation
 import CollatzLean.Collatz2.Local.Defect
 
 /-!
-# Collatz2 Matrix: defect as oriented projective geometry
+# Collatz2 Matrix: defect の wedge 表現
 
-既存 start defect を再定義しない。
-homogeneous affine point `(x,1)` とその matrix image の wedge が
-既存 defect の符号を exact に測ることを示す。
+`DisplacementForm.eval` を正本とし、affine point と homogeneous image の wedge が
+その符号付き評価と一致することだけを Matrix shadow として記録する。
 -/
 
 namespace Collatz2
@@ -14,22 +13,22 @@ namespace MatrixAnalysis
 
 open scoped Matrix
 
-/-- projective affine chart の homogeneous vector。 -/
+/-- Homogeneous point of the projective affine chart. -/
 abbrev HomPoint := Fin 2 → ℤ
 
-/-- 自然数 `x` を homogeneous point `(x,1)` として埋め込む。 -/
+/-- Embed natural `x` as homogeneous point `(x,1)`. -/
 def affinePoint (x : ℕ) : HomPoint :=
   ![(x : ℤ), 1]
 
-/-- 2次元 vector の oriented wedge。 -/
+/-- Oriented wedge of two 2-vectors. -/
 def wedge (p q : HomPoint) : ℤ :=
   p 0 * q 1 - p 1 * q 0
 
-/-- transfer matrix による homogeneous image。 -/
+/-- Homogeneous matrix image of an affine point. -/
 def imagePoint (T : AffineTransfer) (x : ℕ) : HomPoint :=
   representation T *ᵥ affinePoint x
 
-/-- image は `(Cx+B, A)`。 -/
+/-- Matrix image is `(Cx+B,A)`. -/
 theorem imagePoint_eq
     (T : AffineTransfer)
     (x : ℕ) :
@@ -41,19 +40,18 @@ theorem imagePoint_eq
     simp [imagePoint, affinePoint, representation,
       Matrix.mulVec_apply_eq_sum, Fin.sum_univ_two]
 
-/--
-既存 start defect は affine point と matrix image の oriented wedge の負号。
--/
+/-- Start defect/displacement evaluation is the negative oriented wedge. -/
 theorem startDefect_eq_neg_wedge
     (T : AffineTransfer)
     (x : ℕ) :
     T.startDefect x = -wedge (affinePoint x) (imagePoint T x) := by
   rw [imagePoint_eq]
   simp [wedge, affinePoint, AffineTransfer.startDefect,
+    DisplacementForm.eval, AffineTransfer.displacementForm,
     AffineTransfer.determinant]
   ring
 
-/-- positive start defect は matrix image が wedge の負側にあることと同値。 -/
+/-- Positive displacement evaluation is negative wedge orientation. -/
 theorem startDefect_pos_iff_wedge_neg
     (T : AffineTransfer)
     (x : ℕ) :

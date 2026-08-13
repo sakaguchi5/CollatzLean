@@ -1,5 +1,7 @@
 import CollatzLean.Collatz2.Core.Word
 import CollatzLean.Collatz2.Core.AffineTransfer
+import CollatzLean.Collatz2.Core.DisplacementForm
+import CollatzLean.Collatz2.Core.TranslationPath
 import CollatzLean.Collatz2.Core.Realization
 import CollatzLean.Collatz2.Core.Interval
 
@@ -15,23 +17,33 @@ import CollatzLean.Collatz2.Orbit.FutureMinimum
 import CollatzLean.Collatz2.Orbit.FutureMinimumArithmetic
 import CollatzLean.Collatz2.Orbit.FutureMinimumSelection
 
+import CollatzLean.Collatz2.Geometry.Center
+import CollatzLean.Collatz2.Geometry.PrimitiveForm
+
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
+import CollatzLean.Collatz2.Canonical.CenterResidue
 import CollatzLean.Collatz2.Canonical.Replay
 import CollatzLean.Collatz2.Canonical.ReplayExtremality
+import CollatzLean.Collatz2.Canonical.SwapResidue
+import CollatzLean.Collatz2.Canonical.SwapCarry
 
 import CollatzLean.Collatz2.Global.AdjacentTransferChain
 import CollatzLean.Collatz2.Global.SignDichotomy
 import CollatzLean.Collatz2.Global.UnboundedReduction
+import CollatzLean.Collatz2.Global.CenterEscape
+import CollatzLean.Collatz2.Global.MovingCenter
+import CollatzLean.Collatz2.Global.PrimitiveCenter
+import CollatzLean.Collatz2.Global.PrimitiveReturnGap
 
--- Native axis
+-- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
 import CollatzLean.Collatz2.Native.BiCanonical
 import CollatzLean.Collatz2.Native.PrependOneDefect
 import CollatzLean.Collatz2.Native.ReplayDynamics
 import CollatzLean.Collatz2.Native.AdjacentPrependOne
 
--- Matrix axis
+-- Matrix: derived representation view のみ
 import CollatzLean.Collatz2.Matrix.Representation
 import CollatzLean.Collatz2.Matrix.DefectGeometry
 import CollatzLean.Collatz2.Matrix.Commutator
@@ -39,23 +51,16 @@ import CollatzLean.Collatz2.Matrix.FixedPoint
 import CollatzLean.Collatz2.Matrix.CenterTransport
 import CollatzLean.Collatz2.Matrix.ProjectiveDynamics
 
--- Native / Matrix synthesis
-import CollatzLean.Collatz2.Synthesis.CenterComparison
-import CollatzLean.Collatz2.Synthesis.GlobalCenterEscape
-import CollatzLean.Collatz2.Synthesis.MovingCenter
-import CollatzLean.Collatz2.Synthesis.PrimitiveCenter
-import CollatzLean.Collatz2.Synthesis.GlobalPrimitiveCenter
-import CollatzLean.Collatz2.Synthesis.SwapResidue
-import CollatzLean.Collatz2.Synthesis.SwapCarry
-import CollatzLean.Collatz2.Synthesis.PrimitiveReturnGap
-import CollatzLean.Collatz2.Synthesis.KappaSwapValuation
+-- primitive separation の arithmetic shadows
+import CollatzLean.Collatz2.Arithmetic.KappaSwapValuation
 
--- Audit
+-- Obstruction audit
 import CollatzLean.Collatz2.ObstructionAudit.ObstructionAudit
 import CollatzLean.Collatz2.ObstructionAudit.ExactWordTranslation
 import CollatzLean.Collatz2.ObstructionAudit.CanonicalResidueAudit
 import CollatzLean.Collatz2.ObstructionAudit.ExactTranslationConsequences
 import CollatzLean.Collatz2.ObstructionAudit.FutureMinimumPrefixFloor
+import CollatzLean.Collatz2.ObstructionAudit.TranslationShadowAudit
 
 set_option linter.style.header false
 
@@ -64,170 +69,257 @@ set_option linter.style.header false
 
 旧 `CollatzLean.Collatz.*` を import しない独立再構築の入口。
 
-Collatz2 では、有限語・actual run・無限軌道に含まれる情報をできるだけ
-lossless な少数の正本 object に保持し、従来の特殊 branch や座標は
-Prop / projection / characterization theorem として下流で導く。
+Collatz2 の設計原則は、trajectory-specific な branch data を増やさず、
+lossless な少数の正本 object と、その universal projection から特殊概念を導くことである。
 
-## Shared foundation
+## 1. Lossless finite foundation
 
-有限側の正本は `Word`、`AffineTransfer`、`Realizes`、`Runs`、`Interval` である。
+有限側の正本は
 
-`AffineTransfer` は
+* `Word`
+* `AffineTransfer`
+* `Realizes`
+* `Runs`
+* `Interval`
+
+である。
+
+`AffineTransfer T = (C,A,B)` は
 
   `A * y = C * x + B`
 
-という exact affine relation を保持し、word append は transfer composition と一致する。
+を保持する。word append は transfer composition と exact に一致し、
+`AffineTransfer` は最後まで lossless finite object のまま残す。
 
-Expanding / Contracting は primitive branch とせず、
-transfer の signed determinant `C - A` の正負として導く。
+## 2. Universal B-sensitive interface: displacement form
 
-signed defect により actual displacement を
+`B` を単独の座標として解析せず、transfer から一つの整数一次式
 
-  `startDefect = A * (y - x)`
+  `Δ_T(X) = B + (C-A) X`
 
-として測り、PositiveReturn は positive defect のコロラリーとして扱う。
+を導く。これが `DisplacementForm` であり、B-sensitive な解析の共通 interface である。
 
-FirstCrossing は prefix determinant sign profile、
-AllSuffixesContracting は suffix determinant sign profile として再構成する。
+* constant term = `B`
+* slope = `determinant = C-A`
+* evaluation = defect
+* projective root = finite center
+* coefficient content = primitive center content
+* pairwise resultant = separation
 
-## Exact realization recovery
+composition では
 
-`RealizationRecovery` では、valid word の genuine affine realization が odd endpoint を持てば、
-whole equation から一歩ごとの normalized boundary を復元して `Runs` を構成できることを示す。
+  `Δ_(T followedBy U) = C_U * Δ_T + A_T * Δ_U`
+
+が exact に成立する。従って translation law と determinant law は、
+別々の公式ではなく一つの displacement-form transport law の二成分である。
+
+## 3. Genuine word translation path
+
+arbitrary affine transfer では `B` は自由であるが、genuine word では
+
+  `B = Word.affineConst w`
+
+に固定される。
+
+`TranslationPath` では append recursion を translation cocycle として読み、
+exact equality より薄い universal Archimedean shadow
+
+  `B < A * C`
+
+を取り出す。
 
 従って
 
+  arbitrary affine geometry
+
+と
+
+  genuine Collatz word code
+
+の境界は、displacement form の constant term が genuine translation path から
+来ているかどうかとして明示される。
+
+## 4. Local sign and displacement
+
+`Expanding` / `Contracting` は primitive word classification ではなく
+`Δ_T` の slope `C-A` の正負である。
+
+start defect は
+
+  `startDefect T x = Δ_T(x)`
+
+そのもの。realization `x -> y` 上では
+
+  `Δ_T(x) = A * (y-x)`
+  `Δ_T(y) = C * (y-x)`
+
+となるため、positive return / descent は displacement-form evaluation の符号の
+corollary になる。
+
+`FirstCrossing` と `AllSuffixesContracting` は slope sign profile として保持する。
+
+## 5. Synthesis 層を介さない center geometry
+
+finite center は `Δ_T(X)=0` の projective root であり、最初から有理除算しない。
+negative branch では `G=A-C>0` として coefficient pair `(B,G)` を使う。
+
+二 transfer の signed root separation は
+
+  `separation(T,U)
+     = B_T * determinant(U) - B_U * determinant(T)`
+
+である。
+
+旧 `omega` は primitive object ではなく、この separation の Matrix compatibility alias に
+降格する。
+
+* `SameCenter  <-> separation = 0`
+* `CenterRises <-> separation > 0`
+* Matrix commutator upper-right = separation
+* fixed-point-vector wedge = `-separation`
+
+となる。
+
+従って旧 `Synthesis` directory は不要であり、一般幾何は `Geometry`、
+actual chain の幾何は `Global`、canonical arithmetic は `Canonical`、
+valuation は `Arithmetic` に正規配置する。
+
+## 6. Canonical representatives are local root shadows
+
+`oddStartClass` / `canonicalStart` の total definition は従来どおり保持する。
+その上で valid nonempty genuine word では、canonical start/end が同じ
+`DisplacementForm` root の二つの local shadows であることを導く。
+
+* start side: displacement evaluation is divisible by `2*A`
+* endpoint side: displacement evaluation is divisible by `2*C`
+
+`ReplayCoordinate` はこの root-shadow pair の simultaneous lift coordinate である。
+高位概念名 `CenterLiftCoordinate` は semantic alias として与える。
+
+contracting word では quotient を上げるほど displacement が slope に従って減少するため、
+`q=0` は maximal positive-return layer として導かれる。旧 `j=0` は primitive branch ではない。
+
+## 7. Matrix layer is representation only
+
+Matrix は新しい正本ではない。
+
+  `[[C,B],[0,A]]`
+
+は `AffineTransfer` の homogeneous representation にすぎない。
+
+fixed-point vector、wedge、commutator、center-vector transport はすべて
+`DisplacementForm` の root / resultant / composition law の matrix shadows として置く。
+
+## 8. Global adjacent future-minimum chain
+
+非有界 odd orbit から `AdjacentTransferChain` を構成し、各 adjacent block に
+actual `Runs`, positive return, genuine word transfer を保持する。
+
+chain-derived API は本来の
+
+  `Collatz2.AdjacentTransferChain`
+
+namespace に直接置く。そのため
+
+  `C.returnGap`
+  `C.separationAdjacent`
+  `C.centerContent`
+  `C.primitiveKappa`
+
+の dot notation が正規に使える。
+
+strong global sign dichotomy は従来どおり
+
+  positive determinant cofinal
+    OR
+  eventually negative determinant
+
+である。
+
+negative tail では center roots が cofinally infinity へ逃げることと center-order
+transitivityから、positive adjacent separation が cofinally 強制される。
+
+## 9. Primitive negative-root arithmetic
+
+negative transfer の displacement form
+
+  `Δ(X)=B-GX`
+
+を `h=gcd(B,G)` で primitive 化する。
+generic `PrimitiveForm` では
+
+  `B = h*b`
+  `G = h*d`
+
+と primitive root separation を扱う。
+
+future-minimum chain へ specialization すると
+
+  `returnGap = 4*h*s`
+  `b = 3*d + 4*alpha`
+
+となり、adjacent separation は
+
+  `separationAdjacent = 4*h*h'*kappa`
+
+へ factorize する。
+
+`PrimitiveReturnGap` はさらに
+
+  `kappa = d*A'*s' - d'*C*s`
+
+へ戻す。
+
+## 10. Swap / carry / valuation are arithmetic shadows of separation
+
+word swap `u++v` と `v++u` は diagonal coefficients を共有し、translation difference は
+transfer separation そのものになる。
+
+そこから
+
+  separation
+    -> canonical residue displacement
+    -> minimal representative
+    -> 0/1 carry
+    -> primitive `kappa` valuation
+
+という一本の経路を持つ。
+
+`kappa=1` では adjacent swap displacement が `4 mod 8`、従って exact 2-adic depth `2`
+であることを `Arithmetic/KappaSwapValuation` で読む。
+
+## 11. Exact realization recovery
+
+`RealizationRecovery` は重要な lossless boundary theorem である。
+
   valid word
-    + exact `affineConst`
-    + odd endpoint realization
+    + genuine affine realization
+    + odd endpoint
+      -> normalized `Runs`
 
-は stepwise normalized dynamics を失っていない。
+従って exact `affineConst` は単なる数値等式ではなく、stepwise normalized dynamics を
+回復するだけの情報を保持する。
 
-## Canonical / Replay geometry
+## 12. Obstruction audit by displacement shadows
 
-odd endpoint を持つ realization の start が属する合同類を先に構成し、
-その最小非負代表として `canonicalStart` を定義する。
+relaxed audit では translation を free にした model を明示し、どの genuine-word shadow で
+初めて synthetic witness が消えるかを監査する。
 
-normalized `Runs` の endpoint odd から `ReplayCoordinate` を追加仮定なしで構成する。
+canonical start residue だけでは witness は残る。しかし exact translation の前にも
 
-contracting transfer では replay displacement が
+* endpoint-side translation congruence modulo `2*C`
+* genuine translation path-size bound `B < A*C`
 
-  canonical displacement
-    + 2 * determinant * quotient
+という薄い shadow があり、現在の canonical-residue witness はすでにそこで消える。
 
-と exact に変化するため、`q = 0` は replay family の最大 displacement layer となる。
+したがって audit は今後
 
-従って旧 `j = 0` 型の canonical positive return は primitive branch ではなく、
-contracting replay extremality のコロラリーとして現れる。
+  diagonal profile
+    -> local root / translation shadows
+    -> path-size / path-recursion shadows
+    -> exact genuine `B`
+    -> recovered `Runs`
+    -> future-minimum prefix floor
 
-`ReplayDynamics` では replay quotient を canonical residue modulus に対する自然な商として読み、
-word extension による binary right shift と ternary digit decomposition を導く。
-
-## Global unbounded reduction
-
-normalized `OddOrbit` と future minima から、
-隣接 future-minimum 間の lossless `AdjacentTransferChain` を構成する。
-
-各 adjacent block は actual `Runs` と positive return を持ち、
-valid nonempty なので determinant は非零である。
-
-sign profile の強い global dichotomy は
-
-  positive determinant cofinal
-    ∨ eventually negative determinant
-
-である。従来の
-
-  positive determinant cofinal
-    ∨ negative determinant cofinal
-
-はその corollary として残す。
-
-`FutureMinimumArithmetic` では Matrix に依存せず、future minimum `x > 1` から
-first exponent `1`、`x = 4k+3`、adjacent value gap の正の4倍性を導く。
-
-## Two research axes
-
-shared foundation の上で二つの独立した解析軸を並走させる。
-
-### Native axis
-
-`Native` 層では行列表現を用いず、
-既存の affine coefficients・interval・replay・defect を直接解析する。
-
-`BiCanonical` は新しい trajectory data ではなく二つの replay quotient の zero-layer 条件、
-prepend-one は `[1]` と tail の defect cocycle の特殊化として扱う。
-
-### Matrix axis
-
-`Matrix` 層では `AffineTransfer` を新しい正本に置き換えず、
-upper-triangular `2 x 2` integer matrix representation を derived view として用いる。
-
-defect は oriented wedge、旧 center-comparison scalar `omega` は commutator の唯一の
-非自明成分として現れる。
-
-finite fixed point は homogeneous vector `(B, A-C)` として保持する。
-composition では fixed-point vector は正係数線形結合で transport され、
-`omega` は prefix 側で `A`、suffix 側で `C` により exact に scale する。
-
-## Synthesis
-
-`GlobalCenterEscape` と `MovingCenter` により eventually-negative tail では
-strict center rise、すなわち `omega > 0` が cofinally 強制される。
-
-`PrimitiveCenter` / `PrimitiveReturnGap` では
-
-  h = gcd(B,G) = gcd(returnGap,G)
-  returnGap = 4*h*s
-  G = h*d
-  gcd(s,d) = 1
-
-へ primitive 化し、隣接 separation を
-
-  kappa = d*A'*s' - d'*C*s
-
-へ exact に戻す。
-
-`SwapResidue` / `SwapCarry` / `KappaSwapValuation` では同じ `omega` を
-canonical residue displacement、0/1 carry、2-adic separation へ接続する。
-
-## Obstruction audit: exact-word boundary
-
-relaxed audit では primitive arithmetic、positive `kappa`、center escape、
-genuine diagonal `3^p / 2^H`、begins-one profile まで明示的 infinite model が存在する。
-
-今回さらに境界を五段階に分離する。
-
-1. `RealizationRecovery`:
-   `Valid + Realizes + Odd endpoint -> Runs` を general theorem として固定する。
-
-2. `ExactWordTranslation`:
-   audit packet に
-
-     `translate = Word.affineConst word`
-
-   を追加する。これにより各 packet block は genuine `Word.Realizes` / `Runs` へ戻る。
-
-3. `CanonicalResidueAudit`:
-   exact translation より弱い
-
-     `start % residueModulus(word) = canonicalStart(word)`
-
-   だけを追加した relaxed packet は依然 inhabitant を持つことを明示する。
-
-4. `ExactTranslationConsequences`:
-   exact packet から replay coordinate、actual prefix canonical residue、
-   affineConst split recursion、adjacent swap 0/1 carry を薄い consequence として抽出する。
-
-5. `FutureMinimumPrefixFloor`:
-   exact word realizability と別に、future-minimum block 固有の
-
-     every actual prefix boundary >= block start
-
-   を packet として分離する。actual `AdjacentTransferChain` では
-   `FutureMinimumAt` から index-level prefix floor が自動的に成立する。
-
-従って現在の audit の狙いは、exact word translation を一気に不存在化することではなく、
-その genuine-word consequences と future-minimum floor を一枚ずつ戻し、
-synthetic witness が初めて消える最小境界を特定することである。
+という順に、失われた情報を一枚ずつ戻す。
 -/

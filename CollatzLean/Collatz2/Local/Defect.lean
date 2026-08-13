@@ -1,36 +1,41 @@
+import CollatzLean.Collatz2.Core.DisplacementForm
 import CollatzLean.Collatz2.Orbit.Runs
 import CollatzLean.Collatz2.Local.DeterminantSign
-
+import Mathlib.Tactic.Linarith
 
 /-!
-# Collatz2: signed displacement defect
+# Collatz2: displacement-form evaluation と defect
 
-Defect は新しい trajectory data ではなく affine transfer の評価である。
+defect は新しい trajectory data ではなく `DisplacementForm` の評価値である。
+realization `x -> y` 上では
 
-start 側では
+  `Δ_T(x) = A * (y-x)`
+  `Δ_T(y) = C * (y-x)`
 
-  `B + (C-A)x = A(y-x)`
-
-endpoint 側では
-
-  `(A-C)y - B = C(x-y)`
-
-となる。したがって return / descent の符号は defect の符号のコロラリーになる。
+となり、positive return / descent は評価値の符号の corollary になる。
 -/
 
 namespace Collatz2
 
 namespace AffineTransfer
 
-/-- start `x` で評価した signed displacement defect。 -/
+/-- Start defect is displacement-form evaluation at `x`. -/
 def startDefect (T : AffineTransfer) (x : ℕ) : ℤ :=
-  (T.translate : ℤ) + T.determinant * (x : ℤ)
+  T.displacementForm.eval (x : ℤ)
 
-/-- endpoint `y` で評価した signed endpoint defect。 -/
+/-- Endpoint defect keeps the historical reverse-displacement sign. -/
 def endpointDefect (T : AffineTransfer) (y : ℕ) : ℤ :=
-  (-T.determinant) * (y : ℤ) - (T.translate : ℤ)
+  -T.displacementForm.eval (y : ℤ)
 
-/-- realization 上では start defect は scaled displacement そのもの。 -/
+@[simp] theorem startDefect_eq_displacementForm_eval
+    (T : AffineTransfer) (x : ℕ) :
+    T.startDefect x = T.displacementForm.eval (x : ℤ) := rfl
+
+@[simp] theorem endpointDefect_eq_neg_displacementForm_eval
+    (T : AffineTransfer) (y : ℕ) :
+    T.endpointDefect y = -T.displacementForm.eval (y : ℤ) := rfl
+
+/-- Realization turns start evaluation into scaled actual displacement. -/
 theorem Realizes.startDefect_eq_displacement
     {T : AffineTransfer} {x y : ℕ}
     (h : T.Realizes x y) :
@@ -44,37 +49,59 @@ theorem Realizes.startDefect_eq_displacement
     T.startDefect x
         = (T.oddCoeff : ℤ) * (x : ℤ) + (T.translate : ℤ) -
             (T.twoCoeff : ℤ) * (x : ℤ) := by
-              simp [startDefect, determinant]
+              simp [startDefect, DisplacementForm.eval,
+                displacementForm, determinant]
               ring
     _ = (T.twoCoeff : ℤ) * (y : ℤ) -
           (T.twoCoeff : ℤ) * (x : ℤ) := by rw [← hz]
     _ = (T.twoCoeff : ℤ) * ((y : ℤ) - (x : ℤ)) := by ring
 
-/-- realization 上では endpoint defect も scaled reverse displacement。 -/
-theorem Realizes.endpointDefect_eq_reverseDisplacement
+/-- Evaluation at the endpoint has the same displacement with coefficient `C`. -/
+theorem Realizes.displacementForm_eval_end
     {T : AffineTransfer} {x y : ℕ}
     (h : T.Realizes x y) :
-    T.endpointDefect y =
-      (T.oddCoeff : ℤ) * ((x : ℤ) - (y : ℤ)) := by
+    T.displacementForm.eval (y : ℤ) =
+      (T.oddCoeff : ℤ) * ((y : ℤ) - (x : ℤ)) := by
   have hz :
       (T.twoCoeff : ℤ) * (y : ℤ) =
         (T.oddCoeff : ℤ) * (x : ℤ) + (T.translate : ℤ) := by
     exact_mod_cast h
   calc
-    T.endpointDefect y
-        = (T.twoCoeff : ℤ) * (y : ℤ) -
-            (T.oddCoeff : ℤ) * (y : ℤ) - (T.translate : ℤ) := by
-              simp [endpointDefect, determinant]
-              ring
-    _ = (T.oddCoeff : ℤ) * (x : ℤ) -
-          (T.oddCoeff : ℤ) * (y : ℤ) := by
-              rw [hz]
-              ring
-    _ = (T.oddCoeff : ℤ) * ((x : ℤ) - (y : ℤ)) := by ring
+    T.displacementForm.eval (y : ℤ)
+        = (T.translate : ℤ) +
+            ((T.oddCoeff : ℤ) - (T.twoCoeff : ℤ)) * (y : ℤ) := by
+              simp [DisplacementForm.eval, displacementForm, determinant]
+    _ = (T.oddCoeff : ℤ) * ((y : ℤ) - (x : ℤ)) := by
+          rw [show (T.translate : ℤ) =
+              (T.twoCoeff : ℤ) * (y : ℤ) -
+                (T.oddCoeff : ℤ) * (x : ℤ) by linarith [hz]]
+          ring
+
+/-- Historical endpoint defect is scaled reverse displacement. -/
+theorem Realizes.endpointDefect_eq_reverseDisplacement
+    {T : AffineTransfer} {x y : ℕ}
+    (h : T.Realizes x y) :
+    T.endpointDefect y =
+      (T.oddCoeff : ℤ) * ((x : ℤ) - (y : ℤ)) := by
+  rw [endpointDefect_eq_neg_displacementForm_eval,
+    h.displacementForm_eval_end]
+  ring
+
+/-- Same-point composition is the raw displacement-form cocycle. -/
+theorem startDefect_followedBy_same_point
+    (T U : AffineTransfer)
+    (x : ℕ) :
+    (T.followedBy U).startDefect x =
+      (U.oddCoeff : ℤ) * T.startDefect x +
+        (T.twoCoeff : ℤ) * U.startDefect x := by
+  change
+    (T.followedBy U).displacementForm.eval (x : ℤ) = _
+  simpa [startDefect] using
+    T.displacementForm_eval_followedBy U (x : ℤ)
 
 /--
-realized composition の start defect は二つの局所 defect の transported sum。
-これは prepend-one や return balance の上位 cocycle law。
+On an actual composition the intermediate boundary converts the raw cocycle to
+an exact transported-displacement sum.
 -/
 theorem Realizes.startDefect_followedBy
     {T U : AffineTransfer} {x y z : ℕ}
@@ -90,7 +117,7 @@ theorem Realizes.startDefect_followedBy
   push_cast
   ring
 
-/-- endpoint defect にも双対な transported-sum law がある。 -/
+/-- Endpoint defect has the dual transported-sum law. -/
 theorem Realizes.endpointDefect_followedBy
     {T U : AffineTransfer} {x y z : ℕ}
     (hT : T.Realizes x y)
@@ -109,15 +136,15 @@ end AffineTransfer
 
 namespace Word
 
-/-- word start で評価した defect。 -/
+/-- Word start defect is evaluation of the word transfer displacement form. -/
 def startDefect (w : Word) (x : ℕ) : ℤ :=
   (AffineTransfer.ofWord w).startDefect x
 
-/-- word endpoint で評価した defect。 -/
+/-- Word endpoint defect. -/
 def endpointDefect (w : Word) (y : ℕ) : ℤ :=
   (AffineTransfer.ofWord w).endpointDefect y
 
-/-- actual realization では positive return と positive start defect は同値。 -/
+/-- Actual realization: positive return iff positive start evaluation. -/
 theorem Realizes.start_lt_end_iff_startDefect_pos
     {w : Word} {x y : ℕ}
     (h : Realizes w x y) :
@@ -143,7 +170,7 @@ theorem Realizes.start_lt_end_iff_startDefect_pos
       Int.mul_nonpos_of_nonneg_of_nonpos (le_of_lt hA) hdiff
     omega
 
-/-- actual realization では strict descent と positive endpoint defect は同値。 -/
+/-- Actual realization: strict descent iff positive reverse endpoint defect. -/
 theorem Realizes.end_lt_start_iff_endpointDefect_pos
     {w : Word} {x y : ℕ}
     (h : Realizes w x y) :
@@ -169,13 +196,11 @@ theorem Realizes.end_lt_start_iff_endpointDefect_pos
       Int.mul_nonpos_of_nonneg_of_nonpos (le_of_lt hC) hdiff
     omega
 
-/--
-PositiveReturn は新しい data ではなく、realization と start-defect の正符号の合成命題。
--/
+/-- PositiveReturn is realization plus positive displacement evaluation. -/
 def PositiveReturn (w : Word) (x y : ℕ) : Prop :=
   Realizes w x y ∧ 0 < startDefect w x
 
-/-- PositiveReturn は従来の actual `x < y` と exact に同値。 -/
+/-- PositiveReturn is exactly the historical strict actual return. -/
 theorem positiveReturn_iff
     {w : Word} {x y : ℕ} :
     PositiveReturn w x y ↔ Realizes w x y ∧ x < y := by
@@ -189,14 +214,13 @@ end Word
 
 namespace Runs
 
-/-- stepwise run 上の start defect は actual displacement を exact に測る。 -/
+/-- Stepwise run start evaluation is exact actual displacement. -/
 theorem startDefect_eq_displacement
     {w : Word} {x y : ℕ}
     (h : Runs w x y) :
     Word.startDefect w x =
       ((AffineTransfer.ofWord w).twoCoeff : ℤ) *
-        ((y : ℤ) - (x : ℤ)) :=
-by
+        ((y : ℤ) - (x : ℤ)) := by
   have hT : (AffineTransfer.ofWord w).Realizes x y := h.realizes
   exact hT.startDefect_eq_displacement
 

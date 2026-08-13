@@ -1,14 +1,19 @@
 import CollatzLean.Collatz2.ObstructionAudit.MainModel
 
 /-!
-# Collatz2 Obstruction Audit: word realizability boundary
+# Collatz2 Obstruction Audit: exact word-realizability mismatch
 
 主 model は `oddCoeff = 3^p`, `twoCoeff = 2^H` と
 prepend-one exponent profile まで genuine word と一致する。
 
 しかし `AffineTransfer.ofWord` は diagonal だけでなく
-`translate = Word.affineConst word` まで固定する。
-主 model はこの exact translation 条件ではじめて失敗する。
+`translate = Word.affineConst word` まで固定するため、主 model は exact affine
+transfer として genuine word ではない。
+
+注意: これはもはや「exact translation が最初の失敗境界」という主張ではない。
+`TranslationShadowAudit` により、exact equality より薄い endpoint-side congruence や
+path-size shadow の段階ですでに synthetic witness を分離できることが分かっている。
+このファイルは exact mismatch 自体を regression fact として保持する。
 -/
 
 namespace Collatz2
@@ -37,7 +42,7 @@ theorem transfer_ne_ofWord (n : ℕ) :
     simpa [transfer, AffineTransfer.ofWord] using ht)
 
 /--
-主 model が通過する境界:
+主 model が通過する old-style boundary:
 primitive-center / return-gap / positive-kappa / `3^p,2^H` diagonal /
 prepend-one profile までは同時に成立するが、exact word translation は成立しない。
 -/

@@ -2,10 +2,10 @@ import CollatzLean.Collatz2.Local.Defect
 import Mathlib.Tactic.Linarith
 
 /-!
-# Collatz2 Native: prepend-one defect geometry
+# Collatz2 Native: prepend-one displacement geometry
 
 `PrependOne...Data` を先に作らない。
-`[1]` の transfer と既存 defect cocycle の特殊化だけを取り出す。
+`[1]` の transfer と universal displacement-form cocycle の特殊化だけを取り出す。
 
 CORE 型条件が必要になった場合も、この exact sign balance の Prop として後から命名する。
 -/
@@ -13,10 +13,11 @@ CORE 型条件が必要になった場合も、この exact sign balance の Pro
 namespace Collatz2
 namespace Word
 
-/-- `[1]` の start defect は exact に `x + 1`。 -/
+/-- `[1]` の start displacement evaluation は exact に `x + 1`。 -/
 @[simp] theorem startDefect_singleton_one (x : ℕ) :
     startDefect ([1] : Word) x = (x : ℤ) + 1 := by
   simp [startDefect, AffineTransfer.startDefect,
+    DisplacementForm.eval, AffineTransfer.displacementForm,
     AffineTransfer.determinant, AffineTransfer.ofWord,
     oddSteps, twoSteps, affineConst]
   ring
@@ -56,6 +57,7 @@ theorem prependOne_startDefect
         ((AffineTransfer.ofWord v).twoCoeff : ℤ) * ((x : ℤ) + 1) +
           2 * startDefect v y := by
             simp [startDefect, AffineTransfer.startDefect,
+              DisplacementForm.eval, AffineTransfer.displacementForm,
               AffineTransfer.determinant, AffineTransfer.ofWord,
               oddSteps, twoSteps, affineConst]
             ring
@@ -66,9 +68,6 @@ whole defect が正なら、
 `-(2 * tailDefect) < tailTwoCoeff * (x + 1)`
 
 が成り立つ。
-
-これは `[1]` head contribution と tail defect の競合を、
-旧 CORE Data を介さず直接表す基本不等式。
 -/
 theorem tail_defect_bound_of_prependOne_positive
     {v : Word} {x y z : ℕ}

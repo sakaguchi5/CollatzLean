@@ -1,14 +1,16 @@
-import CollatzLean.Collatz2.Canonical.Representative
+import CollatzLean.Collatz2.Canonical.CenterResidue
 import CollatzLean.Collatz2.Orbit.Runs
 
 /-!
-# Collatz2: replay coordinates derived from canonical residue geometry
+# Collatz2: center-root lift としての replay coordinate
 
-ReplayCoordinate を primitive な branch data として置かない。
-odd-endpoint realization の start が canonical representative と同じ residue class に属することから、
-その自然数 quotient を一意な replay layer として読み取る。
+`ReplayCoordinate` は primitive branch data ではない。
+odd-endpoint realization の start が canonical representative と同じ residue class に属する
+ことから自然数 quotient を一意に読む。
 
-`q = 0` はこの座標の最下層であり、次ファイルで contracting replay の extremal layer として導く。
+高位には、同じ displacement root の start-side / endpoint-side residue pair を
+同一 quotient で同時に lift する `CenterLiftCoordinate` と解釈する。
+`q=0` はその最下層である。
 -/
 
 namespace Collatz2
@@ -40,11 +42,18 @@ theorem Realizes.replay
         3 ^ oddSteps w * (x + (2 ^ twoSteps w * 2) * q) +
           affineConst w := by ring
 
-/-- 任意の odd-endpoint realization を canonical layer からの quotient で座標化する。 -/
+/-- 任意の odd-endpoint realization を canonical/root-shadow layer から座標化する。 -/
 structure ReplayCoordinate (w : Word) (X Y : ℕ) where
   quotient : ℕ
   start_eq : X = canonicalStart w + residueModulus w * quotient
   finish_eq : Y = canonicalEnd w + 2 * 3 ^ oddSteps w * quotient
+
+/--
+高位概念名: 同じ displacement root の start/end local shadows を同一 layer で lift する座標。
+既存コードとの互換性のため実体は `ReplayCoordinate` のままにする。
+-/
+abbrev CenterLiftCoordinate (w : Word) (X Y : ℕ) :=
+  ReplayCoordinate w X Y
 
 namespace ReplayCoordinate
 

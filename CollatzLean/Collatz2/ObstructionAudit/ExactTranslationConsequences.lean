@@ -1,5 +1,7 @@
 import CollatzLean.Collatz2.ObstructionAudit.ExactWordTranslation
-import CollatzLean.Collatz2.Synthesis.SwapCarry
+import CollatzLean.Collatz2.Canonical.SwapCarry
+import CollatzLean.Collatz2.Canonical.Replay
+
 
 /-!
 # Collatz2 Obstruction Audit: weak consequences of exact word translation
@@ -12,7 +14,8 @@ import CollatzLean.Collatz2.Synthesis.SwapCarry
 * affineConst の prefix/suffix recursion
 * adjacent word swap の exact 0/1 carry equation
 
-これらを audit の中間層として利用する。
+word swap / carry はもはや `Synthesis` を介さず、`Word` の canonical residue
+geometry と displacement separation の直接の corollary として利用する。
 -/
 
 namespace Collatz2
@@ -80,19 +83,19 @@ theorem adjacent_swapCarry_spec
     (P : ExactWordTranslationConstraints)
     (n : ℕ) :
     Word.canonicalStart (P.word (n + 1) ++ P.word n) +
-        Synthesis.swapResidueDisplacement (P.word n) (P.word (n + 1)) =
+        Word.swapResidueDisplacement (P.word n) (P.word (n + 1)) =
       Word.canonicalStart (P.word n ++ P.word (n + 1)) +
-        Synthesis.swapCarry (P.word n) (P.word (n + 1)) *
+        Word.swapCarry (P.word n) (P.word (n + 1)) *
           Word.residueModulus (P.word n ++ P.word (n + 1)) := by
-  exact Synthesis.swapCarry_spec (P.word n) (P.word (n + 1))
+  exact Word.swapCarry_spec (P.word n) (P.word (n + 1))
 
 /-- adjacent swap carry は常に0または1。 -/
 theorem adjacent_swapCarry_eq_zero_or_one
     (P : ExactWordTranslationConstraints)
     (n : ℕ) :
-    Synthesis.swapCarry (P.word n) (P.word (n + 1)) = 0 ∨
-      Synthesis.swapCarry (P.word n) (P.word (n + 1)) = 1 := by
-  exact Synthesis.swapCarry_eq_zero_or_one (P.word n) (P.word (n + 1))
+    Word.swapCarry (P.word n) (P.word (n + 1)) = 0 ∨
+      Word.swapCarry (P.word n) (P.word (n + 1)) = 1 := by
+  exact Word.swapCarry_eq_zero_or_one (P.word n) (P.word (n + 1))
 
 end ExactWordTranslationConstraints
 end ObstructionAudit

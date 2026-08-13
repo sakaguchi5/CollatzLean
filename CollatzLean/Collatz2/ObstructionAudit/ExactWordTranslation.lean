@@ -6,9 +6,9 @@ import CollatzLean.Collatz2.Canonical.Representative
 # Collatz2 Obstruction Audit: exact word-translation boundary
 
 `DiagonalWordProfileConstraints` は diagonal `3^p / 2^H` と
-word profile までは genuine にするが、translation を自由にしている。
+word profile までは genuine にするが、translation `B` を自由にしている。
 
-ここでは最後の境界
+ここでは exact genuine-word condition
 
   `translate n = Word.affineConst (word n)`
 
@@ -16,7 +16,11 @@ word profile までは genuine にするが、translation を自由にしてい�
 
 この条件を加えると packet の affine equation は genuine `Word.Realizes` になり、
 validity と odd endpoint から `Runs` まで復元される。
-したがってこれは単なる弱い算術 packet ではなく actual dynamics への境界 marker である。
+したがってこれは単なる算術 equality ではなく actual normalized dynamics への
+lossless boundary marker である。
+
+なお `TranslationShadowAudit` では、この exact equality より薄い
+endpoint congruence / path-size shadow を独立に監査する。
 -/
 
 namespace Collatz2
