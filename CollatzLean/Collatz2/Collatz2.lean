@@ -42,7 +42,9 @@ import CollatzLean.Collatz2.Synthesis.CenterComparison
 import CollatzLean.Collatz2.Synthesis.GlobalCenterEscape
 import CollatzLean.Collatz2.Synthesis.MovingCenter
 import CollatzLean.Collatz2.Synthesis.PrimitiveCenter
+import CollatzLean.Collatz2.Synthesis.GlobalPrimitiveCenter
 import CollatzLean.Collatz2.Synthesis.SwapResidue
+import CollatzLean.Collatz2.Synthesis.SwapCarry
 
 set_option linter.style.header false
 
@@ -188,10 +190,26 @@ actual endpoint より右にあり、negative blocks の centers が cofinally i
 
 となる。従って `kappa = 0` を negative divergence の top-level branch に置く必要はない。
 
+`GlobalPrimitiveCenter` ではこれらを global に接続し、eventually-negative branch から
+
+  Cofinal (fun n => 1 <= primitiveKappa_n)
+
+を直接導く。従って primitive changing-center arithmetic は元の adjacent chain 上で
+cofinally 強制される。
+
 `SwapResidue` では同じ `omega` が word order swap の translation difference であり、
 さらに odd-start canonical residue の exact displacement を測ることを示す。
+
+`SwapCarry` ではその ZMod displacement の最小非負代表を取り、actual canonical starts に対して
+
+  canonicalStart(v++u) + displacement
+    = canonicalStart(u++v) + carry * residueModulus(u++v)
+
+を exact に導く。両 representative と displacement は common modulus 未満なので
+`carry` は必ず `0` または `1` である。
+
 これにより center / commutator / primitive arithmetic と canonical / carry 側を
-同じ obstruction scalar で接続する。
+同じ obstruction scalar `omega` で接続する。
 
 Matrix axis は Native axis の代替ではない。
 Matrix axis で構造を発見し、その本質を affine / integer statement に翻訳して
