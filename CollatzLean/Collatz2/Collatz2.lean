@@ -9,6 +9,7 @@ import CollatzLean.Collatz2.Local.DeterminantSign
 import CollatzLean.Collatz2.Local.Defect
 import CollatzLean.Collatz2.Local.FirstCrossing
 import CollatzLean.Collatz2.Local.SuffixDeterminantProfile
+import CollatzLean.Collatz2.Local.TranslationDeterminant
 
 import CollatzLean.Collatz2.Orbit.Runs
 import CollatzLean.Collatz2.Orbit.RunDefect
@@ -55,6 +56,7 @@ import CollatzLean.Collatz2.Matrix.ProjectiveDynamics
 
 -- primitive separation の arithmetic shadows
 import CollatzLean.Collatz2.Arithmetic.KappaSwapValuation
+import CollatzLean.Collatz2.Arithmetic.KappaBoundarySignature
 
 -- Obstruction audit
 import CollatzLean.Collatz2.ObstructionAudit.ObstructionAudit
@@ -123,25 +125,28 @@ arbitrary affine transfer では `B` は自由であるが、genuine word では
 
 に固定される。
 
-`TranslationPath` では append recursion を translation cocycle として読み、
-exact equality より薄い universal Archimedean shadow
+`TranslationPath` は append recursion を translation cocycle として読むだけでなく、
+`B` を prefix two-depth / suffix odd-depth に沿う path terms へ展開する。
+
+valid nonempty word では `B` は odd であり、
+
+  `(oddSteps, twoSteps, affineConst)`
+
+は valid word 自身を一意に復号する lossless code になる。
+また二 translation の差では
+
+* common prefix -> `2^twoSteps(prefix)` divisibility
+* common suffix -> `3^oddSteps(suffix)` divisibility
+
+が exact に現れる。これは separation / word swap の左右 boundary tomography の基礎になる。
+
+さらに universal Archimedean shadow
 
   `B < A * C`
 
-を取り出す。
+も保持する。
 
-従って
-
-  arbitrary affine geometry
-
-と
-
-  genuine Collatz word code
-
-の境界は、displacement form の constant term が genuine translation path から
-来ているかどうかとして明示される。
-
-## 4. Local sign and displacement
+## 4. Local sign, displacement, and determinant integrals
 
 `Expanding` / `Contracting` は primitive word classification ではなく
 `Δ_T` の slope `C-A` の正負である。
@@ -158,7 +163,22 @@ start defect は
 となるため、positive return / descent は displacement-form evaluation の符号の
 corollary になる。
 
-`FirstCrossing` と `AllSuffixesContracting` は slope sign profile として保持する。
+さらに translation path と determinant profile は exact に
+
+  `suffixDeterminantIntegral = 3*B - p*A`
+  `prefixDeterminantIntegral = p*C - 3*B`
+
+で接続される。
+
+従って
+
+  `AllSuffixesContracting -> 3*B < p*A`
+
+および proper-prefix positive profile から
+
+  `3*B <= p*C`
+
+が sign corollary として得られる。length `> 1` の FirstCrossing では後者は strict。
 
 ## 5. Synthesis 層を介さない center geometry
 
@@ -175,7 +195,7 @@ negative branch では `G=A-C>0` として coefficient pair `(B,G)` を使う。
 旧 `omega` は primitive object ではなく、この separation の Matrix compatibility alias に
 降格する。
 
-* `SameCenter  <-> separation = 0`
+* `SameCenter <-> separation = 0`
 * `CenterRises <-> separation > 0`
 * Matrix commutator upper-right = separation
 * fixed-point-vector wedge = `-separation`
@@ -184,7 +204,7 @@ negative branch では `G=A-C>0` として coefficient pair `(B,G)` を使う。
 
 従って旧 `Synthesis` directory は不要であり、一般幾何は `Geometry`、
 actual chain の幾何は `Global`、canonical arithmetic は `Canonical`、
-valuation は `Arithmetic` に正規配置する。
+valuation / boundary arithmetic は `Arithmetic` に正規配置する。
 
 ## 6. Canonical representatives are local root shadows
 
@@ -239,7 +259,7 @@ strong global sign dichotomy は従来どおり
 である。
 
 negative tail では center roots が cofinally infinity へ逃げることと center-order
-transitivityから、positive adjacent separation が cofinally 強制される。
+transitivity から、positive adjacent separation が cofinally 強制される。
 
 ## 9. Primitive negative-root arithmetic
 
@@ -287,8 +307,16 @@ transfer separation そのものになる。
 
 という一本の経路を持つ。
 
-`kappa=1` では adjacent swap displacement が `4 mod 8`、従って exact 2-adic depth `2`
-であることを `Arithmetic/KappaSwapValuation` で読む。
+`kappa=1` では adjacent separation の 2-adic depth が exact に `2`。
+translation-difference の common-prefix divisibility と actual future-minimum head `1` を合わせると、
+adjacent words は 2番目 exponent で必ず分岐し、その一方が exactly `1` になる。
+
+また negative block の center content は `3` と互いに素なので、`kappa=1` separation は
+modulo `3` で非零。translation path の terminal shadow と合わせると、adjacent words の
+terminal exponents は opposite parity を持つ。
+
+従って primitive `kappa=1` は単なる小さい整数 obstruction ではなく、
+word の左右 boundary に rigid な symbolic signature を持つ。
 
 ## 11. Exact realization recovery
 
@@ -314,7 +342,7 @@ canonical start residue だけでは witness は残る。しかし exact transla
 
 という薄い shadow があり、現在の canonical-residue witness はすでにそこで消える。
 
-したがって audit は今後
+今後の audit は
 
   diagonal profile
     -> local root / translation shadows
