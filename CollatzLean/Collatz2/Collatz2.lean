@@ -65,6 +65,8 @@ import CollatzLean.Collatz2.ObstructionAudit.CanonicalResidueAudit
 import CollatzLean.Collatz2.ObstructionAudit.ExactTranslationConsequences
 import CollatzLean.Collatz2.ObstructionAudit.FutureMinimumPrefixFloor
 import CollatzLean.Collatz2.ObstructionAudit.TranslationShadowAudit
+-- 一般補題
+import CollatzLean.Collatz2.Canonical.FiniteSurvivalClassification
 
 set_option linter.style.header false
 
