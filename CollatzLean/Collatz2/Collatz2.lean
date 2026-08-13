@@ -11,6 +11,7 @@ import CollatzLean.Collatz2.Local.SuffixDeterminantProfile
 import CollatzLean.Collatz2.Orbit.Runs
 import CollatzLean.Collatz2.Orbit.OddOrbit
 import CollatzLean.Collatz2.Orbit.FutureMinimum
+import CollatzLean.Collatz2.Orbit.FutureMinimumArithmetic
 import CollatzLean.Collatz2.Orbit.FutureMinimumSelection
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
@@ -39,9 +40,9 @@ import CollatzLean.Collatz2.Matrix.ProjectiveDynamics
 -- Native / Matrix synthesis
 import CollatzLean.Collatz2.Synthesis.CenterComparison
 import CollatzLean.Collatz2.Synthesis.GlobalCenterEscape
-
-
-
+import CollatzLean.Collatz2.Synthesis.MovingCenter
+import CollatzLean.Collatz2.Synthesis.PrimitiveCenter
+import CollatzLean.Collatz2.Synthesis.SwapResidue
 
 set_option linter.style.header false
 
@@ -93,6 +94,9 @@ contracting transfer では replay displacement が
 従って旧 `j = 0` 型の canonical positive return は primitive branch ではなく、
 contracting replay extremality のコロラリーとして現れる。
 
+`ReplayDynamics` では replay quotient を canonical residue modulus に対する自然な商として読み、
+word extension による binary right shift と ternary digit decomposition を導く。
+
 ## Global unbounded reduction
 
 normalized `OddOrbit` と future minima から、
@@ -101,91 +105,95 @@ normalized `OddOrbit` と future minima から、
 各 adjacent block は actual `Runs` と positive return を持ち、
 valid nonempty なので determinant は非零である。
 
-従って global branch は determinant sign profile の purely combinatorial な
-cofinal dichotomy
+sign profile の強い global dichotomy は
+
+  positive determinant cofinal
+    ∨ eventually negative determinant
+
+である。従来の
 
   positive determinant cofinal
     ∨ negative determinant cofinal
 
-から生じる。
+はその corollary として残す。
 
-Expanding cofinal / Contracting cofinal はこの sign dichotomy の別名にすぎない。
-
-negative determinant block では actual positive return と replay extremality を合わせることで、
-canonical (`q = 0`) positive return が自動的に導かれる。
+`FutureMinimumArithmetic` では Matrix に依存せず、future minimum `x > 1` から
+first exponent `1`、`x = 4k+3`、adjacent value gap の正の4倍性を導く。
 
 ## Two research axes
 
-ここから先は shared foundation を変更せず、二つの独立した解析軸を並走させる。
+shared foundation の上で二つの独立した解析軸を並走させる。
 
 ### Native axis
 
 `Native` 層では行列表現を用いず、
 既存の affine coefficients・interval・replay・defect を直接解析する。
 
-現在は、
+現在は `IntervalReplay`、`BiCanonical`、`PrependOneDefect`、`ReplayDynamics` を持つ。
 
-  `IntervalReplay`
-  `BiCanonical`
-  `PrependOneDefect`
-
-を導入している。
-
-`IntervalReplay` は whole run の lossless interval decomposition から
-各 subrun の replay coordinate を導く。
-
-`BiCanonical` は新しい trajectory data ではなく、
-二つの replay quotient がともに `0` であるという薄い canonicality condition として扱う。
-
-prepend-one も専用の巨大な branch data を置かず、
-`[1]` と tail の transfer composition に対する defect cocycle の特殊化として扱う。
+`BiCanonical` は新しい trajectory data ではなく二つの replay quotient の zero-layer 条件、
+prepend-one は `[1]` と tail の defect cocycle の特殊化として扱う。
 
 ### Matrix axis
 
 `Matrix` 層では `AffineTransfer` を新しい正本に置き換えず、
-その upper-triangular `2 x 2` matrix representation を derived view として用いる。
-
-  `Representation`
-  `DefectGeometry`
-  `Commutator`
-  `FixedPoint`
-
-を導入する。
+upper-triangular `2 x 2` integer matrix representation を derived view として用いる。
 
 matrix multiplication は `AffineTransfer.followedBy` と exact に対応する。
+defect は oriented wedge、旧 center-comparison scalar `omega` は commutator の唯一の
+非自明成分として現れる。
 
-defect は matrix action に対する oriented determinant / wedge として解釈される。
-
-二 transfer の非可換性は commutator の唯一の非自明成分に集約され、
-従来の center-comparison scalar に対応する量が matrix commutator として現れる。
-
-fixed point は division を primitive にせず、
-homogeneous fixed-point vector
-
-  `(B, A - C)`
-
-として扱う。
-
-これにより fixed-point geometry、common center、commutation を
-整数係数のまま比較できる。
+finite fixed point は homogeneous vector `(B, A-C)` として保持する。
+composition では fixed-point vector は正係数線形結合で transport され、
+`omega` は prefix 側で `A`、suffix 側で `C` により exact に scale する。
 
 ## Synthesis
 
-`Synthesis` 層だけが Native / Matrix の両方の見方を比較する。
+`Synthesis` 層だけが Native / Matrix / Global の見方を合流させる。
 
-現在の `CenterComparison` では、
+`CenterComparison` では
 
   same center
     ↔ fixed-point vectors are projectively proportional
-    ↔ center wedge is zero
-    ↔ commutator scalar is zero
+    ↔ omega = 0
     ↔ transfer matrices commute
 
-という対応を明示する。
+を示す。
 
-したがって Matrix axis は Native axis の代替ではない。
+`GlobalCenterEscape` では negative adjacent positive return の finite center が
+actual endpoint より右にあり、negative blocks の centers が cofinally infinity へ逃げることを示す。
 
-Matrix axis で構造を発見し、
-必要ならその本質を affine / integer statement に翻訳して Native axis へ戻す、
-という二軸の研究を行う。
+`MovingCenter` では stronger dichotomy の eventually-negative tail を利用し、
+隣接 center の strict rise と `omega > 0` を同一視する。shared future-minimum boundary を消去して
+
+  omega_n
+    = G_n * A_(n+1) * delta_(n+1)
+      - G_(n+1) * C_n * delta_n
+
+を得る。centers が infinity へ逃げるため、eventually negative branch では
+`omega_n > 0` が cofinally 強制される。
+
+`PrimitiveCenter` では fixed-point vector content を
+
+  h = gcd(B,G) = gcd(delta,G)
+
+として actual gap から導き、primitive center を
+
+  b / d = 3 + 4 * alpha / d
+
+へ正規化する。隣接 center-rise event では
+
+  omega_n = 4 * h_n * h_(n+1) * kappa_n,
+  kappa_n >= 1
+
+となる。従って `kappa = 0` を negative divergence の top-level branch に置く必要はない。
+
+`SwapResidue` では同じ `omega` が word order swap の translation difference であり、
+さらに odd-start canonical residue の exact displacement を測ることを示す。
+これにより center / commutator / primitive arithmetic と canonical / carry 側を
+同じ obstruction scalar で接続する。
+
+Matrix axis は Native axis の代替ではない。
+Matrix axis で構造を発見し、その本質を affine / integer statement に翻訳して
+Native axis へ戻す、という二軸の研究を続ける。
 -/

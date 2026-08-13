@@ -5,9 +5,12 @@ import CollatzLean.Collatz2.Global.AdjacentTransferChain
 
 Expanding / Contracting を global primitive branch にしない。
 
-まず adjacent transfer chain の determinant sign profile を
-`positive / negative` の二値列として扱い、その purely combinatorial な cofinal dichotomy を取る。
-Expanding / Contracting は最後に同値な従来名として復元する。
+nonzero determinant の sign profile に対して、まずより強い
+
+  positive determinant cofinal
+    ∨ eventually negative determinant
+
+を取る。従来の positive cofinal / negative cofinal dichotomy はその corollary。
 -/
 
 namespace Collatz2
@@ -51,29 +54,57 @@ def NegativeDeterminantCofinal
     Prop :=
   Cofinal (fun n => C.NegativeAt n)
 
+/-- ある位置以後、全 adjacent block の determinant が負。 -/
+def EventuallyNegative
+    {O : OddOrbit}
+    (C : AdjacentTransferChain O) :
+    Prop :=
+  ∃ N : ℕ, ∀ n : ℕ, N ≤ n → C.NegativeAt n
+
 /--
-nonzero determinant の二値 sign profile なので、
-positive が cofinal か negative が cofinal のどちらか。
+eventually negative なら当然 negative determinant は cofinal。
+-/
+theorem negativeDeterminantCofinal_of_eventuallyNegative
+    {O : OddOrbit}
+    (C : AdjacentTransferChain O)
+    (h : C.EventuallyNegative) :
+    C.NegativeDeterminantCofinal := by
+  rcases h with ⟨N, hN⟩
+  intro M
+  let n := max M N
+  exact ⟨n, le_max_left _ _, hN n (le_max_right _ _)⟩
+
+/--
+nonzero determinant の sign profile に対する強い global dichotomy。
+positive sign が cofinal でなければ、その否定は tail 全体で negative sign を強制する。
+-/
+theorem positiveCofinal_or_eventuallyNegative
+    {O : OddOrbit}
+    (C : AdjacentTransferChain O) :
+    C.PositiveDeterminantCofinal ∨ C.EventuallyNegative := by
+  classical
+  by_cases hP : C.PositiveDeterminantCofinal
+  · exact Or.inl hP
+  · right
+    obtain ⟨N, hN⟩ := Cofinal.eventually_not_of_not hP
+    refine ⟨N, ?_⟩
+    intro n hn
+    have hnotP : ¬ C.PositiveAt n := hN n hn
+    rcases C.positive_or_negative n with hPos | hNeg
+    · exact False.elim (hnotP hPos)
+    · exact hNeg
+
+/--
+従来の cofinal sign dichotomy は強い dichotomy の corollary。
 -/
 theorem determinantSignCofinal
     {O : OddOrbit}
     (C : AdjacentTransferChain O) :
     C.PositiveDeterminantCofinal ∨
       C.NegativeDeterminantCofinal := by
-  classical
-  by_cases hP : C.PositiveDeterminantCofinal
+  rcases C.positiveCofinal_or_eventuallyNegative with hP | hN
   · exact Or.inl hP
-  · right
-    obtain ⟨N, hN⟩ :=
-      Cofinal.eventually_not_of_not hP
-    intro M
-    let n := max M N
-    have hnM : M ≤ n := le_max_left _ _
-    have hnN : N ≤ n := le_max_right _ _
-    have hnotP : ¬ C.PositiveAt n := hN n hnN
-    rcases C.positive_or_negative n with hPos | hNeg
-    · exact False.elim (hnotP hPos)
-    · exact ⟨n, hnM, hNeg⟩
+  · exact Or.inr (C.negativeDeterminantCofinal_of_eventuallyNegative hN)
 
 /-- 従来名 Expanding が cofinal。 -/
 def ExpandingCofinal
@@ -104,7 +135,7 @@ theorem negativeDeterminantCofinal_iff_contractingCofinal
   rfl
 
 /--
-Expanding / Contracting の global 二分岐は determinant-sign cofinality の corollary。
+Expanding / Contracting の global 二分岐は determinant-sign dichotomy の corollary。
 -/
 theorem expanding_or_contracting_cofinal
     {O : OddOrbit}
