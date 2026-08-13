@@ -49,6 +49,9 @@ import CollatzLean.Collatz2.Synthesis.SwapCarry
 import CollatzLean.Collatz2.Synthesis.PrimitiveReturnGap
 import CollatzLean.Collatz2.Synthesis.KappaSwapValuation
 
+-- Audit
+import CollatzLean.Collatz2.ObstructionAudit.ObstructionAudit
+
 set_option linter.style.header false
 
 /-!
