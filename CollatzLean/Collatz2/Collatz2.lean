@@ -29,6 +29,8 @@ import CollatzLean.Collatz2.Canonical.Replay
 import CollatzLean.Collatz2.Canonical.ReplayExtremality
 import CollatzLean.Collatz2.Canonical.SwapResidue
 import CollatzLean.Collatz2.Canonical.SwapCarry
+--一般補題
+import CollatzLean.Collatz2.Canonical.FiniteSurvivalClassification
 
 import CollatzLean.Collatz2.Global.AdjacentTransferChain
 import CollatzLean.Collatz2.Global.AdjacentCanonical
@@ -38,6 +40,8 @@ import CollatzLean.Collatz2.Global.CenterEscape
 import CollatzLean.Collatz2.Global.MovingCenter
 import CollatzLean.Collatz2.Global.PrimitiveCenter
 import CollatzLean.Collatz2.Global.PrimitiveReturnGap
+--
+import CollatzLean.Collatz2.Global.InfiniteSurvival
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
@@ -65,8 +69,7 @@ import CollatzLean.Collatz2.ObstructionAudit.CanonicalResidueAudit
 import CollatzLean.Collatz2.ObstructionAudit.ExactTranslationConsequences
 import CollatzLean.Collatz2.ObstructionAudit.FutureMinimumPrefixFloor
 import CollatzLean.Collatz2.ObstructionAudit.TranslationShadowAudit
--- 一般補題
-import CollatzLean.Collatz2.Canonical.FiniteSurvivalClassification
+
 
 set_option linter.style.header false
 
