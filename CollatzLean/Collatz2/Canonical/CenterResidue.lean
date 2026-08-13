@@ -1,5 +1,6 @@
 import CollatzLean.Collatz2.Canonical.Representative
 import CollatzLean.Collatz2.Orbit.RealizationRecovery
+import CollatzLean.Collatz2.Orbit.RunDefect
 import CollatzLean.Collatz2.Geometry.Center
 
 /-!

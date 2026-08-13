@@ -1,5 +1,4 @@
 import CollatzLean.Collatz2.Core.DisplacementForm
-import CollatzLean.Collatz2.Orbit.Runs
 import CollatzLean.Collatz2.Local.DeterminantSign
 import Mathlib.Tactic.Linarith
 
@@ -211,18 +210,4 @@ theorem positiveReturn_iff
     exact ⟨hreal, (hreal.start_lt_end_iff_startDefect_pos).1 hxy⟩
 
 end Word
-
-namespace Runs
-
-/-- Stepwise run start evaluation is exact actual displacement. -/
-theorem startDefect_eq_displacement
-    {w : Word} {x y : ℕ}
-    (h : Runs w x y) :
-    Word.startDefect w x =
-      ((AffineTransfer.ofWord w).twoCoeff : ℤ) *
-        ((y : ℤ) - (x : ℤ)) := by
-  have hT : (AffineTransfer.ofWord w).Realizes x y := h.realizes
-  exact hT.startDefect_eq_displacement
-
-end Runs
 end Collatz2

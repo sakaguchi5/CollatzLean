@@ -1,6 +1,6 @@
 import CollatzLean.Collatz2.Orbit.FutureMinimumSelection
-import CollatzLean.Collatz2.Canonical.ReplayExtremality
 import CollatzLean.Collatz2.Local.Defect
+import CollatzLean.Collatz2.Local.DeterminantSign
 
 /-!
 # Collatz2: adjacent future-minimum affine-transfer chain
@@ -278,26 +278,6 @@ theorem contracting_positiveReturn
         (C.startValue n)
         (C.endValue n) := by
   exact ⟨(C.negativeAt_iff_contracting n).1 hN, C.positiveReturn n⟩
-
-/--
-第3段階との接続。
-negative determinant の adjacent positive return は replay extremality により
-canonical (`q=0`) positive return を強制する。
--/
-theorem canonical_positive_of_negativeAt
-    {O : OddOrbit}
-    (C : AdjacentTransferChain O)
-    {n : ℕ}
-    (hN : C.NegativeAt n) :
-    Word.canonicalStart (C.word n) <
-      Word.canonicalEnd (C.word n) := by
-  have hC : Word.Contracting (C.word n) :=
-    (C.negativeAt_iff_contracting n).1 hN
-  exact
-    (C.runs n).canonical_positive_of_contracting_positive
-      (C.word_nonempty n)
-      hC
-      (C.startValue_lt_endValue n)
 
 end AdjacentTransferChain
 end Collatz2

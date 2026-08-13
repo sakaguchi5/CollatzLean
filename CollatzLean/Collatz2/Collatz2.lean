@@ -11,6 +11,7 @@ import CollatzLean.Collatz2.Local.FirstCrossing
 import CollatzLean.Collatz2.Local.SuffixDeterminantProfile
 
 import CollatzLean.Collatz2.Orbit.Runs
+import CollatzLean.Collatz2.Orbit.RunDefect
 import CollatzLean.Collatz2.Orbit.RealizationRecovery
 import CollatzLean.Collatz2.Orbit.OddOrbit
 import CollatzLean.Collatz2.Orbit.FutureMinimum
@@ -29,6 +30,7 @@ import CollatzLean.Collatz2.Canonical.SwapResidue
 import CollatzLean.Collatz2.Canonical.SwapCarry
 
 import CollatzLean.Collatz2.Global.AdjacentTransferChain
+import CollatzLean.Collatz2.Global.AdjacentCanonical
 import CollatzLean.Collatz2.Global.SignDichotomy
 import CollatzLean.Collatz2.Global.UnboundedReduction
 import CollatzLean.Collatz2.Global.CenterEscape
