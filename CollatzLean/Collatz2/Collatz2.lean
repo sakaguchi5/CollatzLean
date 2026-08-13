@@ -28,6 +28,7 @@ import CollatzLean.Collatz2.Native.IntervalReplay
 import CollatzLean.Collatz2.Native.BiCanonical
 import CollatzLean.Collatz2.Native.PrependOneDefect
 import CollatzLean.Collatz2.Native.ReplayDynamics
+import CollatzLean.Collatz2.Native.AdjacentPrependOne
 
 -- Matrix axis
 import CollatzLean.Collatz2.Matrix.Representation
@@ -45,6 +46,8 @@ import CollatzLean.Collatz2.Synthesis.PrimitiveCenter
 import CollatzLean.Collatz2.Synthesis.GlobalPrimitiveCenter
 import CollatzLean.Collatz2.Synthesis.SwapResidue
 import CollatzLean.Collatz2.Synthesis.SwapCarry
+import CollatzLean.Collatz2.Synthesis.PrimitiveReturnGap
+import CollatzLean.Collatz2.Synthesis.KappaSwapValuation
 
 set_option linter.style.header false
 
