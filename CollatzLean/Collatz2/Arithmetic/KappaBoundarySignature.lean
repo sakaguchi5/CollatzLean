@@ -4,7 +4,7 @@ import CollatzLean.Collatz2.Core.TranslationPath
 import Mathlib.Data.ZMod.Basic
 
 /-!
-# Collatz2 Arithmetic: kappa=1 の word-boundary signature
+# Collatz2 Arithmetic: kappa=1 の word 境界シグネチャ
 
 primitive `kappa = 1` は単なる小さい center-separation integer ではない。
 translation path の左右 divisibility と組み合わせると、actual adjacent words の
@@ -18,7 +18,7 @@ translation path の左右 divisibility と組み合わせると、actual adjace
 
 namespace Collatz2
 
-/-! ## Small modular helpers -/
+/-! ## 小さな剰余補助定理 -/
 
 /-- `2^(2k)=1 mod 3`. -/
 private theorem two_pow_double_eq_one_mod_three
@@ -40,7 +40,7 @@ private theorem two_pow_double_add_one_eq_two_mod_three
   rw [pow_succ, two_pow_double_eq_one_mod_three]
   norm_num
 
-/-- Powers of two modulo three depend only on exponent parity. -/
+/-- 2 の冪の mod 3 での値は exponent の parity だけで決まる。 -/
 private theorem two_pow_mod_three_eq_of_mod_two_eq
     (a b : ℕ)
     (hmod : a % 2 = b % 2) :
@@ -73,7 +73,7 @@ private theorem two_pow_mod_three_eq_of_mod_two_eq
           simpa [two_mul] using
             two_pow_double_add_one_eq_two_mod_three kb
 
-/-- Nat cast is nonzero in `ZMod 3` when the natural is not divisible by three. -/
+/-- 自然数が 3 で割り切れなければ、その Nat cast は `ZMod 3` で非零。 -/
 private theorem natCast_mod_three_ne_zero_of_not_dvd
     {a : ℕ}
     (hnot : ¬ 3 ∣ a) :
@@ -91,8 +91,7 @@ private theorem natCast_mod_three_ne_zero_of_not_dvd
 namespace Word
 
 /--
-If terminal exponents have the same parity, word-swap separation vanishes
-modulo three.
+terminal exponent の parity が等しければ、word-swap separation は mod 3 で 0 になる。
 -/
 theorem wordSwap_separation_mod_three_eq_zero_of_terminal_same_parity
     {u v : Word}
@@ -160,9 +159,9 @@ end Word
 
 namespace AdjacentTransferChain
 
-/-! ## 2-adic left-boundary signature -/
+/-! ## 2-adic 左境界シグネチャ -/
 
-/-- `kappa=1` makes adjacent separation nonzero modulo eight. -/
+/-- `kappa=1` なら adjacent separation は mod 8 で非零。 -/
 theorem not_eight_dvd_separationAdjacent_of_primitiveKappa_eq_one
     {O : OddOrbit}
     (C : AdjacentTransferChain O)
@@ -190,7 +189,7 @@ theorem not_eight_dvd_separationAdjacent_of_primitiveKappa_eq_one
     decide
   exact hne hmod
 
-/-- A contracting block beginning in `1` must have a second exponent. -/
+/-- `1` で始まる contracting block は必ず2番目の exponent を持つ。 -/
 private theorem tail_nonempty_of_negative_word_eq_one_cons
     {O : OddOrbit}
     (C : AdjacentTransferChain O)
@@ -210,8 +209,8 @@ private theorem tail_nonempty_of_negative_word_eq_one_cons
   exact hnot hC
 
 /--
-Primitive `kappa=1` forces the two adjacent words to split already at their
-second exponents; one of these two second exponents is exactly one.
+primitive `kappa=1` は、二つの adjacent word が2番目の exponent ですでに分岐することを強制する。
+さらに、その二つの second exponent の一方は exact に `1` である。
 -/
 theorem exists_secondExponent_signature_of_primitiveKappa_eq_one
     {O : OddOrbit}
@@ -350,9 +349,9 @@ theorem exists_secondExponent_signature_of_primitiveKappa_eq_one
             exact h8diff
           exact ⟨a, ua, b, vb, hta, htb, hab, hOne⟩
 
-/-! ## 3-adic right-boundary signature -/
+/-! ## 3-adic 右境界シグネチャ -/
 
-/-- Negative word block has center gap not divisible by three. -/
+/-- negative word block の center gap は 3 で割り切れない。 -/
 theorem three_not_dvd_centerGap_of_negativeAt
     {O : OddOrbit}
     (C : AdjacentTransferChain O)
@@ -409,7 +408,7 @@ theorem three_not_dvd_centerGap_of_negativeAt
       h3A
   omega
 
-/-- Center content of a negative word block is also not divisible by three. -/
+/-- negative word block の center content も 3 で割り切れない。 -/
 theorem three_not_dvd_centerContent_of_negativeAt
     {O : OddOrbit}
     (C : AdjacentTransferChain O)
@@ -421,7 +420,7 @@ theorem three_not_dvd_centerContent_of_negativeAt
     dvd_trans h3h (C.centerContent_dvd_centerGap n)
   exact (C.three_not_dvd_centerGap_of_negativeAt hN) h3G
 
-/-- `kappa=1` adjacent separation is nonzero modulo three. -/
+/-- `kappa=1` の adjacent separation は mod 3 で非零。 -/
 theorem separationAdjacent_mod_three_ne_zero_of_primitiveKappa_eq_one
     {O : OddOrbit}
     (C : AdjacentTransferChain O)
@@ -478,8 +477,7 @@ theorem separationAdjacent_mod_three_ne_zero_of_primitiveKappa_eq_one
   ] using hprod.ne_zero
 
 /--
-Primitive `kappa=1` forces the two adjacent terminal exponents to have opposite
-parity.
+primitive `kappa=1` は、二つの adjacent terminal exponent の parity が反対であることを強制する。
 -/
 theorem terminalExponent_parity_ne_of_primitiveKappa_eq_one
     {O : OddOrbit}
@@ -502,7 +500,7 @@ theorem terminalExponent_parity_ne_of_primitiveKappa_eq_one
   simpa [AdjacentTransferChain.separationAdjacent,
     AdjacentTransferChain.transfer] using hzero
 
-/-- Combined left/right symbolic boundary signature of a primitive `kappa=1` event. -/
+/-- primitive `kappa=1` event に対する左右を合わせた symbolic boundary signature。 -/
 theorem primitiveKappa_eq_one_boundarySignature
     {O : OddOrbit}
     (C : AdjacentTransferChain O)

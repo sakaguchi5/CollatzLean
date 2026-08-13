@@ -2,7 +2,7 @@ import CollatzLean.Collatz2.Core.TranslationPath
 import CollatzLean.Collatz2.Local.SuffixDeterminantProfile
 
 /-!
-# Collatz2 Local: translation path as determinant integrals
+# Collatz2 Local: translation path と determinant integral
 
 `B = affineConst w` は determinant sign profile と独立の量ではない。
 translation path を prefix / suffix の signed determinant に沿って積分すると、exact に
@@ -22,7 +22,7 @@ translation path を prefix / suffix の signed determinant に沿って積分�
 namespace Collatz2
 namespace Word
 
-/-! ## Suffix determinant integral -/
+/-! ## Suffix determinant integral（suffix 側 determinant 積分） -/
 
 /--
 Prefix two-depth を重みとして全 nonempty suffix determinant を積分する。
@@ -37,9 +37,9 @@ def suffixDeterminantIntegral : Word → ℤ
         ((2 : ℤ) ^ e) * suffixDeterminantIntegral w
 
 /--
-Exact suffix identity:
+Suffix 側の exact identity：
 
-  `suffixIntegral(w) = 3*B(w) - p(w)*2^H(w)`.
+  `suffixIntegral(w) = 3*B(w) - p(w)*2^H(w)`。
 -/
 theorem suffixDeterminantIntegral_eq
     (w : Word) :
@@ -57,7 +57,7 @@ theorem suffixDeterminantIntegral_eq
       rw [pow_add, pow_succ]
       ring
 
-/-- The all-negative suffix profile descends to the tail. -/
+/-- 全 suffix が negative である profile は tail にも継承される。 -/
 theorem AllSuffixesNegativeDeterminant.tail
     {e : ℕ} {w : Word}
     (h : AllSuffixesNegativeDeterminant (e :: w)) :
@@ -66,7 +66,7 @@ theorem AllSuffixesNegativeDeterminant.tail
   have h' := h (k + 1) (by simp; omega)
   simpa [suffixDeterminant] using h'
 
-/-- Every nonempty all-negative suffix profile has negative weighted integral. -/
+/-- nonempty かつ全 suffix が negative なら、weighted integral は負になる。 -/
 theorem suffixDeterminantIntegral_neg_of_allSuffixesNegative
     {w : Word}
     (hne : w ≠ [])
@@ -93,11 +93,11 @@ theorem suffixDeterminantIntegral_neg_of_allSuffixesNegative
         linarith
 
 /--
-All suffixes contracting implies the sharp translation budget
+全 suffix が contracting なら sharp な translation budget
 
-  `3*B < p*2^H`.
+  `3*B < p*2^H`
 
-This is now a one-line sign corollary of the exact suffix determinant integral.
+が成り立つ。これは exact suffix determinant integral から一行で従う符号系である。
 -/
 theorem AllSuffixesContracting.three_mul_affineConst_lt_oddSteps_mul_twoPow
     {w : Word}
@@ -113,15 +113,15 @@ theorem AllSuffixesContracting.three_mul_affineConst_lt_oddSteps_mul_twoPow
     linarith
   exact_mod_cast hz
 
-/-! ## Proper-prefix determinant integral -/
+/-! ## Proper-prefix determinant integral（proper-prefix 側 determinant 積分） -/
 
 /--
-Reverse recursion for the proper-prefix integral.
+proper-prefix integral の reverse recursion。
 
-If `w = u ++ [e]`, the new proper prefix is `u`; all older prefix weights gain
-one factor `3`.  Thus
+`w = u ++ [e]` なら、新しい proper prefix は `u` であり、それ以前の全 prefix weight には
+`3` が一因子追加される。従って
 
-  `J(u ++ [e]) = 3 * (J(u) + determinant(u))`.
+  `J(u ++ [e]) = 3 * (J(u) + determinant(u))`。
 -/
 def prefixDeterminantIntegralRev : Word → ℤ
   | [] => 0
@@ -130,11 +130,11 @@ def prefixDeterminantIntegralRev : Word → ℤ
         (prefixDeterminantIntegralRev r +
           (AffineTransfer.ofWord r.reverse).determinant)
 
-/-- Proper-prefix integral of a word. -/
+/-- word の proper-prefix integral。 -/
 def prefixDeterminantIntegral (w : Word) : ℤ :=
   prefixDeterminantIntegralRev w.reverse
 
-/-- Closed form of the reverse-recursive proper-prefix integral. -/
+/-- reverse recursion で定義した proper-prefix integral の閉形式。 -/
 theorem prefixDeterminantIntegralRev_eq
     (r : Word) :
     prefixDeterminantIntegralRev r =
@@ -167,9 +167,9 @@ theorem prefixDeterminantIntegralRev_eq
       ring
 
 /--
-Exact prefix identity:
+Prefix 側の exact identity：
 
-  `prefixIntegral(w) = p(w)*3^p(w) - 3*B(w)`.
+  `prefixIntegral(w) = p(w)*3^p(w) - 3*B(w)`。
 -/
 theorem prefixDeterminantIntegral_eq
     (w : Word) :
@@ -181,8 +181,8 @@ theorem prefixDeterminantIntegral_eq
   simp [oddSteps]
 
 /--
-For a reverse-recursive word, positive proper prefixes make the integral
-nonnegative; with at least two symbols it is strictly positive.
+reverse recursion 上で proper prefix がすべて positive なら integral は非負になる。
+さらに記号数が2以上なら strict に正になる。
 -/
 private theorem prefixDeterminantIntegralRev_nonneg_and_pos
     (r : Word)
@@ -251,7 +251,7 @@ private theorem prefixDeterminantIntegralRev_nonneg_and_pos
             linarith [ihData.1, hdet]
           linarith
 
-/-- Positive proper-prefix profile gives a nonnegative weighted prefix integral. -/
+/-- proper-prefix が positive な profile なら weighted prefix integral は非負。 -/
 theorem prefixDeterminantIntegral_nonneg_of_properPrefixesPositive
     {w : Word}
     (hP : ProperPrefixesPositiveDeterminant w) :
@@ -261,7 +261,7 @@ theorem prefixDeterminantIntegral_nonneg_of_properPrefixesPositive
     simpa using hP)
   exact h.1
 
-/-- With at least two symbols, the weighted proper-prefix integral is positive. -/
+/-- 記号数が2以上なら weighted proper-prefix integral は正。 -/
 theorem prefixDeterminantIntegral_pos_of_properPrefixesPositive
     {w : Word}
     (hP : ProperPrefixesPositiveDeterminant w)
@@ -274,9 +274,11 @@ theorem prefixDeterminantIntegral_pos_of_properPrefixesPositive
   simpa using hlen
 
 /--
-Proper-positive prefixes imply the dual translation budget
+proper prefix がすべて positive なら dual translation budget
 
-  `3*B ≤ p*3^p`.
+  `3*B ≤ p*3^p`
+
+が従う。
 -/
 theorem ProperPrefixesPositiveDeterminant.three_mul_affineConst_le_oddSteps_mul_threePow
     {w : Word}
@@ -291,7 +293,7 @@ theorem ProperPrefixesPositiveDeterminant.three_mul_affineConst_le_oddSteps_mul_
     linarith
   exact_mod_cast hz
 
-/-- With a genuine proper prefix, the dual translation budget is strict. -/
+/-- genuine な proper prefix が存在すれば dual translation budget は strict。 -/
 theorem ProperPrefixesPositiveDeterminant.three_mul_affineConst_lt_oddSteps_mul_threePow
     {w : Word}
     (hP : ProperPrefixesPositiveDeterminant w)
@@ -306,14 +308,14 @@ theorem ProperPrefixesPositiveDeterminant.three_mul_affineConst_lt_oddSteps_mul_
     linarith
   exact_mod_cast hz
 
-/-- First crossing always satisfies the weak prefix budget. -/
+/-- First crossing は常に weak prefix budget を満たす。 -/
 theorem FirstCrossing.three_mul_affineConst_le_oddSteps_mul_threePow
     {w : Word}
     (hF : FirstCrossing w) :
     3 * affineConst w ≤ oddSteps w * 3 ^ oddSteps w :=
   hF.properPositive.three_mul_affineConst_le_oddSteps_mul_threePow
 
-/-- First crossing of length at least two satisfies the strict prefix budget. -/
+/-- 長さ2以上の First crossing は strict prefix budget を満たす。 -/
 theorem FirstCrossing.three_mul_affineConst_lt_oddSteps_mul_threePow
     {w : Word}
     (hF : FirstCrossing w)

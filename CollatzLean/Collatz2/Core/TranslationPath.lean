@@ -3,7 +3,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic.Positivity
 
 /-!
-# Collatz2: genuine word translation path
+# Collatz2: genuine word の translation path
 
 任意の affine transfer では `B` は自由だが、genuine Collatz word では
 `B = Word.affineConst w` に固定される。
@@ -29,7 +29,7 @@ word 自身を lossless に符号化することを示す。
 namespace Collatz2
 namespace Word
 
-/-- Semantic name for the exact translation cocycle under word concatenation. -/
+/-- word 連結に対する exact translation cocycle の意味的な別名。 -/
 theorem translationCocycle_append (u v : Word) :
     affineConst (u ++ v) =
       3 ^ oddSteps v * affineConst u +
@@ -37,8 +37,7 @@ theorem translationCocycle_append (u v : Word) :
   affineConst_append u v
 
 /--
-Every genuine word translation is strictly smaller than the product of its two
-diagonal coefficients.
+genuine word の translation は、二つの diagonal coefficient の積より strict に小さい。
 -/
 theorem affineConst_lt_twoPow_mul_threePow (w : Word) :
     affineConst w <
@@ -82,7 +81,7 @@ theorem affineConst_lt_twoPow_mul_threePow (w : Word) :
         Z + X * affineConst w < 3 * ((X * Y) * Z) := hstep
         _ = (X * Y) * (Z * 3) := by ring
 
-/-- Transfer-level version of the genuine translation size bound. -/
+/-- genuine translation の size bound を transfer level に持ち上げた版。 -/
 theorem ofWord_translate_lt_diagonal_product (w : Word) :
     (AffineTransfer.ofWord w).translate <
       (AffineTransfer.ofWord w).twoCoeff *
@@ -90,7 +89,7 @@ theorem ofWord_translate_lt_diagonal_product (w : Word) :
   simpa [AffineTransfer.ofWord] using
     affineConst_lt_twoPow_mul_threePow w
 
-/-- The constant term of the word displacement form satisfies the same bound. -/
+/-- word の displacement form の constant term も同じ bound を満たす。 -/
 theorem displacementForm_constant_lt_diagonal_product (w : Word) :
     (AffineTransfer.ofWord w).displacementForm.constant <
       ((AffineTransfer.ofWord w).twoCoeff *
@@ -99,14 +98,14 @@ theorem displacementForm_constant_lt_diagonal_product (w : Word) :
     (((2 ^ twoSteps w) * (3 ^ oddSteps w) : ℕ) : ℤ)
   exact_mod_cast affineConst_lt_twoPow_mul_threePow w
 
-/-! ## Translation path expansion -/
+/-! ## Translation path の展開 -/
 
-/-- Scale every term of a translation path by the same natural coefficient. -/
+/-- translation path の全項を同じ自然数係数で scale する。 -/
 def scaleTranslationTerms (a : ℕ) : List ℕ → List ℕ
   | [] => []
   | t :: ts => a * t :: scaleTranslationTerms a ts
 
-/-- Uniform scaling does not change the number of path terms. -/
+/-- 一様な scaling では path term の個数は変わらない。 -/
 theorem length_scaleTranslationTerms
     (a : ℕ)
     (ts : List ℕ) :
@@ -117,7 +116,7 @@ theorem length_scaleTranslationTerms
   | cons t ts ih =>
       simp [scaleTranslationTerms, ih]
 
-/-- The sum of a uniformly scaled translation path scales by the same factor. -/
+/-- 一様に scale した translation path の和も同じ係数だけ scale される。 -/
 theorem sum_scaleTranslationTerms
     (a : ℕ)
     (ts : List ℕ) :
@@ -129,15 +128,15 @@ theorem sum_scaleTranslationTerms
       simp [scaleTranslationTerms, ih, Nat.mul_add]
 
 /--
-The path terms whose sum is `affineConst`.
+総和が `affineConst` になる path term。
 
-For `w = [e₁,e₂,...,eₚ]` this unfolds to
+`w = [e₁,e₂,...,eₚ]` では
 
   `3^(p-1),
    2^e₁ * 3^(p-2),
    2^(e₁+e₂) * 3^(p-3), ...`
 
-without introducing a separate summation object.
+と展開され、別個の総和 object を導入する必要はない。
 -/
 def translationPathTerms : Word → List ℕ
   | [] => []
@@ -145,7 +144,7 @@ def translationPathTerms : Word → List ℕ
       3 ^ oddSteps w ::
         scaleTranslationTerms (2 ^ e) (translationPathTerms w)
 
-/-- The translation path has one term per odd step. -/
+/-- translation path は odd step ごとに1項を持つ。 -/
 theorem translationPathTerms_length
     (w : Word) :
     (translationPathTerms w).length = oddSteps w := by
@@ -155,7 +154,7 @@ theorem translationPathTerms_length
   | cons e w ih =>
       simp [translationPathTerms, length_scaleTranslationTerms, oddSteps, ih]
 
-/-- Exact path expansion: the sum of all translation path terms is `B`. -/
+/-- exact path expansion：全 translation path term の和は `B`。 -/
 theorem translationPathTerms_sum_eq_affineConst
     (w : Word) :
     (translationPathTerms w).sum = affineConst w := by
@@ -166,13 +165,13 @@ theorem translationPathTerms_sum_eq_affineConst
       simp [translationPathTerms, sum_scaleTranslationTerms,
         affineConst_cons, ih]
 
-/-! ## Oddness and lossless word coding -/
+/-! ## 奇性と lossless word coding -/
 
-/-- Every power of three is odd. -/
+/-- 3 の任意の冪は odd。 -/
 private theorem threePow_odd (n : ℕ) : Odd (3 ^ n) :=
   (show Odd (3 : ℕ) by decide).pow
 
-/-- A positive power of two contains one explicit factor two. -/
+/-- 2 の正冪は明示的な因子 `2` を一つ持つ。 -/
 private theorem twoPow_eq_two_mul_of_pos
     {e : ℕ}
     (he : 0 < e) :
@@ -183,7 +182,7 @@ private theorem twoPow_eq_two_mul_of_pos
   rw [hd, pow_succ]
   ring
 
-/-- A valid nonempty word has odd affine translation. -/
+/-- valid nonempty word の affine translation は odd。 -/
 theorem affineConst_odd_of_valid_nonempty
     {w : Word}
     (hvalid : Valid w)
@@ -200,7 +199,7 @@ theorem affineConst_odd_of_valid_nonempty
       rw [affineConst_cons, ha, hq]
       ring
 
-/-- Odd naturals are not divisible by two. -/
+/-- odd な自然数は 2 で割り切れない。 -/
 private theorem not_two_dvd_of_odd
     {a : ℕ}
     (ha : Odd a) :
@@ -211,8 +210,8 @@ private theorem not_two_dvd_of_odd
   omega
 
 /--
-If two powers of two times odd numbers agree, their exponents agree.
-This is the elementary decoder step behind translation injectivity.
+2 の冪と odd 数の積どうしが等しければ、その 2 の指数は等しい。
+これは translation の injectivity を支える基本的な decoder step である。
 -/
 private theorem twoPow_mul_odd_exponent_unique
     {e f a b : ℕ}
@@ -264,15 +263,15 @@ private theorem twoPow_mul_odd_exponent_unique
     exact (not_two_dvd_of_odd hb) hdiv
 
 /--
-Valid words are uniquely determined by the lossless triple
-`(oddSteps, twoSteps, affineConst)`.
+valid word は lossless triple
+`(oddSteps, twoSteps, affineConst)` によって一意に決まる。
 
-The first exponent is decoded from
+最初の exponent は
 
   `B(e :: tail) - 3^(length tail) = 2^e * B(tail)`
 
-because a nonempty valid tail has odd `B`; the last exponent is then fixed by
-the total `twoSteps`.
+から復号できる。nonempty valid tail の `B` は odd なので `e` が決まり、最後に total
+`twoSteps` から残りの exponent が固定される。
 -/
 theorem valid_word_unique_of_oddSteps_twoSteps_affineConst
     {u v : Word}
@@ -341,11 +340,11 @@ theorem valid_word_unique_of_oddSteps_twoSteps_affineConst
             subst v
             rfl
 
-/-! ## Translation-difference tomography -/
+/-! ## Translation 差の tomography -/
 
 /--
-Exact common-prefix factorization of a translation difference.
-Equal suffix odd-step count cancels the prefix's `3^p * B(prefix)` contribution.
+translation 差の exact common-prefix factorization。
+suffix の odd-step 数が等しいと、prefix の `3^p * B(prefix)` 寄与が相殺される。
 -/
 theorem affineConst_sub_commonPrefix_eq
     (r u v : Word)
@@ -367,7 +366,7 @@ theorem affineConst_sub_commonPrefix_eq
   rw [huZ, hvZ, hodd]
   ring
 
-/-- A common prefix contributes its full `2^twoSteps` factor to the difference. -/
+/-- common prefix は差に対して `2^twoSteps` の全因子を与える。 -/
 theorem twoPow_prefix_dvd_affineConst_sub
     (r u v : Word)
     (hodd : oddSteps u = oddSteps v) :
@@ -378,8 +377,8 @@ theorem twoPow_prefix_dvd_affineConst_sub
   simpa using affineConst_sub_commonPrefix_eq r u v hodd
 
 /--
-If the two residual words are valid and nonempty, their odd translations differ
-by an extra factor two beyond the common-prefix depth.
+二つの residual word が valid かつ nonempty なら、それらの odd translation の差には
+common-prefix depth に加えてさらに因子 `2` が一つ現れる。
 -/
 theorem twoPow_succ_prefix_dvd_affineConst_sub
     (r u v : Word)
@@ -400,8 +399,8 @@ theorem twoPow_succ_prefix_dvd_affineConst_sub
   ring
 
 /--
-A common prefix of two-depth at least two, followed by nonempty valid residuals,
-forces the translation difference to be divisible by eight.
+two-depth が2以上の common prefix の後に nonempty valid residual が続くなら、
+translation 差は 8 で割り切れる。
 -/
 theorem eight_dvd_affineConst_sub_of_commonPrefix_twoSteps_ge_two
     (r u v : Word)
@@ -424,8 +423,8 @@ theorem eight_dvd_affineConst_sub_of_commonPrefix_twoSteps_ge_two
   ring
 
 /--
-Exact common-suffix factorization of a translation difference.
-Equal prefix two-step count cancels the suffix's `2^H * B(suffix)` contribution.
+translation 差の exact common-suffix factorization。
+prefix の two-step 数が等しいと、suffix の `2^H * B(suffix)` 寄与が相殺される。
 -/
 theorem affineConst_sub_commonSuffix_eq
     (u v s : Word)
@@ -447,7 +446,7 @@ theorem affineConst_sub_commonSuffix_eq
   rw [huZ, hvZ, htwo]
   ring
 
-/-- A common suffix contributes its full `3^oddSteps` factor to the difference. -/
+/-- common suffix は差に対して `3^oddSteps` の全因子を与える。 -/
 theorem threePow_suffix_dvd_affineConst_sub
     (u v s : Word)
     (htwo : twoSteps u = twoSteps v) :
@@ -458,8 +457,8 @@ theorem threePow_suffix_dvd_affineConst_sub
   simpa using affineConst_sub_commonSuffix_eq u v s htwo
 
 /--
-After the equal leading `3^p` terms cancel, sufficiently deep head exponents
-supply a common `2^m` factor to the residual translation difference.
+先頭の等しい `3^p` 項が相殺された後、十分に深い head exponent は residual translation 差に
+共通因子 `2^m` を与える。
 -/
 theorem twoPow_head_dvd_affineConst_sub
     {a b m : ℕ}
@@ -482,8 +481,7 @@ theorem twoPow_head_dvd_affineConst_sub
   ring
 
 /--
-The final exponent itself does not occur in `B`; modulo three only the prefix
-before the terminal exponent remains.
+final exponent 自体は `B` に現れない。mod 3 では terminal exponent より前の prefix だけが残る。
 -/
 theorem affineConst_append_singleton_mod_three
     (u : Word)
