@@ -9,6 +9,7 @@ import CollatzLean.Collatz2.Local.FirstCrossing
 import CollatzLean.Collatz2.Local.SuffixDeterminantProfile
 
 import CollatzLean.Collatz2.Orbit.Runs
+import CollatzLean.Collatz2.Orbit.RealizationRecovery
 import CollatzLean.Collatz2.Orbit.OddOrbit
 import CollatzLean.Collatz2.Orbit.FutureMinimum
 import CollatzLean.Collatz2.Orbit.FutureMinimumArithmetic
@@ -51,6 +52,10 @@ import CollatzLean.Collatz2.Synthesis.KappaSwapValuation
 
 -- Audit
 import CollatzLean.Collatz2.ObstructionAudit.ObstructionAudit
+import CollatzLean.Collatz2.ObstructionAudit.ExactWordTranslation
+import CollatzLean.Collatz2.ObstructionAudit.CanonicalResidueAudit
+import CollatzLean.Collatz2.ObstructionAudit.ExactTranslationConsequences
+import CollatzLean.Collatz2.ObstructionAudit.FutureMinimumPrefixFloor
 
 set_option linter.style.header false
 
@@ -84,6 +89,19 @@ signed defect により actual displacement を
 
 FirstCrossing は prefix determinant sign profile、
 AllSuffixesContracting は suffix determinant sign profile として再構成する。
+
+## Exact realization recovery
+
+`RealizationRecovery` では、valid word の genuine affine realization が odd endpoint を持てば、
+whole equation から一歩ごとの normalized boundary を復元して `Runs` を構成できることを示す。
+
+従って
+
+  valid word
+    + exact `affineConst`
+    + odd endpoint realization
+
+は stepwise normalized dynamics を失っていない。
 
 ## Canonical / Replay geometry
 
@@ -137,8 +155,6 @@ shared foundation の上で二つの独立した解析軸を並走させる。
 `Native` 層では行列表現を用いず、
 既存の affine coefficients・interval・replay・defect を直接解析する。
 
-現在は `IntervalReplay`、`BiCanonical`、`PrependOneDefect`、`ReplayDynamics` を持つ。
-
 `BiCanonical` は新しい trajectory data ではなく二つの replay quotient の zero-layer 条件、
 prepend-one は `[1]` と tail の defect cocycle の特殊化として扱う。
 
@@ -147,7 +163,6 @@ prepend-one は `[1]` と tail の defect cocycle の特殊化として扱う。
 `Matrix` 層では `AffineTransfer` を新しい正本に置き換えず、
 upper-triangular `2 x 2` integer matrix representation を derived view として用いる。
 
-matrix multiplication は `AffineTransfer.followedBy` と exact に対応する。
 defect は oriented wedge、旧 center-comparison scalar `omega` は commutator の唯一の
 非自明成分として現れる。
 
@@ -157,67 +172,62 @@ composition では fixed-point vector は正係数線形結合で transport さ�
 
 ## Synthesis
 
-`Synthesis` 層だけが Native / Matrix / Global の見方を合流させる。
+`GlobalCenterEscape` と `MovingCenter` により eventually-negative tail では
+strict center rise、すなわち `omega > 0` が cofinally 強制される。
 
-`CenterComparison` では
+`PrimitiveCenter` / `PrimitiveReturnGap` では
 
-  same center
-    ↔ fixed-point vectors are projectively proportional
-    ↔ omega = 0
-    ↔ transfer matrices commute
+  h = gcd(B,G) = gcd(returnGap,G)
+  returnGap = 4*h*s
+  G = h*d
+  gcd(s,d) = 1
 
-を示す。
+へ primitive 化し、隣接 separation を
 
-`GlobalCenterEscape` では negative adjacent positive return の finite center が
-actual endpoint より右にあり、negative blocks の centers が cofinally infinity へ逃げることを示す。
+  kappa = d*A'*s' - d'*C*s
 
-`MovingCenter` では stronger dichotomy の eventually-negative tail を利用し、
-隣接 center の strict rise と `omega > 0` を同一視する。shared future-minimum boundary を消去して
+へ exact に戻す。
 
-  omega_n
-    = G_n * A_(n+1) * delta_(n+1)
-      - G_(n+1) * C_n * delta_n
+`SwapResidue` / `SwapCarry` / `KappaSwapValuation` では同じ `omega` を
+canonical residue displacement、0/1 carry、2-adic separation へ接続する。
 
-を得る。centers が infinity へ逃げるため、eventually negative branch では
-`omega_n > 0` が cofinally 強制される。
+## Obstruction audit: exact-word boundary
 
-`PrimitiveCenter` では fixed-point vector content を
+relaxed audit では primitive arithmetic、positive `kappa`、center escape、
+genuine diagonal `3^p / 2^H`、begins-one profile まで明示的 infinite model が存在する。
 
-  h = gcd(B,G) = gcd(delta,G)
+今回さらに境界を五段階に分離する。
 
-として actual gap から導き、primitive center を
+1. `RealizationRecovery`:
+   `Valid + Realizes + Odd endpoint -> Runs` を general theorem として固定する。
 
-  b / d = 3 + 4 * alpha / d
+2. `ExactWordTranslation`:
+   audit packet に
 
-へ正規化する。隣接 center-rise event では
+     `translate = Word.affineConst word`
 
-  omega_n = 4 * h_n * h_(n+1) * kappa_n,
-  kappa_n >= 1
+   を追加する。これにより各 packet block は genuine `Word.Realizes` / `Runs` へ戻る。
 
-となる。従って `kappa = 0` を negative divergence の top-level branch に置く必要はない。
+3. `CanonicalResidueAudit`:
+   exact translation より弱い
 
-`GlobalPrimitiveCenter` ではこれらを global に接続し、eventually-negative branch から
+     `start % residueModulus(word) = canonicalStart(word)`
 
-  Cofinal (fun n => 1 <= primitiveKappa_n)
+   だけを追加した relaxed packet は依然 inhabitant を持つことを明示する。
 
-を直接導く。従って primitive changing-center arithmetic は元の adjacent chain 上で
-cofinally 強制される。
+4. `ExactTranslationConsequences`:
+   exact packet から replay coordinate、actual prefix canonical residue、
+   affineConst split recursion、adjacent swap 0/1 carry を薄い consequence として抽出する。
 
-`SwapResidue` では同じ `omega` が word order swap の translation difference であり、
-さらに odd-start canonical residue の exact displacement を測ることを示す。
+5. `FutureMinimumPrefixFloor`:
+   exact word realizability と別に、future-minimum block 固有の
 
-`SwapCarry` ではその ZMod displacement の最小非負代表を取り、actual canonical starts に対して
+     every actual prefix boundary >= block start
 
-  canonicalStart(v++u) + displacement
-    = canonicalStart(u++v) + carry * residueModulus(u++v)
+   を packet として分離する。actual `AdjacentTransferChain` では
+   `FutureMinimumAt` から index-level prefix floor が自動的に成立する。
 
-を exact に導く。両 representative と displacement は common modulus 未満なので
-`carry` は必ず `0` または `1` である。
-
-これにより center / commutator / primitive arithmetic と canonical / carry 側を
-同じ obstruction scalar `omega` で接続する。
-
-Matrix axis は Native axis の代替ではない。
-Matrix axis で構造を発見し、その本質を affine / integer statement に翻訳して
-Native axis へ戻す、という二軸の研究を続ける。
+従って現在の audit の狙いは、exact word translation を一気に不存在化することではなく、
+その genuine-word consequences と future-minimum floor を一枚ずつ戻し、
+synthetic witness が初めて消える最小境界を特定することである。
 -/
