@@ -81,6 +81,8 @@ import CollatzLean.Collatz2.Mountain.FiniteHercherNarrow
 import CollatzLean.Collatz2.Arithmetic.HercherContinuedFractionCertificate
 import CollatzLean.Collatz2.External.BarinaHercher
 import CollatzLean.Collatz2.Mountain.BarinaHercherLower
+import CollatzLean.Collatz2.Mountain.PolynomialStartBound
+import CollatzLean.Collatz2.Mountain.PolynomialMountainLower
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
@@ -136,11 +138,24 @@ q=0 endpoint-floor obstruction から現在、
 * finite Hercher Lemma 8 / Lemma 20 integer core
 * finite Hercher narrow inequality
 * Barina `2^71` + Hercher continued-fraction denominator lower bound
+* polynomial 2--3 gap からの stage-6 start upper bound
+* mountain chain envelope と stage-7 binary mountain-count certificate
 
 までを current A から切り出す。
 
-特に `CanonicalEndpointFloorContractingReturn.mountainCount_ge_two` は
-mountain decomposition が与えられた current A に最低2山を要求する。
+特に stage 6 は `CanonicalZeroCoreData.exists_polynomialStartBoundData` により
+
+  S+1 <= C*(p+1)^(A+1)
+
+を得る。
+
+stage 7 は mountain decomposition `Cmount` に対して
+
+  p <= clog_2(C*(p+1)^(A+1)) * (2^mountainCount - 1)
+
+という完全整数形へ圧縮する。
+`mountainCount_gt_of_binaryCertificate` に有限整数 certificate を渡せば、
+explicit 2--3 gap 定数から直ちに数値 mountain lower bound を得られる。
 
 また external inputs
 
