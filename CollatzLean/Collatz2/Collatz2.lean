@@ -25,6 +25,7 @@ import CollatzLean.Collatz2.Geometry.PrimitiveForm
 import CollatzLean.Collatz2.Geometry.CyclicCenter
 import CollatzLean.Collatz2.Geometry.RankPath
 import CollatzLean.Collatz2.Geometry.RankUnit
+import CollatzLean.Collatz2.Geometry.RankStrip
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -40,7 +41,10 @@ import CollatzLean.Collatz2.Canonical.PositiveSuffixBudget
 import CollatzLean.Collatz2.Canonical.ZeroCoreSlack
 import CollatzLean.Collatz2.Canonical.Q0Deep
 
+-- rank / cyclic geometry stage 1--7
 import CollatzLean.Collatz2.Canonical.EndpointFloorCyclicGeometry
+import CollatzLean.Collatz2.Canonical.EndpointFloorRankSeparation
+import CollatzLean.Collatz2.Canonical.RotationRankTrap
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
@@ -145,6 +149,10 @@ q=0 endpoint-floor obstruction から現在、
 * Barina `2^71` + Hercher continued-fraction denominator lower bound
 * polynomial 2--3 gap からの stage-6 start upper bound
 * mountain chain envelope と stage-7 binary mountain-count certificate
+* FirstCrossing rational chord rank / primitive rank residue
+* cyclic center recurrence / canonical center shadow / 全 cut exact identity
+* complementary suffix rank と全 cut separation の rank-ready form
+* critical line / rational chord の `stripRank + p*extraDepth` exact decomposition
 
 までを current A から切り出す。
 
@@ -162,6 +170,29 @@ stage 7 は mountain decomposition `Cmount` に対して
 `mountainCount_gt_of_binaryCertificate` に有限整数 certificate を渡せば、
 explicit 2--3 gap 定数から直ちに数値 mountain lower bound を得られる。
 
+rank geometry 側では、proper cut rank
+
+  d_k = H*k - p*h_k
+
+を complementary suffix determinant と同一視し、さらに
+
+  d_k = stripRank(k) + p*extraDepth(k)
+
+へ分解する。`stripRank` は `(p,H,k)` の deterministic geometry、
+`extraDepth` は word 固有の沈み込みである。
+
+`RotationRankTrap` は以前の `MinimalAdjacentCanonicalReturn` /
+`RotationCrossingTrap` に対する conditional bridge であり、endpoint FutureMinimum を
+current A から無条件に導くものではない。そこでは one-step rotation rank の exact shift
+
+  d_rotation(j) = d_original(j+1) - d_original(1)
+
+と、crossing 時の
+
+  rank drop または nontrivial strip
+
+という lossless 二分岐だけを保持する。
+
 また external inputs
 
 * `External.BarinaTwoPow71Input`
@@ -175,5 +206,5 @@ explicit 2--3 gap 定数から直ちに数値 mountain lower bound を得られ�
 
 以前の `MinimalAdjacentCanonicalReturn` / `RotationCrossingTrap` は
 endpoint FutureMinimum を追加で仮定する conditional packet であり、
-current A の無条件正規ルートとしてはこの入口から外す。
+current A の無条件正規ルートとしては使わない。
 -/
