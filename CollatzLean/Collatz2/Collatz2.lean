@@ -44,6 +44,8 @@ import CollatzLean.Collatz2.Global.PrimitiveReturnGap
 import CollatzLean.Collatz2.Global.InfiniteSurvival
 import CollatzLean.Collatz2.Global.OddOrbitSurvivalBridge
 import CollatzLean.Collatz2.Global.RightBranchFirstCrossing
+import CollatzLean.Collatz2.Global.RightBranchZeroReplay
+import CollatzLean.Collatz2.Global.RightBranchZeroReplayMatveev
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
@@ -63,6 +65,8 @@ import CollatzLean.Collatz2.Matrix.ProjectiveDynamics
 -- primitive separation の arithmetic shadows
 import CollatzLean.Collatz2.Arithmetic.KappaSwapValuation
 import CollatzLean.Collatz2.Arithmetic.KappaBoundarySignature
+import CollatzLean.Collatz2.Arithmetic.TwoThreeSmallGap
+import CollatzLean.Collatz2.External.MatveevInput
 
 -- Obstruction audit
 import CollatzLean.Collatz2.ObstructionAudit.ObstructionAudit
