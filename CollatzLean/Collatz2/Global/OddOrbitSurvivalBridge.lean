@@ -740,7 +740,101 @@ theorem hasUnboundedOddOrbit_to_infiniteSurvivalDichotomy :
     · exact
         (O.toNestedSurvivalChain).infiniteSurvivalDichotomy
 
+/--
+## HasUnboundedOddOrbit -> strong infinite-survival dichotomy
 
+非有界 odd-only orbit が存在するなら、その global minimum tail から
 
+* nontrivial minimum anchor `x > 1`
+* endpoint が injective な `NestedSurvivalChain C`
 
+が得られ、さらに C は exact に次の強い二分岐へ落ちる。
+
+1. 全段が forever expanding。
+2. finite-survival start が eventually `x` 一点に孤立し、
+   contracting-center の strict record-low 更新も eventually 停止する。
+
+従って contracting 側では
+
+  start freedom -> eventually singleton
+  center envelope -> eventually constant
+
+が同時に成立する。
+-/
+theorem hasUnboundedOddOrbit_to_strongInfiniteSurvivalDichotomy :
+    HasUnboundedOddOrbit →
+      ∃ x : ℕ,
+        1 < x ∧
+          ∃ C : Word.NestedSurvivalChain x,
+            Function.Injective C.endpoint ∧
+              (
+                Word.NestedSurvivalChain.ForeverExpanding C
+                ∨
+                (
+                  Word.NestedSurvivalChain.EventuallySingletonSurvival C
+                  ∧
+                  ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
+                    ¬ Word.NestedSurvivalChain.BarrierRecord C n
+                )
+              ) := by
+  classical
+  rintro ⟨O, hU⟩
+  let C :
+      Word.NestedSurvivalChain O.globalMinimumValue :=
+    O.toNestedSurvivalChain
+  have hmin :
+      1 < O.globalMinimumValue :=
+    O.globalMinimumValue_gt_one_of_unbounded hU
+  have hInjective :
+      Function.Injective C.endpoint := by
+    dsimp [C]
+    exact
+      O.toNestedSurvivalChain_endpoint_injective_of_unbounded hU
+  refine ⟨O.globalMinimumValue, hmin, C, hInjective, ?_⟩
+  by_cases hE :
+      Word.NestedSurvivalChain.ForeverExpanding C
+  · exact Or.inl hE
+  · right
+    /-
+    ForeverExpanding でない側では、
+    既存の infiniteSurvivalDichotomy の左枝は hE に反するので、
+    EventuallySingletonSurvival が残る。
+    -/
+    have hSingleton :
+        Word.NestedSurvivalChain.EventuallySingletonSurvival C := by
+      rcases C.infiniteSurvivalDichotomy with hExp | hSingle
+      · exact False.elim (hE hExp)
+      · exact hSingle
+    /-
+    ForeverExpanding の否定から、
+    expanding でない有限 prefix が少なくとも一つ存在する。
+    -/
+    have hNotExpanding :
+        ∃ m : ℕ, ¬ Word.Expanding (C.word m) := by
+      simpa [Word.NestedSurvivalChain.ForeverExpanding] using hE
+    obtain ⟨m, hmNotExpanding⟩ := hNotExpanding
+    /-
+    C.word m は valid nonempty なので determinant は0にならない。
+    expanding でなければ contracting。
+    -/
+    have hmContracting :
+        Word.Contracting (C.word m) := by
+      rcases
+          Word.expanding_or_contracting_of_valid_nonempty
+            (C.valid m)
+            (C.nonempty m) with hExp | hCon
+      · exact False.elim (hmNotExpanding hExp)
+      · exact hCon
+    /-
+    endpoint injectivity と contracting prefix の存在から、
+    strict record-low center の更新は eventually 停止する。
+    -/
+    have hBarrier :
+        ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
+          ¬ Word.NestedSurvivalChain.BarrierRecord C n := by
+      exact
+        C.barrierEnvelopeEventuallyConstant
+          hInjective
+          ⟨m, hmContracting⟩
+    exact ⟨hSingleton, hBarrier⟩
 end Collatz2
