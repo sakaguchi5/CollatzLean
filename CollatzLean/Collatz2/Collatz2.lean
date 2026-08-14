@@ -72,8 +72,15 @@ import CollatzLean.Collatz2.Global.CanonicalAdjacentContractingReturn
 import CollatzLean.Collatz2.Global.RightBranchAdjacentReduction
 import CollatzLean.Collatz2.Global.CanonicalEndpointFloorContractingReturn
 import CollatzLean.Collatz2.Global.RightBranchEndpointFloorClosure
-import CollatzLean.Collatz2.Global.MinimalAdjacentCanonicalReturn
-import CollatzLean.Collatz2.Canonical.RotationCrossingTrap
+
+-- Mountain / finite Hercher route (current A only; FutureMinimum endpoint 不使用)
+import CollatzLean.Collatz2.Mountain.Block
+import CollatzLean.Collatz2.Mountain.OneMountainExclusion
+import CollatzLean.Collatz2.Mountain.FiniteHercher
+import CollatzLean.Collatz2.Mountain.FiniteHercherNarrow
+import CollatzLean.Collatz2.Arithmetic.HercherContinuedFractionCertificate
+import CollatzLean.Collatz2.External.BarinaHercher
+import CollatzLean.Collatz2.Mountain.BarinaHercherLower
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
@@ -111,46 +118,42 @@ set_option linter.style.header false
 
 旧 `CollatzLean.Collatz.*` を import しない独立再構築の入口。
 
-q=0 endpoint-floor obstruction は現在、
+current A の正本は `CanonicalEndpointFloorContractingReturn`。
+ここでは endpoint が FutureMinimum であることを仮定しない。
+
+q=0 endpoint-floor obstruction から現在、
 
 * natural coordinates
 * prefix/suffix dual budget
 * exact budget difference
 * suffix budget linear lower bound
 * true j=0 canonical fundamental slacks
-* prepend-one cyclic swap separation
-* exact swap/core-defect identity
 * dual endpoint gap
 * effective 2-3 linear gap
 * nested canonical corridor
-* A-minimality provenance を保持する `MinimalAdjacentCanonicalReturn`
-* future-minimum endpoint による actual cyclic rotation
-* terminal/interior を区別した rotation crossing trap
+* mountain block / mountain decomposition
+* one-mountain paradoxical return exclusion
+* finite Hercher Lemma 8 / Lemma 20 integer core
+* finite Hercher narrow inequality
+* Barina `2^71` + Hercher continued-fraction denominator lower bound
 
-まで lossless に整理される。
+までを current A から切り出す。
 
-`TwoThreeEffectiveGapInput` と `TwoThreeGapPolynomialBound` は
-旧系と同じ外部整数論 input を Collatz2 側へ再定義した純粋 Prop interface。
+特に `CanonicalEndpointFloorContractingReturn.mountainCount_ge_two` は
+mountain decomposition が与えられた current A に最低2山を要求する。
 
-long corridor は
+また external inputs
 
-`CanonicalZeroCoreData.exists_longNestedCanonicalCorridor_rule`
+* `External.BarinaTwoPow71Input`
+* `External.HercherTwoPow71DenominatorInput`
 
-に加え、
+を入れると
 
-`CanonicalZeroCoreData.exists_logarithmicLongNestedCanonicalCorridor`
+`CanonicalEndpointFloorContractingReturn.oddSteps_ge_72057431991`
 
-で `q = log_3(sigma*K*(p+1)^A)+1` を明示的に選び、
-最後 `q` 文字を除く depth `m-q` までの全 suffix canonicality を与える。
+により cycle を仮定せず odd-step 数 `K >= 72057431991` を得る。
 
-さらに `MinimalAdjacentCanonicalReturn` は current A の最短 candidate provenance を保持し、
-B1 zero-core と endpoint future-minimum を同じ packet に載せる。
-そこから `RotationCrossingTrap` が必ず存在し、crossing endpoint `Y` は lossless に
-
-  T <= Y < s
-
-へ閉じ込められる。proper interior crossing なら strict に `T < Y < s`、
-terminal crossing なら `Y = T`。
-
-この二枝をまとめて排除する最終局所 principle が `NoRotationCrossingTrap`。
+以前の `MinimalAdjacentCanonicalReturn` / `RotationCrossingTrap` は
+endpoint FutureMinimum を追加で仮定する conditional packet であり、
+current A の無条件正規ルートとしてはこの入口から外す。
 -/
