@@ -72,6 +72,8 @@ import CollatzLean.Collatz2.Global.CanonicalAdjacentContractingReturn
 import CollatzLean.Collatz2.Global.RightBranchAdjacentReduction
 import CollatzLean.Collatz2.Global.CanonicalEndpointFloorContractingReturn
 import CollatzLean.Collatz2.Global.RightBranchEndpointFloorClosure
+import CollatzLean.Collatz2.Global.MinimalAdjacentCanonicalReturn
+import CollatzLean.Collatz2.Canonical.RotationCrossingTrap
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
@@ -121,6 +123,9 @@ q=0 endpoint-floor obstruction は現在、
 * dual endpoint gap
 * effective 2-3 linear gap
 * nested canonical corridor
+* A-minimality provenance を保持する `MinimalAdjacentCanonicalReturn`
+* future-minimum endpoint による actual cyclic rotation
+* terminal/interior を区別した rotation crossing trap
 
 まで lossless に整理される。
 
@@ -137,4 +142,15 @@ long corridor は
 
 で `q = log_3(sigma*K*(p+1)^A)+1` を明示的に選び、
 最後 `q` 文字を除く depth `m-q` までの全 suffix canonicality を与える。
+
+さらに `MinimalAdjacentCanonicalReturn` は current A の最短 candidate provenance を保持し、
+B1 zero-core と endpoint future-minimum を同じ packet に載せる。
+そこから `RotationCrossingTrap` が必ず存在し、crossing endpoint `Y` は lossless に
+
+  T <= Y < s
+
+へ閉じ込められる。proper interior crossing なら strict に `T < Y < s`、
+terminal crossing なら `Y = T`。
+
+この二枝をまとめて排除する最終局所 principle が `NoRotationCrossingTrap`。
 -/
