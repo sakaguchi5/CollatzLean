@@ -52,6 +52,8 @@ import CollatzLean.Collatz2.Global.RightBranchZeroReplay
 import CollatzLean.Collatz2.Global.RightBranchZeroReplayMatveev
 import CollatzLean.Collatz2.Global.CanonicalAdjacentContractingReturn
 import CollatzLean.Collatz2.Global.RightBranchAdjacentReduction
+import CollatzLean.Collatz2.Global.CanonicalEndpointFloorContractingReturn
+import CollatzLean.Collatz2.Global.RightBranchEndpointFloorClosure
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
