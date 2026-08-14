@@ -50,6 +50,8 @@ import CollatzLean.Collatz2.Global.OddOrbitSurvivalBridge
 import CollatzLean.Collatz2.Global.RightBranchFirstCrossing
 import CollatzLean.Collatz2.Global.RightBranchZeroReplay
 import CollatzLean.Collatz2.Global.RightBranchZeroReplayMatveev
+import CollatzLean.Collatz2.Global.CanonicalAdjacentContractingReturn
+import CollatzLean.Collatz2.Global.RightBranchAdjacentReduction
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
