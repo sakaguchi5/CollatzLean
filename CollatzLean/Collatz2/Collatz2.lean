@@ -22,6 +22,9 @@ import CollatzLean.Collatz2.Orbit.FutureMinimumSelection
 
 import CollatzLean.Collatz2.Geometry.Center
 import CollatzLean.Collatz2.Geometry.PrimitiveForm
+import CollatzLean.Collatz2.Geometry.CyclicCenter
+import CollatzLean.Collatz2.Geometry.RankPath
+import CollatzLean.Collatz2.Geometry.RankUnit
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -36,6 +39,8 @@ import CollatzLean.Collatz2.Canonical.EndpointFundamentalBound
 import CollatzLean.Collatz2.Canonical.PositiveSuffixBudget
 import CollatzLean.Collatz2.Canonical.ZeroCoreSlack
 import CollatzLean.Collatz2.Canonical.Q0Deep
+
+import CollatzLean.Collatz2.Canonical.EndpointFloorCyclicGeometry
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
