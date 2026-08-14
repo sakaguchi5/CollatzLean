@@ -43,6 +43,7 @@ import CollatzLean.Collatz2.Global.PrimitiveReturnGap
 --
 import CollatzLean.Collatz2.Global.InfiniteSurvival
 import CollatzLean.Collatz2.Global.OddOrbitSurvivalBridge
+import CollatzLean.Collatz2.Global.RightBranchFirstCrossing
 
 -- Native: word/run 固有の特殊化
 import CollatzLean.Collatz2.Native.IntervalReplay
