@@ -10,6 +10,7 @@ import CollatzLean.Collatz2.Local.Defect
 import CollatzLean.Collatz2.Local.FirstCrossing
 import CollatzLean.Collatz2.Local.SuffixDeterminantProfile
 import CollatzLean.Collatz2.Local.TranslationDeterminant
+import CollatzLean.Collatz2.Local.ContractingClosure
 
 import CollatzLean.Collatz2.Orbit.Runs
 import CollatzLean.Collatz2.Orbit.RunDefect
@@ -30,7 +31,10 @@ import CollatzLean.Collatz2.Canonical.ReplayExtremality
 import CollatzLean.Collatz2.Canonical.SwapResidue
 import CollatzLean.Collatz2.Canonical.SwapCarry
 --一般補題
-import CollatzLean.Collatz2.Canonical.FiniteSurvivalClassification
+import CollatzLean.Collatz2.Canonical.EndpointFundamentalBound
+import CollatzLean.Collatz2.Canonical.PositiveSuffixBudget
+import CollatzLean.Collatz2.Canonical.ZeroCoreSlack
+import CollatzLean.Collatz2.Canonical.Q0Deep
 
 import CollatzLean.Collatz2.Global.AdjacentTransferChain
 import CollatzLean.Collatz2.Global.AdjacentCanonical
