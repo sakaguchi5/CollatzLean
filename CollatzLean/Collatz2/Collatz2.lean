@@ -47,6 +47,13 @@ import CollatzLean.Collatz2.Canonical.ZeroCoreCanonicalSlacks
 import CollatzLean.Collatz2.Canonical.PrependOneSwapSeparation
 import CollatzLean.Collatz2.Canonical.ZeroCoreSwapDefect
 
+-- q=0 dual-gap / nested-canonical corridor
+import CollatzLean.Collatz2.Arithmetic.ExponentSlope
+import CollatzLean.Collatz2.External.TwoThreeGap
+import CollatzLean.Collatz2.External.TwoThreeEffectiveGap
+import CollatzLean.Collatz2.Canonical.ZeroCoreDualGap
+import CollatzLean.Collatz2.Canonical.ZeroCoreNestedCorridor
+
 import CollatzLean.Collatz2.Global.AdjacentTransferChain
 import CollatzLean.Collatz2.Global.AdjacentCanonical
 import CollatzLean.Collatz2.Global.SignDichotomy
@@ -102,7 +109,7 @@ set_option linter.style.header false
 
 旧 `CollatzLean.Collatz.*` を import しない独立再構築の入口。
 
-今回の追加では q=0 endpoint-floor obstruction を次の lossless な層へ整理する。
+q=0 endpoint-floor obstruction は現在、
 
 * natural coordinates
 * prefix/suffix dual budget
@@ -111,6 +118,23 @@ set_option linter.style.header false
 * true j=0 canonical fundamental slacks
 * prepend-one cyclic swap separation
 * exact swap/core-defect identity
+* dual endpoint gap
+* effective 2-3 linear gap
+* nested canonical corridor
 
-最終的な未証明数学は `CanonicalZeroCoreSwapPrinciple` という Prop に隔離する。
+まで lossless に整理される。
+
+`TwoThreeEffectiveGapInput` と `TwoThreeGapPolynomialBound` は
+旧系と同じ外部整数論 input を Collatz2 側へ再定義した純粋 Prop interface。
+
+long corridor は
+
+`CanonicalZeroCoreData.exists_longNestedCanonicalCorridor_rule`
+
+に加え、
+
+`CanonicalZeroCoreData.exists_logarithmicLongNestedCanonicalCorridor`
+
+で `q = log_3(sigma*K*(p+1)^A)+1` を明示的に選び、
+最後 `q` 文字を除く depth `m-q` までの全 suffix canonicality を与える。
 -/
