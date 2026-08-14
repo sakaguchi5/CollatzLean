@@ -335,5 +335,412 @@ theorem exists_nontrivial_nestedSurvivalChain
       O.toNestedSurvivalChain,
       hmin⟩
 
+/-! ## Unbounded orbit の nontriviality / injectivity -/
+
+/--
+odd な自然数は 2 で割り切れない。
+normalized step の一意性に使う局所補助定理。
+-/
+private theorem not_two_dvd_of_odd_local
+    {a : ℕ}
+    (ha : Odd a) :
+    ¬ 2 ∣ a := by
+  rcases ha with ⟨k, hk⟩
+  intro hdiv
+  rcases hdiv with ⟨d, hd⟩
+  omega
+
+/--
+`e < f` なら、`2^f` は `2^e` にさらに少なくとも一つ `2` を掛けた形になる。
+-/
+private theorem two_pow_even_factor_of_lt_local
+    {e f : ℕ}
+    (hlt : e < f) :
+    ∃ d : ℕ,
+      2 ^ f = 2 ^ e * (2 * 2 ^ d) := by
+  obtain ⟨d, hd⟩ :=
+    Nat.exists_eq_add_of_le (Nat.succ_le_of_lt hlt)
+  refine ⟨d, ?_⟩
+  rw [hd, pow_add, pow_succ]
+  simp [mul_assoc]
+
+
+/--
+`e < f` かつ `2^e * a = 2^f * b` なら、
+小さい指数側の odd part `a` は `2` で割れる。
+-/
+private theorem two_dvd_left_part_of_exponent_lt_local
+    {e f a b : ℕ}
+    (hlt : e < f)
+    (hEq : 2 ^ e * a = 2 ^ f * b) :
+    2 ∣ a := by
+  obtain ⟨d, hpow⟩ :=
+    two_pow_even_factor_of_lt_local hlt
+  have hcancel :
+      a = (2 * 2 ^ d) * b := by
+    apply
+      Nat.mul_left_cancel
+        (Nat.pow_pos (by decide : 0 < (2 : ℕ)))
+    calc
+      2 ^ e * a
+          = 2 ^ f * b := hEq
+      _ = (2 ^ e * (2 * 2 ^ d)) * b := by
+            rw [hpow]
+      _ = 2 ^ e * ((2 * 2 ^ d) * b) := by
+            simp [mul_assoc]
+  refine ⟨2 ^ d * b, ?_⟩
+  calc
+    a = (2 * 2 ^ d) * b := hcancel
+    _ = 2 * (2 ^ d * b) := by
+          simp [mul_assoc]
+
+
+/--
+2 の冪と odd 数の積が等しければ、
+2-adic exponent と odd part はそれぞれ一意。
+
+これは normalized odd-only step の決定性を支える局所補助定理。
+-/
+private theorem two_pow_mul_odd_unique_local
+    {e f a b : ℕ}
+    (ha : Odd a)
+    (hb : Odd b)
+    (hEq : 2 ^ e * a = 2 ^ f * b) :
+    e = f ∧ a = b := by
+  have hef : e = f := by
+    rcases lt_trichotomy e f with hlt | heq | hgt
+    · have hdiv : 2 ∣ a :=
+        two_dvd_left_part_of_exponent_lt_local hlt hEq
+      exact False.elim
+        ((not_two_dvd_of_odd_local ha) hdiv)
+    · exact heq
+    · have hdiv : 2 ∣ b :=
+        two_dvd_left_part_of_exponent_lt_local
+          hgt
+          hEq.symm
+      exact False.elim
+        ((not_two_dvd_of_odd_local hb) hdiv)
+  subst f
+  have hab : a = b := by
+    exact
+      Nat.mul_left_cancel
+        (Nat.pow_pos (by decide : 0 < (2 : ℕ)))
+        hEq
+  exact ⟨rfl, hab⟩
+
+/--
+同じ odd value から始まる normalized odd-only step の次の value は一意。
+-/
+private theorem next_value_eq_of_value_eq
+    (O : OddOrbit)
+    {m n : ℕ}
+    (hEq : O.value m = O.value n) :
+    O.value (m + 1) = O.value (n + 1) := by
+  have hstep :
+      2 ^ O.exponent m * O.value (m + 1) =
+        2 ^ O.exponent n * O.value (n + 1) := by
+    calc
+      2 ^ O.exponent m * O.value (m + 1)
+          = 3 * O.value m + 1 := O.step m
+      _ = 3 * O.value n + 1 := by rw [hEq]
+      _ = 2 ^ O.exponent n * O.value (n + 1) :=
+        (O.step n).symm
+  exact
+    (two_pow_mul_odd_unique_local
+      (O.value_odd (m + 1))
+      (O.value_odd (n + 1))
+      hstep).2
+
+/--
+同じ value に到達した二つの時点から先は、
+全 future value が一致する。
+-/
+private theorem value_eq_add_of_value_eq
+    (O : OddOrbit)
+    {m n : ℕ}
+    (hEq : O.value m = O.value n) :
+    ∀ k : ℕ,
+      O.value (m + k) = O.value (n + k) := by
+  intro k
+  induction k with
+  | zero =>
+      simpa using hEq
+  | succ k ih =>
+      have hnext :=
+        next_value_eq_of_value_eq O ih
+      simpa [Nat.add_assoc] using hnext
+
+/--
+有限 prefix の value を上から抑える elementary bound。
+repeat があるとき全軌道を bounded にするためだけに使う。
+-/
+private def valuePrefixBound
+    (O : OddOrbit) : ℕ → ℕ
+  | 0 => O.value 0
+  | n + 1 =>
+      max (valuePrefixBound O n) (O.value (n + 1))
+
+/-- prefix 内の各 value は `valuePrefixBound` 以下。 -/
+private theorem value_le_valuePrefixBound
+    (O : OddOrbit)
+    {k n : ℕ}
+    (hkn : k ≤ n) :
+    O.value k ≤ valuePrefixBound O n := by
+  induction n with
+  | zero =>
+      have hk : k = 0 := by omega
+      subst k
+      simp [valuePrefixBound]
+  | succ n ih =>
+      by_cases hk : k ≤ n
+      · exact
+          le_trans
+            (ih hk)
+            (by
+              simp [valuePrefixBound])
+      · have hkEq : k = n + 1 := by omega
+        subst k
+        simp [valuePrefixBound]
+
+/--
+同じ value が異なる二時点で現れれば、
+normalized dynamics の決定性により軌道全体は bounded。
+
+後半は repeat interval を period として何度でも左へ戻せる。
+-/
+private theorem bounded_of_value_repeat
+    (O : OddOrbit)
+    {m n : ℕ}
+    (hmn : m < n)
+    (hEq : O.value m = O.value n) :
+    ∃ B : ℕ, ∀ t : ℕ, O.value t ≤ B := by
+  let B : ℕ := valuePrefixBound O n
+  refine ⟨B, ?_⟩
+  intro t
+  refine Nat.strong_induction_on t ?_
+  intro t ih
+  by_cases htn : t ≤ n
+  · exact value_le_valuePrefixBound O htn
+  · have hnt : n < t := by omega
+    let k : ℕ := t - n
+    have hnk : n + k = t := by
+      dsimp [k]
+      omega
+    have hmkLt : m + k < t := by
+      dsimp [k]
+      omega
+    have hshift :
+        O.value (m + k) = O.value (n + k) :=
+      value_eq_add_of_value_eq O hEq k
+    have htEq :
+        O.value t = O.value (m + k) := by
+      calc
+        O.value t
+            = O.value (n + k) := by rw [hnk]
+        _ = O.value (m + k) := hshift.symm
+    rw [htEq]
+    exact ih (m + k) hmkLt
+
+/--
+## Unbounded -> value injective
+
+unbounded odd-only orbit では同じ value を二度通れない。
+
+二度通れば normalized dynamics の決定性により eventual periodic となり、
+上の `bounded_of_value_repeat` により bounded になってしまう。
+-/
+theorem value_injective_of_unbounded
+    (O : OddOrbit)
+    (hU : O.Unbounded) :
+    Function.Injective O.value := by
+  intro m n hEq
+  rcases lt_trichotomy m n with hmn | hmn | hnm
+  · obtain ⟨B, hB⟩ :=
+      bounded_of_value_repeat O hmn hEq
+    obtain ⟨t, ht⟩ := hU B
+    exact False.elim ((not_lt_of_ge (hB t)) ht)
+  · exact hmn
+  · obtain ⟨B, hB⟩ :=
+      bounded_of_value_repeat O hnm hEq.symm
+    obtain ⟨t, ht⟩ := hU B
+    exact False.elim ((not_lt_of_ge (hB t)) ht)
+
+/--
+value が1なら、normalized odd-only step の次も1。
+
+`1 -> 1` の normalization exponent は2で一意。
+-/
+private theorem next_value_eq_one_of_value_eq_one
+    (O : OddOrbit)
+    {n : ℕ}
+    (hn : O.value n = 1) :
+    O.value (n + 1) = 1 := by
+  have hstep :
+      2 ^ O.exponent n * O.value (n + 1) =
+        2 ^ 2 * 1 := by
+    calc
+      2 ^ O.exponent n * O.value (n + 1)
+          = 3 * O.value n + 1 := O.step n
+      _ = 2 ^ 2 * 1 := by
+            rw [hn]
+            norm_num
+  exact
+    (two_pow_mul_odd_unique_local
+      (O.value_odd (n + 1))
+      (by decide : Odd (1 : ℕ))
+      hstep).2
+
+/--
+## Unbounded -> nontrivial minimum
+
+unbounded orbit の global minimum は1より大きい。
+
+もし minimum が1なら、その次も1。
+しかし unbounded orbit の value は injective なので、
+同じ1を連続して取ることはできない。
+-/
+theorem globalMinimumValue_gt_one_of_unbounded
+    (O : OddOrbit)
+    (hU : O.Unbounded) :
+    1 < O.globalMinimumValue := by
+  have hpos : 0 < O.globalMinimumValue :=
+    O.globalMinimumValue_pos
+  by_contra hnot
+  have hminOne :
+      O.globalMinimumValue = 1 := by
+    omega
+  let i : ℕ := O.globalMinimumIndex
+  have hi :
+      O.value i = 1 := by
+    dsimp [i]
+    rw [O.value_globalMinimumIndex, hminOne]
+  have hnext :
+      O.value (i + 1) = 1 :=
+    next_value_eq_one_of_value_eq_one O hi
+  have hsame :
+      O.value i = O.value (i + 1) := by
+    calc
+      O.value i = 1 := hi
+      _ = O.value (i + 1) := hnext.symm
+  have hinj :
+      Function.Injective O.value :=
+    O.value_injective_of_unbounded hU
+  have hidx :
+      i = i + 1 :=
+    hinj hsame
+  omega
+
+/--
+unbounded orbit の minimum-tail endpoint は injective。
+-/
+theorem minimumTailEndpoint_injective_of_unbounded
+    (O : OddOrbit)
+    (hU : O.Unbounded) :
+    Function.Injective O.minimumTailEndpoint := by
+  intro m n hEq
+  have hinj :
+      Function.Injective O.value :=
+    O.value_injective_of_unbounded hU
+  unfold minimumTailEndpoint at hEq
+  have hidx :=
+    hinj hEq
+  omega
+
+/--
+## Unbounded -> NestedSurvivalChain endpoint injective
+
+`toNestedSurvivalChain` に降ろした後も endpoint は injective。
+従って `BarrierEnvelopeEventuallyConstant` の aperiodic 条件を
+unbounded orbit から自動供給できる。
+-/
+theorem toNestedSurvivalChain_endpoint_injective_of_unbounded
+    (O : OddOrbit)
+    (hU : O.Unbounded) :
+    Function.Injective
+      (O.toNestedSurvivalChain).endpoint := by
+  change Function.Injective O.minimumTailEndpoint
+  exact O.minimumTailEndpoint_injective_of_unbounded hU
+
+/--
+unbounded orbit に対する infinite-survival dichotomy。
+
+minimum anchor は nontrivial であり、
+minimum-tail chain の endpoint は injective。
+その上で abstract `infiniteSurvivalDichotomy` を actual orbit に適用する。
+-/
+theorem unbounded_to_infiniteSurvivalDichotomy
+    (O : OddOrbit)
+    (hU : O.Unbounded) :
+    1 < O.globalMinimumValue ∧
+      Function.Injective
+        (O.toNestedSurvivalChain).endpoint ∧
+      (Word.NestedSurvivalChain.ForeverExpanding O.toNestedSurvivalChain ∨
+        Word.NestedSurvivalChain.EventuallySingletonSurvival O.toNestedSurvivalChain) := by
+  constructor
+  · exact O.globalMinimumValue_gt_one_of_unbounded hU
+  constructor
+  · exact
+      O.toNestedSurvivalChain_endpoint_injective_of_unbounded hU
+  · exact
+      (O.toNestedSurvivalChain).infiniteSurvivalDichotomy
+
+/--
+unbounded orbit の contracting branch では、
+center barrier の strict record-low 更新は eventually 停止する。
+-/
+theorem barrierEnvelopeEventuallyConstant_of_unbounded
+    (O : OddOrbit)
+    (hU : O.Unbounded)
+    (hex :
+      ∃ n : ℕ,
+        Word.Contracting
+          ((O.toNestedSurvivalChain).word n)) :
+    ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
+      ¬ Word.NestedSurvivalChain.BarrierRecord O.toNestedSurvivalChain n := by
+  exact
+    (O.toNestedSurvivalChain).barrierEnvelopeEventuallyConstant
+      (O.toNestedSurvivalChain_endpoint_injective_of_unbounded hU)
+      hex
+
 end OddOrbit
+
+
+/--
+## HasUnboundedOddOrbit -> infinite survival dichotomy
+
+非有界 odd-only orbit が存在するなら、
+
+* `x > 1` である nontrivial minimum anchor
+* endpoint が injective な minimum-tail `NestedSurvivalChain`
+
+が存在し、その chain は
+
+  `ForeverExpanding`
+    OR
+  `EventuallySingletonSurvival`
+
+のどちらかへ必ず落ちる。
+-/
+theorem hasUnboundedOddOrbit_to_infiniteSurvivalDichotomy :
+    HasUnboundedOddOrbit →
+      ∃ x : ℕ,
+        1 < x ∧
+          ∃ C : Word.NestedSurvivalChain x,
+            Function.Injective C.endpoint ∧
+              (Word.NestedSurvivalChain.ForeverExpanding C ∨
+                Word.NestedSurvivalChain.EventuallySingletonSurvival C) := by
+  rintro ⟨O, hU⟩
+  refine ⟨O.globalMinimumValue, ?_⟩
+  constructor
+  · exact O.globalMinimumValue_gt_one_of_unbounded hU
+  · refine ⟨O.toNestedSurvivalChain, ?_⟩
+    constructor
+    · exact
+        O.toNestedSurvivalChain_endpoint_injective_of_unbounded hU
+    · exact
+        (O.toNestedSurvivalChain).infiniteSurvivalDichotomy
+
+
+
+
 end Collatz2
