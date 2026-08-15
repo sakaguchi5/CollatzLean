@@ -26,6 +26,7 @@ import CollatzLean.Collatz2.Geometry.CyclicCenter
 import CollatzLean.Collatz2.Geometry.RankPath
 import CollatzLean.Collatz2.Geometry.RankUnit
 import CollatzLean.Collatz2.Geometry.RankStrip
+import CollatzLean.Collatz2.Geometry.ContractingPairDescent
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -41,10 +42,12 @@ import CollatzLean.Collatz2.Canonical.PositiveSuffixBudget
 import CollatzLean.Collatz2.Canonical.ZeroCoreSlack
 import CollatzLean.Collatz2.Canonical.Q0Deep
 
--- rank / cyclic geometry stage 1--7
+-- rank / cyclic geometry stage 1--9b
 import CollatzLean.Collatz2.Canonical.EndpointFloorCyclicGeometry
 import CollatzLean.Collatz2.Canonical.EndpointFloorRankSeparation
 import CollatzLean.Collatz2.Canonical.RotationRankTrap
+import CollatzLean.Collatz2.Canonical.EndpointFloorTailRankTrap
+import CollatzLean.Collatz2.Canonical.EndpointFloorBestUpperReduction
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
@@ -153,22 +156,11 @@ q=0 endpoint-floor obstruction から現在、
 * cyclic center recurrence / canonical center shadow / 全 cut exact identity
 * complementary suffix rank と全 cut separation の rank-ready form
 * critical line / rational chord の `stripRank + p*extraDepth` exact decomposition
+* current A だけからの unconditional tail-rank trap
+* wide strip からの strict denominator / slope descent
+* finite denominator descent の終点 `BestUpperCertificate`
 
 までを current A から切り出す。
-
-特に stage 6 は `CanonicalZeroCoreData.exists_polynomialStartBoundData` により
-
-  S+1 <= C*(p+1)^(A+1)
-
-を得る。
-
-stage 7 は mountain decomposition `Cmount` に対して
-
-  p <= clog_2(C*(p+1)^(A+1)) * (2^mountainCount - 1)
-
-という完全整数形へ圧縮する。
-`mountainCount_gt_of_binaryCertificate` に有限整数 certificate を渡せば、
-explicit 2--3 gap 定数から直ちに数値 mountain lower bound を得られる。
 
 rank geometry 側では、proper cut rank
 
@@ -181,17 +173,39 @@ rank geometry 側では、proper cut rank
 へ分解する。`stripRank` は `(p,H,k)` の deterministic geometry、
 `extraDepth` は word 固有の沈み込みである。
 
-`RotationRankTrap` は以前の `MinimalAdjacentCanonicalReturn` /
-`RotationCrossingTrap` に対する conditional bridge であり、endpoint FutureMinimum を
-current A から無条件に導くものではない。そこでは one-step rotation rank の exact shift
+Stage 7b では current A の
 
-  d_rotation(j) = d_original(j+1) - d_original(1)
+  w = 1 :: tail
 
-と、crossing 時の
+と `tail` contracting だけから最初の tail crossing を取り、actual cyclic return や
+FutureMinimum endpoint を使わず virtual rotation `tail ++ [1]` の rank shift を利用する。
+その crossing では
 
-  rank drop または nontrivial strip
+  d_(r+1) <= d_1
 
-という lossless 二分岐だけを保持する。
+または
+
+  p < stripRank(w,r)
+
+の lossless 二分岐を得る。
+
+Stage 9a では wide strip を pure exponent pair `(p,H)` の降下へ変換する。
+
+  p < H*r - p*criticalHeight(r)
+
+なら
+
+  Q = (r, criticalHeight(r)+1)
+
+は strict contracting で、`r<p` かつ slope も strict に小さい。
+
+Stage 9b では denominator の strong induction によりこの降下を有限回反復し、
+全 proper denominator で
+
+  stripRank <= p
+
+を満たす `StripReduced` descendant を `BestUpperCertificate` として保持する。
+これは今後の terminal / mandatory-area 解析の正規化入力になる。
 
 また external inputs
 
@@ -204,7 +218,7 @@ current A から無条件に導くものではない。そこでは one-step rot
 
 により cycle を仮定せず odd-step 数 `K >= 72057431991` を得る。
 
-以前の `MinimalAdjacentCanonicalReturn` / `RotationCrossingTrap` は
-endpoint FutureMinimum を追加で仮定する conditional packet であり、
-current A の無条件正規ルートとしては使わない。
+`RotationRankTrap` は以前の `MinimalAdjacentCanonicalReturn` /
+`RotationCrossingTrap` に対する conditional bridge として残すが、current A の無条件正規ルートは
+`EndpointFloorTailRankTrap` / `EndpointFloorBestUpperReduction` を使う。
 -/
