@@ -27,6 +27,8 @@ import CollatzLean.Collatz2.Geometry.RankPath
 import CollatzLean.Collatz2.Geometry.RankUnit
 import CollatzLean.Collatz2.Geometry.RankStrip
 import CollatzLean.Collatz2.Geometry.ContractingPairDescent
+import CollatzLean.Collatz2.Geometry.BestUpperSlope
+import CollatzLean.Collatz2.Geometry.PrimitiveBestUpper
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -42,12 +44,13 @@ import CollatzLean.Collatz2.Canonical.PositiveSuffixBudget
 import CollatzLean.Collatz2.Canonical.ZeroCoreSlack
 import CollatzLean.Collatz2.Canonical.Q0Deep
 
--- rank / cyclic geometry stage 1--9b
+-- rank / cyclic geometry
 import CollatzLean.Collatz2.Canonical.EndpointFloorCyclicGeometry
 import CollatzLean.Collatz2.Canonical.EndpointFloorRankSeparation
 import CollatzLean.Collatz2.Canonical.RotationRankTrap
 import CollatzLean.Collatz2.Canonical.EndpointFloorTailRankTrap
 import CollatzLean.Collatz2.Canonical.EndpointFloorBestUpperReduction
+import CollatzLean.Collatz2.Canonical.EndpointFloorRecordDescent
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
@@ -133,79 +136,35 @@ set_option linter.style.header false
 旧 `CollatzLean.Collatz.*` を import しない独立再構築の入口。
 
 current A の正本は `CanonicalEndpointFloorContractingReturn`。
-ここでは endpoint が FutureMinimum であることを仮定しない。
+endpoint FutureMinimum は仮定しない。
 
-q=0 endpoint-floor obstruction から現在、
+rank geometry では現在、従来の
 
-* natural coordinates
-* prefix/suffix dual budget
-* exact budget difference
-* suffix budget linear lower bound
-* true j=0 canonical fundamental slacks
-* dual endpoint gap
-* effective 2-3 linear gap
-* nested canonical corridor
-* mountain block / mountain decomposition
-* one-mountain paradoxical return exclusion
-* finite Hercher Lemma 8 / Lemma 20 integer core
-* finite Hercher narrow inequality
-* Barina `2^71` + Hercher continued-fraction denominator lower bound
-* polynomial 2--3 gap からの stage-6 start upper bound
-* mountain chain envelope と stage-7 binary mountain-count certificate
-* FirstCrossing rational chord rank / primitive rank residue
-* cyclic center recurrence / canonical center shadow / 全 cut exact identity
-* complementary suffix rank と全 cut separation の rank-ready form
-* critical line / rational chord の `stripRank + p*extraDepth` exact decomposition
-* current A だけからの unconditional tail-rank trap
-* wide strip からの strict denominator / slope descent
-* finite denominator descent の終点 `BestUpperCertificate`
+* FirstCrossing rational chord rank
+* `stripRank + p*extraDepth` decomposition
+* unconditional tail-rank trap
+* wide-strip denominator descent
+* `BestUpperCertificate`
 
-までを current A から切り出す。
+に加えて、次の三段を切り出す。
 
-rank geometry 側では、proper cut rank
+1. `StripReduced` と smaller-denominator best-upper slope の exact equivalence。
+2. exponent pair の gcd primitive 化。contracting / slope / StripReduced を保存し、
+   primitive+reduced では proper strip rank が `1,...,p-1` を一度ずつ取る。
+3. primitive+reduced branch で current A の任意 proper cut から suffix crossing を再起動し、
+   wide strip を排除して strict rank descent を得る。開始 rank が `p` 未満なら crossing block は
 
-  d_k = H*k - p*h_k
+     twoSteps(block) = criticalHeight(length) + 1
 
-を complementary suffix determinant と同一視し、さらに
+   という minimal FirstCrossing block になり、interior endpoint は再び critical roof 上へ戻る。
 
-  d_k = stripRank(k) + p*extraDepth(k)
+従って Stage 3 の `NextRecordBlockData` は well-founded record iteration の一段を保持する。
+初期 cut `a=1` については primitive+reduced branch で
 
-へ分解する。`stripRank` は `(p,H,k)` の deterministic geometry、
-`extraDepth` は word 固有の沈み込みである。
+  0 < d_1 < p
+  7*p < 12*d_1
 
-Stage 7b では current A の
-
-  w = 1 :: tail
-
-と `tail` contracting だけから最初の tail crossing を取り、actual cyclic return や
-FutureMinimum endpoint を使わず virtual rotation `tail ++ [1]` の rank shift を利用する。
-その crossing では
-
-  d_(r+1) <= d_1
-
-または
-
-  p < stripRank(w,r)
-
-の lossless 二分岐を得る。
-
-Stage 9a では wide strip を pure exponent pair `(p,H)` の降下へ変換する。
-
-  p < H*r - p*criticalHeight(r)
-
-なら
-
-  Q = (r, criticalHeight(r)+1)
-
-は strict contracting で、`r<p` かつ slope も strict に小さい。
-
-Stage 9b では denominator の strong induction によりこの降下を有限回反復し、
-全 proper denominator で
-
-  stripRank <= p
-
-を満たす `StripReduced` descendant を `BestUpperCertificate` として保持する。
-これは今後の terminal / mandatory-area 解析の正規化入力になる。
+まで保持する。
 
 また external inputs
 
@@ -213,12 +172,6 @@ Stage 9b では denominator の strong induction によりこの降下を有限�
 * `External.HercherTwoPow71DenominatorInput`
 
 を入れると
-
 `CanonicalEndpointFloorContractingReturn.oddSteps_ge_72057431991`
-
-により cycle を仮定せず odd-step 数 `K >= 72057431991` を得る。
-
-`RotationRankTrap` は以前の `MinimalAdjacentCanonicalReturn` /
-`RotationCrossingTrap` に対する conditional bridge として残すが、current A の無条件正規ルートは
-`EndpointFloorTailRankTrap` / `EndpointFloorBestUpperReduction` を使う。
+により cycle を仮定せず odd-step 数の既存下界を得る。
 -/
