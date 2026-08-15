@@ -29,6 +29,7 @@ import CollatzLean.Collatz2.Geometry.RankStrip
 import CollatzLean.Collatz2.Geometry.ContractingPairDescent
 import CollatzLean.Collatz2.Geometry.BestUpperSlope
 import CollatzLean.Collatz2.Geometry.PrimitiveBestUpper
+import CollatzLean.Collatz2.Geometry.WeightedRankSum
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -51,6 +52,8 @@ import CollatzLean.Collatz2.Canonical.RotationRankTrap
 import CollatzLean.Collatz2.Canonical.EndpointFloorTailRankTrap
 import CollatzLean.Collatz2.Canonical.EndpointFloorBestUpperReduction
 import CollatzLean.Collatz2.Canonical.EndpointFloorRecordDescent
+import CollatzLean.Collatz2.Canonical.EndpointFloorRecordChain
+import CollatzLean.Collatz2.Canonical.EndpointFloorWeightedRank
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
@@ -158,13 +161,32 @@ rank geometry では現在、従来の
 
    という minimal FirstCrossing block になり、interior endpoint は再び critical roof 上へ戻る。
 
-従って Stage 3 の `NextRecordBlockData` は well-founded record iteration の一段を保持する。
+Stage 3 の `NextRecordBlockData` は `EndpointFloorRecordChain` で rank strong induction により
+terminal まで有限反復される。block lengths `r_i` について exact に
+
+  1 + sum r_i = p
+  1 + sum (criticalHeight(r_i)+1) = H
+  d_1 = sum (p-stripRank(r_i))
+
+まで telescope する。
+
+また `WeightedRankSum` / `EndpointFloorWeightedRank` では primitive rank unit `u` により
+translation path 全体を
+
+  3*B = 3^p * sum u^(-d_k)     (mod G)
+
+へまとめ、current A の small-residue equation と合わせて
+
+  sum u^(-d_k) = 6*n           (mod G)
+
+まで回収する。従って残る核心は weighted residue avoidance そのものになる。
+
 初期 cut `a=1` については primitive+reduced branch で
 
   0 < d_1 < p
   7*p < 12*d_1
 
-まで保持する。
+を保持する。
 
 また external inputs
 
