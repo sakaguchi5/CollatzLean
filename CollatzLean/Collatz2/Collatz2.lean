@@ -26,10 +26,12 @@ import CollatzLean.Collatz2.Geometry.CyclicCenter
 import CollatzLean.Collatz2.Geometry.RankPath
 import CollatzLean.Collatz2.Geometry.RankUnit
 import CollatzLean.Collatz2.Geometry.RankStrip
+import CollatzLean.Collatz2.Geometry.RankQuotient
 import CollatzLean.Collatz2.Geometry.ContractingPairDescent
 import CollatzLean.Collatz2.Geometry.BestUpperSlope
 import CollatzLean.Collatz2.Geometry.PrimitiveBestUpper
 import CollatzLean.Collatz2.Geometry.WeightedRankSum
+import CollatzLean.Collatz2.Geometry.WeightedRankFerrers
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -54,6 +56,7 @@ import CollatzLean.Collatz2.Canonical.EndpointFloorBestUpperReduction
 import CollatzLean.Collatz2.Canonical.EndpointFloorRecordDescent
 import CollatzLean.Collatz2.Canonical.EndpointFloorRecordChain
 import CollatzLean.Collatz2.Canonical.EndpointFloorWeightedRank
+import CollatzLean.Collatz2.Canonical.EndpointFloorRankFerrers
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
@@ -179,7 +182,31 @@ translation path 全体を
 
   sum u^(-d_k) = 6*n           (mod G)
 
-まで回収する。従って残る核心は weighted residue avoidance そのものになる。
+まで回収する。
+
+さらに `RankQuotient` / `WeightedRankFerrers` では original word 上で
+
+  d_k = rankResidue(k) + p*rankQuotient(k)
+  rankResidue(k) = stripRank(k) % p
+  rankQuotient(k) = stripRank(k)/p + extraDepth(k)
+
+を exact に保持する。従って wide strip は descendant modulus へ移らず original word の
+positive rank quotient として残る。
+
+primitive slope では proper rank residues は `1,...,p-1` を一度ずつ取り、weighted sum は
+
+  W = 1 + proper permutation-weighted half-depth sum
+
+および
+
+  W = baselineResidueSum + (halfUnitValue-1)*ferrersCellSum
+
+へ exact に書き換えられる。`EndpointFloorRankFerrers` はこれを current A の
+
+  W = 6*n
+
+へ直接接続する。従って reduced / nonreduced の両方を original weighted residue 上の
+一つの quotient-depth profile として扱える。
 
 初期 cut `a=1` については primitive+reduced branch で
 
