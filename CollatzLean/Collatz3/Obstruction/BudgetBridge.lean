@@ -146,9 +146,9 @@ theorem affineConst_eq_contractionCompensation_add_positiveReturnCost
       (Nat.le_of_lt (startValue_lt_endValue D))
   simpa [
     Collatz2.AffineTransfer.ofWord,
-    Collatz3.AffineTransfer.contractionCompensation,
-    Collatz3.AffineTransfer.positiveReturnCost,
-    Collatz3.AffineTransfer.contractionGap,
+    Collatz2.AffineTransfer.contractionCompensation,
+    Collatz2.AffineTransfer.positiveReturnCost,
+    Collatz2.AffineTransfer.contractionGap,
     contractionCompensation,
     positiveReturnCost,
     coefficientGap,
@@ -156,7 +156,6 @@ theorem affineConst_eq_contractionCompensation_add_positiveReturnCost
     startValue,
     endValue
   ] using hEq
-
 /--
 Collatz3 最初の exact integer budget theorem。
 

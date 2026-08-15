@@ -1,96 +1,54 @@
-import CollatzLean.Collatz2.Core.Realization
-import Mathlib.Tactic.Linarith
+import CollatzLean.Collatz2.Core.BoundaryForm
 
 /-!
-# Collatz3: source-target boundary form
+# Collatz3 compatibility wrapper
 
-`Collatz3` は `Collatz2` を import して、新しい統一座標系を最短距離で検証する
-研究層である。
-
-有限 affine transfer
-
-  A * y = C * x + B
-
-に対し、source / target を別々に動かす二変数形式
-
-  Θ_T(X,Y) = B + C*X - A*Y
-
-を導入する。actual realization は `Θ_T(x,y)=0` そのものである。
-
-さらに contracting positive return では
-
-  B = (A-C)*x + A*(y-x)
-
-を自然数上の exact equality として保持する。
+`BoundaryForm` の正本は `Collatz2.Core.BoundaryForm` へ移動した。
+このファイルは既存 `Collatz3.*` API を壊さないための薄い wrapper。
 -/
 
 namespace Collatz3
 
-open Collatz2
-
 namespace AffineTransfer
 
-/-- source / target を別々に持つ boundary form。 -/
-def boundaryForm
+abbrev boundaryForm
     (T : Collatz2.AffineTransfer)
     (x y : ℕ) : ℤ :=
-  (T.translate : ℤ) +
-    (T.oddCoeff : ℤ) * (x : ℤ) -
-    (T.twoCoeff : ℤ) * (y : ℤ)
+  Collatz2.AffineTransfer.boundaryForm T x y
 
-/-- actual realization は boundary form の zero-locus。 -/
+abbrev diagonalBoundaryForm
+    (T : Collatz2.AffineTransfer)
+    (x : ℕ) : ℤ :=
+  Collatz2.AffineTransfer.diagonalBoundaryForm T x
+
+abbrev contractionGap
+    (T : Collatz2.AffineTransfer) : ℕ :=
+  Collatz2.AffineTransfer.contractionGap T
+
+abbrev contractionCompensation
+    (T : Collatz2.AffineTransfer)
+    (x : ℕ) : ℕ :=
+  Collatz2.AffineTransfer.contractionCompensation T x
+
+abbrev positiveReturnCost
+    (T : Collatz2.AffineTransfer)
+    (x y : ℕ) : ℕ :=
+  Collatz2.AffineTransfer.positiveReturnCost T x y
+
 theorem realizes_iff_boundaryForm_eq_zero
     (T : Collatz2.AffineTransfer)
     (x y : ℕ) :
-    T.Realizes x y ↔ boundaryForm T x y = 0 := by
-  constructor
-  · intro h
-    unfold Collatz2.AffineTransfer.Realizes at h
-    unfold boundaryForm
-    have hZ :
-        (T.twoCoeff : ℤ) * (y : ℤ) =
-          (T.oddCoeff : ℤ) * (x : ℤ) + (T.translate : ℤ) := by
-      exact_mod_cast h
-    linarith
-  · intro h
-    unfold boundaryForm at h
-    have hZ :
-        (T.twoCoeff : ℤ) * (y : ℤ) =
-          (T.oddCoeff : ℤ) * (x : ℤ) + (T.translate : ℤ) := by
-      linarith
-    unfold Collatz2.AffineTransfer.Realizes
-    exact_mod_cast hZ
+    T.Realizes x y ↔ boundaryForm T x y = 0 :=
+  Collatz2.AffineTransfer.realizes_iff_boundaryForm_eq_zero T x y
 
-/-- diagonal restriction は通常の same-frame displacement。 -/
-def diagonalBoundaryForm
-    (T : Collatz2.AffineTransfer)
-    (x : ℕ) : ℤ :=
-  boundaryForm T x x
+theorem boundaryForm_followedBy
+    (T U : Collatz2.AffineTransfer)
+    (x y z : ℕ) :
+    boundaryForm (T.followedBy U) x z =
+      (U.oddCoeff : ℤ) * boundaryForm T x y +
+        (T.twoCoeff : ℤ) * boundaryForm U y z :=
+  Collatz2.AffineTransfer.boundaryForm_followedBy T U x y z
 
-/-- contracting coefficient gap `A-C`。 -/
-def contractionGap
-    (T : Collatz2.AffineTransfer) : ℕ :=
-  T.twoCoeff - T.oddCoeff
-
-/-- actual source height に対する contraction compensation。 -/
-def contractionCompensation
-    (T : Collatz2.AffineTransfer)
-    (x : ℕ) : ℕ :=
-  contractionGap T * x
-
-/-- actual frame が右へ移動するための cost。 -/
-def positiveReturnCost
-    (T : Collatz2.AffineTransfer)
-    (x y : ℕ) : ℕ :=
-  T.twoCoeff * (y - x)
-
-/--
-contracting realization の translation は
-
-  B = contraction compensation + actual positive-return cost
-
-へ exact に分解される。
--/
 theorem translate_eq_contractionCompensation_add_positiveReturnCost
     {T : Collatz2.AffineTransfer}
     {x y : ℕ}
@@ -98,35 +56,9 @@ theorem translate_eq_contractionCompensation_add_positiveReturnCost
     (hContracting : T.oddCoeff ≤ T.twoCoeff)
     (hReturn : x ≤ y) :
     T.translate =
-      contractionCompensation T x +
-        positiveReturnCost T x y := by
-  have hGap :
-      contractionGap T + T.oddCoeff = T.twoCoeff := by
-    unfold contractionGap
-    exact Nat.sub_add_cancel hContracting
-  have hReturnAdd : x + (y - x) = y := by
-    omega
-  have hRealizes' :
-      T.twoCoeff * y = T.oddCoeff * x + T.translate := by
-    exact hRealizes
-  have hEq :
-      (contractionCompensation T x + positiveReturnCost T x y) +
-          T.oddCoeff * x =
-        T.translate + T.oddCoeff * x := by
-    calc
-      (contractionCompensation T x + positiveReturnCost T x y) +
-            T.oddCoeff * x
-          = (contractionGap T + T.oddCoeff) * x +
-              T.twoCoeff * (y - x) := by
-                simp only [contractionCompensation, positiveReturnCost]
-                ring
-      _ = T.twoCoeff * x + T.twoCoeff * (y - x) := by
-            rw [hGap]
-      _ = T.twoCoeff * (x + (y - x)) := by ring
-      _ = T.twoCoeff * y := by rw [hReturnAdd]
-      _ = T.oddCoeff * x + T.translate := hRealizes'
-      _ = T.translate + T.oddCoeff * x := by ring
-  exact (Nat.add_right_cancel hEq).symm
+      contractionCompensation T x + positiveReturnCost T x y :=
+  Collatz2.AffineTransfer.translate_eq_contractionCompensation_add_positiveReturnCost
+    hRealizes hContracting hReturn
 
 end AffineTransfer
 end Collatz3
