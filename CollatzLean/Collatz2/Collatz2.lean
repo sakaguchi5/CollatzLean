@@ -32,6 +32,8 @@ import CollatzLean.Collatz2.Geometry.BestUpperSlope
 import CollatzLean.Collatz2.Geometry.PrimitiveBestUpper
 import CollatzLean.Collatz2.Geometry.WeightedRankSum
 import CollatzLean.Collatz2.Geometry.WeightedRankFerrers
+import CollatzLean.Collatz2.Geometry.WeightedRankBaseline
+import CollatzLean.Collatz2.Geometry.ResidueIndexedFerrers
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -57,6 +59,7 @@ import CollatzLean.Collatz2.Canonical.EndpointFloorRecordDescent
 import CollatzLean.Collatz2.Canonical.EndpointFloorRecordChain
 import CollatzLean.Collatz2.Canonical.EndpointFloorWeightedRank
 import CollatzLean.Collatz2.Canonical.EndpointFloorRankFerrers
+import CollatzLean.Collatz2.Canonical.EndpointFloorFerrersInverse
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
@@ -207,6 +210,26 @@ primitive slope では proper rank residues は `1,...,p-1` を一度ずつ取�
 
 へ直接接続する。従って reduced / nonreduced の両方を original weighted residue 上の
 一つの quotient-depth profile として扱える。
+
+さらに `WeightedRankBaseline` / `ResidueIndexedFerrers` では primitive residue permutation を
+完全に消去して
+
+  baselineResidueSum = 1 + v + ... + v^(p-1)
+  (v-1)*baselineResidueSum = halfUnitValue-1
+
+を得る。また inverse permutation `residueCut` により
+
+  q_r = rankQuotient(residueCut(r))
+
+という residue-indexed quotient profile を構成し、proper cut の quotient/weight はその profile
+から exact に復元される。
+
+`EndpointFloorFerrersInverse` は `W=6*n`, baseline identity, `2*half=1` を消去し、primitive
+current A に対して rank unit `R` が存在して exact に
+
+  (1-v) * (ferrersCellSum + 12*n) = 1    (mod G)
+
+を満たすところまで圧縮する。
 
 初期 cut `a=1` については primitive+reduced branch で
 
