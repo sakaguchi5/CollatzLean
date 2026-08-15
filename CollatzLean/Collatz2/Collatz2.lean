@@ -34,6 +34,8 @@ import CollatzLean.Collatz2.Geometry.WeightedRankSum
 import CollatzLean.Collatz2.Geometry.WeightedRankFerrers
 import CollatzLean.Collatz2.Geometry.WeightedRankBaseline
 import CollatzLean.Collatz2.Geometry.ResidueIndexedFerrers
+import CollatzLean.Collatz2.Geometry.RankUnitGeometricInverse
+import CollatzLean.Collatz2.Geometry.ResidueIndexedFerrersCellSum
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
@@ -60,6 +62,7 @@ import CollatzLean.Collatz2.Canonical.EndpointFloorRecordChain
 import CollatzLean.Collatz2.Canonical.EndpointFloorWeightedRank
 import CollatzLean.Collatz2.Canonical.EndpointFloorRankFerrers
 import CollatzLean.Collatz2.Canonical.EndpointFloorFerrersInverse
+import CollatzLean.Collatz2.Canonical.EndpointFloorFerrersClosedForm
 
 -- q=0 final core reduction
 import CollatzLean.Collatz2.Global.EndpointFloorNaturalCoordinates
@@ -230,6 +233,21 @@ current A に対して rank unit `R` が存在して exact に
   (1-v) * (ferrersCellSum + 12*n) = 1    (mod G)
 
 を満たすところまで圧縮する。
+
+`RankUnitGeometricInverse` / `ResidueIndexedFerrersCellSum` / `EndpointFloorFerrersClosedForm`
+ではさらに同じ rank unit 上で
+
+  (u-1) * (ferrersCellSum + 12*n - 1) = 1
+  ferrersCellSum + 12*n = 2*baselineResidueSum
+  ferrersCellSum + 12*n - 1 = 1 + u + ... + u^(p-1)
+
+を exact に保持する。加えて `ferrersCellSum` を residue-indexed profile
+
+  q_r = rankQuotient(residueCut(r))
+
+だけで書いた column sum、さらに各 cell を `v^(r+p*j)` とする generating sumへ完全に
+reindex する。従って primitive current A の closed form から cut index は消え、自由度は
+residue-indexed Ferrers profile に集約される。
 
 初期 cut `a=1` については primitive+reduced branch で
 
