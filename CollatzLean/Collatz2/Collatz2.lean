@@ -146,6 +146,10 @@ import CollatzLean.Collatz2.CSTMicro.Affine
 import CollatzLean.Collatz2.CSTMicro.Residue
 import CollatzLean.Collatz2.CSTMicro.MicroObject
 import CollatzLean.Collatz2.CSTMicro.PolynomialCapacity
+import CollatzLean.Collatz2.CSTMicro.InversePathSum
+import CollatzLean.Collatz2.CSTMicro.AdjacentFerrersSwap
+import CollatzLean.Collatz2.CSTMicro.ResidueCarry
+import CollatzLean.Collatz2.CSTMicro.SmallRepresentativeCarry
 
 set_option linter.style.header false
 
