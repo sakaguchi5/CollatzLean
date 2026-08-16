@@ -38,7 +38,7 @@ theorem exists_expanding_height (k : ℕ) :
   nlinarith
 
 /-- `2^k < 3^m` を初めて満たす最小 height。 -/
-noncomputable def criticalHeight (k : ℕ) : ℕ :=
+def criticalHeight (k : ℕ) : ℕ :=
   Nat.find (exists_expanding_height k)
 
 /-- critical height 自身は expanding。 -/
@@ -113,7 +113,7 @@ theorem criticalHeight_succ_le (k : ℕ) :
   exact criticalHeight_le_of_expanding hnext
 
 /-- mechanical prefix 用の height。時刻 0 だけ 0 に正規化する。 -/
-noncomputable def criticalPrefixHeight : ℕ → ℕ
+def criticalPrefixHeight : ℕ → ℕ
   | 0 => 0
   | k + 1 => criticalHeight (k + 1)
 

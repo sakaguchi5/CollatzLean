@@ -157,6 +157,9 @@ import CollatzLean.Collatz2.CSTMicro.CarryCorridorExtraction
 import CollatzLean.Collatz2.CSTMicro.SturmianHeight
 import CollatzLean.Collatz2.CSTMicro.BinaryFerrersOrder
 import CollatzLean.Collatz2.CSTMicro.FerrersBoundarySturmian
+import CollatzLean.Collatz2.CSTMicro.BeattyPositions
+import CollatzLean.Collatz2.CSTMicro.CriticalCrossingIndex
+import CollatzLean.Collatz2.CSTMicro.BoundaryXiTruncation
 
 
 set_option linter.style.header false

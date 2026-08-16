@@ -53,7 +53,7 @@ theorem isCriticalSturmianBoundaryWord_iff_criticalHeight
     exact h.2 j hjPos hjLt
 
 /-- critical mechanical step bit。 -/
-noncomputable def criticalSturmianBit (i : ℕ) : Bool :=
+def criticalSturmianBit (i : ℕ) : Bool :=
   decide (criticalPrefixHeight (i + 1) = criticalPrefixHeight i + 1)
 
 /--
@@ -101,7 +101,7 @@ theorem criticalPrefixHeight_step (i : ℕ) :
     simp [bitNat]
 
 /-- upper mechanical Sturmian word の finite prefix。 -/
-noncomputable def criticalSturmianPrefix : ℕ → ParityWord
+def criticalSturmianPrefix : ℕ → ParityWord
   | 0 => []
   | n + 1 => criticalSturmianPrefix n ++ [criticalSturmianBit n]
 
@@ -208,7 +208,7 @@ theorem criticalSturmianPrefix_prefixOddCount
 first-passage length `k>0` に対応する critical boundary word。
 mechanical prefix の最後の crossing bit は terminal では 0 に落ちる。
 -/
-noncomputable def criticalBoundaryWord : ℕ → ParityWord
+def criticalBoundaryWord : ℕ → ParityWord
   | 0 => []
   | k + 1 => criticalSturmianPrefix k ++ [false]
 
