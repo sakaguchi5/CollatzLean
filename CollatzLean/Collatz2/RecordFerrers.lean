@@ -7,6 +7,7 @@ import CollatzLean.Collatz2.Geometry.CriticalCarry
 import CollatzLean.Collatz2.Geometry.MinimalCrossingBlock
 import CollatzLean.Collatz2.Geometry.RecordDecomposition
 import CollatzLean.Collatz2.Geometry.RecordFerrersFactorization
+import CollatzLean.Collatz2.Geometry.PrimitiveReducedRecordInverse
 import CollatzLean.Collatz2.Geometry.FerrersReconstruction
 import CollatzLean.Collatz2.Geometry.LocalTranslationSet
 import CollatzLean.Collatz2.Geometry.BlockFerrersDeficit
