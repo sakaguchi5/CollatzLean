@@ -154,6 +154,10 @@ import CollatzLean.Collatz2.CSTMicro.FerrersChain
 import CollatzLean.Collatz2.CSTMicro.FirstPassagePreservation
 import CollatzLean.Collatz2.CSTMicro.FirstFailureExtraction
 import CollatzLean.Collatz2.CSTMicro.CarryCorridorExtraction
+import CollatzLean.Collatz2.CSTMicro.SturmianHeight
+import CollatzLean.Collatz2.CSTMicro.BinaryFerrersOrder
+import CollatzLean.Collatz2.CSTMicro.FerrersBoundarySturmian
+
 
 set_option linter.style.header false
 
