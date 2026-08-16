@@ -140,6 +140,12 @@ import CollatzLean.Collatz2.Canonical.EndpointFloorRecordFactorizationBridge
 -- primitive-reduced current A -> valid local micro packet -> genuine recovery
 import CollatzLean.Collatz2.Canonical.EndpointFloorValidRecordMicroBridge
 
+--CSTMicro
+import CollatzLean.Collatz2.CSTMicro.Path
+import CollatzLean.Collatz2.CSTMicro.Affine
+import CollatzLean.Collatz2.CSTMicro.Residue
+import CollatzLean.Collatz2.CSTMicro.MicroObject
+
 set_option linter.style.header false
 
 /-!
