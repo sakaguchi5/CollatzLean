@@ -136,6 +136,8 @@ import CollatzLean.Collatz2.ObstructionAudit.TranslationShadowAudit
 import CollatzLean.Collatz2.RecordFerrers
 -- current A -> generic Record/Ferrers bridge
 import CollatzLean.Collatz2.Canonical.EndpointFloorRecordFactorizationBridge
+-- primitive-reduced current A -> valid local micro packet -> genuine recovery
+import CollatzLean.Collatz2.Canonical.EndpointFloorValidRecordMicroBridge
 
 set_option linter.style.header false
 
