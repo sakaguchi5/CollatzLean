@@ -37,6 +37,7 @@ import CollatzLean.Collatz2.Geometry.ResidueIndexedFerrers
 import CollatzLean.Collatz2.Geometry.RankUnitGeometricInverse
 import CollatzLean.Collatz2.Geometry.ResidueIndexedFerrersCellSum
 import CollatzLean.Collatz2.Geometry.ValidRecordRealization
+import CollatzLean.Collatz2.Geometry.PrimitiveReducedChristoffelBridge
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
