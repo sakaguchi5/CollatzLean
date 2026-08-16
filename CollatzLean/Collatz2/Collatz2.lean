@@ -145,6 +145,7 @@ import CollatzLean.Collatz2.CSTMicro.Path
 import CollatzLean.Collatz2.CSTMicro.Affine
 import CollatzLean.Collatz2.CSTMicro.Residue
 import CollatzLean.Collatz2.CSTMicro.MicroObject
+import CollatzLean.Collatz2.CSTMicro.PolynomialCapacity
 
 set_option linter.style.header false
 
