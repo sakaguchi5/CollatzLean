@@ -177,3 +177,109 @@ theorem rankQuotient_eq_extraDepth_of_primitiveReduced
 end CanonicalEndpointFloorContractingReturn
 end OddOrbit
 end Collatz2
+
+namespace Collatz2
+namespace Word
+namespace ContractingExponentPair
+
+/--
+primitive + StripReduced pair では proper denominator の strip rank は
+whole slope の Euclidean remainder そのもの。
+
+  stripRank r = (H * r) % p
+-/
+theorem stripRank_eq_twoDepth_mul_mod_of_primitive_reduced
+    {P : ContractingExponentPair}
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    {r : ℕ}
+    (hrPos : 0 < r)
+    (hrLt : r < P.oddCount) :
+    P.stripRank r =
+      (P.twoDepth * r) % P.oddCount := by
+  have hFloor :=
+    P.criticalHeight_eq_chordFloor_of_primitive_reduced
+      hPrimitive hReduced hrPos hrLt
+  have hMod :=
+    Nat.mod_add_div
+      (P.twoDepth * r)
+      P.oddCount
+  unfold stripRank
+  rw [hFloor]
+  omega
+
+end ContractingExponentPair
+end Word
+
+namespace OddOrbit
+namespace CanonicalEndpointFloorContractingReturn
+
+/--
+current A specialization:
+
+primitive + StripReduced では proper cut の deterministic strip は
+
+  stripRank(k) = (H*k) % p
+
+という Euclidean remainder そのものになる。
+-/
+theorem stripRank_eq_twoSteps_mul_mod_of_primitiveReduced
+    {O : OddOrbit}
+    (D : CanonicalEndpointFloorContractingReturn O)
+    (hPrimitive : D.exponentPair.IsPrimitive)
+    (hReduced : D.exponentPair.StripReduced)
+    {k : ℕ}
+    (hkPos : 0 < k)
+    (hkLt : k < Word.oddSteps D.word) :
+    Word.stripRank D.word k =
+      (Word.twoSteps D.word * k) %
+        Word.oddSteps D.word := by
+  have h :=
+    D.exponentPair.stripRank_eq_twoDepth_mul_mod_of_primitive_reduced
+      hPrimitive hReduced hkPos (by simpa using hkLt)
+  simpa [exponentPair_stripRank_eq] using h
+
+/--
+current A specialization:
+
+primitive + StripReduced では proper chord rank は
+
+  chordRank(k)
+    = (H*k mod p) + p*extraDepth(k)
+
+と exact に分解される。
+
+したがって proper cut の rank 情報は
+
+* bounded residue `(H*k) mod p`
+* genuine Ferrers column height `extraDepth(k)`
+
+だけになる。
+-/
+theorem chordRank_eq_mod_add_oddSteps_mul_extraDepth_of_primitiveReduced
+    {O : OddOrbit}
+    (D : CanonicalEndpointFloorContractingReturn O)
+    (hPrimitive : D.exponentPair.IsPrimitive)
+    (hReduced : D.exponentPair.StripReduced)
+    {k : ℕ}
+    (hkPos : 0 < k)
+    (hkLt : k < Word.oddSteps D.word) :
+    Word.chordRank D.word k =
+      (Word.twoSteps D.word * k) %
+          Word.oddSteps D.word +
+        Word.oddSteps D.word *
+          Word.extraDepth D.word k := by
+  have hF : Word.FirstCrossing D.word :=
+    D.wordFirstCrossing
+  have hDecomp :=
+    hF.chordRank_eq_stripRank_add_extraDepth
+      hkPos hkLt
+  have hStrip :=
+    D.stripRank_eq_twoSteps_mul_mod_of_primitiveReduced
+      hPrimitive hReduced hkPos hkLt
+  rw [hStrip] at hDecomp
+  exact hDecomp
+
+end CanonicalEndpointFloorContractingReturn
+end OddOrbit
+end Collatz2
