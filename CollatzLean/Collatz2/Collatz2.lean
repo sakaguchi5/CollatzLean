@@ -150,6 +150,10 @@ import CollatzLean.Collatz2.CSTMicro.InversePathSum
 import CollatzLean.Collatz2.CSTMicro.AdjacentFerrersSwap
 import CollatzLean.Collatz2.CSTMicro.ResidueCarry
 import CollatzLean.Collatz2.CSTMicro.SmallRepresentativeCarry
+import CollatzLean.Collatz2.CSTMicro.FerrersChain
+import CollatzLean.Collatz2.CSTMicro.FirstPassagePreservation
+import CollatzLean.Collatz2.CSTMicro.FirstFailureExtraction
+import CollatzLean.Collatz2.CSTMicro.CarryCorridorExtraction
 
 set_option linter.style.header false
 
