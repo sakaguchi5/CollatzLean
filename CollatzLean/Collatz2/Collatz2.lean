@@ -174,6 +174,11 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.StrongDenominatorWindowC
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.StrongBoundaryMatch
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.StrongTwoLogDyadicSlack
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.StrongBoundaryAClosure
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalContinuedFractionData
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalChristoffelPacket
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalSturmianStrongOverlap
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalFiniteXiIdentity
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalStrongMatchConstruction
 
 
 set_option linter.style.header false
