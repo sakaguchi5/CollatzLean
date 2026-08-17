@@ -200,6 +200,7 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualBoundaryAFromRhin
 --CSTMicro/CarryGeometry
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyGeometry
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyExtraction
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedDefectCrossing
 
 
 
