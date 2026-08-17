@@ -161,6 +161,12 @@ import CollatzLean.Collatz2.CSTMicro.BeattyPositions
 import CollatzLean.Collatz2.CSTMicro.CriticalCrossingIndex
 import CollatzLean.Collatz2.CSTMicro.BoundaryXiTruncation
 
+--CSTMicro/ExternalArithmetic
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.LopezStollPacket
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ChristoffelHeightSqueeze
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.DenominatorWindowCover
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalIntegerResidueSeparation
+
 
 set_option linter.style.header false
 
