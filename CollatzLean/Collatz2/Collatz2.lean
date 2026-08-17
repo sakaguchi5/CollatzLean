@@ -197,6 +197,10 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualCriticalFiniteScan
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualBoundaryFiniteCheck1538
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualBoundaryAFromRhin
 
+--CSTMicro/CarryGeometry
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyGeometry
+
+
 
 set_option linter.style.header false
 
