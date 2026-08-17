@@ -188,6 +188,14 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalChristoffelHeigh
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RhinTwoThreeGap14
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RhinStrongSlackStartNine
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalASteps6to8
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalPowerFarey
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalPowerFareyGeometry
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalPowerFareyBeatty
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RhinLinearForm14
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualRhinStrongSlack
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualCriticalFiniteScan
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualBoundaryFiniteCheck1538
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualBoundaryAFromRhin
 
 
 set_option linter.style.header false
