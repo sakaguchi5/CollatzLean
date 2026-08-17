@@ -184,6 +184,10 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalChristoffelPacke
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBeattyConvergentCorridor
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalSturmianFiniteScanIdentity
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalStrongMatchProof
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalChristoffelHeightFour
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RhinTwoThreeGap14
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RhinStrongSlackStartNine
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalASteps6to8
 
 
 set_option linter.style.header false
