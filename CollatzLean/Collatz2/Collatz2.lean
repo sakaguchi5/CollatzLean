@@ -166,6 +166,10 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.LopezStollPacket
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ChristoffelHeightSqueeze
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.DenominatorWindowCover
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalIntegerResidueSeparation
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.LopezStollInstantiation
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ChristoffelHeightBound
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.TwoLogDyadicSlack
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BoundaryACandidate
 
 
 set_option linter.style.header false
