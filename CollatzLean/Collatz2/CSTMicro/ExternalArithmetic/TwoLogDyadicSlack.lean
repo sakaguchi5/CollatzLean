@@ -2,10 +2,7 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ChristoffelHeightBound
 import Mathlib.Tactic.Ring
 
 /-!
-# Two-logarithm input -> dyadic height squeeze
-
-Baker / Gouillon 型の二対数線形形式評価に必要な役割を
-exact に一箇所へ切り出す。
+# Diophantine denominator growth -> dyadic height squeeze
 
 coarse denominator window
 
@@ -16,7 +13,8 @@ coarse denominator window
 
   2^q_j * 2^q_{j-2} ≤ 2^e.
 
-したがって、外部 two-log theorem から最終的に
+したがって、外部の two-logarithm / irrationality-measure input から
+continued-fraction denominator growth を制御し、最終的に
 
   H q_j (B(U_j)+1) < 2^q_{j-2}
 
@@ -26,7 +24,12 @@ coarse denominator window
 
 が従う。
 
-隣接 window の coverage 自体には Baker/Gouillon は使わない。
+ここで必要なのは特定の Baker / Gouillon 定理そのものではなく、
+最終的な dyadic domination だけである。
+したがって将来 Rhin / Wang--Wu 型の `log 2 / log 3` 専用評価へ差し替えても
+下流の theorem は変わらない。
+
+隣接 window の coverage 自体には外部 Diophantine estimate は使わない。
 -/
 
 namespace Collatz2
@@ -38,10 +41,11 @@ def NatBoundMonotone (B : ℕ → ℕ) : Prop :=
   ∀ ⦃a b : ℕ⦄, a ≤ b → B a ≤ B b
 
 /--
-two-logarithm estimate から必要な最終 dyadic slack。
+外部 Diophantine estimate から必要な最終 dyadic slack。
 
-実際の Gouillon/Baker 移植では denominator growth control から
-この inequality を示せばよい。
+`start` の具体値はここでは固定しない。
+選択した explicit two-log / irrationality-measure theorem から denominator growth を評価し、
+その有効開始点以降でこの inequality を示せばよい。
 -/
 structure TwoLogDyadicSlack
     (F : CriticalResidueApproximationFamily)

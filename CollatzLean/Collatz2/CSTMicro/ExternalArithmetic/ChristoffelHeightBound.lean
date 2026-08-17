@@ -19,9 +19,8 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.LopezStollInstantiation
 odd/even corrected formulas を通して fixed constant `H`
 （例えば粗い `H=4`）へ押し込む層に対応する。
 
-このファイルでは、その文献依存の formula 展開を
-`ChristoffelHeightInstantiation.height` 一点に隔離する。
-以後の squeeze は既存 theorem だけで進む。
+ここは two-logarithm theorem ではなく、corrected numerator formula と
+Christoffel balance から得る elementary Archimedean estimate の層である。
 -/
 
 namespace Collatz2
@@ -66,7 +65,7 @@ def toApproximationFamily
   height := by
     intro j
     simpa [LopezStollInstantiation.packet] using C.height j
-  upper_cofinal := L.upper_cofinal
+  upper_cofinal := L.window_upper_cofinal
 }
 
 /-- family の q は元の continued-fraction denominator。 -/

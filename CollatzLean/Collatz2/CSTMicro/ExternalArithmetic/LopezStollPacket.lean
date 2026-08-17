@@ -10,13 +10,17 @@ import Mathlib.Tactic.Linarith
 
 外部文献側から必要なのは各 index `j` について概ね
 
-* approximation precision `E_j`,
+* certified approximation precision `E_j`,
 * Archimedean scale index `q_j`,
 * integers `P_j,Q_j`,
 * `Q_j` は odd,
 * `-P_j/Q_j` は nonnegative integer ではない,
 
 である。
+
+重要なのは `E_j` を actual 2-adic valuation の最大値とは解釈しないこと。
+後段が利用してよい precision budget を表すだけであり、
+実際の valuation が `E_j` より大きくても何も問題はない。
 
 2-adic approximation 自体は、後段では
 
@@ -42,7 +46,7 @@ def ExcludesNonnegativeExact (P Q : ℤ) : Prop :=
 /--
 一つの corrected López--Stoll approximant に必要な pure arithmetic packet。
 
-`q` は Christoffel height scale、`E` は exact 2-adic precision。
+`q` は Christoffel height scale、`E` は certified 2-adic precision budget。
 `denominatorOdd` は `Q` が 2-adic unit であることを表す。
 -/
 structure LopezStollPacket where

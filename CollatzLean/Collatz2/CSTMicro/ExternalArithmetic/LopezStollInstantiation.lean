@@ -6,17 +6,23 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalIntegerResidueSe
 abstract `LopezStollPacket` を、実際の continued-fraction index `j` に沿う
 一族としてまとめる。
 
-このファイル自身は López--Stoll の解析定理を axiom 化しない。
-原論文から移植すべき exact facts を structure field として明示し、
-そこから既存の `LopezStollPacket` を構成する。
+このファイルで actual family から要求するのは、文献側で本当に自然な data だけである。
+特に `E_j` を「exact 2-adic valuation」として外部入力にはしない。
+後段で使う certified precision budget は
 
-必要なのは各 `j` について
+  U_j = q_{j+1} + q_{j-1}
 
-* denominator scale `q_j`,
-* exact 2-adic precision `E_j = q_{j+1}+q_{j-1}`,
+とこちらで選び、`packet.E := U_j` と定義する。
+実際の corrected approximant がこの budget まで target と一致することは、
+Boundary A 側の finite divisibility certificate が担う。
+
+したがって actual instantiation に必要なのは各 `j` について
+
+* continued-fraction denominator scale `q_j`,
 * corrected numerator / denominator `P_j,Q_j`,
 * `Q_j` は odd,
 * `-P_j/Q_j` は nonnegative integer ではない,
+* denominator sequence 自身が cofinal,
 
 である。
 
@@ -30,15 +36,13 @@ namespace CSTMicro
 namespace ExternalArithmetic
 
 /--
-López--Stoll corrected convergent family から必要な exact arithmetic data。
+López--Stoll corrected convergent family から必要な actual arithmetic data。
 
-`start` は後段の height / two-log estimate が一様に使える index まで
-有限個を捨ててよい。そのため theorem の内容を弱めず、十分大きい index から
-family を開始できる。
+`start` は後段の height / Diophantine estimate が一様に使える index まで
+有限個を捨ててよい。その具体的な大きさはこの interface では固定しない。
 -/
 structure LopezStollInstantiation where
   q : ℕ → ℕ
-  E : ℕ → ℕ
   P : ℕ → ℤ
   Q : ℕ → ℤ
   start : ℕ
@@ -47,18 +51,12 @@ structure LopezStollInstantiation where
   /-- continued-fraction denominator は増加する。 -/
   q_mono : ∀ n : ℕ, q n ≤ q (n + 1)
 
-  /-- packet scale は exact precision 以下。 -/
-  q_le_E : ∀ j : ℕ, q j ≤ E j
+  /-- denominator sequence 自身が `start` 以降 cofinal。 -/
+  q_cofinal :
+    ∀ N : ℕ, ∃ j : ℕ,
+      start ≤ j ∧ N ≤ q j
 
-  /-- López--Stoll Lemma 21 の precision formula。 -/
-  precision_eq :
-    ∀ j : ℕ,
-      E j = denominatorWindowUpper q j
-
-  /-- denominator は非零。 -/
-  Q_ne_zero : ∀ j : ℕ, Q j ≠ 0
-
-  /-- denominator は 2-adic unit。 -/
+  /-- denominator は 2-adic unit。非零性もここから従う。 -/
   Q_odd : ∀ j : ℕ, ¬ (2 : ℤ) ∣ Q j
 
   /--
@@ -70,23 +68,53 @@ structure LopezStollInstantiation where
   exact_nonnegative_excluded :
     ∀ j : ℕ, ExcludesNonnegativeExact (P j) (Q j)
 
-  /-- approximation windows の upper endpoints は cofinal。 -/
-  upper_cofinal :
-    ∀ N : ℕ, ∃ j : ℕ,
-      start ≤ j ∧
-        N ≤ denominatorWindowUpper q j
-
 namespace LopezStollInstantiation
 
-/-- index `j` の corrected approximant を abstract packet へ落とす。 -/
+/-- `q_j` は chosen window upper endpoint 以下。 -/
+theorem q_le_windowUpper
+    (L : LopezStollInstantiation)
+    (j : ℕ) :
+    L.q j ≤ denominatorWindowUpper L.q j := by
+  unfold denominatorWindowUpper
+  have hmono : L.q j ≤ L.q (j + 1) := L.q_mono j
+  omega
+
+/-- `Q_j` は odd なので非零。 -/
+theorem Q_ne_zero
+    (L : LopezStollInstantiation)
+    (j : ℕ) :
+    L.Q j ≠ 0 := by
+  intro hzero
+  apply L.Q_odd j
+  rw [hzero]
+  exact dvd_zero _
+
+/--
+`q_j` 自身の cofinality から chosen precision window の upper endpoint の
+cofinality を導く。
+-/
+theorem window_upper_cofinal
+    (L : LopezStollInstantiation) :
+    ∀ N : ℕ, ∃ j : ℕ,
+      L.start ≤ j ∧
+        N ≤ denominatorWindowUpper L.q j := by
+  intro N
+  rcases L.q_cofinal N with ⟨j, hjStart, hN⟩
+  exact ⟨j, hjStart, le_trans hN (L.q_le_windowUpper j)⟩
+
+/--
+index `j` の corrected approximant を abstract packet へ落とす。
+
+`E` は actual valuation ではなく、後段で安全に利用する certified window upper endpoint。
+-/
 def packet
     (L : LopezStollInstantiation)
     (j : ℕ) : LopezStollPacket := {
   q := L.q j
-  E := L.E j
+  E := denominatorWindowUpper L.q j
   P := L.P j
   Q := L.Q j
-  q_le_E := L.q_le_E j
+  q_le_E := L.q_le_windowUpper j
   Q_ne_zero := L.Q_ne_zero j
   denominatorOdd := L.Q_odd j
   exactNonnegativeExcluded := L.exact_nonnegative_excluded j
@@ -98,7 +126,7 @@ def packet
 
 @[simp] theorem packet_E
     (L : LopezStollInstantiation) (j : ℕ) :
-    (L.packet j).E = L.E j := rfl
+    (L.packet j).E = denominatorWindowUpper L.q j := rfl
 
 @[simp] theorem packet_P
     (L : LopezStollInstantiation) (j : ℕ) :
@@ -108,11 +136,11 @@ def packet
     (L : LopezStollInstantiation) (j : ℕ) :
     (L.packet j).Q = L.Q j := rfl
 
-/-- packet precision は denominator window upper endpoint そのもの。 -/
+/-- packet の certified precision budget は chosen window upper endpoint そのもの。 -/
 theorem packet_precision
     (L : LopezStollInstantiation) (j : ℕ) :
     (L.packet j).E = denominatorWindowUpper L.q j := by
-  simpa [packet] using L.precision_eq j
+  rfl
 
 /--
 odd-convergent 側の sign argument から

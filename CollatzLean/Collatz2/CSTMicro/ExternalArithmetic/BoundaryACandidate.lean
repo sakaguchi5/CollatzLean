@@ -12,17 +12,20 @@ A branch は canonical critical Sturmian boundary 自身が
 
 1. boundary least representative を `Candidate(e,R)` にする、
 2. boundary failure から `R` の polynomial bound を得る、
-3. actual López--Stoll family の candidate matching と
+3. actual corrected family の finite divisibility certificate と
    two-log dyadic slack があれば large A failure を排除する、
 4. 残る有限初期範囲を確認すれば nontrivial A branch 全体を排除する、
 
 ところまで接続する。
 
-ここで precision は exact に
+ここで boundary precision は exact に
 
   e = length - 1 = beattyIndex(endpointOddCount)
 
 である。
+
+一方、approximant 側の `E_j` は exact valuation ではなく、
+後段が利用してよい certified precision budget である。
 -/
 
 namespace Collatz2
@@ -138,23 +141,58 @@ theorem ferrersBoundary_representative_le_failureBound
   exact hBound
 
 /--
-actual López--Stoll corrected approximants が
-boundary Ξ candidate と同じ 2-adic target を近似する、という bridge。
+actual corrected approximants が boundary Ξ candidate と同じ finite 2-adic target を
+certified window precision まで近似する、という bridge。
 
-原論文 Lemma 21 + finite truncation tail valuation を
-移植するときに埋める唯一の matching field。
+ここで要求するのは generalized continued fraction の値そのものではない。
+各 `j` の explicit corrected `P_j,Q_j` について
+
+  e ≤ q_{j+1}+q_{j-1}
+  BoundaryXiCandidate e R
+  --------------------------------
+  2^e ∣ P_j + R Q_j
+
+を示す finite divisibility certificate だけである。
+
+実装時には critical Sturmian prefix overlap と
+`BoundaryXiTruncation` の finite identity から証明する。
 -/
 structure BoundaryLopezStollMatch
-    (F : CriticalResidueApproximationFamily) where
+    (L : LopezStollInstantiation) where
   xiTargetAgreement :
-    F.CandidateMatches BoundaryXiCandidate
+    ∀ j e R : ℕ,
+      L.start ≤ j →
+      e ≤ denominatorWindowUpper L.q j →
+      BoundaryXiCandidate e R →
+      MatchesAtTwoPower e (L.P j) (L.Q j) R
+
+namespace BoundaryLopezStollMatch
+
+/--
+actual-family matching certificate を abstract separation engine の
+`CandidateMatches` へ落とす。
+-/
+theorem toCandidateMatches
+    {L : LopezStollInstantiation}
+    (C : ChristoffelHeightInstantiation L)
+    (M : BoundaryLopezStollMatch L) :
+    C.toApproximationFamily.CandidateMatches BoundaryXiCandidate := by
+  intro j e R hjStart hPrecision hCandidate
+  have hCertified :
+      e ≤ denominatorWindowUpper L.q j := by
+    change e ≤ denominatorWindowUpper L.q j at hPrecision
+    exact hPrecision
+  change MatchesAtTwoPower e (L.P j) (L.Q j) R
+  exact M.xiTargetAgreement j e R hjStart hCertified hCandidate
+
+end BoundaryLopezStollMatch
 
 /--
 large precision の A failure は abstract separation engine で排除される。
 -/
 theorem no_large_critical_boundary_failure
     (F : CriticalResidueApproximationFamily)
-    (M : BoundaryLopezStollMatch F)
+    (hMatch : F.CandidateMatches BoundaryXiCandidate)
     {K A : ℕ}
     (hGap :
       ∀ p H : ℕ,
@@ -184,7 +222,7 @@ theorem no_large_critical_boundary_failure
     ferrersBoundary_isBoundaryXiCandidate hBoundary
   exact
     F.no_small_candidate_eventually
-      M.xiTargetAgreement
+      hMatch
       S.toWindowHeightSqueeze
       hLarge
       hR
@@ -193,7 +231,7 @@ theorem no_large_critical_boundary_failure
 /--
 nontrivial A branch 全排除。
 
-large precision は López--Stoll + height + two-log engine で落とし、
+large precision は corrected approximants + height + two-log engine で落とし、
 `e < firstPrecision` の有限個だけ直接確認する。
 
 `length > 2` を入れるのは `0`, `10` という strict-separation の
@@ -201,7 +239,7 @@ trivial exceptions を除くため。
 -/
 theorem boundaryA_eliminated_of_finite_check
     (F : CriticalResidueApproximationFamily)
-    (M : BoundaryLopezStollMatch F)
+    (hMatch : F.CandidateMatches BoundaryXiCandidate)
     {K A : ℕ}
     (hGap :
       ∀ p H : ℕ,
@@ -228,7 +266,7 @@ theorem boundaryA_eliminated_of_finite_check
       F.firstPrecision ≤ v.length - 1
   · exact
       no_large_critical_boundary_failure
-        F M hGap S hBoundary hLarge
+        F hMatch hGap S hBoundary hLarge
   · have hSmall :
         v.length - 1 < F.firstPrecision := by
       omega
@@ -238,14 +276,15 @@ theorem boundaryA_eliminated_of_finite_check
 actual instantiation 版。
 
 `LopezStollInstantiation` + `ChristoffelHeightInstantiation` から family を作り、
-matching / two-log / finite check を供給すれば A branch が消える。
+finite matching certificate / two-log slack / finite check を供給すれば A branch が消える。
+
+matching は `CriticalResidueApproximationFamily` という height 付き package に対してではなく、
+actual corrected `P_j,Q_j` に直接与える。
 -/
 theorem boundaryA_eliminated_from_actual_family
     {L : LopezStollInstantiation}
     (C : ChristoffelHeightInstantiation L)
-    (M :
-      BoundaryLopezStollMatch
-        C.toApproximationFamily)
+    (M : BoundaryLopezStollMatch L)
     {K A : ℕ}
     (hGap :
       ∀ p H : ℕ,
@@ -272,7 +311,7 @@ theorem boundaryA_eliminated_from_actual_family
   exact
     boundaryA_eliminated_of_finite_check
       C.toApproximationFamily
-      M
+      (M.toCandidateMatches C)
       hGap
       S
       hFinite
