@@ -160,6 +160,7 @@ import CollatzLean.Collatz2.CSTMicro.FerrersBoundarySturmian
 import CollatzLean.Collatz2.CSTMicro.BeattyPositions
 import CollatzLean.Collatz2.CSTMicro.CriticalCrossingIndex
 import CollatzLean.Collatz2.CSTMicro.BoundaryXiTruncation
+import CollatzLean.Collatz2.CSTMicro.FirstFailureProvenance
 
 --CSTMicro/ExternalArithmetic
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.LopezStollPacket
@@ -202,6 +203,7 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyGeometry
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyExtraction
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedDefectCrossing
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.WeightedRankSmallResidueBridge
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedFerrersCocycle
 
 
 
