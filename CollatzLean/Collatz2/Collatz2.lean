@@ -238,6 +238,8 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ResidualRankTopLedger
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ExtraDepthFerrersTransport
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.CriticalBoundaryExtraDepth
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FerrersColumnOccupancy
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnLayerFareyBridge
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.CriticalColumnLayerFareyBridge
 
 set_option linter.style.header false
 
