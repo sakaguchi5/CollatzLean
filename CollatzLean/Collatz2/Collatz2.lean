@@ -234,6 +234,10 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.DiscountedThreeQStrip
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.UniversalRankTopFerrersStep
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FerrersStepRankTopLedger
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RankTopChainWindingLedger
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ResidualRankTopLedger
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ExtraDepthFerrersTransport
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.CriticalBoundaryExtraDepth
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FerrersColumnOccupancy
 
 set_option linter.style.header false
 
