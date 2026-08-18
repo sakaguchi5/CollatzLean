@@ -227,6 +227,10 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FerrersStepRankTransport
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RankCellInsertionCost
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RelativeRankCellCostLedger
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.WeightedRankGlobalCostBridge
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.UniversalCutWeight
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RankTopWinding
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.LocalRankTopLedger
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.DiscountedThreeQStrip
 
 set_option linter.style.header false
 
