@@ -208,6 +208,8 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedFerrersLedger
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ActualBoundaryFirstFailureCocycle
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.CanonicalRepresentativeTrace
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ActualBoundaryFirstFailureCocycle
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ExactNormalizedFerrersLedger
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ActualABExactCellLedger
 
 
 
