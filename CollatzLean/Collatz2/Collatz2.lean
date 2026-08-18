@@ -204,6 +204,8 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyExtraction
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedDefectCrossing
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.WeightedRankSmallResidueBridge
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedFerrersCocycle
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedFerrersLedger
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ActualBoundaryFirstFailureCocycle
 
 
 
