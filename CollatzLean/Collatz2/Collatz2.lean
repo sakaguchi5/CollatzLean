@@ -214,6 +214,7 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FerrersCellResiduePotential
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.SafePrefixExactCellFirstPassage
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.SafePrefixCarryClearance
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MinimalBadFirstPassage
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MinimalActualABObstructionPacket
 
 
 
