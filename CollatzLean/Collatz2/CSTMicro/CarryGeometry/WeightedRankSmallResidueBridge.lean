@@ -2,47 +2,37 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.NormalizedDefectCrossing
 import CollatzLean.Collatz2.Geometry.WeightedRankSum
 
 /-!
-# General CST: normalized defect -> weighted-rank small-residue bridge
+# General CST: B first-failure -> weighted-rank small-residue bridge
 
-`NormalizedDefectCrossing` までで actual first failure の upper coordinate
+前段 `NormalizedDefectCrossing` までで B の actual first failure は
 
-  q = normalizedSeparationDefectInt upper
+  q = normalizedSeparationDefectInt upper,
+  0 ≤ q < m,
+  q < D,
+  0 < D < G
 
-は
-
-  0 ≤ q < m
-
-を満たすことが分かった。
-
-一方 `Geometry/WeightedRankSum` は odd-only exponent word `Word = List ℕ` 上で
-
-  3 * B = 3^m * weightedRankSum      (mod G)
-
-を与える。
+という normalized strip を持つ。
 
 このファイルでは standard parity word を run-length で odd-only exponent word へ
-lossless に圧縮し、first-passage upper word について
+lossless に圧縮し、B first-failure upper word を既存 `Word.FirstCrossing` geometry へ接続する。
 
-  oddSteps   = oddCount,
-  twoSteps   = standard length,
-  Word.B     = CSTMicro.B,
-  terminalGap = CSTMicro terminal gap,
+その上で
 
-を証明する。さらに first-passage 性を odd-only `FirstCrossing` へ移す。
+  B = G*R + 2^k*q
 
-その上で normalized defect equation
+を mod `G` に落とし、既存 weighted-rank identity
 
-  B = G * R + 2^k * q
+  3*B = 3^m*weightedRankSum
 
-を mod G に落とし、`2^k = 3^m (mod G)` と weighted-rank identity を結合して
+と結合して
 
-  3*q = weightedRankSum              (mod G)
+  3*q = weightedRankSum                 (mod G)
 
 を得る。
 
-既存 `RankUnitData` は primitive endpoint `gcd(k,m)=1` なら内部構成できる。
-nonprimitive endpoint では root-unit の存在はこのファイルでは仮定せず、
-既存 weighted-rank formalism の適用可能範囲を正確に分離する。
+primitive endpoint `gcd(k,m)=1` では既存 `RankUnitData` を内部構成できるため、
+B first failure は追加仮定なしで weighted-rank small-residue packet に到達する。
+A/B 分類そのものを飛び越える一般化は行わず、failure semantics は `FirstFailureEdge` に閉じる。
 -/
 
 namespace Collatz2
@@ -100,9 +90,7 @@ def exponentWordOfParity (v : ParityWord) : Collatz2.Word :=
       (leadingEvenCount v + 1) :: exponentWordOfParity v := by
   rfl
 
-/--
-leading even-run と exponent sum を足すと standard word length に戻る。
--/
+/-- leading even-run と exponent sum を足すと standard word length に戻る。 -/
 theorem leadingEvenCount_add_twoSteps_exponentWordOfParity
     (v : ParityWord) :
     leadingEvenCount v + Collatz2.Word.twoSteps (exponentWordOfParity v) =
@@ -267,7 +255,7 @@ theorem IsFirstPassageWord.exists_eq_true_cons
         norm_num [CoefficientExpandingAt, prefixOddCount, oddCount, bitNat] at hExp
       · exact ⟨t, rfl⟩
 
-/-! ## 2. actual first-failure upper word as an odd-only FirstCrossing word -/
+/-! ## 2. B first-failure upper word as an odd-only FirstCrossing word -/
 
 namespace FirstFailureEdge
 
@@ -345,10 +333,7 @@ theorem upperExponentWord_nonempty
   rw [F.upperExponentWord_oddSteps]
   exact F.edge_oddTotal_pos
 
-/--
-standard first-passage の proper expansion を run checkpoints へ制限すると、
-encoded odd-only word の全 proper prefix determinant が positive。
--/
+/-- standard first-passage の proper expansion を run checkpoints へ制限する。 -/
 theorem upperExponentWord_properPositive
     (F : FirstFailureEdge) :
     Collatz2.Word.ProperPrefixesPositiveDeterminant F.upperExponentWord := by
@@ -470,17 +455,13 @@ theorem upperNormalizedDefectNat_lt_oddSteps
   rw [F.upperExponentWord_oddSteps]
   exact F.upperNormalizedDefectNat_lt_oddTotal
 
-/--
-upper affine equation を natural small coordinate で書き直す。
--/
+/-- upper affine equation を natural small coordinate で書き直す。 -/
 theorem upper_affineConst_eq_gap_mul_R_add_modulus_mul_upperQ
     (F : FirstFailureEdge) :
     affineConst F.step.edge.upperWord =
       wordTerminalGap F.step.edge.upperWord * F.step.edge.upperR +
         F.step.edge.modulus * F.upperNormalizedDefectNat := by
-  have h :=
-    FirstFailureFareyData.upper_affineConst_eq_gap_mul_R_add_modulus_mul_normalized
-      (F := F)
+  have h := F.upper_affineConst_eq_gap_mul_R_add_modulus_mul_normalized
   rw [← F.upperNormalizedDefectNat_cast] at h
   exact_mod_cast h
 
@@ -506,7 +487,7 @@ theorem upperExponentWord_affineConst_eq_gap_mul_R_add_twoPow_mul_upperQ
             unfold AdjacentFerrersSwap.modulus
             rw [F.upperExponentWord_twoSteps]
 
-/-! ## 4. weighted-rank congruence -/
+/-! ## 4. weighted-rank congruence and B final packet -/
 
 /-- mod terminal gap では `2^H = 3^p`。 -/
 theorem upperExponentWord_twoPow_cast_eq_threePow_cast
@@ -537,11 +518,7 @@ theorem upperExponentWord_twoPow_cast_eq_threePow_cast
   rw [hGapZero, zero_add] at hCast
   simpa [w] using hCast.symm
 
-/--
-normalized defect equation を mod G に落とすと
-
-  B = 3^m * q  (mod G).
--/
+/-- normalized defect equation を mod G に落とすと `B = 3^m*q`。 -/
 theorem upperExponentWord_affineConst_cast_eq_threePow_mul_upperQ
     (F : FirstFailureEdge) :
     ((Collatz2.Word.affineConst F.upperExponentWord : ℕ) :
@@ -566,12 +543,7 @@ theorem upperExponentWord_affineConst_cast_eq_threePow_mul_upperQ
   rw [F.upperExponentWord_twoPow_cast_eq_threePow_cast] at hCast
   exact hCast
 
-/--
-既存 RankUnitData が使える endpoint では、actual first failure の small coordinate が
-weighted rank sum そのものを決める。
-
-  3*q = weightedRankSum  (mod G).
--/
+/-- 既存 RankUnitData が使える endpoint では `3*q = weightedRankSum`。 -/
 theorem weightedRankSum_eq_three_mul_upperNormalizedDefectNat
     (F : FirstFailureEdge)
     (R : Collatz2.Word.RankUnitData F.upperExponentWord) :
@@ -620,12 +592,7 @@ theorem weightedRankSum_eq_three_mul_upperNormalizedDefectNat
           Collatz2.Word.weightedRankSum R := hW'
   exact R.cancel_threePow hCancel
 
-/--
-actual first failure の weighted-rank residue は、幅 `m` の ordinary set
-`{3q | 0 ≤ q < m}` に必ず入る。
-
-`q` は Nat なので `0 ≤ q` は型から自動。
--/
+/-- actual B first failure の weighted-rank residue は `{3q | 0 ≤ q < m}` に入る。 -/
 theorem weightedRank_small_residue_packet
     (F : FirstFailureEdge)
     (R : Collatz2.Word.RankUnitData F.upperExponentWord) :
@@ -641,9 +608,38 @@ theorem weightedRank_small_residue_packet
     F.weightedRankSum_eq_three_mul_upperNormalizedDefectNat R⟩
 
 /--
-primitive endpoint `gcd(k,m)=1` では既存 rank-unit theorem により、
-small-residue weighted-rank packet は追加仮定なしで存在する。
+4段 pipeline を一つにまとめた B first-failure normal form。
+
+* `q < m`,
+* `q < D`,
+* `0 < D < G`,
+* `3q = weightedRankSum (mod G)`
+
+を同時に保持する。
 -/
+theorem weightedRank_bounded_firstFailure_packet
+    (F : FirstFailureEdge)
+    (R : Collatz2.Word.RankUnitData F.upperExponentWord) :
+    ∃ D : FirstFailureFareyData F,
+      ∃ q : ℕ,
+        q < Collatz2.Word.oddSteps F.upperExponentWord ∧
+        (q : ℤ) = normalizedSeparationDefectInt F.step.edge.upperWord ∧
+        (q : ℤ) < D.farey.residue ∧
+        0 < D.farey.residue ∧
+        D.farey.residue < D.farey.G ∧
+        (((3 : ℕ) : ZMod (Collatz2.Word.terminalGap F.upperExponentWord))) *
+            ((q : ℕ) : ZMod (Collatz2.Word.terminalGap F.upperExponentWord)) =
+          Collatz2.Word.weightedRankSum R := by
+  let D := F.toFirstFailureFareyData
+  refine ⟨D, F.upperNormalizedDefectNat,
+    F.upperNormalizedDefectNat_lt_oddSteps,
+    F.upperNormalizedDefectNat_cast, ?_,
+    D.residue_pos, D.residue_lt_gap,
+    F.weightedRankSum_eq_three_mul_upperNormalizedDefectNat R⟩
+  rw [F.upperNormalizedDefectNat_cast]
+  exact D.upper_normalizedSeparationDefectInt_lt_residue
+
+/-- primitive endpoint では既存 rank-unit theorem により small-residue packet は無条件。 -/
 theorem exists_weightedRank_small_residue_packet_of_coprime
     (F : FirstFailureEdge)
     (hcop : Nat.Coprime F.step.edge.length F.step.edge.oddTotal) :
@@ -662,6 +658,30 @@ theorem exists_weightedRank_small_residue_packet_of_coprime
   obtain ⟨R⟩ :=
     F.upperExponentWord_firstCrossing.exists_rankUnitData_of_coprime hcopWord
   exact ⟨R, F.weightedRank_small_residue_packet R⟩
+
+/-- primitive B first failure の bounded normal form は追加仮定なしで存在する。 -/
+theorem exists_weightedRank_bounded_firstFailure_packet_of_coprime
+    (F : FirstFailureEdge)
+    (hcop : Nat.Coprime F.step.edge.length F.step.edge.oddTotal) :
+    ∃ R : Collatz2.Word.RankUnitData F.upperExponentWord,
+      ∃ D : FirstFailureFareyData F,
+        ∃ q : ℕ,
+          q < Collatz2.Word.oddSteps F.upperExponentWord ∧
+          (q : ℤ) = normalizedSeparationDefectInt F.step.edge.upperWord ∧
+          (q : ℤ) < D.farey.residue ∧
+          0 < D.farey.residue ∧
+          D.farey.residue < D.farey.G ∧
+          (((3 : ℕ) : ZMod (Collatz2.Word.terminalGap F.upperExponentWord))) *
+              ((q : ℕ) : ZMod (Collatz2.Word.terminalGap F.upperExponentWord)) =
+            Collatz2.Word.weightedRankSum R := by
+  have hcopWord :
+      Nat.Coprime
+        (Collatz2.Word.twoSteps F.upperExponentWord)
+        (Collatz2.Word.oddSteps F.upperExponentWord) := by
+    simpa using hcop
+  obtain ⟨R⟩ :=
+    F.upperExponentWord_firstCrossing.exists_rankUnitData_of_coprime hcopWord
+  exact ⟨R, F.weightedRank_bounded_firstFailure_packet R⟩
 
 end FirstFailureEdge
 

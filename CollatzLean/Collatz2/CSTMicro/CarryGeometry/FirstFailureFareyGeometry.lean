@@ -2,42 +2,43 @@ import CollatzLean.Collatz2.CSTMicro.CarryCorridorExtraction
 import Mathlib.Tactic.LinearCombination
 
 /-!
-# General CST: first-failure carry の Farey / terminal-gap 幾何
+# General CST: B first-failure carry / Farey interface
 
-current `FirstFailureEdge` から無条件に得られる 2-adic carry 座標を、
-後で terminal-gap / Farey 座標へ接続しやすい形に独立化する。
+B の first failure を後段の normalized crossing / weighted-rank small residue へ渡すため、
+このファイルでは「意味論」と「純算術 interface」を分離して保持する。
 
-このファイルではまず
+前半は actual `FirstFailureEdge` から得られる dyadic carry 幾何：
 
+* signed separation defect `B - G*R`,
 * carry complement `2^k - deltaR`,
-* first-failure の small error `upperR`,
-* separation defect の exact jump,
-* first-failure では jump が strict positive,
+* carry 時の exact defect jump,
+* first failure における jump の strict positivity,
+* polynomial-small upper representative,
 
-を current CSTMicro object だけから証明する。
+を扱う。
 
-後半では pure arithmetic packet
+後半は adjacent cell から後で canonical に抽出される pure Farey packet
 
-  2^d * s - 3^a * h = 1
+  2^d * s - 3^a * h = 1,
+  D = 2^i * h - 3^r * s,
+  G = 2^k - 3^m
 
-から cell residue
+を独立した integer object として固定し、
 
-  D = 2^i * h - 3^r * s
-
-を定義し、terminal gap `G = 2^k - 3^m` に対する exact identities
-
-  2^d * D = G*h - 3^r
+  2^d * D = G*h - 3^r,
   3^a * D = G*s - 2^i
 
 を証明する。
 
-`AdjacentFerrersSwap` からこの Farey packet を自動抽出する bridge は、
-modular inverse representative の quotient を ordinary integer に持ち上げる
-次段の証明義務として意図的に分離している。
+この段階では A/B を横断する failure abstraction へ一般化しない。
+反例性・positivity は `FirstFailureEdge` / `FirstFailureFareyData` に閉じ込め、
+`AdjacentFerrersSwap` / `FareyCellPacket` は計算 kernel としてのみ generic に保つ。
 -/
 
 namespace Collatz2
 namespace CSTMicro
+
+/-! ## 1. B first-failure の signed defect と dyadic carry -/
 
 /-- word-level pure separation の signed defect `B - G*R`。 -/
 def wordSeparationDefectInt (v : ParityWord) : ℤ :=
@@ -256,12 +257,7 @@ theorem lowerR_le_carryComplement_add_lengthPolynomial
 
 end FirstFailureEdge
 
-/-!
-## Pure Farey cell packet
-
-ここから下は `AdjacentFerrersSwap` の implementation から独立した純整数論層。
-`h,s,G` は signed algebra を簡潔に保つため `ℤ` で持つ。
--/
+/-! ## 2. Pure Farey cell arithmetic -/
 
 /--
 一つの local cell に付随する determinant-one / terminal-gap 座標。
@@ -344,16 +340,11 @@ theorem twoPow_lt_gap_mul_s_of_residue_pos
 
 end FareyCellPacket
 
-/-!
-## Bridge target
-
-次段で証明すべき modular-inverse extraction を interface として固定する。
-existence はこのファイルでは仮定しない。
--/
+/-! ## 3. B first-failure と Farey packet の interface -/
 
 /--
 first-failure edge の carry complement が Farey denominator `h` を持つ、
-という次段 bridge 用 packet。
+という actual bridge 用 packet。
 -/
 structure FirstFailureFareyData (F : FirstFailureEdge) where
   farey : FareyCellPacket

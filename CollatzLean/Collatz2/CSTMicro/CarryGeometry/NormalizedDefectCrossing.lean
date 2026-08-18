@@ -1,33 +1,41 @@
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyExtraction
 
 /-!
-# General CST: normalized first-failure defect crossing
+# General CST: B first-failure normalized defect crossing
 
-`FirstFailureFareyExtraction` までで actual first failure は
+`FirstFailureFareyExtraction` までで B の actual first failure は
 
   carryCellJumpInt = 2^k * D,
-  D > 0
+  0 < D < G
 
-という positive Farey residue を持つことが分かった。
+という bounded Farey cell を持つ。
 
 このファイルでは word-level signed defect
 
   defect = B - G * R
 
-が常に parity modulus `2^k` の倍数であることを ordinary integer に戻し、
-その quotient を affine endpoint と start representative の差として canonical に定義する。
+が terminal-contracting word で parity modulus `2^k` の倍数になることを ordinary integer に戻し、
+その quotient を canonical affine endpoint と start representative の差
 
-first failure では normalized defect `q` が
+  q = endpoint(R) - R
+
+として定義する。
+
+B first failure では
 
   q_lower < 0 ≤ q_upper,
   q_upper = q_lower + D,
   q_upper < m,
+  q_upper < D,
+  0 < D < G
 
-を満たす。したがって failure は幅 `m` の integer strip への最初の crossing に落ちる。
+を同時に得る。これが後段 weighted-rank bridge へ渡す normalized crossing strip である。
 -/
 
 namespace Collatz2
 namespace CSTMicro
+
+/-! ## 1. normalized signed defect -/
 
 /--
 least parity representative `R` を whole affine equation に代入して得る
@@ -145,6 +153,8 @@ theorem wordSeparationDefectInt_eq_modulus_mul_normalized
           (leastRepresentative v : ℤ)) := by
             ring
 
+/-! ## 2. B first-failure strip coordinates -/
+
 namespace FirstFailureEdge
 
 /-- first-failure lower edge word は first-passage。 -/
@@ -238,9 +248,7 @@ theorem upper_threePow_lt_modulus
   unfold CoefficientContracting at h
   simpa [AdjacentFerrersSwap.modulus] using h
 
-/--
-upper affine numerator は `m * 2^k` より strict に小さい。
--/
+/-- upper affine numerator は `m * 2^k` より strict に小さい。 -/
 theorem upper_affineConst_lt_oddTotal_mul_modulus
     (F : FirstFailureEdge) :
     affineConst F.step.edge.upperWord <
@@ -254,13 +262,7 @@ theorem upper_affineConst_lt_oddTotal_mul_modulus
     (Nat.mul_lt_mul_left hm).2 hPow
   exact lt_of_le_of_lt hB hmul
 
-/--
-first failure の upper normalized defect は endpoint odd count より小さい。
-
-  0 ≤ q_upper < m
-
-の右側。
--/
+/-- first failure の upper normalized defect は endpoint odd count より小さい。 -/
 theorem upper_normalizedSeparationDefectInt_lt_oddTotal
     (F : FirstFailureEdge) :
     normalizedSeparationDefectInt F.step.edge.upperWord <
@@ -322,7 +324,39 @@ theorem upper_normalizedSeparationDefectInt_lt_length
     exact_mod_cast hmNat
   exact lt_of_lt_of_le hq hm
 
+/--
+upper defect equation を ordinary integer strip coordinate で書き直す。
+Farey data を使わないため、B first-failure の normalized layer に置く。
+-/
+theorem upper_affineConst_eq_gap_mul_R_add_modulus_mul_normalized
+    (F : FirstFailureEdge) :
+    (affineConst F.step.edge.upperWord : ℤ) =
+      (wordTerminalGap F.step.edge.upperWord : ℤ) *
+          (F.step.edge.upperR : ℤ) +
+        (F.step.edge.modulus : ℤ) *
+          normalizedSeparationDefectInt F.step.edge.upperWord := by
+  have hFactor :=
+    wordSeparationDefectInt_eq_modulus_mul_normalized
+      F.step.edge.upperWord F.edge_upper_firstPassage.2.2
+  rw [F.step.edge.parityModulus_upperWord] at hFactor
+  unfold wordSeparationDefectInt at hFactor
+  change
+    (affineConst F.step.edge.upperWord : ℤ) =
+      (wordTerminalGap F.step.edge.upperWord : ℤ) *
+          (leastRepresentative F.step.edge.upperWord : ℤ) +
+        (F.step.edge.modulus : ℤ) *
+          normalizedSeparationDefectInt F.step.edge.upperWord
+  simpa [AdjacentFerrersSwap.upperR] using (by
+    linarith [hFactor] :
+      (affineConst F.step.edge.upperWord : ℤ) =
+        (wordTerminalGap F.step.edge.upperWord : ℤ) *
+            (leastRepresentative F.step.edge.upperWord : ℤ) +
+          (F.step.edge.modulus : ℤ) *
+            normalizedSeparationDefectInt F.step.edge.upperWord)
+
 end FirstFailureEdge
+
+/-! ## 3. Farey jump と normalized crossing の結合 -/
 
 namespace FirstFailureFareyData
 
@@ -340,11 +374,7 @@ theorem carryCellJumpInt_eq_modulus_mul_residue
   rw [← D.k_eq_length, D.farey.k_eq, pow_add]
   ring
 
-/--
-normalized defect は一つの actual first-failure cell で exact に `D` 増える。
-
-  q_upper = q_lower + D.
--/
+/-- normalized defect は一つの actual first-failure cell で exact に `D` 増える。 -/
 theorem normalizedSeparationDefectInt_upper_eq_lower_add_residue
     {F : FirstFailureEdge}
     (D : FirstFailureFareyData F) :
@@ -386,8 +416,6 @@ first failure の normalized crossing strip。
   0 ≤ q_upper < m,
   q_upper = q_lower + D,
   q_upper < D.
-
-ここで `m` は common endpoint odd count。
 -/
 theorem normalized_crossing_strip
     {F : FirstFailureEdge}
@@ -407,9 +435,31 @@ theorem normalized_crossing_strip
   rw [D.m_eq_oddTotal]
   exact F.upper_normalizedSeparationDefectInt_lt_oddTotal
 
-/-- upper defect equation を ordinary integer strip coordinate で書き直す。
-(D : FirstFailureFareyData F)が unused なのは「証明で使い忘れた」のではなく、
-この定理が Farey layer より一段手前に属している証拠
+/--
+Farey interval `0 < D < G` まで含めた B first-failure normalized normal form。
+-/
+theorem bounded_normalized_crossing_strip
+    {F : FirstFailureEdge}
+    (D : FirstFailureFareyData F) :
+    let qLower := normalizedSeparationDefectInt F.step.edge.lowerWord
+    let qUpper := normalizedSeparationDefectInt F.step.edge.upperWord
+    qLower < 0 ∧
+      0 ≤ qUpper ∧
+      qUpper < (D.farey.m : ℤ) ∧
+      qUpper = qLower + D.farey.residue ∧
+      qUpper < D.farey.residue ∧
+      0 < D.farey.residue ∧
+      D.farey.residue < D.farey.G := by
+  dsimp
+  have hStrip := D.normalized_crossing_strip
+  dsimp at hStrip
+  refine ⟨hStrip.1, hStrip.2.1, hStrip.2.2.1,
+    hStrip.2.2.2.1, hStrip.2.2.2.2,
+    D.residue_pos, D.residue_lt_gap⟩
+
+/--
+旧 namespace からの互換 alias。
+本体は `FirstFailureEdge.upper_affineConst_eq_gap_mul_R_add_modulus_mul_normalized`。
 -/
 theorem upper_affineConst_eq_gap_mul_R_add_modulus_mul_normalized
     {F : FirstFailureEdge} :
@@ -417,33 +467,16 @@ theorem upper_affineConst_eq_gap_mul_R_add_modulus_mul_normalized
       (wordTerminalGap F.step.edge.upperWord : ℤ) *
           (F.step.edge.upperR : ℤ) +
         (F.step.edge.modulus : ℤ) *
-          normalizedSeparationDefectInt F.step.edge.upperWord := by
-  have hFactor :=
-    wordSeparationDefectInt_eq_modulus_mul_normalized
-      F.step.edge.upperWord F.edge_upper_firstPassage.2.2
-  rw [F.step.edge.parityModulus_upperWord] at hFactor
-  unfold wordSeparationDefectInt at hFactor
-  change
-    (affineConst F.step.edge.upperWord : ℤ) =
-      (wordTerminalGap F.step.edge.upperWord : ℤ) *
-          (leastRepresentative F.step.edge.upperWord : ℤ) +
-        (F.step.edge.modulus : ℤ) *
-          normalizedSeparationDefectInt F.step.edge.upperWord
-  simpa [AdjacentFerrersSwap.upperR] using (by
-    linarith [hFactor] :
-      (affineConst F.step.edge.upperWord : ℤ) =
-        (wordTerminalGap F.step.edge.upperWord : ℤ) *
-            (leastRepresentative F.step.edge.upperWord : ℤ) +
-          (F.step.edge.modulus : ℤ) *
-            normalizedSeparationDefectInt F.step.edge.upperWord)
+          normalizedSeparationDefectInt F.step.edge.upperWord :=
+  F.upper_affineConst_eq_gap_mul_R_add_modulus_mul_normalized
 
 end FirstFailureFareyData
 
+/-! ## 4. canonical existence packets -/
+
 namespace FirstFailureEdge
 
-/--
-canonical actual Farey packet を選べば normalized crossing strip は常に存在する。
--/
+/-- canonical actual Farey packet を選べば normalized crossing strip は常に存在する。 -/
 theorem exists_normalized_crossing_strip
     (F : FirstFailureEdge) :
     ∃ D : FirstFailureFareyData F,
@@ -457,9 +490,23 @@ theorem exists_normalized_crossing_strip
   let D := F.toFirstFailureFareyData
   exact ⟨D, D.normalized_crossing_strip⟩
 
-/--
-polynomial-small residue error と normalized crossing strip を同時に保持する final packet。
--/
+/-- `0 < D < G` まで保持する canonical normalized crossing packet。 -/
+theorem exists_bounded_normalized_crossing_strip
+    (F : FirstFailureEdge) :
+    ∃ D : FirstFailureFareyData F,
+      let qLower := normalizedSeparationDefectInt F.step.edge.lowerWord
+      let qUpper := normalizedSeparationDefectInt F.step.edge.upperWord
+      qLower < 0 ∧
+        0 ≤ qUpper ∧
+        qUpper < (D.farey.m : ℤ) ∧
+        qUpper = qLower + D.farey.residue ∧
+        qUpper < D.farey.residue ∧
+        0 < D.farey.residue ∧
+        D.farey.residue < D.farey.G := by
+  let D := F.toFirstFailureFareyData
+  exact ⟨D, D.bounded_normalized_crossing_strip⟩
+
+/-- polynomial-small residue error と normalized crossing strip を同時に保持する既存 packet。 -/
 theorem exists_normalized_crossing_strip_with_polynomial_error
     (F : FirstFailureEdge)
     {K A : ℕ}
@@ -484,6 +531,38 @@ theorem exists_normalized_crossing_strip_with_polynomial_error
   dsimp at hStrip
   refine ⟨D, hStrip.1, hStrip.2.1, hStrip.2.2.1,
     hStrip.2.2.2.1, hStrip.2.2.2.2, ?_⟩
+  exact D.upperR_le_lengthPolynomial hGap
+
+/--
+`0 < D < G`、normalized strip、polynomial-small upperR を同時に保持する B final packet。
+-/
+theorem exists_bounded_normalized_crossing_strip_with_polynomial_error
+    (F : FirstFailureEdge)
+    {K A : ℕ}
+    (hGap :
+      ∀ p H : ℕ,
+        0 < p →
+        3 ^ p < 2 ^ H →
+        3 ^ p ≤
+          K * (p + 1) ^ A * (2 ^ H - 3 ^ p)) :
+    ∃ D : FirstFailureFareyData F,
+      let qLower := normalizedSeparationDefectInt F.step.edge.lowerWord
+      let qUpper := normalizedSeparationDefectInt F.step.edge.upperWord
+      qLower < 0 ∧
+        0 ≤ qUpper ∧
+        qUpper < (D.farey.m : ℤ) ∧
+        qUpper = qLower + D.farey.residue ∧
+        qUpper < D.farey.residue ∧
+        0 < D.farey.residue ∧
+        D.farey.residue < D.farey.G ∧
+        F.step.edge.upperR ≤
+          K * (D.farey.k + 1) ^ (A + 1) := by
+  let D := F.toFirstFailureFareyData
+  have hStrip := D.bounded_normalized_crossing_strip
+  dsimp at hStrip
+  refine ⟨D, hStrip.1, hStrip.2.1, hStrip.2.2.1,
+    hStrip.2.2.2.1, hStrip.2.2.2.2.1,
+    hStrip.2.2.2.2.2.1, hStrip.2.2.2.2.2.2, ?_⟩
   exact D.upperR_le_lengthPolynomial hGap
 
 end FirstFailureEdge

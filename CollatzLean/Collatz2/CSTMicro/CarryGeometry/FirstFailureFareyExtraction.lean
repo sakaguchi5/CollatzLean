@@ -1,52 +1,48 @@
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstFailureFareyGeometry
 
 /-!
-# General CST: first-failure Farey packet の actual extraction
+# General CST: B first-failure Farey packet の actual extraction
 
-`FirstFailureFareyGeometry` では、actual first-failure carry 側と
-pure Farey packet 側を interface だけで分離していた。
+前ファイルでは
 
-このファイルではその残り bridge を閉じる。
+* B first failure の actual carry geometry,
+* pure `FareyCellPacket`,
+* `FirstFailureFareyData` interface
 
-一つの adjacent Ferrers swap に対して
+を分離した。
+
+このファイルでは一つの `AdjacentFerrersSwap` に対して
 
   i = position,
   d = 2 + right.length,
   a = oddCount left + 1,
-  r = oddCount right,
+  r = oddCount right
 
-と置く。small modulus `2^d` における `3^{-a}` の least representative を
-`u` とすると
-
-  0 < u < 2^d,
-  3^a * u = 1 + 2^d * q
-
-となる。そこで
+を取り、small modulus `2^d` における `3^{-a}` の least representative `u` から
 
   h = 2^d - u,
-  s = 3^a - q
+  s = 3^a - q,
+  2^d*s - 3^a*h = 1
 
-と置けば
+を ordinary integer に持ち上げる。さらに
 
-  2^d * s - 3^a * h = 1.
+  deltaR = 2^i*u,
+  carryComplement = 2^i*h
 
-さらに full modulus `2^(i+d)` 上の local residue は exact に
+を exact に証明し、任意の `FirstFailureEdge` から canonical な
+`FirstFailureFareyData` を構成する。
 
-  deltaR = 2^i * u
+B の意味論は `FirstFailureFareyData` に閉じたまま、actual first failure では
 
-なので、carry complement は
+  0 < D < G
 
-  2^k - deltaR = 2^i * h
-
-へ factor する。
-
-これにより任意の `FirstFailureEdge` から `FirstFailureFareyData` を
-無条件に構成できる。最後に既存の strict positive carry jump と結合し、
-actual first failure の Farey residue `D` が strict positive であることまで証明する。
+までをこの層の最終 normal form として証明する。
 -/
 
 namespace Collatz2
 namespace CSTMicro
+
+/-! ## 1. adjacent Ferrers cell の modular inverse extraction -/
 
 namespace AdjacentFerrersSwap
 
@@ -118,6 +114,7 @@ theorem fareyLocalInverse_lt
   unfold fareyLocalInverse
   exact ZMod.val_lt _
 
+/-- small inverse representative は正。 -/
 theorem fareyLocalInverse_pos
     (S : AdjacentFerrersSwap) :
     0 < S.fareyLocalInverse := by
@@ -208,6 +205,15 @@ theorem fareyH_pos
     0 < S.fareyH := by
   unfold fareyH
   exact Nat.sub_pos_of_lt S.fareyLocalInverse_lt
+
+/-- `h` は small modulus `2^d` より strict に小さい。 -/
+theorem fareyH_lt_twoPow
+    (S : AdjacentFerrersSwap) :
+    S.fareyH < 2 ^ S.fareyTailDepth := by
+  unfold fareyH
+  have huPos := S.fareyLocalInverse_pos
+  have huLt := S.fareyLocalInverse_lt
+  omega
 
 /--
 small inverse quotient から determinant-one equation を得る。
@@ -399,9 +405,7 @@ theorem scaled_fareyLocalInverse_cast_eq_deltaClass
       rw [hInv']
       ring
 
-/--
-full local ordinary representative は exact に `2^i*u`。
--/
+/-- full local ordinary representative は exact に `2^i*u`。 -/
 theorem deltaR_eq_twoPow_mul_fareyLocalInverse
     (S : AdjacentFerrersSwap) :
     S.deltaR = 2 ^ S.position * S.fareyLocalInverse := by
@@ -415,9 +419,7 @@ theorem deltaR_eq_twoPow_mul_fareyLocalInverse
   rw [hxval] at hVal
   simpa only [deltaR] using hVal.symm
 
-/--
-carry complement は exact に `2^i*h`。
--/
+/-- carry complement は exact に `2^i*h`。 -/
 theorem carryComplement_eq_twoPow_mul_fareyH
     (S : AdjacentFerrersSwap) :
     S.carryComplement = 2 ^ S.position * S.fareyH := by
@@ -425,6 +427,17 @@ theorem carryComplement_eq_twoPow_mul_fareyH
   rw [S.deltaR_eq_twoPow_mul_fareyLocalInverse]
   rw [S.length_eq_position_add_fareyTailDepth, pow_add]
   rw [← Nat.mul_sub_left_distrib]
+
+/-- actual cell の carry complement は full modulus より strict に小さい。 -/
+theorem carryComplement_lt_modulus
+    (S : AdjacentFerrersSwap) :
+    S.carryComplement < S.modulus := by
+  rw [S.carryComplement_eq_twoPow_mul_fareyH]
+  unfold modulus
+  rw [S.length_eq_position_add_fareyTailDepth, pow_add]
+  have hp : 0 < 2 ^ S.position := Nat.pow_pos (by omega)
+  exact
+    (Nat.mul_lt_mul_left hp).2 S.fareyH_lt_twoPow
 
 /-- 一つの adjacent swap から pure Farey packet を canonical に構成する。 -/
 def toFareyCellPacket
@@ -445,6 +458,8 @@ def toFareyCellPacket
 }
 
 end AdjacentFerrersSwap
+
+/-! ## 2. actual B first-failure packet -/
 
 namespace FirstFailureEdge
 
@@ -468,10 +483,7 @@ def toFirstFailureFareyData
     exact_mod_cast F.step.edge.carryComplement_eq_twoPow_mul_fareyH
 }
 
-/--
-前ファイルで残していた bridge の existence。
-任意の first-failure edge は actual Farey packet を持つ。
--/
+/-- 任意の B first-failure edge は actual Farey packet を持つ。 -/
 theorem exists_firstFailureFareyData
     (F : FirstFailureEdge) :
     Nonempty (FirstFailureFareyData F) := by
@@ -500,6 +512,41 @@ theorem farey_G_eq_wordTerminalGap
   rw [F.step.edge.wordTerminalGap_lowerWord]
   rw [Nat.cast_sub hle]
   simp [AdjacentFerrersSwap.modulus]
+
+/-- B first failure の terminal gap `G` は strict positive。 -/
+theorem gap_pos
+    {F : FirstFailureEdge}
+    (D : FirstFailureFareyData F) :
+    0 < D.farey.G := by
+  rw [D.farey_G_eq_wordTerminalGap]
+  have hContract :
+      3 ^ F.step.edge.oddTotal < F.step.edge.modulus := by
+    have h := F.lower_firstPassage.2.2
+    unfold CoefficientContracting at h
+    rw [F.step.lower_eq] at h
+    simpa [AdjacentFerrersSwap.modulus] using h
+  have hGapNat :
+      0 < wordTerminalGap F.step.edge.lowerWord := by
+    rw [F.step.edge.wordTerminalGap_lowerWord]
+    exact Nat.sub_pos_of_lt hContract
+  exact_mod_cast hGapNat
+
+/-- actual bridge の Farey coordinate `h` は `2^d` より小さい。 -/
+theorem farey_h_lt_twoPow
+    {F : FirstFailureEdge}
+    (D : FirstFailureFareyData F) :
+    D.farey.h < (2 : ℤ) ^ D.farey.d := by
+  have hCompNat := F.step.edge.carryComplement_lt_modulus
+  have hComp :
+      (F.step.edge.carryComplement : ℤ) <
+        (F.step.edge.modulus : ℤ) := by
+    exact_mod_cast hCompNat
+  rw [D.complement_eq] at hComp
+  unfold AdjacentFerrersSwap.modulus at hComp
+  push_cast at hComp
+  rw [← D.k_eq_length, D.farey.k_eq, pow_add] at hComp
+  have hi : 0 < (2 : ℤ) ^ D.farey.i := by positivity
+  exact (Int.mul_lt_mul_left hi).mp hComp
 
 /--
 actual carry jump を Farey residue へ exact factorization する。
@@ -532,9 +579,7 @@ theorem carryCellJumpInt_eq_twoPow_mul_twoPow_mul_residue
         ((2 : ℤ) ^ D.farey.d * D.farey.residue) := by
           rw [← hTwo]
 
-/--
-actual first failure の Farey residue `D` は strict positive。
--/
+/-- actual B first failure の Farey residue `D` は strict positive。 -/
 theorem residue_pos
     {F : FirstFailureEdge}
     (D : FirstFailureFareyData F) :
@@ -553,6 +598,45 @@ theorem residue_pos
   exact
     pos_of_mul_pos_right hInner (le_of_lt hd)
 
+/-- actual B first failure の Farey residue は terminal gap より小さい。 -/
+theorem residue_lt_gap
+    {F : FirstFailureEdge}
+    (D : FirstFailureFareyData F) :
+    D.farey.residue < D.farey.G := by
+  have hEq := D.farey.twoPow_mul_residue
+  have hG := D.gap_pos
+  have hH := D.farey_h_lt_twoPow
+  have hThree : 0 < (3 : ℤ) ^ D.farey.r := by positivity
+  have hUpper :
+      D.farey.G * D.farey.h - (3 : ℤ) ^ D.farey.r <
+        D.farey.G * (2 : ℤ) ^ D.farey.d := by
+    have hSub :
+        D.farey.G * D.farey.h - (3 : ℤ) ^ D.farey.r <
+          D.farey.G * D.farey.h := by
+      linarith
+    have hMul :
+        D.farey.G * D.farey.h <
+          D.farey.G * (2 : ℤ) ^ D.farey.d :=
+      (Int.mul_lt_mul_left hG).2 hH
+    exact lt_trans hSub hMul
+  have hScaled :
+      (2 : ℤ) ^ D.farey.d * D.farey.residue <
+        (2 : ℤ) ^ D.farey.d * D.farey.G := by
+    calc
+      (2 : ℤ) ^ D.farey.d * D.farey.residue
+          = D.farey.G * D.farey.h - (3 : ℤ) ^ D.farey.r := hEq
+      _ < D.farey.G * (2 : ℤ) ^ D.farey.d := hUpper
+      _ = (2 : ℤ) ^ D.farey.d * D.farey.G := by ring
+  have hd : 0 < (2 : ℤ) ^ D.farey.d := by positivity
+  exact (Int.mul_lt_mul_left hd).mp hScaled
+
+/-- B first-failure Farey cell の canonical interval `0 < D < G`。 -/
+theorem residue_pos_lt_gap
+    {F : FirstFailureEdge}
+    (D : FirstFailureFareyData F) :
+    0 < D.farey.residue ∧ D.farey.residue < D.farey.G :=
+  ⟨D.residue_pos, D.residue_lt_gap⟩
+
 /-- actual first failure では `G*h > 3^r`。 -/
 theorem threePow_lt_gap_mul_h
     {F : FirstFailureEdge}
@@ -569,13 +653,12 @@ theorem twoPow_lt_gap_mul_s
 
 end FirstFailureFareyData
 
+/-! ## 3. B first-failure Farey normal-form packets -/
+
 namespace FirstFailureEdge
 
 /--
-first failure を一つの positive Farey + polynomial-small error packet にまとめる。
-
-ここで得られる `D` は actual edge から canonical に抽出したものであり、
-もはや外部 bridge 仮定を必要としない。
+既存互換 packet。first failure を positive Farey + polynomial-small error にまとめる。
 -/
 theorem exists_positive_farey_packet_with_polynomial_error
     (F : FirstFailureEdge)
@@ -595,6 +678,32 @@ theorem exists_positive_farey_packet_with_polynomial_error
         K * (D.farey.k + 1) ^ (A + 1) := by
   let D := F.toFirstFailureFareyData
   refine ⟨D, D.residue_pos, ?_, ?_⟩
+  · exact D.lowerR_eq_twoPow_mul_h_add_upperR
+  · exact D.upperR_le_lengthPolynomial hGap
+
+/--
+B first failure の Farey interval `0 < D < G` と polynomial-small error を
+一つの packet にまとめる。
+-/
+theorem exists_bounded_farey_packet_with_polynomial_error
+    (F : FirstFailureEdge)
+    {K A : ℕ}
+    (hGap :
+      ∀ p H : ℕ,
+        0 < p →
+        3 ^ p < 2 ^ H →
+        3 ^ p ≤
+          K * (p + 1) ^ A * (2 ^ H - 3 ^ p)) :
+    ∃ D : FirstFailureFareyData F,
+      0 < D.farey.residue ∧
+      D.farey.residue < D.farey.G ∧
+      (F.step.edge.lowerR : ℤ) =
+        (2 : ℤ) ^ D.farey.i * D.farey.h +
+          (F.step.edge.upperR : ℤ) ∧
+      F.step.edge.upperR ≤
+        K * (D.farey.k + 1) ^ (A + 1) := by
+  let D := F.toFirstFailureFareyData
+  refine ⟨D, D.residue_pos, D.residue_lt_gap, ?_, ?_⟩
   · exact D.lowerR_eq_twoPow_mul_h_add_upperR
   · exact D.upperR_le_lengthPolynomial hGap
 
