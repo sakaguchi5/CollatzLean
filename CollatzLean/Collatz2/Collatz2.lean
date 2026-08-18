@@ -221,9 +221,9 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.BoundaryRespectingCellSlack
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.PositiveCostFerrersPotential
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.BoundaryRespectingRankCellBridge
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ThreeQSmallStrip
-
-
-
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.GeneralPredecessorRankCellBridge
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FirstPassagePredecessorRankDepth
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FerrersStepRankTransport
 
 set_option linter.style.header false
 
