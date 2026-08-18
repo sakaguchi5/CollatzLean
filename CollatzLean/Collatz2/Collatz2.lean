@@ -218,6 +218,9 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MinimalActualABObstructionPac
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MinimalBadPredecessorGeometry
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MinimalBadCellCostObstruction
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.BoundaryRespectingCellSlack
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.PositiveCostFerrersPotential
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.BoundaryRespectingRankCellBridge
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ThreeQSmallStrip
 
 
 
