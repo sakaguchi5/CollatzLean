@@ -213,6 +213,7 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ActualABExactCellLedger
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.FerrersCellResiduePotential
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.SafePrefixExactCellFirstPassage
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.SafePrefixCarryClearance
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MinimalBadFirstPassage
 
 
 
@@ -222,6 +223,6 @@ set_option linter.style.header false
 # Collatz2
 
 旧 `CollatzLean.Collatz.*` に依存しない独立再構築の入口。
-既存 current-A / mountain / obstruction API に加え、`RecordFerrers` で
+既存 current-A / mountain / obstruction AMinimalBadFirstPassageI に加え、`RecordFerrers` で
 current-A 非依存の record/Ferrers/affine factorization 一般層を公開する。
 -/
