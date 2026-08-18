@@ -61,12 +61,52 @@ theorem nonempty_ferrersChain
       rcases ih with ⟨D⟩
       exact ⟨FerrersChain.step D S⟩
 
-/-- safety proof を忘れると通常の Ferrers chain。 -/
-noncomputable def toFerrersChain
+/--
+safety proof だけを忘れ、同じ step 列をそのまま通常の Ferrers chain へ写す。
+
+`Classical.choice` を介さず、`SafeFerrersChain` の constructor history を
+structural recursion でそのまま `FerrersChain` へ移す。
+-/
+def toFerrersChain :
+    {start finish : ParityWord} →
+      SafeFerrersChain start finish →
+        FerrersChain start finish
+  | _, _, .refl v _hSafe =>
+      FerrersChain.refl v
+  | _, _, .step C S _hSafe =>
+      FerrersChain.step (toFerrersChain C) S
+
+/--
+`SafeFerrersChain` に現れる全 step が述語 `P` を満たすことを順序を保って表す。
+
+endpoint safety は `SafeFerrersChain` 自身が保持しているため、ここでは step-level の
+追加条件だけを lossless に畳み込む。後段で「以前の全 carry が clearance 未満」などを
+全 intermediate step に対して述べるための共通 API とする。
+-/
+def AllSteps
+    (P : ∀ {lower upper : ParityWord}, FerrersStep lower upper → Prop)
     {start finish : ParityWord}
-    (C : SafeFerrersChain start finish) :
-    FerrersChain start finish :=
-  Classical.choice C.nonempty_ferrersChain
+    (C : SafeFerrersChain start finish) : Prop :=
+  match C with
+  | .refl _ _ => True
+  | .step C S _ => AllSteps P C ∧ P S
+
+@[simp] theorem allSteps_refl
+    (P : ∀ {lower upper : ParityWord}, FerrersStep lower upper → Prop)
+    (v : ParityWord)
+    (hSafe : WordPureSeparation v) :
+    AllSteps P (SafeFerrersChain.refl v hSafe) := by
+  simp [AllSteps]
+
+@[simp] theorem allSteps_step
+    (P : ∀ {lower upper : ParityWord}, FerrersStep lower upper → Prop)
+    {u v w : ParityWord}
+    (C : SafeFerrersChain u v)
+    (S : FerrersStep v w)
+    (hSafe : WordPureSeparation w) :
+    AllSteps P (SafeFerrersChain.step C S hSafe) ↔
+      AllSteps P C ∧ P S := by
+  rfl
 
 /-- safe chain の start は safe。 -/
 theorem start_safe
