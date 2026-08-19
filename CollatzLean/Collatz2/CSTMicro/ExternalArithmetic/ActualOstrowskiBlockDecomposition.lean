@@ -286,15 +286,108 @@ theorem ActualCriticalOstrowskiExpansion.blockScales_mass_eq
       rw [actualCriticalBlockScaleMass_replicate]
       exact hDecomp.symm
 
-/-- bounded expansion を canonical choice として保持する。 -/
-noncomputable def boundedActualCriticalOstrowskiExpansionChoice
+/--
+任意 `n < P_(R+3)` に対する bounded greedy Ostrowski expansion を
+division / remainder から直接構成する。
+
+実データは
+  d   = n / P_(R+2)
+  rem = n % P_(R+2)
+で再帰的に決まり、classical choice は不要。
+-/
+def boundedActualCriticalOstrowskiExpansionChoice
     (R n : ℕ)
     (hn : n < criticalPowerP (R + 3)) :
-    ActualCriticalOstrowskiExpansion R n :=
-  Classical.choice (exists_actualCriticalOstrowskiExpansion R n hn)
+    ActualCriticalOstrowskiExpansion R n := by
+  induction R generalizing n with
+  | zero =>
+      exact
+        .base n (by
+          simpa using hn)
+  | succ R ih =>
+      let B := criticalPowerP (R + 3)
+      let d := n / B
+      let rem := n % B
+      have hBPos : 0 < B := by
+        dsimp [B]
+        exact criticalPowerP_pos (by omega)
+      have hremLt : rem < B := by
+        dsimp [rem]
+        exact Nat.mod_lt n hBPos
+      let lower : ActualCriticalOstrowskiExpansion R rem :=
+        ih rem (by
+          simpa [B] using hremLt)
+      have hSpec :=
+        actualCriticalPartialQuotient_spec
+          (r := R + 3) (by omega)
+      have hPrevLtB :
+          criticalPowerP (R + 2) < B := by
+        dsimp [B]
+        exact
+          criticalPowerP_strict_succ
+            (r := R + 2) (by omega)
+      have hNext :
+          criticalPowerP (R + 4) =
+            criticalPowerP (R + 2) +
+              actualCriticalPartialQuotient (R + 3) * B := by
+        simpa [B, Nat.add_assoc] using hSpec.2.1
+      have hDivMul :
+          d * B ≤ n := by
+        dsimp [d]
+        exact Nat.div_mul_le_self n B
+      have hnNext :
+          n < criticalPowerP (R + 4) := by
+        simpa only [show R + 1 + 3 = R + 4 by omega] using hn
+      have hdLe :
+          d ≤ actualCriticalPartialQuotient (R + 3) := by
+        by_contra hnot
+        have hALtD :
+            actualCriticalPartialQuotient (R + 3) < d := by
+          omega
+        have hABLe :
+            (actualCriticalPartialQuotient (R + 3) + 1) * B ≤
+              d * B := by
+          exact Nat.mul_le_mul_right B (by omega)
+        have hNextLt :
+            criticalPowerP (R + 4) <
+              (actualCriticalPartialQuotient (R + 3) + 1) * B := by
+          rw [hNext]
+          nlinarith
+        have hContra :
+            (actualCriticalPartialQuotient (R + 3) + 1) * B <
+              (actualCriticalPartialQuotient (R + 3) + 1) * B := by
+          calc
+            (actualCriticalPartialQuotient (R + 3) + 1) * B
+                ≤ d * B := hABLe
+            _ ≤ n := hDivMul
+            _ < criticalPowerP (R + 4) := hnNext
+            _ <
+              (actualCriticalPartialQuotient (R + 3) + 1) * B :=
+                hNextLt
+        exact (Nat.lt_irrefl _ hContra)
+      have hDecomp :
+          n = rem + d * B := by
+        have h := Nat.mod_add_div n B
+        dsimp [rem, d]
+        simpa [Nat.mul_comm] using h.symm
+      have hMax :
+          d = actualCriticalPartialQuotient (R + 3) →
+            rem < criticalPowerP (R + 2) := by
+        intro hdEq
+        rw [hdEq] at hDecomp
+        rw [hNext] at hn
+        omega
+      exact
+        .step lower
+          (by
+            simpa [Nat.add_assoc] using hn)
+          (by
+            simpa [B] using hDecomp)
+          hdLe
+          hMax
 
 /-- bounded canonical scale-block list。 -/
-noncomputable def boundedActualCriticalOstrowskiBlockScales
+def boundedActualCriticalOstrowskiBlockScales
     (R n : ℕ)
     (hn : n < criticalPowerP (R + 3)) : List ℕ :=
   (boundedActualCriticalOstrowskiExpansionChoice R n hn).blockScales
@@ -311,7 +404,7 @@ theorem boundedActualCriticalOstrowskiBlockScales_mass_eq
       (boundedActualCriticalOstrowskiExpansionChoice R n hn)
 
 /-- arbitrary prefix `n` の canonical scale-block list。 -/
-noncomputable def actualCriticalOstrowskiBlockScales
+def actualCriticalOstrowskiBlockScales
     (n : ℕ) : List ℕ :=
   boundedActualCriticalOstrowskiBlockScales n n
     (self_lt_criticalPowerP_add_three n)
@@ -358,7 +451,7 @@ def actualCriticalPhaseBlocksFrom :
       simp [actualCriticalPhaseBlocksFrom, ih]
 
 /-- arbitrary prefix `n` の canonical phase-aware block list。 -/
-noncomputable def actualCriticalOstrowskiPhaseBlocks
+def actualCriticalOstrowskiPhaseBlocks
     (n : ℕ) : List ActualCriticalPhaseBlock :=
   actualCriticalPhaseBlocksFrom 0
     (actualCriticalOstrowskiBlockScales n)
