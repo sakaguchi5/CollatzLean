@@ -256,6 +256,10 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualOstrowskiBlockDeco
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBProfileDefectBridge
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBProfileBlockReduction
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ProfileIntervalCostBlocks
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RestrictedOstrowskiIntervals
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBeattyCurrentCorridor
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalIntervalPhasePeriodicity
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ShiftedCorrectedChristoffelDictionary
 
 set_option linter.style.header false
 
