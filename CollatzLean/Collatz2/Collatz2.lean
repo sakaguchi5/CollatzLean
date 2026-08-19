@@ -253,6 +253,7 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MaximalProfileLayerIntervals
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalPrefixOstrowski
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalIntervalAffineDefect
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualOstrowskiBlockDecomposition
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBProfileDefectBridge
 
 set_option linter.style.header false
 
