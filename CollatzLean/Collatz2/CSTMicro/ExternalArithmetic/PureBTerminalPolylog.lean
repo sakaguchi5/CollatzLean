@@ -5,20 +5,20 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ChristoffelHeightSqueeze
 /-!
 # Terminal critical suffix polylog bound
 
-correct route:
+改良後の route:
 
   terminal B
     -> small positive tail state Z
     -> record start is BoundaryXiCandidate
-    -> strong Xi / Christoffel H=4 / Rhin denominator growth
-    -> every record length L = O((log m)^196)
+    -> strong Xi / Christoffel H=4
+    -> height lower bound と Rhin denominator growth 1回だけで
+       every record length L = O((log m)^14)
     -> each carry record has Rhin phase drop >= (2L)^(-14)
     -> number of records O(L^14)
     -> terminal suffix length O(L^15)
-    -> O((log m)^2940).
+    -> O((log m)^210).
 
 既存 repo の private theorem / def は外から使用しない。
-必要な denominator growth は `RhinRecordPublic` の public theorem だけを使う。
 -/
 
 namespace Collatz2
@@ -136,7 +136,7 @@ theorem dyadic_poly14_forces_linear
       exact_mod_cast hBigNat
     nlinarith
 
-/-! ## 2. small Xi candidate -> precision bound -/
+/-! ## 2. small Xi candidate -> degree-14 precision bound -/
 
 /-- strong windows用 sequence monotonicity helper。 -/
 theorem natSeq_mono_of_succ
@@ -161,11 +161,18 @@ theorem natSeq_mono_of_succ
 def terminalRecordExceptionalPrecision : ℕ :=
   strongDenominatorWindowUpper criticalPowerQ 11
 
+/--
+large-window 側の degree-14 coefficient。
+height inequality から precision を直接読むための coefficient。
+-/
+def smallXiTailConstant : ℕ :=
+  4 * 65536 ^ 14 + 2
+
 /-- generic small-Xi precision bound。 -/
 def smallXiPrecisionBound (ell : ℕ) : ℕ :=
   max 1538
     (max terminalRecordExceptionalPrecision
-      (2 ^ 17 * (65536 * (ell + 1)) ^ 196))
+      (smallXiTailConstant * (ell + 1) ^ 14))
 
 /--
 large precision の Xi candidate から、
@@ -187,10 +194,6 @@ theorem exists_actualRecord_window_with_heightLower
           (x + 1) := by
   let L := actualRecordLopezStollInstantiation
   let C := actualRecordHeightFour R
-  /-
-  `L.q` は actual critical denominator sequence そのもの。
-  definitional equality を関数として固定する。
-  -/
   have hLq : L.q = criticalPowerQ := by
     funext k
     rfl
@@ -281,8 +284,6 @@ Xi candidate の dyadic size と height squeeze から
   q_(j-1) ≤ 65536 * (ell+1)
 
 を得る。
-
-この補題に power cancellation と Rhin の q-growth を隔離する。
 -/
 theorem actualRecord_tail_prevQ_le_linear
     (R : RhinLinearForm14)
@@ -376,48 +377,219 @@ theorem actualRecord_tail_prevQ_le_linear
   exact dyadic_poly14_forces_linear hMain
 
 /--
-tail range で previous denominator が linear bound を満たせば、
-strong-window upper bound から precision bound が従う。
+height lower bound から、指数部分だけを取り出して
+`e ≤ q + q + ell + 2` を得る。
+-/
+private theorem precision_le_two_q_add_ell_add_two
+    {e x ell q : ℕ}
+    (hxSize : x + 1 ≤ 2 ^ ell)
+    (hHeightLower :
+      2 ^ e ≤
+        (4 * q * 2 ^ q) * (x + 1)) :
+    e ≤ q + q + ell + 2 := by
+  have hSizeScaled :
+      (4 * q * 2 ^ q) * (x + 1) ≤
+        (4 * q * 2 ^ q) * 2 ^ ell :=
+    Nat.mul_le_mul_left (4 * q * 2 ^ q) hxSize
+  have hqPow : q ≤ 2 ^ q := by
+    exact Nat.le_of_lt Nat.lt_two_pow_self
+  have hCoeff :
+      4 * q * 2 ^ q ≤
+        4 * (2 ^ q) * 2 ^ q := by
+    exact
+      Nat.mul_le_mul_right (2 ^ q)
+        (Nat.mul_le_mul_left 4 hqPow)
+  have hCoeffScaled :
+      (4 * q * 2 ^ q) * 2 ^ ell ≤
+        (4 * (2 ^ q) * 2 ^ q) * 2 ^ ell :=
+    Nat.mul_le_mul_right (2 ^ ell) hCoeff
+  have hPowEq :
+      (4 * (2 ^ q) * 2 ^ q) * 2 ^ ell =
+        2 ^ (q + q + ell + 2) := by
+    rw [show (4 : ℕ) = 2 ^ 2 by norm_num]
+    simp only [pow_add]
+    ring
+  have hPowBound :
+      2 ^ e ≤ 2 ^ (q + q + ell + 2) := by
+    calc
+      2 ^ e ≤ (4 * q * 2 ^ q) * (x + 1) := hHeightLower
+      _ ≤ (4 * q * 2 ^ q) * 2 ^ ell := hSizeScaled
+      _ ≤ (4 * (2 ^ q) * 2 ^ q) * 2 ^ ell := hCoeffScaled
+      _ = 2 ^ (q + q + ell + 2) := hPowEq
+  exact
+    (Nat.pow_le_pow_iff_right
+      (by decide : 1 < (2 : ℕ))).mp hPowBound
+
+
+/--
+previous q の linear bound と Rhin の degree-14 bound から、
+current q を `ell` の degree 14 多項式で抑える。
+-/
+private theorem actualRecord_tail_current_q_le_explicit
+    (R : RhinLinearForm14)
+    {ell j : ℕ}
+    (hjTail : 12 ≤ j)
+    (hPrevLinear :
+      criticalPowerQ (j - 1) ≤
+        65536 * (ell + 1)) :
+    criticalPowerQ j ≤
+      2 * (65536 ^ 14) * (ell + 1) ^ 14 := by
+  let n := criticalPowerQ (j - 1)
+  let q := criticalPowerQ j
+  have hqBound : q ≤ 2 * n ^ 14 := by
+    simpa [q, n] using
+      R.actual_record_current_q_le_prev_pow14 hjTail
+  have hnLinear :
+      n ≤ 65536 * (ell + 1) := by
+    simpa [n] using hPrevLinear
+  have hnPow :
+      n ^ 14 ≤
+        (65536 * (ell + 1)) ^ 14 :=
+    Nat.pow_le_pow_left hnLinear 14
+  have hqSub :
+      q ≤ 2 * (65536 * (ell + 1)) ^ 14 :=
+    le_trans hqBound
+      (Nat.mul_le_mul_left 2 hnPow)
+  calc
+    q ≤ 2 * (65536 * (ell + 1)) ^ 14 := hqSub
+    _ = 2 * (65536 ^ 14) * (ell + 1) ^ 14 := by
+      rw [mul_pow]
+      ring
+
+
+/--
+`ell + 1` はその 14 乗以下。
+この小補題を独立させて power normalization を隔離する。
+-/
+private theorem ell_add_one_le_pow14
+    (ell : ℕ) :
+    ell + 1 ≤ (ell + 1) ^ 14 := by
+  have h :=
+    Nat.pow_le_pow_right
+      (by omega : 0 < ell + 1)
+      (by norm_num : 1 ≤ 14)
+  simpa using h
+
+
+/--
+`q ≤ 2 A M` と `ell + 1 ≤ M` から、
+`q + q + ell + 2` 全体を一つの `M` に吸収する。
+
+巨大定数を入れず、純粋な symbolic arithmetic として処理する。
+-/
+private theorem two_q_add_ell_add_two_le_tail
+    {q ell A M : ℕ}
+    (hq : q ≤ 2 * A * M)
+    (hM : ell + 1 ≤ M) :
+    q + q + ell + 2 ≤
+      (4 * A + 2) * M := by
+  have hEll :
+      ell + 2 ≤ 2 * M := by
+    have h0 :
+        ell + 2 ≤ 2 * (ell + 1) := by
+      omega
+    exact
+      le_trans h0
+        (Nat.mul_le_mul_left 2 hM)
+  calc
+    q + q + ell + 2
+        ≤
+      (2 * A * M) +
+        (2 * A * M) +
+        2 * M := by
+          omega
+    _ = (4 * A + 2) * M := by
+      ring
+
+
+/--
+tail 部分について precision を
+`smallXiTailConstant * (ell+1)^14` まで抑える。
+-/
+private theorem actualRecord_tail_precision_le_explicit
+    (R : RhinLinearForm14)
+    {e x ell j : ℕ}
+    (hxSize : x + 1 ≤ 2 ^ ell)
+    (hHeightLower :
+      2 ^ e ≤
+        (4 * criticalPowerQ j *
+          2 ^ criticalPowerQ j) *
+          (x + 1))
+    (hjTail : 12 ≤ j)
+    (hPrevLinear :
+      criticalPowerQ (j - 1) ≤
+        65536 * (ell + 1)) :
+    e ≤
+      smallXiTailConstant * (ell + 1) ^ 14 := by
+  let q := criticalPowerQ j
+  have hHeightLower' :
+      2 ^ e ≤
+        (4 * q * 2 ^ q) * (x + 1) := by
+    simpa [q] using hHeightLower
+  have heCore :
+      e ≤ q + q + ell + 2 :=
+    precision_le_two_q_add_ell_add_two
+      hxSize hHeightLower'
+  have hq :
+      q ≤
+        2 * (65536 ^ 14) *
+          (ell + 1) ^ 14 := by
+    simpa [q] using
+      actualRecord_tail_current_q_le_explicit
+        R hjTail hPrevLinear
+  have hM :
+      ell + 1 ≤ (ell + 1) ^ 14 :=
+    ell_add_one_le_pow14 ell
+  have hTail :
+      q + q + ell + 2 ≤
+        (4 * (65536 ^ 14) + 2) *
+          (ell + 1) ^ 14 := by
+    exact
+      two_q_add_ell_add_two_le_tail
+        hq hM
+  have he :
+      e ≤
+        (4 * (65536 ^ 14) + 2) *
+          (ell + 1) ^ 14 :=
+    le_trans heCore hTail
+  simpa [smallXiTailConstant] using he
+
+
+/--
+height lower bound をもう一度直接使い、precision を degree 14 で抑える。
+
+ここでは q_(j+1) へ進まず、height lower bound から precision を直接読む。
 -/
 theorem actualRecord_tail_precision_le_smallXiPrecisionBound
     (R : RhinLinearForm14)
-    {e ell j : ℕ}
-    (hWindowUpper :
-      e ≤ strongDenominatorWindowUpper criticalPowerQ j)
+    {e x ell j : ℕ}
+    (hxSize : x + 1 ≤ 2 ^ ell)
+    (hHeightLower :
+      2 ^ e ≤
+        (4 * criticalPowerQ j *
+          2 ^ criticalPowerQ j) *
+          (x + 1))
     (hjTail : 12 ≤ j)
     (hPrevLinear :
       criticalPowerQ (j - 1) ≤
         65536 * (ell + 1)) :
     e ≤ smallXiPrecisionBound ell := by
-  let n := criticalPowerQ (j - 1)
-  have hUpperActual :=
-    R.actual_record_strongWindowUpper_le_prev_pow196
-      hjTail
-  have heUpper :
-      e ≤ 2 ^ 17 * n ^ 196 := by
-    calc
-      e
-          ≤ strongDenominatorWindowUpper
-              criticalPowerQ j :=
-        hWindowUpper
-      _ ≤ 2 ^ 17 * n ^ 196 := by
-        simpa [n] using hUpperActual
-  have hnLinear :
-      n ≤ 65536 * (ell + 1) := by
-    simpa [n] using hPrevLinear
-  have hnPow :
-      n ^ 196 ≤
-        (65536 * (ell + 1)) ^ 196 :=
-    Nat.pow_le_pow_left hnLinear 196
-  have hTailBound :
+  have heExplicit :
       e ≤
-        2 ^ 17 *
-          (65536 * (ell + 1)) ^ 196 :=
-    le_trans
-      heUpper
-      (Nat.mul_le_mul_left (2 ^ 17) hnPow)
+        smallXiTailConstant *
+          (ell + 1) ^ 14 :=
+    actualRecord_tail_precision_le_explicit
+      R
+      hxSize
+      hHeightLower
+      hjTail
+      hPrevLinear
   unfold smallXiPrecisionBound
-  omega
+  exact
+    le_trans heExplicit
+      (le_trans
+        (le_max_right _ _)
+        (le_max_right _ _))
 
 /--
 `j < 12` の有限 exceptional range では、
@@ -452,11 +624,13 @@ theorem actualRecord_exceptional_precision_le_smallXiPrecisionBound
       e ≤ terminalRecordExceptionalPrecision := by
     exact le_trans hWindowUpper hExceptional
   unfold smallXiPrecisionBound
-  omega
+  exact
+    le_trans heExceptional
+      (le_trans (le_max_left _ _) (le_max_right _ _))
 
 /--
 Xi candidate `x` が `x+1 <= 2^ell` なら、
-その precision は explicit bound 以下。
+その precision は explicit degree-14 bound 以下。
 -/
 theorem smallXiCandidate_precision_le
     (R : RhinLinearForm14)
@@ -466,52 +640,36 @@ theorem smallXiCandidate_precision_le
     e ≤ smallXiPrecisionBound ell := by
   by_cases hSmall : e < 1538
   · unfold smallXiPrecisionBound
-    omega
-  · have hLarge : 1538 ≤ e := by
-      omega
+    exact le_trans (Nat.le_of_lt hSmall) (le_max_left _ _)
+  · have hLarge : 1538 ≤ e := by omega
     rcases exists_actualRecord_window_with_heightLower
         R hLarge hCandidate with
-      ⟨j,
-        hWindowLow,
-        hWindowUpper,
-        hHeightLower⟩
+      ⟨j, hWindowLow, hWindowUpper, hHeightLower⟩
     by_cases hjTail : 12 ≤ j
     · have hPrevLinear :
           criticalPowerQ (j - 1) ≤
             65536 * (ell + 1) :=
         actualRecord_tail_prevQ_le_linear
-          R
-          hxSize
-          hWindowLow
-          hHeightLower
-          hjTail
+          R hxSize hWindowLow hHeightLower hjTail
       exact
         actualRecord_tail_precision_le_smallXiPrecisionBound
-          R
-          hWindowUpper
-          hjTail
-          hPrevLinear
-    · have hjLt : j < 12 := by
-        omega
+          R hxSize hHeightLower hjTail hPrevLinear
+    · have hjLt : j < 12 := by omega
       exact
         actualRecord_exceptional_precision_le_smallXiPrecisionBound
-          hWindowUpper
-          hjLt
+          hWindowUpper hjLt
 
 /-! ## 3. specialize the candidate bound to terminal B states -/
 
-/-- linear denominator constant after substituting `ellSize=20+15*ell`。 -/
-def terminalRecordPrevQConstant : ℕ := 65536 * 21
-
-/-- one record length の `(ell+1)^196` coefficient。 -/
+/-- one record length の `(ell+1)^14` coefficient。 -/
 def terminalRecordLengthConstant : ℕ :=
   max 1538
     (max terminalRecordExceptionalPrecision
-      (2 ^ 17 * terminalRecordPrevQConstant ^ 196))
+      (smallXiTailConstant * 21 ^ 14))
 
 /-- one record / final fragment length bound。 -/
 def terminalRecordLengthBound (ell : ℕ) : ℕ :=
-  terminalRecordLengthConstant * (ell + 1) ^ 196
+  terminalRecordLengthConstant * (ell + 1) ^ 14
 
 /-- terminal record length bound は正。 -/
 theorem terminalRecordLengthBound_pos (ell : ℕ) :
@@ -519,33 +677,35 @@ theorem terminalRecordLengthBound_pos (ell : ℕ) :
   unfold terminalRecordLengthBound terminalRecordLengthConstant
   positivity
 
-/-- terminal-state 用 size parameterを代入した small-Xi precision bound を一様 record boundへ吸収。 -/
+/--
+terminal-state 用 size parameter `20+15*ell` を代入した
+small-Xi degree-14 bound を一様 record bound へ吸収する。
+-/
 theorem smallXiPrecisionBound_terminalSize_le_recordLengthBound
     (ell : ℕ) :
-    smallXiPrecisionBound (20 + 15 * ell) ≤ terminalRecordLengthBound ell := by
-  let M := (ell + 1) ^ 196
+    smallXiPrecisionBound (20 + 15 * ell) ≤
+      terminalRecordLengthBound ell := by
+  let M := (ell + 1) ^ 14
   have hM : 1 ≤ M := by
     have hMpos : 0 < M := by
       dsimp [M]
       positivity
     omega
   have hSizeLinear :
-      65536 * ((20 + 15 * ell) + 1) ≤
-        terminalRecordPrevQConstant * (ell + 1) := by
-    unfold terminalRecordPrevQConstant
-    nlinarith
+      (20 + 15 * ell) + 1 ≤ 21 * (ell + 1) := by
+    omega
   have hPowLinear :
-      (65536 * ((20 + 15 * ell) + 1)) ^ 196 ≤
-        (terminalRecordPrevQConstant * (ell + 1)) ^ 196 :=
-    Nat.pow_le_pow_left hSizeLinear 196
+      ((20 + 15 * ell) + 1) ^ 14 ≤
+        (21 * (ell + 1)) ^ 14 :=
+    Nat.pow_le_pow_left hSizeLinear 14
   have hTailCoeff :
-      2 ^ 17 * (65536 * ((20 + 15 * ell) + 1)) ^ 196 ≤
-        (2 ^ 17 * terminalRecordPrevQConstant ^ 196) * M := by
+      smallXiTailConstant * ((20 + 15 * ell) + 1) ^ 14 ≤
+        (smallXiTailConstant * 21 ^ 14) * M := by
     calc
-      2 ^ 17 * (65536 * ((20 + 15 * ell) + 1)) ^ 196
-          ≤ 2 ^ 17 * (terminalRecordPrevQConstant * (ell + 1)) ^ 196 :=
-        Nat.mul_le_mul_left (2 ^ 17) hPowLinear
-      _ = (2 ^ 17 * terminalRecordPrevQConstant ^ 196) * M := by
+      smallXiTailConstant * ((20 + 15 * ell) + 1) ^ 14
+          ≤ smallXiTailConstant * (21 * (ell + 1)) ^ 14 :=
+        Nat.mul_le_mul_left smallXiTailConstant hPowLinear
+      _ = (smallXiTailConstant * 21 ^ 14) * M := by
         dsimp [M]
         rw [mul_pow]
         ring
@@ -558,7 +718,7 @@ theorem smallXiPrecisionBound_terminalSize_le_recordLengthBound
     dsimp [C]
     unfold terminalRecordLengthConstant
     exact le_trans (le_max_left _ _) (le_max_right _ _)
-  have hCoeffC : 2 ^ 17 * terminalRecordPrevQConstant ^ 196 ≤ C := by
+  have hCoeffC : smallXiTailConstant * 21 ^ 14 ≤ C := by
     dsimp [C]
     unfold terminalRecordLengthConstant
     exact le_trans (le_max_right _ _) (le_max_right _ _)
@@ -573,13 +733,13 @@ theorem smallXiPrecisionBound_terminalSize_le_recordLengthBound
       _ = C * 1 := by simp
       _ ≤ C * M := Nat.mul_le_mul_left C hM
   have hTailScaled :
-      2 ^ 17 * (65536 * ((20 + 15 * ell) + 1)) ^ 196 ≤ C * M := by
+      smallXiTailConstant * ((20 + 15 * ell) + 1) ^ 14 ≤ C * M := by
     exact le_trans hTailCoeff (Nat.mul_le_mul_right M hCoeffC)
   unfold smallXiPrecisionBound terminalRecordLengthBound
   change
     max 1538
         (max terminalRecordExceptionalPrecision
-          (2 ^ 17 * (65536 * ((20 + 15 * ell) + 1)) ^ 196)) ≤
+          (smallXiTailConstant * ((20 + 15 * ell) + 1) ^ 14)) ≤
       C * M
   exact max_le h1538Scaled (max_le hExcScaled hTailScaled)
 
@@ -644,7 +804,7 @@ theorem length_le_beattyIndex
   have hCrit := Collatz2.Word.le_criticalHeight_of_twoPow_lt_threePow hPow
   simpa [beattyIndex_eq_wordCriticalHeight_all] using hCrit
 
-/-- one first-carry record の length bound。 -/
+/-- one first-carry record の degree-14 length bound。 -/
 theorem terminalRecordPiece_length_le
     (R : RhinLinearForm14)
     (P : PureBProfileObstruction)
@@ -666,7 +826,7 @@ theorem terminalRecordPiece_length_le
   exact le_trans hre
     (le_trans hPrec (smallXiPrecisionBound_terminalSize_le_recordLengthBound ell))
 
-/-- final no-carry fragment も同じ length bound。 -/
+/-- final no-carry fragment も同じ degree-14 length bound。 -/
 theorem terminalNoCarryFragment_length_le
     (R : RhinLinearForm14)
     (P : PureBProfileObstruction)
@@ -815,10 +975,6 @@ theorem CriticalRecordChain.recordCount_div_le_phase
               (criticalRealPhase start - criticalRealPhase (start + r)) := by
         ring
       rw [hCount, hPhaseAdd]
-      /-
-      `push_cast` は goal だけでなく induction hypothesis / one-record bound にも
-      同じ正規化をかける。これで `↑(2 * L)` と `2 * ↑L` の表記差を消す。
-      -/
       push_cast at hIH hDrop ⊢
       calc
         ((tail.recordCount : ℝ) + 1) / (2 * (L : ℝ)) ^ 14
@@ -951,11 +1107,7 @@ theorem CriticalRecordChain.remaining_le_recordCount_succ_mul
       unfold CriticalRecordChain.recordCount
       ring
 
-
-/--
-pure arithmetic:
-`((2L)^14 + 1)L <= (2^14 + 1)L^15`。
--/
+/-- pure arithmetic: `((2L)^14 + 1)L <= (2^14 + 1)L^15`。 -/
 theorem twoMulPow14_add_one_mul_le_pow15
     {L : ℕ}
     (hLPos : 0 < L) :
@@ -983,7 +1135,6 @@ theorem twoMulPow14_add_one_mul_le_pow15
     _ = (2 ^ 14 + 1) * L ^ 15 := by
           ring
 
-
 /--
 record count bound `count <= (2L)^14` を
 whole-chain packing bound へ変換する。
@@ -1005,7 +1156,6 @@ theorem recordCount_succ_mul_le_pow15
   exact
     le_trans hFirst
       (twoMulPow14_add_one_mul_le_pow15 hLPos)
-
 
 /--
 phase packing と各 piece の長さ上界から、
@@ -1037,50 +1187,45 @@ theorem CriticalRecordChain.remaining_le_pow15_of_record_bounds
       hLPos hCount
   exact le_trans hTotal hPacked
 
-
 /--
 `terminalRecordLengthBound` の 15 乗だけを展開する。
 
-ここで初めて
-  196 * 15 = 2940
+ここで
+  14 * 15 = 210
 を処理する。
 -/
 theorem terminalRecordLengthBound_pow15_expansion
     (ell : ℕ) :
     terminalRecordLengthBound ell ^ 15 =
       terminalRecordLengthConstant ^ 15 *
-        (ell + 1) ^ 2940 := by
+        (ell + 1) ^ 210 := by
   unfold terminalRecordLengthBound
   rw [mul_pow]
   have hPower :
-      ((ell + 1) ^ 196) ^ 15 =
-        (ell + 1) ^ 2940 := by
+      ((ell + 1) ^ 14) ^ 15 =
+        (ell + 1) ^ 210 := by
     rw [← pow_mul]
   rw [hPower]
 
-
-/--
-`L^15` packing を最終 polylog constant の形へ変換する。
--/
+/-- `L^15` packing を最終 degree-210 polylog constant の形へ変換する。 -/
 theorem terminalRecordLengthBound_pack_eq_polylog
     (ell : ℕ) :
     (2 ^ 14 + 1) *
         terminalRecordLengthBound ell ^ 15 =
       terminalCriticalSuffixPolylogConstant *
-        (ell + 1) ^ 2940 := by
+        (ell + 1) ^ 210 := by
   rw [terminalRecordLengthBound_pow15_expansion]
   unfold terminalCriticalSuffixPolylogConstant
   exact
     (Nat.mul_assoc
       (2 ^ 14 + 1)
       (terminalRecordLengthConstant ^ 15)
-      ((ell + 1) ^ 2940)).symm
+      ((ell + 1) ^ 210)).symm
 
 /--
 main pure theorem, dyadic-size form。
 
-`m+1 <= 2^ell` なら
-terminal critical suffix length は degree 2940。
+`m+1 <= 2^ell` なら terminal critical suffix length は degree 210。
 -/
 theorem PureBProfileObstruction.terminalCriticalSuffix_le_dyadicPolylog
     (R : RhinLinearForm14)
@@ -1091,7 +1236,7 @@ theorem PureBProfileObstruction.terminalCriticalSuffix_le_dyadicPolylog
     (hmSize : P.m + 1 ≤ 2 ^ ell) :
     P.m - a ≤
       terminalCriticalSuffixPolylogConstant *
-        (ell + 1) ^ 2940 := by
+        (ell + 1) ^ 210 := by
   obtain ⟨C⟩ :=
     exists_criticalRecordChain a (P.m - a)
   have ha :
@@ -1123,10 +1268,10 @@ theorem PureBProfileObstruction.terminalCriticalSuffix_le_dyadicPolylog
       hChain
     _ =
         terminalCriticalSuffixPolylogConstant *
-          (ell + 1) ^ 2940 :=
+          (ell + 1) ^ 210 :=
       terminalRecordLengthBound_pack_eq_polylog ell
 
-/-- canonical longest terminal critical suffix `t` の dyadic-size bound。 -/
+/-- canonical longest terminal critical suffix `t` の dyadic-size degree-210 bound。 -/
 theorem PureBProfileObstruction.terminalCriticalLength_le_dyadicPolylog
     (R : RhinLinearForm14)
     (P : PureBProfileObstruction)
@@ -1134,7 +1279,7 @@ theorem PureBProfileObstruction.terminalCriticalLength_le_dyadicPolylog
     (hy : 0 ≤ P.y)
     (hmSize : P.m + 1 ≤ 2 ^ ell) :
     P.terminalCriticalLength ≤
-      terminalCriticalSuffixPolylogConstant * (ell + 1) ^ 2940 := by
+      terminalCriticalSuffixPolylogConstant * (ell + 1) ^ 210 := by
   unfold PureBProfileObstruction.terminalCriticalLength
   exact
     P.terminalCriticalSuffix_le_dyadicPolylog
@@ -1150,7 +1295,7 @@ theorem MinimalActualABObstructionPacket.terminalCriticalSuffix_le_dyadicPolylog
     (S : IsTerminalCriticalSuffix (M.toPureBProfileObstruction hLen) a)
     (hmSize : (M.toPureBProfileObstruction hLen).m + 1 ≤ 2 ^ ell) :
     (M.toPureBProfileObstruction hLen).m - a ≤
-      terminalCriticalSuffixPolylogConstant * (ell + 1) ^ 2940 := by
+      terminalCriticalSuffixPolylogConstant * (ell + 1) ^ 210 := by
   exact
     (M.toPureBProfileObstruction hLen).terminalCriticalSuffix_le_dyadicPolylog
       R S (M.toPureBProfileObstruction_y_nonneg hLen) hmSize
@@ -1164,16 +1309,16 @@ theorem MinimalActualABObstructionPacket.terminalCriticalLength_le_dyadicPolylog
     {ell : ℕ}
     (hmSize : (M.toPureBProfileObstruction hLen).m + 1 ≤ 2 ^ ell) :
     (M.toPureBProfileObstruction hLen).terminalCriticalLength ≤
-      terminalCriticalSuffixPolylogConstant * (ell + 1) ^ 2940 := by
+      terminalCriticalSuffixPolylogConstant * (ell + 1) ^ 210 := by
   exact
     (M.toPureBProfileObstruction hLen).terminalCriticalLength_le_dyadicPolylog
       R (M.toPureBProfileObstruction_y_nonneg hLen) hmSize
 
 /--
-Nat logarithm form。数学的には `t = O((log m)^2940)`。
+Nat logarithm form。数学的には `t = O((log m)^210)`。
 `+2` は zero / finite initial rangeを一つの式に吸収するため。
 -/
-theorem MinimalActualABObstructionPacket.terminalCriticalSuffix_le_log2940
+theorem MinimalActualABObstructionPacket.terminalCriticalSuffix_le_log210
     (R : RhinLinearForm14)
     {Len : ℕ}
     (M : MinimalActualABObstructionPacket Len)
@@ -1182,7 +1327,7 @@ theorem MinimalActualABObstructionPacket.terminalCriticalSuffix_le_log2940
     (S : IsTerminalCriticalSuffix (M.toPureBProfileObstruction hLen) a) :
     (M.toPureBProfileObstruction hLen).m - a ≤
       terminalCriticalSuffixPolylogConstant *
-        (Nat.log 2 ((M.toPureBProfileObstruction hLen).m + 1) + 2) ^ 2940 := by
+        (Nat.log 2 ((M.toPureBProfileObstruction hLen).m + 1) + 2) ^ 210 := by
   let m := (M.toPureBProfileObstruction hLen).m
   let ell := Nat.log 2 (m + 1) + 1
   have hmPos : 0 < m + 1 := by omega
@@ -1199,17 +1344,17 @@ theorem MinimalActualABObstructionPacket.terminalCriticalSuffix_le_log2940
   simpa [ell, m, Nat.add_assoc] using hMain
 
 /-- actual minimal B の canonical terminal critical length `t` を直接 bound する最終 theorem。 -/
-theorem MinimalActualABObstructionPacket.terminalCriticalLength_le_log2940
+theorem MinimalActualABObstructionPacket.terminalCriticalLength_le_log210
     (R : RhinLinearForm14)
     {Len : ℕ}
     (M : MinimalActualABObstructionPacket Len)
     (hLen : 2 < Len) :
     (M.toPureBProfileObstruction hLen).terminalCriticalLength ≤
       terminalCriticalSuffixPolylogConstant *
-        (Nat.log 2 ((M.toPureBProfileObstruction hLen).m + 1) + 2) ^ 2940 := by
+        (Nat.log 2 ((M.toPureBProfileObstruction hLen).m + 1) + 2) ^ 210 := by
   unfold PureBProfileObstruction.terminalCriticalLength
   exact
-    M.terminalCriticalSuffix_le_log2940
+    M.terminalCriticalSuffix_le_log210
       R hLen (M.toPureBProfileObstruction hLen).terminalCriticalStart_spec
 
 end ExternalArithmetic
