@@ -388,22 +388,26 @@ theorem firstPassage_profileAffineNumerator_eq_wordAffineConst
 /--
 first-failure upper exponent word の natural normalized dataを `3^m`-deep defectとして読む。
 
-witness は `y = upperR + q`。
+canonical witness は existence から選ばず、最初から
+
+  y = upperR + q
+
+と明示する。
 -/
-theorem FirstFailureEdge.exists_deep_threeAdic_wordAffine_defect
+theorem FirstFailureEdge.deep_threeAdic_wordAffine_defect_explicit
     (F : FirstFailureEdge) :
-    ∃ y : ℤ,
-      (Collatz2.Word.affineConst F.upperExponentWord : ℤ) -
-          (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) * y =
-        (3 : ℤ) ^ Collatz2.Word.oddSteps F.upperExponentWord *
-          (F.upperNormalizedDefectNat : ℤ) := by
+    (Collatz2.Word.affineConst F.upperExponentWord : ℤ) -
+        (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) *
+          ((F.step.edge.upperR : ℤ) +
+            (F.upperNormalizedDefectNat : ℤ)) =
+      (3 : ℤ) ^ Collatz2.Word.oddSteps F.upperExponentWord *
+        (F.upperNormalizedDefectNat : ℤ) := by
   let w := F.upperExponentWord
   let q := F.upperNormalizedDefectNat
-  let y : ℤ := (F.step.edge.upperR : ℤ) + (q : ℤ)
-  refine ⟨y, ?_⟩
   change
     (Collatz2.Word.affineConst w : ℤ) -
-        (Collatz2.Word.terminalGap w : ℤ) * y =
+        (Collatz2.Word.terminalGap w : ℤ) *
+          ((F.step.edge.upperR : ℤ) + (q : ℤ)) =
       (3 : ℤ) ^ Collatz2.Word.oddSteps w * (q : ℤ)
   have hAffineNat :=
     F.upperExponentWord_affineConst_eq_gap_mul_R_add_twoPow_mul_upperQ
@@ -430,7 +434,6 @@ theorem FirstFailureEdge.exists_deep_threeAdic_wordAffine_defect
     exact Nat.sub_add_cancel (Nat.le_of_lt hPow)
   have hGap := congrArg (fun n : ℕ => (n : ℤ)) hGapNat
   push_cast at hGap
-  dsimp [y]
   rw [hAffine]
   have hTwo :
       (2 : ℤ) ^ Collatz2.Word.twoSteps w =
@@ -439,6 +442,56 @@ theorem FirstFailureEdge.exists_deep_threeAdic_wordAffine_defect
     linarith
   rw [hTwo]
   ring
+
+/--
+同じ deep equation を満たす integer witness は一意。
+terminal gap が strict positive なので cancellation できる。
+-/
+theorem FirstFailureEdge.deep_threeAdic_wordAffine_witness_unique
+    (F : FirstFailureEdge)
+    {y₁ y₂ : ℤ}
+    (h₁ :
+      (Collatz2.Word.affineConst F.upperExponentWord : ℤ) -
+          (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) * y₁ =
+        (3 : ℤ) ^ Collatz2.Word.oddSteps F.upperExponentWord *
+          (F.upperNormalizedDefectNat : ℤ))
+    (h₂ :
+      (Collatz2.Word.affineConst F.upperExponentWord : ℤ) -
+          (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) * y₂ =
+        (3 : ℤ) ^ Collatz2.Word.oddSteps F.upperExponentWord *
+          (F.upperNormalizedDefectNat : ℤ)) :
+    y₁ = y₂ := by
+  have hMul :
+      (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) * y₁ =
+        (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) * y₂ := by
+    linarith
+  have hF : Collatz2.Word.FirstCrossing F.upperExponentWord :=
+    F.upperExponentWord_firstCrossing
+  have hPow :
+      3 ^ Collatz2.Word.oddSteps F.upperExponentWord <
+        2 ^ Collatz2.Word.twoSteps F.upperExponentWord :=
+    (Collatz2.Word.contracting_iff_threePow_lt_twoPow).1
+      hF.terminalContracting
+  have hGapPos : 0 < Collatz2.Word.terminalGap F.upperExponentWord := by
+    unfold Collatz2.Word.terminalGap
+    exact Nat.sub_pos_of_lt hPow
+  have hGapNe :
+      (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt hGapPos)
+  exact mul_left_cancel₀ hGapNe hMul
+
+/-- existence 版は explicit canonical witness の薄い wrapper。 -/
+theorem FirstFailureEdge.exists_deep_threeAdic_wordAffine_defect
+    (F : FirstFailureEdge) :
+    ∃ y : ℤ,
+      (Collatz2.Word.affineConst F.upperExponentWord : ℤ) -
+          (Collatz2.Word.terminalGap F.upperExponentWord : ℤ) * y =
+        (3 : ℤ) ^ Collatz2.Word.oddSteps F.upperExponentWord *
+          (F.upperNormalizedDefectNat : ℤ) := by
+  exact
+    ⟨(F.step.edge.upperR : ℤ) +
+        (F.upperNormalizedDefectNat : ℤ),
+      deep_threeAdic_wordAffine_defect_explicit F⟩
 
 /-! ## 5. pure obstruction packet -/
 
@@ -579,17 +632,22 @@ private theorem pureBExponentWord_eq_exponentWordOfParity
       (pureBFailureEdge_upperWord_eq_word M)
 
 /--
-deep three-adic equation の integer witness を canonical に一つ選ぶ。
+deep equation の canonical witness。
+
+existence theorem から witness を選び直さず、actual formula
+
+  y = upperR + q
+
+をそのまま定義にする。
 -/
-private noncomputable def pureBDeepWitness
+private def pureBDeepWitness
     {L : ℕ}
     (M : MinimalActualABObstructionPacket L) :
     ℤ :=
-  Classical.choose
-    (FirstFailureEdge.exists_deep_threeAdic_wordAffine_defect
-      (pureBFailureEdge M))
+  ((pureBFailureEdge M).step.edge.upperR : ℤ) +
+    ((pureBFailureEdge M).upperNormalizedDefectNat : ℤ)
 
-/-- 選んだ deep witness の specification。 -/
+/-- explicit canonical witness の specification。 -/
 private theorem pureBDeepWitness_spec
     {L : ℕ}
     (M : MinimalActualABObstructionPacket L) :
@@ -598,15 +656,12 @@ private theorem pureBDeepWitness_spec
           pureBDeepWitness M =
       (3 : ℤ) ^ pureBm M *
         ((pureBFailureEdge M).upperNormalizedDefectNat : ℤ) := by
-  have h :=
-    Classical.choose_spec
-      (FirstFailureEdge.exists_deep_threeAdic_wordAffine_defect
-        (pureBFailureEdge M))
   simpa [
     pureBDeepWitness,
     pureBExponentWord,
     pureBm
-  ] using h
+  ] using
+    FirstFailureEdge.deep_threeAdic_wordAffine_defect_explicit (pureBFailureEdge M)
 
 /-- actual packet の q と first-failure normalized q は同じ。 -/
 private theorem pureBFailureEdge_upperQ_eq_actualQ
@@ -810,7 +865,7 @@ private theorem pureBProfile_deep_defect
   exact hDeep
 
 /-- minimal B から抽出する pure profile packet。 -/
-noncomputable def toPureBProfileObstruction
+def toPureBProfileObstruction
     {L : ℕ}
     (M : MinimalActualABObstructionPacket L)
     (hL : 2 < L) :
@@ -835,6 +890,45 @@ theorem toPureBProfileObstruction_q_eq
     (hL : 2 < L) :
     (M.toPureBProfileObstruction hL).q = M.actual.q := by
   rfl
+
+/-- pure packet の witness は actual representative と q の和そのもの。 -/
+theorem toPureBProfileObstruction_y_eq_upperR_add_q
+    {L : ℕ}
+    (M : MinimalActualABObstructionPacket L)
+    (hL : 2 < L) :
+    (M.toPureBProfileObstruction hL).y =
+      ((M.actual.firstFailureEdge.step.edge.upperR : ℤ) +
+        (M.actual.q : ℤ)) := by
+  change
+    pureBDeepWitness M =
+      ((M.actual.firstFailureEdge.step.edge.upperR : ℤ) +
+        (M.actual.q : ℤ))
+  unfold pureBDeepWitness
+  rw [pureBFailureEdge_upperQ_eq_actualQ M]
+  rfl
+
+/-- actual B 由来の pure witness は非負。 -/
+theorem toPureBProfileObstruction_y_nonneg
+    {L : ℕ}
+    (M : MinimalActualABObstructionPacket L)
+    (hL : 2 < L) :
+    0 ≤ (M.toPureBProfileObstruction hL).y := by
+  rw [M.toPureBProfileObstruction_y_eq_upperR_add_q hL]
+  positivity
+
+/-- tiny quotient q は canonical witness y 以下。 -/
+theorem toPureBProfileObstruction_q_le_y
+    {L : ℕ}
+    (M : MinimalActualABObstructionPacket L)
+    (hL : 2 < L) :
+    ((M.toPureBProfileObstruction hL).q : ℤ) ≤
+      (M.toPureBProfileObstruction hL).y := by
+  rw [M.toPureBProfileObstruction_q_eq hL]
+  rw [M.toPureBProfileObstruction_y_eq_upperR_add_q hL]
+  have hR :
+      (0 : ℤ) ≤ (M.actual.firstFailureEdge.step.edge.upperR : ℤ) := by
+    positivity
+  linarith
 
 /--
 Stage 6 の boundary-fragment branch 用 companion property。

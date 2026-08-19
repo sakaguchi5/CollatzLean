@@ -476,6 +476,42 @@ theorem toPureBProfileBlockReduction_q_eq
     (M.toPureBProfileBlockReduction hL).q = M.actual.q := by
   rfl
 
+
+/-- Stage 6 packet の witness も actual `upperR + q` そのもの。 -/
+theorem toPureBProfileBlockReduction_y_eq_upperR_add_actualQ
+    {L : ℕ}
+    (M : MinimalActualABObstructionPacket L)
+    (hL : 2 < L) :
+    (M.toPureBProfileBlockReduction hL).y =
+      ((M.actual.firstFailureEdge.step.edge.upperR : ℤ) +
+        (M.actual.q : ℤ)) := by
+  change
+    (M.toPureBProfileObstruction hL).y =
+      ((M.actual.firstFailureEdge.step.edge.upperR : ℤ) +
+        (M.actual.q : ℤ))
+  exact M.toPureBProfileObstruction_y_eq_upperR_add_q hL
+
+/-- Stage 6 packet の witness は非負。 -/
+theorem toPureBProfileBlockReduction_y_nonneg
+    {L : ℕ}
+    (M : MinimalActualABObstructionPacket L)
+    (hL : 2 < L) :
+    0 ≤ (M.toPureBProfileBlockReduction hL).y := by
+  change 0 ≤ (M.toPureBProfileObstruction hL).y
+  exact M.toPureBProfileObstruction_y_nonneg hL
+
+/-- Stage 6 packet でも tiny quotient は witness 以下。 -/
+theorem toPureBProfileBlockReduction_q_le_y
+    {L : ℕ}
+    (M : MinimalActualABObstructionPacket L)
+    (hL : 2 < L) :
+    ((M.toPureBProfileBlockReduction hL).q : ℤ) ≤
+      (M.toPureBProfileBlockReduction hL).y := by
+  change
+    ((M.toPureBProfileObstruction hL).q : ℤ) ≤
+      (M.toPureBProfileObstruction hL).y
+  exact M.toPureBProfileObstruction_q_le_y hL
+
 /--
 Stage 7 boundary-fragment branch 用 companion。
 Stage 6 packet の q は任意 first-passage predecessor residue より strict に小さい。

@@ -255,6 +255,7 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalIntervalAffineDe
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualOstrowskiBlockDecomposition
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBProfileDefectBridge
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBProfileBlockReduction
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ProfileIntervalCostBlocks
 
 set_option linter.style.header false
 
