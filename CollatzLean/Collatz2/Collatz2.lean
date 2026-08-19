@@ -179,6 +179,7 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalContinuedFractio
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalChristoffelPacket
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ChristoffelWronskian
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CorrectedChristoffelWronskian
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ChristoffelDefectValuation
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalSturmianStrongOverlap
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalFiniteXiIdentity
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalStrongMatchConstruction
@@ -247,6 +248,7 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MarkedFinalColumnCellPacket
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnLayerCostDynamics
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.AdmissibleSturmianProfile
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ProfileCostClosedForm
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.SturmianProfileLevelSets
 
 set_option linter.style.header false
 
