@@ -242,6 +242,9 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnLayerFareyBridge
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.CriticalColumnLayerFareyBridge
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnProfileResidualLedger
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MarkedFinalColumnCellPacket
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnLayerCostDynamics
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.AdmissibleSturmianProfile
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ProfileCostClosedForm
 
 set_option linter.style.header false
 
