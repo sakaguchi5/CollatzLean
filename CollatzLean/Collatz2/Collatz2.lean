@@ -249,6 +249,8 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnLayerCostDynamics
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.AdmissibleSturmianProfile
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ProfileCostClosedForm
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.SturmianProfileLevelSets
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.MaximalProfileLayerIntervals
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalPrefixOstrowski
 
 set_option linter.style.header false
 
