@@ -261,6 +261,12 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBeattyCurrentCor
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalIntervalPhasePeriodicity
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ShiftedCorrectedChristoffelDictionary
 
+-- terminal critical Record / Xi / polylog closure (1 + 2 + 3)
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.TerminalCriticalRecord
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalState
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RhinRecordPublic
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalPolylog
+
 set_option linter.style.header false
 
 /-!
