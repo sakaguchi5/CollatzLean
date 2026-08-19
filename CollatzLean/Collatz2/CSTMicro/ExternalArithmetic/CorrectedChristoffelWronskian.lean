@@ -290,6 +290,105 @@ theorem correctedChristoffelWronskianNext_sq
     congr 1
     omega
 
+/-! ## actual critical power-Farey sequence への無仮定 specialization -/
+
+/--
+actual critical sequence の even index では、
+corrected determinant は exact に `-2^strongPrecision`。
+-/
+theorem actualCorrectedChristoffelWronskianNext_eq_neg_twoPow_strongPrecision_of_even
+    {j : ℕ}
+    (hj : 9 ≤ j)
+    (hjEven : j % 2 = 0) :
+    correctedChristoffelWronskianNext
+        actualCriticalContinuedFractionData j =
+      -((2 : ℤ) ^
+        actualCriticalContinuedFractionData.strongPrecision j) := by
+  exact
+    correctedChristoffelWronskianNext_eq_neg_twoPow_strongPrecision_of_even
+      actualCriticalRawChristoffelWronskianLaw
+      (by
+        simpa using hj)
+      hjEven
+
+
+/--
+actual critical sequence の odd index では、
+corrected determinant は exact に `+2^strongPrecision`。
+-/
+theorem actualCorrectedChristoffelWronskianNext_eq_twoPow_strongPrecision_of_odd
+    {j : ℕ}
+    (hj : 9 ≤ j)
+    (hjOdd : j % 2 = 1) :
+    correctedChristoffelWronskianNext
+        actualCriticalContinuedFractionData j =
+      (2 : ℤ) ^
+        actualCriticalContinuedFractionData.strongPrecision j := by
+  exact
+    correctedChristoffelWronskianNext_eq_twoPow_strongPrecision_of_odd
+      actualCriticalRawChristoffelWronskianLaw
+      (by
+        simpa using hj)
+      hjOdd
+
+
+/--
+actual critical sequence の全 relevant index で、
+corrected determinant は parity に応じた exact signed `2^strongPrecision`。
+-/
+theorem actualCorrectedChristoffelWronskianNext_signed_strongPrecision
+    {j : ℕ}
+    (hj : 9 ≤ j) :
+    (j % 2 = 0 ∧
+        correctedChristoffelWronskianNext
+            actualCriticalContinuedFractionData j =
+          -((2 : ℤ) ^
+            actualCriticalContinuedFractionData.strongPrecision j)) ∨
+      (j % 2 = 1 ∧
+        correctedChristoffelWronskianNext
+            actualCriticalContinuedFractionData j =
+          (2 : ℤ) ^
+            actualCriticalContinuedFractionData.strongPrecision j) := by
+  exact
+    correctedChristoffelWronskianNext_signed_strongPrecision
+      actualCriticalRawChristoffelWronskianLaw
+      (by
+        simpa using hj)
+
+
+/--
+actual critical sequence の corrected determinant は、
+start=9 以降では常に nonzero。
+-/
+theorem actualCorrectedChristoffelWronskianNext_ne_zero
+    {j : ℕ}
+    (hj : 9 ≤ j) :
+    correctedChristoffelWronskianNext
+        actualCriticalContinuedFractionData j ≠ 0 := by
+  exact
+    correctedChristoffelWronskianNext_ne_zero
+      actualCriticalRawChristoffelWronskianLaw
+      (by
+        simpa using hj)
+
+
+/--
+actual critical sequence の corrected determinant の平方は
+exact に `2^(2*strongPrecision)`。
+-/
+theorem actualCorrectedChristoffelWronskianNext_sq
+    {j : ℕ}
+    (hj : 9 ≤ j) :
+    correctedChristoffelWronskianNext
+        actualCriticalContinuedFractionData j ^ 2 =
+      (2 : ℤ) ^
+        (2 * actualCriticalContinuedFractionData.strongPrecision j) := by
+  exact
+    correctedChristoffelWronskianNext_sq
+      actualCriticalRawChristoffelWronskianLaw
+      (by
+        simpa using hj)
+
 end ExternalArithmetic
 end CSTMicro
 end Collatz2
