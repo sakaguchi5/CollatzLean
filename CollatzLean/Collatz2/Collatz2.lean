@@ -296,6 +296,9 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerTermina
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBAffineCornerTelescope
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBUniversalWeightCornerTelescope
 
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerSmallRootReduction
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerLeftSmallRoot
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerRightShiftedSmallRoot
 
 set_option linter.style.header false
 
