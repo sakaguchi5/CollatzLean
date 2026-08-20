@@ -283,7 +283,9 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalLastDepthPa
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalDepthTwoCarryModSix
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellPredecessor
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellDeltaB
-
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBActualProfileCoordinateBridge
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellActualPredecessor
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellMinimalityPacket
 
 set_option linter.style.header false
 
