@@ -277,6 +277,13 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBShiftedDefectStateI
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBProfileNumeratorValuation
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalCoreValuation
 
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalCoreRightCarry
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalCoreRightCarryChain
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalLastDepthParity
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalDepthTwoCarryModSix
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellPredecessor
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellDeltaB
+
 
 set_option linter.style.header false
 
