@@ -287,6 +287,16 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBActualProfileCoordi
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellActualPredecessor
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTopCellMinimalityPacket
 
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBExposedPredecessorIndex
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBExposedPredecessorRealization
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalExposedCorner
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBPositiveComponentEndpoint
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleExposedCornerRigidity
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerTerminalCore
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBAffineCornerTelescope
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBUniversalWeightCornerTelescope
+
+
 set_option linter.style.header false
 
 /-!
