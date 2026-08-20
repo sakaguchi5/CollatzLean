@@ -267,6 +267,11 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalState
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.RhinRecordPublic
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalPolylog
 
+-- origin full-depth exclusion -> maximal arithmetic critical tail -> one terminal polylog window
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBIntegralCriticalTail
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBFullDepthOriginExclusion
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBIntegralTailPolylog
+
 set_option linter.style.header false
 
 /-!
