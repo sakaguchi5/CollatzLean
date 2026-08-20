@@ -272,6 +272,12 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBIntegralCriticalTai
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBFullDepthOriginExclusion
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBIntegralTailPolylog
 
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBShiftedWronskianElimination
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBShiftedDefectStateIdentities
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBProfileNumeratorValuation
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalCoreValuation
+
+
 set_option linter.style.header false
 
 /-!
