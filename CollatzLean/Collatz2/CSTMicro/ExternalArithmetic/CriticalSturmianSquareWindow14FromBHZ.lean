@@ -57,7 +57,7 @@ noncomputable def criticalSturmianSquareWindow14FromBHZ
     refine ⟨r, hNr, ?_, hSquare⟩
     by_cases hjNine : 9 ≤ j
     · have hPNext :=
-        R.criticalPowerP_next_le_32768_mul_pow14 hjNine
+        criticalPowerP_next_le_32768_mul_pow14 R hjNine
       have hPjPow :
           criticalPowerP j ^ 14 ≤ (N + 1) ^ 14 := by
         apply Nat.pow_le_pow_left
@@ -96,7 +96,9 @@ noncomputable def criticalSturmianSquareWindow14FromBHZ
           criticalPowerP 9 ≤ max (criticalPowerP 9) 32768 :=
         le_max_left _ _
       have hPowOne : 1 ≤ (N + 1) ^ 14 := by
-        positivity
+        have hPos : 0 < (N + 1) ^ 14 := by
+          positivity
+        omega
       calc
         r
             ≤ B.bandConstant * criticalPowerP (j + 1) := hrBand
