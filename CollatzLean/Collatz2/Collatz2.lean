@@ -345,6 +345,8 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBeattyLocalSquar
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalSturmianSquareWindow14
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBLocalSquareRigidity
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTailLog14
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalInitialSquareBand
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalPowerPGapGrowth14
 
 
 
