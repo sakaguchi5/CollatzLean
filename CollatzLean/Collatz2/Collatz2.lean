@@ -372,6 +372,12 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZFiniteWordMorphisms
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalStandardSemistandardWords
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalProposition33FromWordFormula
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalProposition33MorphismStage
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalPhaseDigitUniqueness
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalProposition33MorphismStage
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalProposition33MorphismStage
+
+
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalProposition33ActualStage
 
 set_option linter.style.header false
 
