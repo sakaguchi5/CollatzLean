@@ -362,7 +362,9 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBHZIndexing
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalShiftBHZOstrowskiBridge
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalPhaseCoordinates
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalPrefixPowerCandidate
-
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalIntegerOrbitConjugacy
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalInterceptDigitIdentification
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalShiftSAdicSemanticsFromOdometer
 
 
 set_option linter.style.header false
