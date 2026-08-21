@@ -1,54 +1,61 @@
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeChristoffelDefectValuation
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBResidualLocalWronskian
 
 /-!
-# Pure B Stage 8R: criticalization start の residual dyadic rigidity
+# Pure B Stage 8R2: corridor-free residual dyadic rigidity
 
-旧 Stage 8
-`PureBCriticalizationStartDyadicRigidity.lean`
-では、canonical adjacent corrected Wronskian の full precision を使うために
-
-  beattyIndex a < criticalPowerQ j
-
-を仮定し、
-
-  2^(Q_(j+1)-Q_j) ∣ (Z_(a+P_j)-Z_a)
-
-を得ていた。
-
-しかし full q-jump を最初から要求する必要はない。
-canonical Wronskian が持つ strong precision
-
-  S_j = Q_j + Q_(j+1) - 1
-
-から phase cost `beta(a)` と block factor `Q_j` を差し引いた残余を
+旧 Stage 8R は full q-jump 仮定 `beta(a)<Q_j` を residual exponent
 
   rho(a,j)
-    := min
-         (Q_(j+1)-Q_j)
-         (S_j - (beta(a)+Q_j))
+    = min(
+        Q_(j+1)-Q_j,
+        strongPrecision(j) - (beta(a)+Q_j))
 
-とする。
+へ置き換えたが、canonical shifted dictionary を criticalization start で直接使うため
 
-この Stage 8R では `beta(a) < Q_j` を完全に削除し、
+  a + P_j     < P_(j+1)
+  a + P_(j+1) < P_(j+2)
 
-  2^rho(a,j) ∣ (Z_(a+P_j)-Z_a)
+という二本の corridor 条件をまだ要求していた。
 
-を証明する。criticalization start で state difference は nonzero なので、
-uniform state bound と合わせて
+この Stage 8R2 では、`PureBResidualLocalWronskian` の corridor-free local theorem
 
-  2^rho(a,j) <= 4*yNat
+  2^(S_j-beta(a)) | Wloc(a,j)
 
-を得る。
+を使い、上の二本を live theorem の仮定から除去する。
 
-旧 precision 仮定 `beta(a) < Q_j` が成立する場合には
-`rho(a,j)=Q_(j+1)-Q_j` となるため、旧 Stage 8 の full q-jump は
-この residual theorem の特殊ケースとして回収される。
+重要な論理分岐は `rho=0 / rho>0` である。
 
-重要:
-* このファイルは旧 Stage 8 を import しない。
-* `PureBGoodScaleCounterexample.lean` も import しない。
-* 旧 Stage 8 と counterexample は archive / diagnostic record として残し、
-  live aggregate からは外すことを想定している。
+* `rho=0` では dyadic divisibility は情報を持たない。
+* `rho>0` なら
+    beta(a) < Q_(j+1)-1
+  が自動的に従い、Beatty monotonicity と endpoint formula から
+    a < P_(j+1)
+  が自動的に従う。
+  したがって residual local Wronskian theorem と extended Beatty shift を
+  仮定追加なしで起動できる。
+
+その結果、nontrivial branch の最終 theorem は
+
+  2 <= criticalizationStart
+  9 <= j
+  criticalizationStart + P_(j+1) <= m
+  0 < rho(criticalizationStart,j)
+
+だけから
+
+  2^rho <= 4*yNat
+
+を与える。
+
+一般形は正確に
+
+  rho = 0  OR  2^rho <= 4*yNat
+
+である。
+
+旧 `beta(a)<Q_j` を仮定すれば rho は full q-jump なので正であり、
+corridor 条件なしで旧 full-q-jump bound も回収できる。
 -/
 
 namespace Collatz2
@@ -57,16 +64,14 @@ namespace ExternalArithmetic
 
 namespace PureBProfileObstruction
 
+/-! ## 1. residual exponent -/
+
 /--
-Stage 8R の residual dyadic exponent。
+Stage 8R2 の residual dyadic exponent。
 
-`S_j` を corrected Wronskian の canonical strong precision とすると
-
-  rho(a,j) = min(Q_(j+1)-Q_j, S_j-(beta(a)+Q_j)).
-
-第一項は adjacent denominator jump そのもの。
-第二項は phase `a` と first block factor `2^Q_j` を消したあとに
-Wronskian から実際に残る precision。
+local Wronskian が持つ residual precision
+`S_j-beta(a)` を、next block が持つ `Q_(j+1)` で cap し、
+first block factor `Q_j` を消した残りに等しい。
 -/
 def residualQJumpExponent (a j : ℕ) : ℕ :=
   min
@@ -74,17 +79,7 @@ def residualQJumpExponent (a j : ℕ) : ℕ :=
     (actualCriticalContinuedFractionData.strongPrecision j -
       (beattyIndex a + criticalPowerQ j))
 
-/--
-residual exponent の phase-loss 表示。
-
-`S_j = Q_j + Q_(j+1) - 1` を代入すると
-
-  rho(a,j)
-    = min(Q_(j+1)-Q_j, Q_(j+1)-1-beta(a)).
-
-これは `a=1000, j=9` の diagnostic counterexample で現れた
-exact loss と同じ形である。
--/
+/-- residual exponent の phase-loss 表示。 -/
 theorem residualQJumpExponent_eq_phaseLoss
     (a j : ℕ) :
     residualQJumpExponent a j =
@@ -105,9 +100,8 @@ theorem residualQJumpExponent_eq_phaseLoss
   rw [hLoss]
 
 /--
-旧 Stage 8 の precision 仮定を置けば residual exponent は full q-jump に戻る。
-
-したがって Stage 8R は旧 Stage 8B の真の一般化になっている。
+旧 full-precision 条件 `beta(a)<Q_j` の下では residual exponent は
+full adjacent q-jump に戻る。
 -/
 theorem residualQJumpExponent_eq_full_of_precision
     {a j : ℕ}
@@ -125,117 +119,230 @@ theorem residualQJumpExponent_eq_full_of_precision
     omega
   exact min_eq_left hLe
 
+/-! ## 2. rho>0 が phase window を自動的に強制する -/
+
 /--
-8R-A: integral tail の canonical standard block defect は endpoint state difference の
-exact pure-two-power multiple。
+`rho(a,j)>0` なら phase-loss 側も正なので
 
-corridor 内では block の Beatty rise が exact に `Q_j` なので
+  beta(a) < Q_(j+1)-1.
 
-  B_j(a) = F[a,a+P_j](Z_a)
-         = 2^Q_j (Z_(a+P_j)-Z_a).
-
-旧 8A と数学内容は同じだが、旧 Stage 8 を import せず live route を独立させるため
-ここで再証明する。
+これは Stage 8R2 で local Wronskian window を自動生成する第一段。
 -/
-theorem integralCanonicalBlockDefect_eq_twoPow_mul_stateDifference_residual
+theorem beattyIndex_lt_nextQ_pred_of_residualQJumpExponent_pos
+    {a j : ℕ}
+    (hRhoPos : 0 < residualQJumpExponent a j) :
+    beattyIndex a < criticalPowerQ (j + 1) - 1 := by
+  rw [residualQJumpExponent_eq_phaseLoss] at hRhoPos
+  have hLe :
+      residualQJumpExponent a j ≤
+        criticalPowerQ (j + 1) - 1 - beattyIndex a := by
+    rw [residualQJumpExponent_eq_phaseLoss]
+    exact min_le_right _ _
+  omega
+
+/--
+`rho(a,j)>0` なら `a<P_(j+1)`。
+
+`P_(j+1)` endpoint では parity に応じて
+
+* odd  : beta(P_(j+1)) = Q_(j+1)
+* even : beta(P_(j+1)) = Q_(j+1)-1
+
+なので、`beta(a)<Q_(j+1)-1` と strict monotonicity により
+`a` は必ず next numerator より左にある。
+-/
+theorem lt_nextP_of_residualQJumpExponent_pos
+    {a j : ℕ}
+    (hj : 9 ≤ j)
+    (hRhoPos : 0 < residualQJumpExponent a j) :
+    a < criticalPowerP (j + 1) := by
+  have hBeta :=
+    beattyIndex_lt_nextQ_pred_of_residualQJumpExponent_pos
+      (a := a) (j := j) hRhoPos
+  by_contra hNot
+  have hPLe :
+      criticalPowerP (j + 1) ≤ a := by
+    omega
+  have hBetaMono :
+      beattyIndex (criticalPowerP (j + 1)) ≤ beattyIndex a := by
+    by_cases hEq : criticalPowerP (j + 1) = a
+    · subst a
+      exact le_rfl
+    · have hLt : criticalPowerP (j + 1) < a := by
+        omega
+      exact le_of_lt (beattyIndex_strictMono hLt)
+  have hmod :
+      (j + 1) % 2 < 2 :=
+    Nat.mod_lt (j + 1) (by decide)
+  by_cases hOdd : (j + 1) % 2 = 1
+  · have hEnd :=
+      actual_beattyIndex_currentP_eq_Q_of_odd
+        (j := j + 1) (by omega) hOdd
+    rw [hEnd] at hBetaMono
+    omega
+  · have hEven : (j + 1) % 2 = 0 := by
+      omega
+    have hEnd :=
+      actual_beattyIndex_currentP_eq_Q_pred_of_even
+        (j := j + 1) (by omega) hEven
+    rw [hEnd] at hBetaMono
+    omega
+
+/-! ## 3. local Wronskian と affine defects の exact cross identity -/
+
+/--
+positive next-numerator window では local numerator Wronskian は
+同じ left state `y` で読む affine defects の cross と exact に一致する。
+
+state parameter の項は
+
+  Gamma_(j+1) Gamma_j y - Gamma_j Gamma_(j+1) y
+
+として消える。
+-/
+theorem residualLocalAdjacentWronskian_eq_defectCross
+    {a j : ℕ}
+    (hj : 9 ≤ j)
+    (haPos : 0 < a)
+    (haLt : a < criticalPowerP (j + 1))
+    (y : ℤ) :
+    residualLocalAdjacentWronskian a j =
+      actualCriticalRawPowerGap (j + 1) *
+          criticalIntervalDefectZ
+            a (a + criticalPowerP j) y -
+        actualCriticalRawPowerGap j *
+          criticalIntervalDefectZ
+            a (a + criticalPowerP (j + 1)) y := by
+  have hGapJ :=
+    residualLocalBlockGap_eq_rawGap
+      (a := a) (j := j) hj haPos haLt
+  have hGapNext :=
+    residualLocalNextBlockGap_eq_rawGap
+      (a := a) (j := j) hj haPos haLt
+  unfold residualLocalBlockGap at hGapJ hGapNext
+  unfold residualLocalAdjacentWronskian residualLocalBlockNumerator
+  unfold criticalIntervalDefectZ
+  rw [hGapJ, hGapNext]
+  ring
+
+/-! ## 4. endpoint-state conversion without old corridor inequalities -/
+
+/--
+`0<a<P_(j+1)` では current standard block defect は exact に
+
+  2^Q_j (Z_(a+P_j)-Z_a).
+
+旧 8R-A の `a+P_j<P_(j+1)` は不要で、
+extended Beatty shift の `a<P_(j+1)` だけでよい。
+-/
+theorem integralCurrentBlockDefect_eq_twoPow_mul_stateDifference
     (P : PureBProfileObstruction)
     {a j : ℕ}
     (A : IsIntegralCriticalTail P a)
     (haPos : 0 < a)
+    (haLt : a < criticalPowerP (j + 1))
     (hBlockEnd : a + criticalPowerP j ≤ P.m)
-    (hj : 9 ≤ j)
-    (hRange :
-      a + criticalPowerP j < criticalPowerP (j + 1)) :
-    P.integralCanonicalBlockDefect A j =
+    (hj : 9 ≤ j) :
+    criticalIntervalDefectZ
+        a (a + criticalPowerP j)
+        (P.integralCriticalTailStateInt A a le_rfl A.1) =
       (2 : ℤ) ^ criticalPowerQ j *
         (P.integralCriticalTailStateInt
             A (a + criticalPowerP j) (by omega) hBlockEnd -
           P.integralCriticalTailStateInt A a le_rfl A.1) := by
-  have hRise :
-      beattyIndex (a + criticalPowerP j) - beattyIndex a =
-        criticalPowerQ j := by
-    have hmod : j % 2 < 2 := Nat.mod_lt j (by decide)
-    by_cases hjOdd : j % 2 = 1
-    · have hShift0 :=
-        actual_beattyIndex_add_currentP_eq_add_Q_of_odd
-          (j := j)
-          (x := a)
-          hj
-          hjOdd
-          (by
-            simpa [Nat.add_comm] using hRange)
-      have hShift :
-          beattyIndex (a + criticalPowerP j) =
-            criticalPowerQ j + beattyIndex a := by
-        rw [Nat.add_comm a (criticalPowerP j)]
-        exact hShift0
-      omega
-    · have hjEven : j % 2 = 0 := by omega
-      have hShift0 :=
-        actual_beattyIndex_add_currentP_eq_add_Q_of_even
-          (j := j)
-          (x := a)
-          hj
-          hjEven
-          haPos
-          (by
-            simpa [Nat.add_comm] using hRange)
-      have hShift :
-          beattyIndex (a + criticalPowerP j) =
-            criticalPowerQ j + beattyIndex a := by
-        rw [Nat.add_comm a (criticalPowerP j)]
-        exact hShift0
-      omega
-  have hLeft :=
+  have hRise :=
+    actual_beattyIndex_currentP_rise_eq_Q_of_pos_lt_nextP
+      (j := j) (x := a) hj haPos haLt
+  have hState :=
     P.criticalIntervalDefectZ_at_integralLeftState
       (A := A)
       (s := a)
       (r := criticalPowerP j)
       le_rfl
       hBlockEnd
-  rw [hRise] at hLeft
-  simpa [integralCanonicalBlockDefect] using hLeft
+  rw [hRise] at hState
+  exact hState
 
 /--
-8R-B: corrected Wronskian の strong precision を「使えるだけ」使う。
+同じ `0<a<P_(j+1)` だけで next standard block も
 
-旧 8B は `beta(a) < Q_j` により full exponent
-`Q_(j+1)-Q_j` を要求していた。
+  2^Q_(j+1) (Z_(a+P_(j+1))-Z_a)
 
-ここでは
-
-  rho = min(
-    Q_(j+1)-Q_j,
-    strongPrecision(j) - (beta(a)+Q_j))
-
-だけを取り出す。したがって追加の `hPrecision` は不要。
-
-結論:
-
-  2^rho | Z_(a+P_j)-Z_a.
+へ変換できる。
 -/
-theorem twoPow_residualQJump_dvd_integralStateDifference
+theorem integralNextBlockDefect_eq_twoPow_mul_stateDifference
     (P : PureBProfileObstruction)
     {a j : ℕ}
     (A : IsIntegralCriticalTail P a)
     (haPos : 0 < a)
-    (hBlockEndJ : a + criticalPowerP j ≤ P.m)
+    (haLt : a < criticalPowerP (j + 1))
+    (hBlockEnd : a + criticalPowerP (j + 1) ≤ P.m)
+    (hj : 9 ≤ j) :
+    criticalIntervalDefectZ
+        a (a + criticalPowerP (j + 1))
+        (P.integralCriticalTailStateInt A a le_rfl A.1) =
+      (2 : ℤ) ^ criticalPowerQ (j + 1) *
+        (P.integralCriticalTailStateInt
+            A (a + criticalPowerP (j + 1)) (by omega) hBlockEnd -
+          P.integralCriticalTailStateInt A a le_rfl A.1) := by
+  have hRise :=
+    actual_beattyIndex_nextP_rise_eq_nextQ_of_pos_lt_nextP
+      (j := j) (x := a) hj haPos haLt
+  have hState :=
+    P.criticalIntervalDefectZ_at_integralLeftState
+      (A := A)
+      (s := a)
+      (r := criticalPowerP (j + 1))
+      le_rfl
+      hBlockEnd
+  rw [hRise] at hState
+  exact hState
+
+/-! ## 5. corridor-free residual divisibility on the useful branch -/
+
+/--
+`a<P_(j+1)` の local Wronskian precision と endpoint-state identity を合成する。
+
+old Stage 8R-B の二本の corridor
+
+  a + P_j     < P_(j+1)
+  a + P_(j+1) < P_(j+2)
+
+は消えている。
+
+必要なのは、adjacent pair の大きい endpoint が integral tail 内にあることだけ。
+-/
+theorem twoPow_residualQJump_dvd_integralStateDifference_of_lt_nextP
+    (P : PureBProfileObstruction)
+    {a j : ℕ}
+    (A : IsIntegralCriticalTail P a)
+    (haPos : 0 < a)
+    (haLt : a < criticalPowerP (j + 1))
     (hBlockEndNext : a + criticalPowerP (j + 1) ≤ P.m)
-    (hj : 9 ≤ j)
-    (hRangeJ :
-      a + criticalPowerP j < criticalPowerP (j + 1))
-    (hRangeNext :
-      a + criticalPowerP (j + 1) < criticalPowerP (j + 2)) :
+    (hj : 9 ≤ j) :
     (2 : ℤ) ^ residualQJumpExponent a j ∣
       (P.integralCriticalTailStateInt
-          A (a + criticalPowerP j) (by omega) hBlockEndJ -
+          A (a + criticalPowerP j)
+          (by
+            have _hPmono :
+                criticalPowerP j < criticalPowerP (j + 1) :=
+              criticalPowerP_strict_succ (r := j) (by omega)
+            omega)
+          (by
+            have hPmono :
+                criticalPowerP j < criticalPowerP (j + 1) :=
+              criticalPowerP_strict_succ (r := j) (by omega)
+            omega) -
         P.integralCriticalTailStateInt A a le_rfl A.1) := by
   let r : ℕ := residualQJumpExponent a j
-  change
-    (2 : ℤ) ^ r ∣
-      (P.integralCriticalTailStateInt
-          A (a + criticalPowerP j) (by omega) hBlockEndJ -
-        P.integralCriticalTailStateInt A a le_rfl A.1)
+  let S : ℕ := actualCriticalContinuedFractionData.strongPrecision j
+  let E : ℕ := S - beattyIndex a
+  have hPmono :
+      criticalPowerP j < criticalPowerP (j + 1) :=
+    criticalPowerP_strict_succ (r := j) (by omega)
+  have hBlockEndJ :
+      a + criticalPowerP j ≤ P.m := by
+    omega
   let Za : ℤ :=
     P.integralCriticalTailStateInt A a le_rfl A.1
   let Zj : ℤ :=
@@ -246,263 +353,242 @@ theorem twoPow_residualQJump_dvd_integralStateDifference
       A (a + criticalPowerP (j + 1)) (by omega) hBlockEndNext
   let Dj : ℤ := Zj - Za
   let Dn : ℤ := Zn - Za
+  change (2 : ℤ) ^ r ∣ Dj
+  by_cases hr0 : r = 0
+  · rw [hr0]
+    simp
+  have hrPos : 0 < r := by omega
+  have hStrong :
+      S = criticalPowerQ j + criticalPowerQ (j + 1) - 1 := by
+    dsimp [S]
+    simp [actualCriticalContinuedFractionData]
+  have hRLeJump :
+      r ≤ criticalPowerQ (j + 1) - criticalPowerQ j := by
+    dsimp [r, residualQJumpExponent]
+    exact min_le_left _ _
+  have hRLeBudget :
+      r ≤ S - (beattyIndex a + criticalPowerQ j) := by
+    dsimp [r, S, residualQJumpExponent]
+    exact min_le_right _ _
+  have hBudgetPos :
+      0 < S - (beattyIndex a + criticalPowerQ j) := by
+    omega
+  have hBudget :
+      beattyIndex a + criticalPowerQ j ≤ S := by
+    omega
+  have hQPos : 0 < criticalPowerQ j :=
+    criticalPowerQ_pos j
+  have hQNextPos : 0 < criticalPowerQ (j + 1) :=
+    criticalPowerQ_pos (j + 1)
+  have hQlt :
+      criticalPowerQ j < criticalPowerQ (j + 1) :=
+    criticalPowerQ_lt_next hj
+  have hQPlusRLeE :
+      criticalPowerQ j + r ≤ E := by
+    dsimp [E]
+    omega
+  have hQPlusRLeNext :
+      criticalPowerQ j + r ≤ criticalPowerQ (j + 1) := by
+    omega
+  have hLocalDvdE :
+      (2 : ℤ) ^ E ∣ residualLocalAdjacentWronskian a j := by
+    simpa [E, S] using
+      twoPow_residualPrecision_dvd_residualLocalAdjacentWronskian
+        (a := a) (j := j) hj haPos haLt
+  have hPowSmallDvdE :
+      (2 : ℤ) ^ (criticalPowerQ j + r) ∣ (2 : ℤ) ^ E := by
+    refine ⟨
+      (2 : ℤ) ^ (E - (criticalPowerQ j + r)),
+      ?_⟩
+    have hSplit :
+        E =
+          (criticalPowerQ j + r) +
+            (E - (criticalPowerQ j + r)) := by
+      omega
+    rw [hSplit, pow_add]
+    simp
+  have hLocalDvd :
+      (2 : ℤ) ^ (criticalPowerQ j + r) ∣
+        residualLocalAdjacentWronskian a j :=
+    dvd_trans hPowSmallDvdE hLocalDvdE
+  have hCross :=
+    residualLocalAdjacentWronskian_eq_defectCross
+      (a := a) (j := j) hj haPos haLt Za
   have hJ0 :=
-    P.integralCanonicalBlockDefect_eq_twoPow_mul_stateDifference_residual
+    P.integralCurrentBlockDefect_eq_twoPow_mul_stateDifference
       (A := A)
       haPos
+      haLt
       hBlockEndJ
       hj
-      hRangeJ
   have hJ :
-      P.integralCanonicalBlockDefect A j =
+      criticalIntervalDefectZ
+          a (a + criticalPowerP j) Za =
         (2 : ℤ) ^ criticalPowerQ j * Dj := by
-    simpa [Dj, Zj, Za] using hJ0
+    simpa [Za, Zj, Dj] using hJ0
   have hN0 :=
-    P.integralCanonicalBlockDefect_eq_twoPow_mul_stateDifference_residual
+    P.integralNextBlockDefect_eq_twoPow_mul_stateDifference
       (A := A)
-      (j := j + 1)
       haPos
+      haLt
       hBlockEndNext
-      (by omega)
-      hRangeNext
-  have hN :
-      P.integralCanonicalBlockDefect A (j + 1) =
-        (2 : ℤ) ^ criticalPowerQ (j + 1) * Dn := by
-    simpa [Dn, Zn, Za] using hN0
-  have hCross :=
-    P.integralCanonicalBlockDefect_adjacentWronskian
-      (A := A)
-      haPos
       hj
-      hRangeJ
-      hRangeNext
-  have hStrong :
-      actualCriticalContinuedFractionData.strongPrecision j =
-        criticalPowerQ j + criticalPowerQ (j + 1) - 1 := by
-    simp [actualCriticalContinuedFractionData]
-  by_cases hBudget :
-      beattyIndex a + criticalPowerQ j ≤
-        actualCriticalContinuedFractionData.strongPrecision j
-  · have hRLeJump :
-        r ≤ criticalPowerQ (j + 1) - criticalPowerQ j := by
-      dsimp [r, residualQJumpExponent]
-      exact min_le_left _ _
-    have hRLeLoss :
-        r ≤
-          actualCriticalContinuedFractionData.strongPrecision j -
-            (beattyIndex a + criticalPowerQ j) := by
-      dsimp [r, residualQJumpExponent]
-      exact min_le_right _ _
-    have hExpLe :
-        beattyIndex a + (criticalPowerQ j + r) ≤
-          actualCriticalContinuedFractionData.strongPrecision j := by
-      omega
-    have hPurePowDvd :
-        (2 : ℤ) ^ (beattyIndex a + (criticalPowerQ j + r)) ∣
-          (2 : ℤ) ^
-            actualCriticalContinuedFractionData.strongPrecision j := by
-      refine ⟨
-        (2 : ℤ) ^
-          (actualCriticalContinuedFractionData.strongPrecision j -
-            (beattyIndex a + (criticalPowerQ j + r))),
-        ?_⟩
-      have hSplit :
-          actualCriticalContinuedFractionData.strongPrecision j =
-            (beattyIndex a + (criticalPowerQ j + r)) +
-              (actualCriticalContinuedFractionData.strongPrecision j -
-                (beattyIndex a + (criticalPowerQ j + r))) := by
-        omega
-      rw [hSplit, pow_add]
-      simp
-    have hWronskianDvd :
-        (2 : ℤ) ^ (beattyIndex a + (criticalPowerQ j + r)) ∣
-          correctedChristoffelWronskianNext
-            actualCriticalContinuedFractionData j := by
-      rcases
-          actualCorrectedChristoffelWronskianNext_signed_strongPrecision
-            hj with
-        hEven | hOdd
-      · rw [hEven.2]
-        exact dvd_neg.mpr hPurePowDvd
-      · rw [hOdd.2]
-        exact hPurePowDvd
-    have hRhsDvd :
-        (2 : ℤ) ^ (beattyIndex a + (criticalPowerQ j + r)) ∣
-          (3 : ℤ) ^ (a - 1) *
-            correctedChristoffelWronskianNext
-              actualCriticalContinuedFractionData j :=
-      dvd_mul_of_dvd_right hWronskianDvd _
-    have hLeftDvd :
-        (2 : ℤ) ^ (beattyIndex a + (criticalPowerQ j + r)) ∣
-          (2 : ℤ) ^ beattyIndex a *
-            (actualCriticalRawPowerGap (j + 1) *
-                P.integralCanonicalBlockDefect A j -
-              actualCriticalRawPowerGap j *
-                P.integralCanonicalBlockDefect A (j + 1)) := by
-      rw [hCross]
-      exact hRhsDvd
-    have hCrossDvd :
-        (2 : ℤ) ^ (criticalPowerQ j + r) ∣
-          (actualCriticalRawPowerGap (j + 1) *
-              P.integralCanonicalBlockDefect A j -
-            actualCriticalRawPowerGap j *
-              P.integralCanonicalBlockDefect A (j + 1)) := by
-      rcases hLeftDvd with ⟨u, hu⟩
-      refine ⟨u, ?_⟩
-      have hPowSplit :
-          (2 : ℤ) ^ (beattyIndex a + (criticalPowerQ j + r)) =
-            (2 : ℤ) ^ beattyIndex a *
-              (2 : ℤ) ^ (criticalPowerQ j + r) := by
-        rw [pow_add]
-      have hTwoNe : (2 : ℤ) ^ beattyIndex a ≠ 0 := by
-        positivity
-      apply mul_left_cancel₀ hTwoNe
-      calc
-        (2 : ℤ) ^ beattyIndex a *
-            (actualCriticalRawPowerGap (j + 1) *
-                P.integralCanonicalBlockDefect A j -
-              actualCriticalRawPowerGap j *
-                P.integralCanonicalBlockDefect A (j + 1))
-            =
-          (2 : ℤ) ^ (beattyIndex a + (criticalPowerQ j + r)) * u := hu
-        _ =
-          (2 : ℤ) ^ beattyIndex a *
-            ((2 : ℤ) ^ (criticalPowerQ j + r) * u) := by
-              rw [hPowSplit]
-              ring
-    rw [hJ, hN] at hCrossDvd
-    have hQlt :
-        criticalPowerQ j < criticalPowerQ (j + 1) :=
-      criticalPowerQ_lt_next hj
-    have hQRLe :
-        criticalPowerQ j + r ≤ criticalPowerQ (j + 1) := by
-      omega
-    have hNextSplit :
-        criticalPowerQ (j + 1) =
-          (criticalPowerQ j + r) +
-            (criticalPowerQ (j + 1) - (criticalPowerQ j + r)) := by
-      omega
-    have hSecond :
-        (2 : ℤ) ^ (criticalPowerQ j + r) ∣
-          actualCriticalRawPowerGap j *
-            ((2 : ℤ) ^ criticalPowerQ (j + 1) * Dn) := by
-      refine ⟨
+  have hN :
+      criticalIntervalDefectZ
+          a (a + criticalPowerP (j + 1)) Za =
+        (2 : ℤ) ^ criticalPowerQ (j + 1) * Dn := by
+    simpa [Za, Zn, Dn] using hN0
+  rw [hCross, hJ, hN] at hLocalDvd
+  have hNextSplit :
+      criticalPowerQ (j + 1) =
+        (criticalPowerQ j + r) +
+          (criticalPowerQ (j + 1) - (criticalPowerQ j + r)) := by
+    omega
+  have hSecond :
+      (2 : ℤ) ^ (criticalPowerQ j + r) ∣
         actualCriticalRawPowerGap j *
-          ((2 : ℤ) ^
-              (criticalPowerQ (j + 1) - (criticalPowerQ j + r)) * Dn),
-        ?_⟩
-      rw [hNextSplit, pow_add]
-      ring_nf
-      simp
-    have hFirst :
-        (2 : ℤ) ^ (criticalPowerQ j + r) ∣
-          actualCriticalRawPowerGap (j + 1) *
-            ((2 : ℤ) ^ criticalPowerQ j * Dj) := by
-      have hAdd := dvd_add hCrossDvd hSecond
-      have hEq :
-          (actualCriticalRawPowerGap (j + 1) *
-                ((2 : ℤ) ^ criticalPowerQ j * Dj) -
-              actualCriticalRawPowerGap j *
-                ((2 : ℤ) ^ criticalPowerQ (j + 1) * Dn)) +
+          ((2 : ℤ) ^ criticalPowerQ (j + 1) * Dn) := by
+    refine ⟨
+      actualCriticalRawPowerGap j *
+        ((2 : ℤ) ^
+            (criticalPowerQ (j + 1) - (criticalPowerQ j + r)) * Dn),
+      ?_⟩
+    rw [hNextSplit, pow_add]
+    ring_nf
+    simp
+  have hFirst :
+      (2 : ℤ) ^ (criticalPowerQ j + r) ∣
+        actualCriticalRawPowerGap (j + 1) *
+          ((2 : ℤ) ^ criticalPowerQ j * Dj) := by
+    have hAdd := dvd_add hLocalDvd hSecond
+    have hEq :
+        (actualCriticalRawPowerGap (j + 1) *
+              ((2 : ℤ) ^ criticalPowerQ j * Dj) -
             actualCriticalRawPowerGap j *
-              ((2 : ℤ) ^ criticalPowerQ (j + 1) * Dn) =
-          actualCriticalRawPowerGap (j + 1) *
-            ((2 : ℤ) ^ criticalPowerQ j * Dj) := by
-        ring
-      rw [hEq] at hAdd
-      exact hAdd
-    have hProduct :
-        (2 : ℤ) ^ r ∣
-          actualCriticalRawPowerGap (j + 1) * Dj := by
-      rcases hFirst with ⟨u, hu⟩
-      refine ⟨u, ?_⟩
-      have hPowSplit :
-          (2 : ℤ) ^ (criticalPowerQ j + r) =
-            (2 : ℤ) ^ criticalPowerQ j * (2 : ℤ) ^ r := by
-        rw [pow_add]
-      have hTwoNe : (2 : ℤ) ^ criticalPowerQ j ≠ 0 := by
-        positivity
-      apply mul_left_cancel₀ hTwoNe
-      calc
+              ((2 : ℤ) ^ criticalPowerQ (j + 1) * Dn)) +
+          actualCriticalRawPowerGap j *
+            ((2 : ℤ) ^ criticalPowerQ (j + 1) * Dn) =
+        actualCriticalRawPowerGap (j + 1) *
+          ((2 : ℤ) ^ criticalPowerQ j * Dj) := by
+      ring
+    rw [hEq] at hAdd
+    exact hAdd
+  have hProduct :
+      (2 : ℤ) ^ r ∣
+        actualCriticalRawPowerGap (j + 1) * Dj := by
+    rcases hFirst with ⟨u, hu⟩
+    refine ⟨u, ?_⟩
+    have hPowSplit :
+        (2 : ℤ) ^ (criticalPowerQ j + r) =
+          (2 : ℤ) ^ criticalPowerQ j * (2 : ℤ) ^ r := by
+      rw [pow_add]
+    have hTwoNe : (2 : ℤ) ^ criticalPowerQ j ≠ 0 := by
+      positivity
+    apply mul_left_cancel₀ hTwoNe
+    calc
+      (2 : ℤ) ^ criticalPowerQ j *
+          (actualCriticalRawPowerGap (j + 1) * Dj) =
+        actualCriticalRawPowerGap (j + 1) *
+          ((2 : ℤ) ^ criticalPowerQ j * Dj) := by
+            ring
+      _ = (2 : ℤ) ^ (criticalPowerQ j + r) * u := hu
+      _ =
         (2 : ℤ) ^ criticalPowerQ j *
-            (actualCriticalRawPowerGap (j + 1) * Dj) =
-          actualCriticalRawPowerGap (j + 1) *
-            ((2 : ℤ) ^ criticalPowerQ j * Dj) := by
-              ring
-        _ = (2 : ℤ) ^ (criticalPowerQ j + r) * u := hu
-        _ =
-          (2 : ℤ) ^ criticalPowerQ j *
-            ((2 : ℤ) ^ r * u) := by
-              rw [hPowSplit]
-              ring
-    have hRLeNext : r ≤ criticalPowerQ (j + 1) := by
-      omega
-    have hNextRSplit :
-        criticalPowerQ (j + 1) =
-          r + (criticalPowerQ (j + 1) - r) := by
-      omega
-    have hGapCoprime :
+          ((2 : ℤ) ^ r * u) := by
+            rw [hPowSplit]
+            ring
+  have hRLeNext : r ≤ criticalPowerQ (j + 1) := by
+    omega
+  have hNextRSplit :
+      criticalPowerQ (j + 1) =
+        r + (criticalPowerQ (j + 1) - r) := by
+    omega
+  have hGapCoprime :
+      IsCoprime
+        ((2 : ℤ) ^ r)
+        (actualCriticalRawPowerGap (j + 1)) := by
+    have h23 : IsCoprime (2 : ℤ) (3 : ℤ) := by
+      refine ⟨-1, 1, ?_⟩
+      norm_num
+    have hBase :
         IsCoprime
           ((2 : ℤ) ^ r)
-          (actualCriticalRawPowerGap (j + 1)) := by
-      have h23 : IsCoprime (2 : ℤ) (3 : ℤ) := by
-        refine ⟨-1, 1, ?_⟩
-        norm_num
-      have hBase :
-          IsCoprime
-            ((2 : ℤ) ^ r)
-            ((3 : ℤ) ^ criticalPowerP (j + 1)) := by
-        exact h23.pow
-      rcases hBase with ⟨u, v, huv⟩
-      refine ⟨
-        u + v *
-          (2 : ℤ) ^ (criticalPowerQ (j + 1) - r),
-        -v,
-        ?_⟩
-      unfold actualCriticalRawPowerGap
-      have hTwoSplit :
-          (2 : ℤ) ^ criticalPowerQ (j + 1) =
-            (2 : ℤ) ^ r *
-              (2 : ℤ) ^ (criticalPowerQ (j + 1) - r) := by
-        rw [hNextRSplit, pow_add]
-        simp
-      rw [hTwoSplit]
-      calc
-        (u + v *
-              (2 : ℤ) ^ (criticalPowerQ (j + 1) - r)) *
-              (2 : ℤ) ^ r +
-            (-v) *
-              ((2 : ℤ) ^ r *
-                  (2 : ℤ) ^ (criticalPowerQ (j + 1) - r) -
-                (3 : ℤ) ^ criticalPowerP (j + 1))
-            =
-          u * (2 : ℤ) ^ r +
-            v * (3 : ℤ) ^ criticalPowerP (j + 1) := by
-              ring
-        _ = 1 := huv
-    have hDj :
-        (2 : ℤ) ^ r ∣ Dj :=
-      hGapCoprime.dvd_of_dvd_mul_left hProduct
-    simpa [Dj, Zj, Za] using hDj
-  · have hLossZero :
-        actualCriticalContinuedFractionData.strongPrecision j -
-            (beattyIndex a + criticalPowerQ j) = 0 := by
-      omega
-    have hrZero : r = 0 := by
-      dsimp [r, residualQJumpExponent]
-      rw [hLossZero]
+          ((3 : ℤ) ^ criticalPowerP (j + 1)) := by
+      exact h23.pow
+    rcases hBase with ⟨u, v, huv⟩
+    refine ⟨
+      u + v *
+        (2 : ℤ) ^ (criticalPowerQ (j + 1) - r),
+      -v,
+      ?_⟩
+    unfold actualCriticalRawPowerGap
+    have hTwoSplit :
+        (2 : ℤ) ^ criticalPowerQ (j + 1) =
+          (2 : ℤ) ^ r *
+            (2 : ℤ) ^ (criticalPowerQ (j + 1) - r) := by
+      rw [hNextRSplit, pow_add]
       simp
-    rw [hrZero]
-    simp
+    rw [hTwoSplit]
+    calc
+      (u + v *
+            (2 : ℤ) ^ (criticalPowerQ (j + 1) - r)) *
+            (2 : ℤ) ^ r +
+          (-v) *
+            ((2 : ℤ) ^ r *
+                (2 : ℤ) ^ (criticalPowerQ (j + 1) - r) -
+              (3 : ℤ) ^ criticalPowerP (j + 1))
+          =
+        u * (2 : ℤ) ^ r +
+          v * (3 : ℤ) ^ criticalPowerP (j + 1) := by
+            ring
+      _ = 1 := huv
+  exact hGapCoprime.dvd_of_dvd_mul_left hProduct
 
 /--
-8R-C: canonical arithmetic criticalization start では standard-period shift による
-state return は起こらない。
+Stage 8R2 が実際に使う wrapper。
 
-この部分は旧 8C と同じで、`hPrecision` を一切使っていない。
-もし `Z_(a+P_j)=Z_a` なら、P-periodicity により one-cell Beatty gap も
-`a-1 -> a` と `a+P_j-1 -> a+P_j` で一致する。integral recurrence を一歩戻すと
-`terminalRawTail(a-1)` に extra factor 3 が入り、`a` の minimality に矛盾する。
+`rho>0` なら `a<P_(j+1)` が自動なので、公開仮定には phase window すら現れない。
+-/
+theorem twoPow_residualQJump_dvd_integralStateDifference
+    (P : PureBProfileObstruction)
+    {a j : ℕ}
+    (A : IsIntegralCriticalTail P a)
+    (haPos : 0 < a)
+    (hBlockEndNext : a + criticalPowerP (j + 1) ≤ P.m)
+    (hj : 9 ≤ j)
+    (hRhoPos : 0 < residualQJumpExponent a j) :
+    (2 : ℤ) ^ residualQJumpExponent a j ∣
+      (P.integralCriticalTailStateInt
+          A (a + criticalPowerP j)
+          (by
+            have _hPmono :
+                criticalPowerP j < criticalPowerP (j + 1) :=
+              criticalPowerP_strict_succ (r := j) (by omega)
+            omega)
+          (by
+            have hPmono :
+                criticalPowerP j < criticalPowerP (j + 1) :=
+              criticalPowerP_strict_succ (r := j) (by omega)
+            omega) -
+        P.integralCriticalTailStateInt A a le_rfl A.1) := by
+  have haLt :=
+    lt_nextP_of_residualQJumpExponent_pos
+      (a := a) (j := j) hj hRhoPos
+  exact
+    P.twoPow_residualQJump_dvd_integralStateDifference_of_lt_nextP
+      (A := A)
+      haPos
+      haLt
+      hBlockEndNext
+      hj
+
+/-! ## 6. criticalization start nonreturn without old corridor -/
+
+/--
+criticalization start では、`2<=a<P_(j+1)` の standard shift による state return は不可能。
+
+old 8R-C の corridor 条件を、extended Beatty shift が与える
+predecessor one-cell equality に置き換えた。
 -/
 theorem criticalizationStart_integralState_ne_of_standardShift_residual
     (P : PureBProfileObstruction)
@@ -511,9 +597,8 @@ theorem criticalizationStart_integralState_ne_of_standardShift_residual
     (hj : 9 ≤ j)
     (hBlockEnd :
       P.criticalizationStart + criticalPowerP j ≤ P.m)
-    (hRange :
-      P.criticalizationStart + criticalPowerP j <
-        criticalPowerP (j + 1)) :
+    (hStartLt :
+      P.criticalizationStart < criticalPowerP (j + 1)) :
     P.integralCriticalTailStateInt
         P.criticalizationStart_spec
         (P.criticalizationStart + criticalPowerP j)
@@ -533,61 +618,13 @@ theorem criticalizationStart_integralState_ne_of_standardShift_residual
   intro hReturn
   have haTwo : 2 ≤ a := by
     simpa [a] using hStartTwo
-  have haPos : 0 < a := by
-    omega
+  have haLt : a < criticalPowerP (j + 1) := by
+    simpa [a] using hStartLt
   have hPPos : 0 < criticalPowerP j :=
     criticalPowerP_pos (by omega)
-  have hShiftA :
-      beattyIndex (a + criticalPowerP j) =
-        criticalPowerQ j + beattyIndex a := by
-    have hmod : j % 2 < 2 := Nat.mod_lt j (by decide)
-    by_cases hjOdd : j % 2 = 1
-    · have h :=
-        actual_beattyIndex_add_currentP_eq_add_Q_of_odd
-          (j := j) (x := a) hj hjOdd
-          (by simpa [Nat.add_comm] using hRange)
-      rw [Nat.add_comm a (criticalPowerP j)]
-      exact h
-    · have hjEven : j % 2 = 0 := by
-        omega
-      have h :=
-        actual_beattyIndex_add_currentP_eq_add_Q_of_even
-          (j := j) (x := a) hj hjEven haPos
-          (by simpa [Nat.add_comm] using hRange)
-      rw [Nat.add_comm a (criticalPowerP j)]
-      exact h
-  have hRangePred :
-      criticalPowerP j + (a - 1) <
-        criticalPowerP (j + 1) := by
-    omega
-  have hShiftPred0 :
-      beattyIndex (criticalPowerP j + (a - 1)) =
-        criticalPowerQ j + beattyIndex (a - 1) := by
-    have hmod : j % 2 < 2 := Nat.mod_lt j (by decide)
-    by_cases hjOdd : j % 2 = 1
-    · exact
-        actual_beattyIndex_add_currentP_eq_add_Q_of_odd
-          (j := j) (x := a - 1) hj hjOdd hRangePred
-    · have hjEven : j % 2 = 0 := by
-        omega
-      exact
-        actual_beattyIndex_add_currentP_eq_add_Q_of_even
-          (j := j) (x := a - 1) hj hjEven (by omega) hRangePred
-  have hShiftPred :
-      beattyIndex (a + criticalPowerP j - 1) =
-        criticalPowerQ j + beattyIndex (a - 1) := by
-    have hIndex :
-        criticalPowerP j + (a - 1) =
-          a + criticalPowerP j - 1 := by
-      omega
-    rw [← hIndex]
-    exact hShiftPred0
-  have hGapEq :
-      beattyIndex (a + criticalPowerP j) -
-          beattyIndex (a + criticalPowerP j - 1) =
-        beattyIndex a - beattyIndex (a - 1) := by
-    rw [hShiftA, hShiftPred]
-    omega
+  have hGapEq :=
+    actual_beattyIndex_currentP_preserves_pred_cell_of_two_le_lt_nextP
+      (j := j) (x := a) hj haTwo haLt
   have hStepStart :
       a ≤ a + criticalPowerP j - 1 := by
     omega
@@ -738,21 +775,14 @@ theorem criticalizationStart_integralState_ne_of_standardShift_residual
     P.criticalizationStart_minimal hPrev
   change a ≤ a - 1 at hMin
   omega
+
+/-! ## 7. final corridor-free Stage 8R2 -/
+
 /--
-8R-D: residual divisibility、criticalization-start nonreturn、
-uniform `0 <= Z_s <= 4y` を合わせる。
+nontrivial residual branch の final dyadic rigidity。
 
-旧 Stage 8D の `hPrecision` は完全に消え、残る仮定は
-
-  a + P_(j+1) <= m
-  a + P_j     < P_(j+1)
-  a + P_(j+1) < P_(j+2)
-
-の三つだけ。
-
-結論:
-
-  2^rho(a,j) <= 4*yNat.
+公開仮定から old corridor は完全に消えた。
+`rho>0` 自身が必要な local phase window を自動生成する。
 -/
 theorem criticalizationStart_residualQJump_dyadic_bound
     (P : PureBProfileObstruction)
@@ -762,12 +792,9 @@ theorem criticalizationStart_residualQJump_dyadic_bound
     (hj : 9 ≤ j)
     (hBlockEndNext :
       P.criticalizationStart + criticalPowerP (j + 1) ≤ P.m)
-    (hRangeJ :
-      P.criticalizationStart + criticalPowerP j <
-        criticalPowerP (j + 1))
-    (hRangeNext :
-      P.criticalizationStart + criticalPowerP (j + 1) <
-        criticalPowerP (j + 2)) :
+    (hRhoPos :
+      0 <
+        residualQJumpExponent P.criticalizationStart j) :
     2 ^ residualQJumpExponent P.criticalizationStart j ≤
       4 * P.yNat := by
   let a := P.criticalizationStart
@@ -775,43 +802,37 @@ theorem criticalizationStart_residualQJump_dyadic_bound
     P.criticalizationStart_spec
   have haTwo : 2 ≤ a := by
     simpa [a] using hStartTwo
-  have haPos : 0 < a := by
-    omega
+  have haPos : 0 < a := by omega
+  have hRhoPos' :
+      0 < residualQJumpExponent a j := by
+    simpa [a] using hRhoPos
+  have haLt :
+      a < criticalPowerP (j + 1) :=
+    lt_nextP_of_residualQJumpExponent_pos
+      (a := a) (j := j) hj hRhoPos'
   have hPmono :
       criticalPowerP j < criticalPowerP (j + 1) :=
     criticalPowerP_strict_succ (r := j) (by omega)
-  have hBlockEndJ :
-      a + criticalPowerP j ≤ P.m := by
-    have hNext :
-        a + criticalPowerP (j + 1) ≤ P.m := by
-      simpa [a] using hBlockEndNext
-    omega
-  have hRangeJ' :
-      a + criticalPowerP j < criticalPowerP (j + 1) := by
-    simpa [a] using hRangeJ
-  have hRangeNext' :
-      a + criticalPowerP (j + 1) <
-        criticalPowerP (j + 2) := by
-    simpa [a] using hRangeNext
   have hEndNext :
       a + criticalPowerP (j + 1) ≤ P.m := by
     simpa [a] using hBlockEndNext
+  have hBlockEndJ :
+      a + criticalPowerP j ≤ P.m := by
+    omega
   have hDiv :=
     P.twoPow_residualQJump_dvd_integralStateDifference
       (A := A)
       haPos
-      hBlockEndJ
       hEndNext
       hj
-      hRangeJ'
-      hRangeNext'
+      hRhoPos'
   have hNe :=
     P.criticalizationStart_integralState_ne_of_standardShift_residual
       (j := j)
       hStartTwo
       hj
       (by simpa [a] using hBlockEndJ)
-      hRangeJ
+      (by simpa [a] using haLt)
   let Za : ℤ :=
     P.integralCriticalTailStateInt A a le_rfl A.1
   let Zj : ℤ :=
@@ -863,11 +884,10 @@ theorem criticalizationStart_residualQJump_dyadic_bound
         have hNegPos : 0 < -D := by
           linarith
         nlinarith
-      have huOne : (1 : ℤ) ≤ u := by
-        omega
       have hPowLeNeg :
           (2 : ℤ) ^ residualQJumpExponent a j ≤ -D := by
         rw [hu]
+        have huOne : (1 : ℤ) ≤ u := by omega
         nlinarith
       have hNegLe : -D ≤ Za := by
         dsimp [D]
@@ -877,11 +897,10 @@ theorem criticalizationStart_residualQJump_dyadic_bound
     · rcases hDivD with ⟨u, hu⟩
       have huPos : 0 < u := by
         nlinarith
-      have huOne : (1 : ℤ) ≤ u := by
-        omega
       have hPowLeD :
           (2 : ℤ) ^ residualQJumpExponent a j ≤ D := by
         rw [hu]
+        have huOne : (1 : ℤ) ≤ u := by omega
         nlinarith
       have hDLe : D ≤ Zj := by
         dsimp [D]
@@ -899,11 +918,40 @@ theorem criticalizationStart_residualQJump_dyadic_bound
   simpa [a] using hNat
 
 /--
-8R-E: 旧 full-q-jump bound は residual theorem の特殊ケースとして回収できる。
+corridor-free Stage 8R2 の unconditional presentation。
 
-この theorem は compatibility checkpoint。
-live route の本体は `criticalizationStart_residualQJump_dyadic_bound` であり、
-今後の scale selection は residual exponent を直接評価する。
+`rho=0` は情報ゼロ branch として明示的に残し、
+nontrivial branch では dyadic bound を得る。
+-/
+theorem criticalizationStart_residualQJump_zero_or_dyadic_bound
+    (P : PureBProfileObstruction)
+    (hy : 0 ≤ P.y)
+    {j : ℕ}
+    (hStartTwo : 2 ≤ P.criticalizationStart)
+    (hj : 9 ≤ j)
+    (hBlockEndNext :
+      P.criticalizationStart + criticalPowerP (j + 1) ≤ P.m) :
+    residualQJumpExponent P.criticalizationStart j = 0 ∨
+      2 ^ residualQJumpExponent P.criticalizationStart j ≤
+        4 * P.yNat := by
+  by_cases hZero :
+      residualQJumpExponent P.criticalizationStart j = 0
+  · exact Or.inl hZero
+  · right
+    apply
+      P.criticalizationStart_residualQJump_dyadic_bound
+        hy
+        hStartTwo
+        hj
+        hBlockEndNext
+    omega
+
+/-! ## 8. old full-q-jump compatibility, now corridor-free -/
+
+/--
+旧 precision 仮定 `beta(a)<Q_j` を置く場合は `rho=Q_(j+1)-Q_j>0`。
+
+したがって旧 full-q-jump bound は、二本の corridor 条件なしで回収される。
 -/
 theorem criticalizationStart_fullQJump_dyadic_bound_of_precision_residual
     (P : PureBProfileObstruction)
@@ -913,29 +961,33 @@ theorem criticalizationStart_fullQJump_dyadic_bound_of_precision_residual
     (hj : 9 ≤ j)
     (hBlockEndNext :
       P.criticalizationStart + criticalPowerP (j + 1) ≤ P.m)
-    (hRangeJ :
-      P.criticalizationStart + criticalPowerP j <
-        criticalPowerP (j + 1))
-    (hRangeNext :
-      P.criticalizationStart + criticalPowerP (j + 1) <
-        criticalPowerP (j + 2))
     (hPrecision :
       beattyIndex P.criticalizationStart < criticalPowerQ j) :
     2 ^ (criticalPowerQ (j + 1) - criticalPowerQ j) ≤
       4 * P.yNat := by
-  have hResidual :=
+  have hEq :=
+    residualQJumpExponent_eq_full_of_precision
+      (a := P.criticalizationStart)
+      (j := j)
+      hj
+      hPrecision
+  have hQlt :
+      criticalPowerQ j < criticalPowerQ (j + 1) :=
+    criticalPowerQ_lt_next hj
+  have hRhoPos :
+      0 <
+        residualQJumpExponent P.criticalizationStart j := by
+    rw [hEq]
+    omega
+  have hBound :=
     P.criticalizationStart_residualQJump_dyadic_bound
       hy
       hStartTwo
       hj
       hBlockEndNext
-      hRangeJ
-      hRangeNext
-  rw [
-    residualQJumpExponent_eq_full_of_precision
-      hj hPrecision
-  ] at hResidual
-  exact hResidual
+      hRhoPos
+  rw [hEq] at hBound
+  exact hBound
 
 end PureBProfileObstruction
 

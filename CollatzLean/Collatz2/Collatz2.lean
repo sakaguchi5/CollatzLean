@@ -338,8 +338,9 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeChristoffel
 
 -- Stage 8R: residual dyadic rigidity
 -- full-precision 仮定を要求せず、phase loss 後に残る dyadic precision を使う。
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ExtendedCriticalBeattyPhaseShift
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBResidualLocalWronskian
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBCriticalizationStartResidualDyadicRigidity
-
 
 set_option linter.style.header false
 
