@@ -321,6 +321,7 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeShiftedStat
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeIntegralStateWronskian
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeChristoffelDefectValuation
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBCriticalizationStartDyadicRigidity
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBGoodScaleCounterexample
 
 
 set_option linter.style.header false
