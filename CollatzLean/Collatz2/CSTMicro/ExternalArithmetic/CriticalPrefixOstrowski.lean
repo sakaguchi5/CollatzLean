@@ -874,15 +874,24 @@ theorem exists_actualCriticalPartialQuotient
       exists_actualCriticalPartialQuotient_initial hr hsmall⟩
   · exact exists_actualCriticalPartialQuotient_large (by omega)
 
-/-- recurrence から canonical に選ぶ actual partial quotient。 -/
-noncomputable def actualCriticalPartialQuotient
-    (r : ℕ) : ℕ := by
-  classical
-  exact
-    if hr : 2 ≤ r then
-      Nat.find (exists_actualCriticalPartialQuotient hr)
-    else
-      0
+/--
+actual critical continued-fraction partial quotient の
+完全 executable 版。
+
+r >= 2 では recurrence
+
+  Q_(r+1) = Q_(r-1) + a_r * Q_r
+
+から coefficient を直接復元する。
+-/
+def actualCriticalPartialQuotient
+    (r : ℕ) : ℕ :=
+  if 2 ≤ r then
+    (criticalPowerQ (r + 1) - criticalPowerQ (r - 1)) /
+      criticalPowerQ r
+  else
+    0
+
 
 /-- canonical partial quotient は recurrence を満たす。 -/
 theorem actualCriticalPartialQuotient_spec
@@ -890,10 +899,24 @@ theorem actualCriticalPartialQuotient_spec
     (hr : 2 ≤ r) :
     IsActualCriticalPartialQuotient r
       (actualCriticalPartialQuotient r) := by
-  classical
-  unfold actualCriticalPartialQuotient
-  simp only [dif_pos hr]
-  exact Nat.find_spec (exists_actualCriticalPartialQuotient hr)
+  obtain ⟨a, ha⟩ :=
+    exists_actualCriticalPartialQuotient hr
+  have hQ := ha.2.2
+  have hSub :
+      criticalPowerQ (r + 1) - criticalPowerQ (r - 1) =
+        a * criticalPowerQ r := by
+    omega
+  have hEq :
+      actualCriticalPartialQuotient r = a := by
+    unfold actualCriticalPartialQuotient
+    simp only [if_pos hr]
+    rw [hSub]
+    -- ここは既存の criticalPowerQ の positivity 補題を使う。
+    have hQr : 0 < criticalPowerQ r := by
+      exact criticalPowerQ_pos r
+    exact Nat.mul_div_left a hQr
+  rw [hEq]
+  exact ha
 
 /-- canonical partial quotient は正。 -/
 theorem actualCriticalPartialQuotient_pos

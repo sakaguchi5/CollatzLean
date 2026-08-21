@@ -357,8 +357,11 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerCritica
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerLeftLocalizationLog14
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerStrongLeftReadyGeometry
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerLog14StrongClosure
-
-
+--BHZ
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBHZIndexing
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalShiftBHZOstrowskiBridge
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalPhaseCoordinates
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalPrefixPowerCandidate
 
 
 
