@@ -1,33 +1,36 @@
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalShiftBHZOstrowskiBridge
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBeattyIncrementWord
 
 /-!
-# BHZ phase coordinates for the shifted critical word
+# BHZ phase coordinates for the shifted critical Beatty word
 
-There are two different objects which must not be silently identified:
+BHZ の slope は `α = log₂ 3 - 1`。
+従って word-side coordinate は
 
-1. the integer phase `s`, whose shifted critical word is obtained by reading
-   the critical Beatty/Sturmian word from position `s`;
-2. the BHZ Ostrowski digit vector `(c_k)` describing the same phase in the
-   odometer/S-adic coordinate system.
+  beattyIndex (n+1) - beattyIndex n - 1
 
-`CriticalShiftBHZOstrowskiBridge` has already constructed the arithmetic
-coordinate `(c_k)` and proved that its Ostrowski value is exactly `s`.
+の binary word、すなわち `criticalBeattyIncrementBit` でなければならない。
 
-This file fixes the *word-side* coordinate of the same phase.  It does not yet
-assert the BHZ multiplicative S-adic formula.  That is the next semantic
-bridge to prove from BHZ Proposition 2.7/2.8.  Keeping the target explicit here
-prevents the old mistake of treating an arbitrary shifted interval as an
-origin prefix.
+注意:
+Ferrers boundary 側の `criticalSturmianBit` は別 slope の mechanical word なので、
+BHZ Proposition 3.3 の word coordinate としては使わない。
+
+このファイルは
+
+1. integer phase `s` の BHZ/Ostrowski digit coordinate、
+2. 同じ phase から読む actual critical Beatty increment word、
+
+を一つの packet に置く。
 -/
 
 namespace Collatz2
 namespace CSTMicro
 namespace ExternalArithmetic
 
-/-- The critical Sturmian bit seen from integer phase `s`. -/
+/-- BHZ critical binary word を integer phase `s` から読む。 -/
 def criticalShiftBit
     (s n : ℕ) : Bool :=
-  criticalSturmianBit (s + n)
+  criticalBeattyIncrementBit (s + n)
 
 /-- Relative Beatty rise of the shifted critical word. -/
 def criticalShiftRise
@@ -39,7 +42,7 @@ def criticalShiftRise
     criticalShiftRise s 0 = 0 := by
   simp [criticalShiftRise]
 
-/-- Shift composition is exact on the word-side coordinate. -/
+/-- Shift composition is exact on the BHZ word-side coordinate. -/
 theorem criticalShiftBit_add_phase
     (s t n : ℕ) :
     criticalShiftBit (s + t) n =
@@ -50,18 +53,35 @@ theorem criticalShiftBit_add_phase
 theorem criticalShiftRise_add_phase
     (s t k : ℕ) :
     criticalShiftRise (s + t) k =
-      beattyIndex (s + (t + k)) - beattyIndex (s + t) := by
+      beattyIndex (s + (t + k)) -
+        beattyIndex (s + t) := by
   simp [criticalShiftRise, Nat.add_assoc]
+
+/--
+shifted BHZ bit の consecutive two-block equality から
+`CriticalBeattySquareAt` を直接得る。
+-/
+theorem criticalBeattySquareAt_of_criticalShiftBit_blocks
+    {s r : ℕ}
+    (hr : 0 < r)
+    (hBlock :
+      ∀ i : ℕ, i < r →
+        criticalShiftBit s i =
+          criticalShiftBit s (r + i)) :
+    CriticalBeattySquareAt s r := by
+  apply
+    criticalBeattySquareAt_of_incrementBit_blocks
+      hr
+  intro i hi
+  have h := hBlock i hi
+  simpa [criticalShiftBit, Nat.add_assoc] using h
 
 /--
 A packet carrying the two exact coordinates of the same integer phase.
 
-* `digits` is the canonical BHZ/Ostrowski arithmetic coordinate;
-* `bit` and `rise` are the actual shifted critical word coordinate.
-
-The missing future theorem is not a field here: we do **not** assume that an
-S-adic evaluator built from `digits` equals `bit`.  That equality must be
-proved from the BHZ odometer conjugacy.
+* `digitsHigh` / `digit` are the BHZ/Ostrowski arithmetic coordinate;
+* `shiftedBit` is the actual BHZ binary increment word;
+* `shiftedRise` is the actual relative Beatty rise.
 -/
 structure CriticalBHZPhasePacket (s : ℕ) where
   expansion : BHZCriticalPhaseExpansion (s + 2) s
@@ -96,7 +116,7 @@ theorem weightedValue_eq_phase
   unfold digitsHigh
   exact P.expansion.weightedValue_digitsHigh
 
-/-- Word-side shifted bit attached to the packet's phase. -/
+/-- Word-side shifted BHZ bit attached to the packet's phase. -/
 def shiftedBit
     {s : ℕ}
     (_P : CriticalBHZPhasePacket s)
@@ -110,17 +130,26 @@ def shiftedRise
     (k : ℕ) : ℕ :=
   criticalShiftRise s k
 
+/--
+packet の shifted bit blocks が square なら actual Beatty square。
+-/
+theorem squareAt_of_shiftedBit_blocks
+    {s r : ℕ}
+    (P : CriticalBHZPhasePacket s)
+    (hr : 0 < r)
+    (hBlock :
+      ∀ i : ℕ, i < r →
+        P.shiftedBit i =
+          P.shiftedBit (r + i)) :
+    CriticalBeattySquareAt s r := by
+  exact
+    criticalBeattySquareAt_of_criticalShiftBit_blocks
+      hr hBlock
+
 end CriticalBHZPhasePacket
 
 /--
-The precise semantic obligation still required from BHZ Proposition 2.7/2.8.
-
-`evalBit P n` is intended to be the bit obtained by evaluating the
-multiplicative S-adic expansion with the packet's digits.  An inhabitant must
-prove that this evaluator equals the actual shifted critical word.
-
-This is intentionally an interface only; no inhabitant is asserted in this
-file.
+BHZ S-adic/Ostrowski evaluator と actual shifted BHZ word の semantic port。
 -/
 structure BHZCriticalShiftSAdicSemantics where
   evalBit :

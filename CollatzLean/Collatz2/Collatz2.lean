@@ -365,7 +365,9 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalPrefixPowerCa
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalIntegerOrbitConjugacy
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalInterceptDigitIdentification
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalShiftSAdicSemanticsFromOdometer
-
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalProposition33Port
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalPrefixPowerSquare
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBeattyIncrementWord
 
 set_option linter.style.header false
 
