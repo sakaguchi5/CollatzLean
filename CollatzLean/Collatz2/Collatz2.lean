@@ -320,8 +320,25 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeShiftedDict
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeShiftedStateCollapse
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeIntegralStateWronskian
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeChristoffelDefectValuation
-import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBCriticalizationStartDyadicRigidity
-import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBGoodScaleCounterexample
+-- Stage 8 legacy / diagnostic archive
+--
+-- `PureBCriticalizationStartDyadicRigidity` は
+-- full Q-jump を得るために
+--   beattyIndex criticalizationStart < criticalPowerQ j
+-- を要求していた旧 Stage 8。
+--
+-- `PureBGoodScaleCounterexample` は arbitrary-phase への
+-- full-precision 移植が成立しないことを記録する diagnostic counterexample。
+--
+-- 両ファイルとも証明史・反例記録として保存するが、
+-- live proof route からは意図的に除外する。
+--
+-- import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBCriticalizationStartDyadicRigidity
+-- import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBGoodScaleCounterexample
+
+-- Stage 8R: residual dyadic rigidity
+-- full-precision 仮定を要求せず、phase loss 後に残る dyadic precision を使う。
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBCriticalizationStartResidualDyadicRigidity
 
 
 set_option linter.style.header false
