@@ -341,6 +341,13 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBRelativeChristoffel
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ExtendedCriticalBeattyPhaseShift
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBResidualLocalWronskian
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBCriticalizationStartResidualDyadicRigidity
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalBeattyLocalSquares
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalSturmianSquareWindow14
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBLocalSquareRigidity
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTailLog14
+
+
+
 
 set_option linter.style.header false
 
