@@ -3,13 +3,13 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerLargeMR
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerBeattyTwoStep
 
 /-!
-# Pure B single-corner: Beatty lower slope -> StrongLeftReady
+# Pure B single-corner: Beatty lower slope -> sharpened StrongLeftReady
 
 Beatty two-step theorem
 
   beta(k+2) >= beta(k)+3
 
-を反復し、粗いが explicit な lower slope
+を反復し、
 
   k + floor(k/2) <= beta(k)
 
@@ -17,11 +17,11 @@ Beatty two-step theorem
 
 `t=m-b` と置くと `3t+1<=m` は `2t<=b-1` を意味するため
 
-  beta(b-1) >= (b-1)+floor((b-1)/2) >= m-1.
+  beta(b-1) >= m-1.
 
-従って `m>=1539` なら Strong Xi port が要求する
+Xi threshold が 118 へ下がったので、`m>=119` なら
 
-  1538 <= beta(b-1),
+  118 <= beta(b-1),
   m+1 <= beta(b-1)+2
 
 が同時に成立する。
@@ -81,16 +81,16 @@ theorem m_pred_le_strongLeftPrecision_of_three_tail
   rw [hSum]
   exact le_trans (Nat.add_le_add_left hHalf _) hBeat
 
-/-- large m と terminal-third condition から StrongLeftReady を構成。 -/
+/-- `m>=119` と terminal-third condition から sharpened StrongLeftReady。 -/
 theorem strongLeftReady_of_large_and_three_tail
     {P : PureBProfileObstruction}
     (S : P.SingleExposedCornerRigidityPacket)
-    (hmLarge : 1539 ≤ P.m)
+    (hmLarge : 119 ≤ P.m)
     (hThird : 3 * (P.m - S.b) + 1 ≤ P.m) :
     S.StrongLeftReady := by
   have hPrec := S.m_pred_le_strongLeftPrecision_of_three_tail hThird
   constructor
-  · exact le_trans (by omega : 1538 ≤ P.m - 1) hPrec
+  · exact le_trans (by omega : 118 ≤ P.m - 1) hPrec
   · omega
 
 end PureBProfileObstruction.SingleExposedCornerRigidityPacket

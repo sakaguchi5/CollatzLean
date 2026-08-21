@@ -349,6 +349,8 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalInitialSquare
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalPowerPGapGrowth14
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.CriticalSturmianSquareWindow14FromBHZ
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTailLog14FromBHZ
+
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualXiFiniteCheck118
 --
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerActualLeftPrefix
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerCriticalizationRun
