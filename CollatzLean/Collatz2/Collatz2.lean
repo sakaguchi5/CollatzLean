@@ -402,11 +402,15 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerExactBH
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerExactBHZFiniteBands
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerLog196EventualThreshold
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerCardOne6466
-
+/-
 -- card=1 finite residue: whole-run dyadic reduction + sharp local target + defect recurrence
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerWholeRunDyadic
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerFiniteWidth112
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerDefectRecurrence
+-/
+-- card=1 finite side: entrance Xi freeze -> b < 116, m <= 2270
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerEntranceXi
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerEntranceXiFinite
 
 set_option linter.style.header false
 
