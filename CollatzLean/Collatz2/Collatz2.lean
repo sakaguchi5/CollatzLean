@@ -393,7 +393,10 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBLocalOneShortSquare
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTailLog196
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerLog196StrongClosure
 
-
+-- exact BHZ denominator を最後まで保持する live route
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalOneShortSelectorExact
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTailExactOneShort
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerExactBHZWidth
 
 set_option linter.style.header false
 
