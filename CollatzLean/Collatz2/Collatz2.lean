@@ -398,6 +398,11 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BHZCriticalOneShortSelec
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalTailExactOneShort
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerExactBHZWidth
 
+-- card=1: exact finite bands + eventual 196 fallback -> m >= 6466 closure
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerExactBHZFiniteBands
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerLog196EventualThreshold
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerCardOne6466
+
 set_option linter.style.header false
 
 /-!
