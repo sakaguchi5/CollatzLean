@@ -2,6 +2,9 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.TerminalLastTwoExposedNormalFor
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.CarryNormalizedCheckpoint
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RecordFerrersExposedProvenance
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedBranchDivisibility
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedTerminalComponentRigidity
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSingleCornerHenselObligation
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedBranchClosure
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTwoCornerHensel
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftOfCriticalizationBridge
 
@@ -10,12 +13,8 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftOfCriticalizationBridge
 
 `card E ≥ 2` branch の共通入口。
 
-1. terminal 側 last-two exposed normal form
-2. carry-normalized checkpoint / endpoint correction
-3. Record--Ferrers exposed provenance
-4. restarted zero-bridge の extra 3-adic divisibility
-5. attached two-corner geometry + mod 3 Hensel interface
-6. criticalization より左の exposed + global exact unit bridge
-
-をまとめて import する。
+restarted Case I は区間を corrected し、
+唯一の open arithmetic obligation を
+`RestartedSingleCornerHenselObligation.lean` に隔離した。
+それ以外の restarted flow は `RestartedBranchClosure.lean` で `False` まで接続済み。
 -/

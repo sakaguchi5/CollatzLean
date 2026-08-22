@@ -2,17 +2,19 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RecordFerrersExposedProvenance
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBTerminalCoreRightCarryChain
 
 /-!
-# MultiCorner: restarted branch divisibility
+# MultiCorner: corrected restarted-branch divisibility
 
-restarted branch では、左の exposed component と terminal positive component の間に
-zero-depth bridge が現れる場合がある。
+旧版は restarted branch の zero interval を `[s,b)` としていたが、
+実際の Case I は `s ≤ a < b` であり `a` は exposed なので `h a > 0`。
+従って zero interval は `(a,b)`、すなわち `[a+1,b)` に限られる。
 
-このファイルでは、その zero bridge を通る closed numerator が exact に 3-power を
-獲得することを固定し、terminal core の exact 3-adic order と組み合わせて、
-restart 後の terminal contribution 自身に full corridor divisibility が強制されることを示す。
+このファイルでは zero bridge と arithmetic corridor を分離する。
 
-まだここでは contradiction までは主張しない。後段では、この extra divisibility と
-terminal component の局所 Hensel state を衝突させる。
+* arithmetic: `s ≤ k ≤ c` なら tail `[k,c)` は `3^(c-k)` で割れる。
+* geometry: `[u,b)` が zero なら tail `[u,c)` と tail `[b,c)` は一致する。
+
+restarted branch では `u=a+1<b` を取ることで local width `c-b` より
+一段深い `3^(c-b+1)` divisibility が得られる。
 -/
 
 namespace Collatz2
@@ -29,11 +31,7 @@ open ExternalArithmetic
     profileRightmostColumnMass h n = 0 := by
   simp [profileRightmostColumnMass, hZero]
 
-/--
-`[s,s+d)` が zero-depth なら、closed numerator はその区間で毎回 `3` 倍される。
-
-  C_(s+d) = 3^d C_s.
--/
+/-- `[s,s+d)` が zero-depth なら closed numerator は毎回 `3` 倍される。 -/
 theorem profileDyadicClosedNumerator_add_eq_threePow_mul_of_zero_interval
     (h : ℕ → ℕ)
     (s d : ℕ)
@@ -76,10 +74,7 @@ theorem profileDyadicClosedNumerator_eq_threePow_mul_of_zero_interval
   rw [hEq] at hMain
   exact hMain
 
-/--
-cut `b ≤ c` より右に残る contribution を integer difference として定義する。
-後で sum 形へ展開できるが、divisibility にはこの exact split interface が十分。
--/
+/-- cut `b ≤ c` より右の closed contribution。 -/
 noncomputable def restartedClosedTailZ
     (P : PureBProfileObstruction)
     (b c : ℕ) : ℤ :=
@@ -98,115 +93,106 @@ theorem profileDyadicClosedNumerator_cast_eq_scaledPrefix_add_restartedTail
   unfold restartedClosedTailZ
   ring
 
-/--
-`[s,b)` が zero-depth なら、`b` prefix は `s` prefix まで吸収できる。
+/-- `3^r` は `r ≤ R` なら `3^R` を割る。 -/
+theorem threePow_dvd_threePow_of_le
+    {r R : ℕ}
+    (h : r ≤ R) :
+    (3 : ℤ) ^ r ∣ (3 : ℤ) ^ R := by
+  refine ⟨(3 : ℤ) ^ (R - r), ?_⟩
+  have hExp : R = r + (R - r) := by omega
+  rw [hExp, pow_add]
+  simp
 
-  C_c = 3^(c-s) C_s + Tail[b,c].
+/--
+criticalization corridor 内の任意 cut `k` では、tail `[k,c)` 自身が
+local width `c-k` の full 3-adic depthを持つ。
+
+zero interval は一切仮定しない。
 -/
-theorem profileDyadicClosedNumerator_cast_eq_scaledZeroBridgePrefix_add_restartedTail
+theorem restartedTail_localWidth_dvd
     (P : PureBProfileObstruction)
-    {s b c : ℕ}
-    (hsb : s ≤ b)
-    (hbc : b ≤ c)
-    (hZero : ∀ k : ℕ, s ≤ k → k < b → P.h k = 0) :
-    (profileDyadicClosedNumerator c P.h : ℤ) =
-      (3 : ℤ) ^ (c - s) *
-          (profileDyadicClosedNumerator s P.h : ℤ) +
-        restartedClosedTailZ P b c := by
-  have hScaleNat :=
-    profileDyadicClosedNumerator_eq_threePow_mul_of_zero_interval
-      P.h hsb hZero
-  have hScaleZ :
-      (profileDyadicClosedNumerator b P.h : ℤ) =
-        (3 : ℤ) ^ (b - s) *
-          (profileDyadicClosedNumerator s P.h : ℤ) := by
-    exact_mod_cast hScaleNat
-  have hExp : c - s = (c - b) + (b - s) := by
-    omega
-  rw [profileDyadicClosedNumerator_cast_eq_scaledPrefix_add_restartedTail]
-  rw [hScaleZ, hExp, pow_add]
-  ring
-
-/--
-restarted subcase を使うための packet。
-`previous < componentStart` が geometric restarted、`[s,b)` zero が arithmetic bridge。
--/
-structure RestartedZeroBridgePacket
-    (P : PureBProfileObstruction) where
-  normalForm : LastTwoExposedNormalForm P
-  componentStart : ℕ
-  previous_lt_componentStart :
-    normalForm.previous < componentStart
-  criticalization_le_componentStart :
-    P.criticalizationStart ≤ componentStart
-  componentStart_le_terminalCriticalStart :
-    componentStart ≤ P.terminalCriticalStart
-  zero_before_restart :
-    ∀ k : ℕ,
-      P.criticalizationStart ≤ k →
-      k < componentStart →
-      P.h k = 0
-
-namespace RestartedZeroBridgePacket
-
-/-- corridor width は local terminal width と restart 前の extra width に分解する。 -/
-theorem corridorWidth_eq_terminalWidth_add_extraWidth
-    {P : PureBProfileObstruction}
-    (B : RestartedZeroBridgePacket P) :
-    P.terminalCriticalStart - P.criticalizationStart =
-      (P.terminalCriticalStart - B.componentStart) +
-        (B.componentStart - P.criticalizationStart) := by
-  have hSB := B.criticalization_le_componentStart
-  have hBC := B.componentStart_le_terminalCriticalStart
-  omega
-
-/--
-exact terminal-core order により、restart 後 tail は full corridor `3^(c-s)` で割れる。
-
-これは local terminal width `c-b` に加えて `b-s` 段の extra divisibility を要求する、
-restarted branch の arithmetic core。
--/
-theorem restartedTail_fullCorridor_dvd
-    {P : PureBProfileObstruction}
-    (B : RestartedZeroBridgePacket P)
-    (hStart : 0 < P.criticalizationStart) :
-    (3 : ℤ) ^
-        (P.terminalCriticalStart - P.criticalizationStart) ∣
-      restartedClosedTailZ
-        P B.componentStart P.terminalCriticalStart := by
-  have hCoreDvd :
+    {k : ℕ}
+    (hStart : 0 < P.criticalizationStart)
+    (hsk : P.criticalizationStart ≤ k)
+    (hkc : k ≤ P.terminalCriticalStart) :
+    (3 : ℤ) ^ (P.terminalCriticalStart - k) ∣
+      restartedClosedTailZ P k P.terminalCriticalStart := by
+  have hDeep :
       (3 : ℤ) ^
           (P.terminalCriticalStart - P.criticalizationStart) ∣
         (profileDyadicClosedNumerator
           P.terminalCriticalStart P.h : ℤ) := by
     simpa [PureBProfileObstruction.terminalNoncriticalProfileCore] using
       (P.terminalCore_exactThreeAdicOrder hStart).1
-  have hSplit :=
-    profileDyadicClosedNumerator_cast_eq_scaledZeroBridgePrefix_add_restartedTail
-      P
-      B.criticalization_le_componentStart
-      B.componentStart_le_terminalCriticalStart
-      B.zero_before_restart
-  have hPrefixDvd :
-      (3 : ℤ) ^
-          (P.terminalCriticalStart - P.criticalizationStart) ∣
+  have hExpLe :
+      P.terminalCriticalStart - k ≤
+        P.terminalCriticalStart - P.criticalizationStart := by
+    omega
+  have hPowDvd :
+      (3 : ℤ) ^ (P.terminalCriticalStart - k) ∣
         (3 : ℤ) ^
-            (P.terminalCriticalStart - P.criticalizationStart) *
-          (profileDyadicClosedNumerator P.criticalizationStart P.h : ℤ) := by
-    refine ⟨(profileDyadicClosedNumerator P.criticalizationStart P.h : ℤ), ?_⟩
+          (P.terminalCriticalStart - P.criticalizationStart) :=
+    threePow_dvd_threePow_of_le hExpLe
+  have hCore :
+      (3 : ℤ) ^ (P.terminalCriticalStart - k) ∣
+        (profileDyadicClosedNumerator
+          P.terminalCriticalStart P.h : ℤ) :=
+    dvd_trans hPowDvd hDeep
+  have hPrefix :
+      (3 : ℤ) ^ (P.terminalCriticalStart - k) ∣
+        (3 : ℤ) ^ (P.terminalCriticalStart - k) *
+          (profileDyadicClosedNumerator k P.h : ℤ) := by
+    refine ⟨(profileDyadicClosedNumerator k P.h : ℤ), ?_⟩
     ring
   have hTailEq :
-      restartedClosedTailZ P B.componentStart P.terminalCriticalStart =
-        (profileDyadicClosedNumerator P.terminalCriticalStart P.h : ℤ) -
-          (3 : ℤ) ^
-              (P.terminalCriticalStart - P.criticalizationStart) *
-            (profileDyadicClosedNumerator P.criticalizationStart P.h : ℤ) := by
-    rw [hSplit]
-    ring
+      restartedClosedTailZ P k P.terminalCriticalStart =
+        (profileDyadicClosedNumerator
+          P.terminalCriticalStart P.h : ℤ) -
+          (3 : ℤ) ^ (P.terminalCriticalStart - k) *
+            (profileDyadicClosedNumerator k P.h : ℤ) := by
+    unfold restartedClosedTailZ
+    rfl
   rw [hTailEq]
-  exact dvd_sub hCoreDvd hPrefixDvd
+  exact dvd_sub hCore hPrefix
 
-end RestartedZeroBridgePacket
+/--
+`[u,b)` が zero なら cut を `u` から `b` へ動かしても右 tail は変わらない。
+-/
+theorem restartedClosedTailZ_eq_of_zero_interval
+    (P : PureBProfileObstruction)
+    {u b c : ℕ}
+    (hub : u ≤ b)
+    (hbc : b ≤ c)
+    (hZero : ∀ k : ℕ, u ≤ k → k < b → P.h k = 0) :
+    restartedClosedTailZ P u c = restartedClosedTailZ P b c := by
+  have hScaleNat :=
+    profileDyadicClosedNumerator_eq_threePow_mul_of_zero_interval
+      P.h hub hZero
+  have hScaleZ :
+      (profileDyadicClosedNumerator b P.h : ℤ) =
+        (3 : ℤ) ^ (b - u) *
+          (profileDyadicClosedNumerator u P.h : ℤ) := by
+    exact_mod_cast hScaleNat
+  have hExp : c - u = (c - b) + (b - u) := by
+    omega
+  unfold restartedClosedTailZ
+  rw [hScaleZ, hExp, pow_add]
+  ring
+
+/-- tail を右へ一列伸ばす exact recurrence。 -/
+theorem restartedClosedTailZ_succ
+    (P : PureBProfileObstruction)
+    {b c : ℕ}
+    (hbc : b ≤ c) :
+    restartedClosedTailZ P b (c + 1) =
+      (profileRightmostColumnMass P.h c : ℤ) +
+        3 * restartedClosedTailZ P b c := by
+  unfold restartedClosedTailZ
+  rw [profileDyadicClosedNumerator_succ_rightCarry]
+  push_cast
+  have hExp : c + 1 - b = (c - b) + 1 := by omega
+  rw [hExp, pow_succ]
+  ring
 
 end MultiCorner
 end CSTMicro
