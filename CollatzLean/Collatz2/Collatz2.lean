@@ -412,6 +412,10 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerDefectR
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerEntranceXi
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerEntranceXiFinite
 
+-- card=1 finite residue: bounded Hensel scanner -> complete single-corner closure
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerFiniteHenselScan
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerCardOneClosure
+
 set_option linter.style.header false
 
 /-!
