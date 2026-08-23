@@ -10,6 +10,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftOfCriticalizationBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselBeattyArithmetic
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselFactorRepeat
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselNonzeroRepeat
 
 
 
