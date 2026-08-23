@@ -2,10 +2,10 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedTerminalComponentRigid
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSingleCornerHenselObligation
 
 /-!
-# MultiCorner: restarted branch closure modulo one pure Hensel obligation
+# MultiCorner: restarted branch closure modulo one branch-specific arithmetic obligation
 
 このファイルでは唯一の axiom
-`singleCornerDefect_fullDepth_exact_threeAdicOrder`
+`restartedSingleCorner_noExtraThreeAdic`
 以外はすべて current repo の定義・定理から導く。
 
 Case I restarted:
@@ -20,7 +20,12 @@ Case I restarted:
   3^(w+1) | Tail[b,c]
   Tail[b,c] = singleCornerDefect b w
 
-を得る。一方 full-depth exact-order axiom は extra digit を禁止するため False。
+を得る。
+
+新しい arithmetic obligation は arbitrary `(b,w)` の
+full-depth exact-order を要求しない。
+この actual restarted packet について extra digit
+`3^(w+1)` だけを禁止するため、そのまま False になる。
 -/
 
 namespace Collatz2
@@ -29,7 +34,7 @@ namespace MultiCorner
 
 open ExternalArithmetic
 
-/-- restarted terminal straight packet は arithmetic obligation と矛盾する。 -/
+/-- restarted terminal straight packet は branch-specific arithmetic obligation と矛盾する。 -/
 theorem restartedBranch_impossible
     {P : PureBProfileObstruction}
     {N : LastTwoExposedNormalForm P}
@@ -39,17 +44,9 @@ theorem restartedBranch_impossible
   have hExtraTail := S.tail_extra_threeAdic_dvd hStart
   have hTailEq := S.tail_eq_singleCornerDefect
   rw [hTailEq] at hExtraTail
-  have hFullPow :
-      (3 : ℤ) ^ S.width ∣ (3 : ℤ) ^ (S.width + 1) :=
-    threePow_dvd_threePow_of_le (by omega)
-  have hFull :
-      (3 : ℤ) ^ S.width ∣
-        (singleCornerDefect S.b S.width : ℤ) :=
-    dvd_trans hFullPow hExtraTail
-  have hNoExtra :=
-    singleCornerDefect_fullDepth_exact_threeAdicOrder
-      S.beattyIndex_b_pos S.width_pos hFull
-  exact hNoExtra hExtraTail
+  exact
+    (restartedSingleCorner_noExtraThreeAdic S hStart)
+      hExtraTail
 
 /--
 raw last-two geometry から restarted packet を作ってそのまま閉じる wrapper。
