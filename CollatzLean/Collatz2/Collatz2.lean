@@ -416,7 +416,11 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerEntranc
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerFiniteHenselScan
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerCardOneClosure
 
+--純算術
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.MonotoneSuffixHenselChain
+
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.MultiCorner
+
 
 
 

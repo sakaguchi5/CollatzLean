@@ -7,6 +7,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSingleCornerHenselObli
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedBranchClosure
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTwoCornerHensel
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftOfCriticalizationBridge
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselBridge
 
 /-!
 # CSTMicro MultiCorner
