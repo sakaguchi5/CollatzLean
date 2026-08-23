@@ -2,30 +2,31 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedTerminalComponentRigid
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSingleCornerHenselObligation
 
 /-!
-# MultiCorner: restarted branch closure modulo one branch-specific arithmetic obligation
+# MultiCorner: restarted branch closure modulo one large-width arithmetic obligation
 
 このファイルでは唯一の axiom
-`restartedSingleCorner_noExtraThreeAdic`
+`restartedSingleCorner_noExtraThreeAdic_large`
 以外はすべて current repo の定義・定理から導く。
 
-Case I restarted:
-
-  s ≤ a,
-  a は previous exposed,
-  h(a+1)=0,
-  terminal exposed t=c-1
-
-から
+Case I restarted から
 
   3^(w+1) | Tail[b,c]
   Tail[b,c] = singleCornerDefect b w
 
 を得る。
 
-新しい arithmetic obligation は arbitrary `(b,w)` の
-full-depth exact-order を要求しない。
-この actual restarted packet について extra digit
-`3^(w+1)` だけを禁止するため、そのまま False になる。
+ここで width を分ける。
+
+* `w ≤ 3`:
+  `RestartedSingleCornerHenselObligation` 内の exact finite recurrence 計算で
+  extra digit を theorem として排除する。
+
+* `4 ≤ w`:
+  branch-specific large-width obligation
+  `restartedSingleCorner_noExtraThreeAdic_large`
+  を使う。
+
+したがって axiom は actual restarted branch の large-width 部分だけに残る。
 -/
 
 namespace Collatz2
@@ -34,7 +35,7 @@ namespace MultiCorner
 
 open ExternalArithmetic
 
-/-- restarted terminal straight packet は branch-specific arithmetic obligation と矛盾する。 -/
+/-- restarted terminal straight packet は small theorem / large-width obligation と矛盾する。 -/
 theorem restartedBranch_impossible
     {P : PureBProfileObstruction}
     {N : LastTwoExposedNormalForm P}
@@ -44,9 +45,16 @@ theorem restartedBranch_impossible
   have hExtraTail := S.tail_extra_threeAdic_dvd hStart
   have hTailEq := S.tail_eq_singleCornerDefect
   rw [hTailEq] at hExtraTail
-  exact
-    (restartedSingleCorner_noExtraThreeAdic S hStart)
-      hExtraTail
+  by_cases hSmall : S.width ≤ 3
+  · exact
+      (restartedSingleCorner_noExtraThreeAdic_small S hSmall)
+        hExtraTail
+  · have hLarge : 4 ≤ S.width := by
+      omega
+    exact
+      (restartedSingleCorner_noExtraThreeAdic_large
+        S hStart hLarge)
+        hExtraTail
 
 /--
 raw last-two geometry から restarted packet を作ってそのまま閉じる wrapper。
