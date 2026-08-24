@@ -24,6 +24,8 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCriticalTailFusion
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedRepeatIntervalDefectBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedRightEndSmallness
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselFinite36
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedShiftedRepeatIntervalDefect
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalPredFusion
 
 /-!
 # CSTMicro MultiCorner
