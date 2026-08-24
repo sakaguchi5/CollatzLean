@@ -29,6 +29,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalPredFusion
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalFareyComparison
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCriticalizationUnitBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalThreeClearance
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalTailDepthCoordinates
 
 /-!
 # CSTMicro MultiCorner
