@@ -8,6 +8,9 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedBranchClosure
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTwoCornerHensel
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCarryNormalizedTail
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCanonicalHenselBridge
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedHenselFactorRepeat
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedHenselZeroCycleBridge
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedHenselNonzeroRepeatObligation
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftOfCriticalizationBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselBeattyArithmetic
@@ -34,7 +37,23 @@ restarted Case I は corrected terminal component から suffix-Hensel chain へ
 compatibility wrapper であり、未証明 obligation は持たない。
 最終 theorem-only closure は `RestartedBranchClosure.lean`。
 
-attached branch は `AttachedCarryNormalizedTail` と
-`AttachedCanonicalHenselBridge` により、actual two-corner geometry から
-canonical free-base Hensel chain まで正式に接続する。
+attached branch は
+
+* `AttachedCarryNormalizedTail`,
+* `AttachedCanonicalHenselBridge`,
+* `AttachedHenselFactorRepeat`,
+* `AttachedHenselZeroCycleBridge`
+
+により actual two-corner geometry から free-base repeated-block / zero-cycle equation まで
+正式に接続する。
+
+現在 attached で意図的に未証明として残す一点は
+`AttachedNonzeroRepeatSmallnessObligation` である。
+これは forced repeat の nonzero scaled difference `M` に対し
+
+  -2^m < M < 2^m
+
+を Farey/minimality/terminal constraints から導く smallness だけを表す。
+新しい axiom は追加せず、`AttachedHenselNonzeroRepeatObligation.lean` で theorem の仮定として
+明示している。
 -/

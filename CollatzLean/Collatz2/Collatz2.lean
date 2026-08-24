@@ -425,6 +425,8 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.MonotoneSuffixHenselZero
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.TwoThreeCycleDenominator
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.MonotoneSuffixHenselFinite36
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselChain
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselRepeatArithmetic
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselZeroRepeatArithmetic
 
 
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.MultiCorner
