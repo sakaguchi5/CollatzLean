@@ -6,6 +6,8 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedTerminalComponentRigid
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSingleCornerHenselObligation
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedBranchClosure
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTwoCornerHensel
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCarryNormalizedTail
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCanonicalHenselBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftOfCriticalizationBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselBeattyArithmetic
@@ -31,4 +33,8 @@ restarted Case I は corrected terminal component から suffix-Hensel chain へ
 `RestartedSingleCornerHenselObligation.lean` は旧 API 名を theorem として残す
 compatibility wrapper であり、未証明 obligation は持たない。
 最終 theorem-only closure は `RestartedBranchClosure.lean`。
+
+attached branch は `AttachedCarryNormalizedTail` と
+`AttachedCanonicalHenselBridge` により、actual two-corner geometry から
+canonical free-base Hensel chain まで正式に接続する。
 -/
