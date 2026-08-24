@@ -20,6 +20,10 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselPrimitiveZ
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselZeroCycle
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselLargeWidthClosure
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselFinite36
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCriticalTailFusion
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedRepeatIntervalDefectBridge
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedRightEndSmallness
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselFinite36
 
 /-!
 # CSTMicro MultiCorner
