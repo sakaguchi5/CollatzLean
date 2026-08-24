@@ -28,6 +28,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedShiftedRepeatIntervalDe
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalPredFusion
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalFareyComparison
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCriticalizationUnitBridge
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalThreeClearance
 
 /-!
 # CSTMicro MultiCorner
