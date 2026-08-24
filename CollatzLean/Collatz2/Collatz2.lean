@@ -420,6 +420,9 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBSingleCornerCardOne
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.MonotoneSuffixHenselChain
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.MonotoneSuffixHenselRepeatArithmetic
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BeattyFactorRepeat
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BeattyCyclicCarryArithmetic
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.MonotoneSuffixHenselZeroCycleArithmetic
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.TwoThreeCycleDenominator
 
 
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.MultiCorner
