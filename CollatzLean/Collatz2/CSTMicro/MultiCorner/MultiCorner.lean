@@ -16,15 +16,19 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselZeroCycle
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselLargeWidthClosure
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselFinite36
 
-
-
 /-!
 # CSTMicro MultiCorner
 
 `card E ≥ 2` branch の共通入口。
 
-restarted Case I は区間を corrected し、
-唯一の open arithmetic obligation を
-`RestartedSingleCornerHenselObligation.lean` に隔離した。
-それ以外の restarted flow は `RestartedBranchClosure.lean` で `False` まで接続済み。
+restarted Case I は corrected terminal component から suffix-Hensel chain へ移し、
+
+* finite range `width ≤ 36` は deterministic backward certificate,
+* large range `37 ≤ width` は Beatty factor repeat + zero-cycle closure
+
+で全幅を axiom なしに排除する。
+
+`RestartedSingleCornerHenselObligation.lean` は旧 API 名を theorem として残す
+compatibility wrapper であり、未証明 obligation は持たない。
+最終 theorem-only closure は `RestartedBranchClosure.lean`。
 -/

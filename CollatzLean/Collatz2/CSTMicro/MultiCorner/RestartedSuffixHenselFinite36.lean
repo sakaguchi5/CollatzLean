@@ -87,24 +87,14 @@ private theorem finite36_beattyIndex_add_two_le
   omega
 
 /--
-width ≥ 5 なら actual Beatty staircase の terminal exponent は 3 以上。
+width ≥ 5 なら actual Beatty staircase の terminal exponent は 4 以上。
 
 `n = width-1` とすると
 
-  delta_n - 1
-    = beta(b+n) - beta(b) - n.
+  delta_n - 1 = beta(b+n) - beta(b) - n,
 
-Beatty additivity より
-
-  beta(b+n) - beta(b) ≥ beta(n),
-
-また `n ≥ 4` では `beta(n) ≥ n+2`。
-
-したがって
-
-  delta_n - 1 ≥ 2,
-
-ゆえに `delta_n ≥ 3`。
+かつ Beatty additivity の carry は 0/1。
+`n ≥ 4` では `beta(n) ≥ n+2` なので結論する。
 -/
 theorem suffixHenselDelta_terminal_ge_three_of_five_le_width
     {P : PureBProfileObstruction}
@@ -147,6 +137,7 @@ theorem suffixHenselDelta_terminal_ge_three_of_five_le_width
       3 ≤ S.suffixHenselDelta n := by
     exact_mod_cast hDeltaLowerZ
   simpa [n] using hDeltaLower
+
 /-! ## restart extra digit を q₀ へ輸送 -/
 
 /--
@@ -270,36 +261,31 @@ private theorem false_of_width_eq_four_and_extra
         h3lt
         hD3
         hQ3
-        (by
-          norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
+        (by norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
     have h2lt : 2 < C.width := by omega
     have h1 :=
       C.previous_state_eq_of_candidate
         (i := 1)
-        (dNext := 1)
-        (dPrev := 1)
-        (qNext := 1)
-        (qPrev := 1)
         h2lt
         h2.1
         h2.2
-        (by
-          norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
-    have h1lt : 1 < C.width := by omega
-    have h1lt : 1 < C.width := by
-      omega
-    have h0 :=
-      C.previous_state_eq_of_candidate
-        (i := 0)
         (dNext := 1)
         (dPrev := 1)
         (qNext := 1)
         (qPrev := 1)
+        (by norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
+    have h1lt : 1 < C.width := by omega
+    have h0 :=
+      C.previous_state_eq_of_candidate
+        (i := 0)
         h1lt
         h1.1
         h1.2
-        (by
-          norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
+        (dNext := 1)
+        (dPrev := 1)
+        (qNext := 1)
+        (qPrev := 1)
+        (by norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
     have hThreeDiv :=
       S.three_dvd_suffixHenselQuotient_zero_of_extra hStart hExtra
     have hThreeDivC : (3 : ℤ) ∣ C.q 0 := by
@@ -367,6 +353,158 @@ theorem false_of_width_four_to_thirtySix
   have hNo :=
     S.restartedSingleCorner_noExtraThreeAdic_four_to_thirtySix
       hStart hLower hUpper
+  have hExtraTail := S.tail_extra_threeAdic_dvd hStart
+  have hExtraDefect :
+      (3 : ℤ) ^ (S.width + 1) ∣
+        (singleCornerDefect S.b S.width : ℤ) := by
+    rw [← S.tail_eq_singleCornerDefect]
+    exact hExtraTail
+  exact hNo hExtraDefect
+
+
+/-! ## widths 1..3 の extra-digit closure -/
+
+/--
+width `1..3` では pure Hensel chain が残る場合もあるが、
+restart extra digit は入口 quotient に `3 ∣ q₀` を強制する。
+backward determinism で各 surviving chain の `q₀ = 1` を読み、矛盾させる。
+-/
+private theorem false_of_width_le_three_and_extra
+    {P : PureBProfileObstruction}
+    {N : LastTwoExposedNormalForm P}
+    (S : RestartedTerminalStraightPacket P N)
+    (hStart : 0 < P.criticalizationStart)
+    (hWidth : S.width ≤ 3)
+    (hExtra :
+      (3 : ℤ) ^ (S.width + 1) ∣
+        (singleCornerDefect S.b S.width : ℤ)) :
+    False := by
+  let C := S.toMonotoneSuffixHenselChain hStart
+  have hCW : C.width = S.width := by
+    rfl
+  have hThreeDiv :=
+    S.three_dvd_suffixHenselQuotient_zero_of_extra hStart hExtra
+  have hThreeDivC : (3 : ℤ) ∣ C.q 0 := by
+    simpa [C, toMonotoneSuffixHenselChain] using hThreeDiv
+  have hCases :
+      S.width = 1 ∨ S.width = 2 ∨ S.width = 3 := by
+    have hPos := S.width_pos
+    omega
+  rcases hCases with hW1 | hW23
+  · have hC1 : C.width = 1 := by
+      omega
+    have hRec0 := C.recurrence 0 (by omega)
+    have hQ1 : C.q 1 = 0 := by
+      simpa [hC1] using C.q_terminal
+    rw [C.delta_zero, hQ1] at hRec0
+    norm_num at hRec0
+    omega
+  · rcases hW23 with hW2 | hW3
+    · have hC2 : C.width = 2 := by
+        omega
+      have hPos1 : 0 < C.delta 1 := by
+        exact C.delta_pos (by omega)
+      have hEven1 : C.delta 1 % 2 = 0 := by
+        simpa [hC2] using C.terminal_delta_mod_two_eq_zero
+      have hLe1 : C.delta 1 ≤ 2 := by
+        have h := C.terminal_delta_le_width
+        simpa [hC2] using h
+      have hD1 : C.delta 1 = 2 := by
+        omega
+      have hRec1 := C.recurrence 1 (by omega)
+      have hQ2 : C.q 2 = 0 := by
+        simpa [hC2] using C.q_terminal
+      rw [hD1, hQ2] at hRec1
+      norm_num at hRec1
+      have hQ1 : C.q 1 = 1 := by
+        omega
+      have hRec0 := C.recurrence 0 (by omega)
+      rw [C.delta_zero, hQ1] at hRec0
+      norm_num at hRec0
+      have hQ0 : C.q 0 = 1 := by
+        omega
+      rw [hQ0] at hThreeDivC
+      norm_num at hThreeDivC
+    · have hC3 : C.width = 3 := by
+        omega
+      have hPos2 : 0 < C.delta 2 := by
+        exact C.delta_pos (by omega)
+      have hEven2 : C.delta 2 % 2 = 0 := by
+        simpa [hC3] using C.terminal_delta_mod_two_eq_zero
+      have hLe2 : C.delta 2 ≤ 3 := by
+        have h := C.terminal_delta_le_width
+        simpa [hC3] using h
+      have hD2 : C.delta 2 = 2 := by
+        omega
+      have hRec2 := C.recurrence 2 (by omega)
+      have hQ3 : C.q 3 = 0 := by
+        simpa [hC3] using C.q_terminal
+      rw [hD2, hQ3] at hRec2
+      norm_num at hRec2
+      have hQ2 : C.q 2 = 1 := by
+        omega
+      have h1 :=
+        C.previous_state_eq_of_candidate
+          (i := 1)
+          (dNext := 2)
+          (dPrev := 1)
+          (qNext := 1)
+          (qPrev := 1)
+          (by omega)
+          hD2
+          hQ2
+          (by
+            norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
+      have h0 :=
+        C.previous_state_eq_of_candidate
+          (i := 0)
+          (dNext := 1)
+          (dPrev := 1)
+          (qNext := 1)
+          (qPrev := 1)
+          (by omega)
+          h1.1
+          h1.2
+          (by
+            norm_num [MonotoneSuffixHenselChain.IsBackwardPredecessor])
+      rw [h0.2] at hThreeDivC
+      norm_num at hThreeDivC
+
+/--
+actual restarted packet の全 finite range `width ≤ 36` を一括で閉じる。
+width positive は packet 自身が持つので、`1..3` と `4..36` の二分だけでよい。
+-/
+theorem restartedSingleCorner_noExtraThreeAdic_le_thirtySix
+    {P : PureBProfileObstruction}
+    {N : LastTwoExposedNormalForm P}
+    (S : RestartedTerminalStraightPacket P N)
+    (hStart : 0 < P.criticalizationStart)
+    (hUpper : S.width ≤ 36) :
+    ¬ (3 : ℤ) ^ (S.width + 1) ∣
+      (singleCornerDefect S.b S.width : ℤ) := by
+  intro hExtra
+  by_cases hSmall : S.width ≤ 3
+  · exact S.false_of_width_le_three_and_extra hStart hSmall hExtra
+  · have hLower : 4 ≤ S.width := by
+      omega
+    exact
+      (S.restartedSingleCorner_noExtraThreeAdic_four_to_thirtySix
+        hStart hLower hUpper) hExtra
+
+/--
+geometry が与える extra digit と finite arithmetic closure を合わせると、
+actual restarted packet は `width ≤ 36` を取れない。
+-/
+theorem false_of_width_le_thirtySix
+    {P : PureBProfileObstruction}
+    {N : LastTwoExposedNormalForm P}
+    (S : RestartedTerminalStraightPacket P N)
+    (hStart : 0 < P.criticalizationStart)
+    (hUpper : S.width ≤ 36) :
+    False := by
+  have hNo :=
+    S.restartedSingleCorner_noExtraThreeAdic_le_thirtySix
+      hStart hUpper
   have hExtraTail := S.tail_extra_threeAdic_dvd hStart
   have hExtraDefect :
       (3 : ℤ) ^ (S.width + 1) ∣

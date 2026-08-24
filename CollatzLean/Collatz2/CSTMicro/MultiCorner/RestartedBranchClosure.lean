@@ -1,32 +1,23 @@
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedTerminalComponentRigidity
-import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSingleCornerHenselObligation
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselFinite36
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedSuffixHenselLargeWidthClosure
 
 /-!
-# MultiCorner: restarted branch closure modulo one large-width arithmetic obligation
+# MultiCorner: restarted branch theorem-only closure
 
-このファイルでは唯一の axiom
-`restartedSingleCorner_noExtraThreeAdic_large`
-以外はすべて current repo の定義・定理から導く。
+restarted Case I から作られる `RestartedTerminalStraightPacket` は、
+現在は全 width を axiom なしで排除できる。
 
-Case I restarted から
+* `width ≤ 36`:
+  deterministic backward Hensel certificates と restart extra digit により
+  `RestartedSuffixHenselFinite36` で排除する。
 
-  3^(w+1) | Tail[b,c]
-  Tail[b,c] = singleCornerDefect b w
+* `37 ≤ width`:
+  forced Beatty repeat の nonzero branch と zero branch をともに排除した
+  `RestartedSuffixHenselLargeWidthClosure` で閉じる。
 
-を得る。
-
-ここで width を分ける。
-
-* `w ≤ 3`:
-  `RestartedSingleCornerHenselObligation` 内の exact finite recurrence 計算で
-  extra digit を theorem として排除する。
-
-* `4 ≤ w`:
-  branch-specific large-width obligation
-  `restartedSingleCorner_noExtraThreeAdic_large`
-  を使う。
-
-したがって axiom は actual restarted branch の large-width 部分だけに残る。
+従って旧 `restartedSingleCorner_noExtraThreeAdic_large` axiom は
+この closure では一切使用しない。
 -/
 
 namespace Collatz2
@@ -35,29 +26,27 @@ namespace MultiCorner
 
 open ExternalArithmetic
 
-/-- restarted terminal straight packet は small theorem / large-width obligation と矛盾する。 -/
+/--
+actual restarted terminal straight packet は全 width で不可能。
+
+finite / large の二分だけで閉じる theorem-only の最終入口。
+-/
 theorem restartedBranch_impossible
     {P : PureBProfileObstruction}
     {N : LastTwoExposedNormalForm P}
     (S : RestartedTerminalStraightPacket P N)
     (hStart : 0 < P.criticalizationStart) :
     False := by
-  have hExtraTail := S.tail_extra_threeAdic_dvd hStart
-  have hTailEq := S.tail_eq_singleCornerDefect
-  rw [hTailEq] at hExtraTail
-  by_cases hSmall : S.width ≤ 3
-  · exact
-      (restartedSingleCorner_noExtraThreeAdic_small S hSmall)
-        hExtraTail
-  · have hLarge : 4 ≤ S.width := by
+  by_cases hFinite : S.width ≤ 36
+  · exact S.false_of_width_le_thirtySix hStart hFinite
+  · have hLarge : 37 ≤ S.width := by
       omega
     exact
-      (restartedSingleCorner_noExtraThreeAdic_large
-        S hStart hLarge)
-        hExtraTail
+      S.restartedSuffixHensel_false_of_width_ge_37
+        hStart hLarge
 
 /--
-raw last-two geometry から restarted packet を作ってそのまま閉じる wrapper。
+raw last-two geometry から restarted packet を作ってそのまま theorem-only で閉じる wrapper。
 
 `hRestart : h(a+1)=0` が restarted の局所条件、
 `hCaseI : s≤a` が Case I。
