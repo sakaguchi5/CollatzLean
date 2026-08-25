@@ -430,6 +430,11 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselZe
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.BeattyCycleIntervalBridge
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseScaledDifferenceShift
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.IntegralCriticalIntervalDefectStateDiff
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselLeftExtension
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselAdjacentReturn
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselTerminalReturn
+
+
 
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.MultiCorner
 
