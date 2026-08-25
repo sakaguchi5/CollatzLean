@@ -33,6 +33,9 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalTailDepthCoordi
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedShiftedRepeatStateDifference
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedFreeBaseQOneBound
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedNonzeroRepeatDepthBudget
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedActualTerminalMountain
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedMountainParameterLeftIdentity
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedMountainParameterTerminalInverse
 
 /-!
 # CSTMicro MultiCorner
