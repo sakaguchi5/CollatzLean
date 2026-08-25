@@ -36,6 +36,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedNonzeroRepeatDepthBudge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedActualTerminalMountain
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedMountainParameterLeftIdentity
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedMountainParameterTerminalInverse
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedActualMountainBridge
 
 /-!
 # CSTMicro MultiCorner
