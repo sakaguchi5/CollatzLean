@@ -30,6 +30,9 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalFareyComparison
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedCriticalizationUnitBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalThreeClearance
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedTerminalTailDepthCoordinates
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedShiftedRepeatStateDifference
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedFreeBaseQOneBound
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedNonzeroRepeatDepthBudget
 
 /-!
 # CSTMicro MultiCorner
