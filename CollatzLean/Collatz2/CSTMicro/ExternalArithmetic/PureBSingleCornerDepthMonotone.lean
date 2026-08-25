@@ -97,13 +97,17 @@ theorem depth_difference_eq_beatty_excess
     lt_of_lt_of_le hkC hcLeM
   have hlM : l < P.m :=
     lt_of_lt_of_le hlc hcLeM
-  have hDepthK := P.admissible.depth_le hkM
-  have hDepthL := P.admissible.depth_le hlM
   have hMono := S.depth_mono hbk hkl hlc
   have hLineK := S.checkpoint_line k hbk hkC
   have hLineL := S.checkpoint_line l (le_trans hbk hkl) hlc
-  unfold profileCheckpoint at hLineK hLineL
-  omega
+  have hCheckpoint :
+      profileCheckpoint P.h l =
+        profileCheckpoint P.h k + (l - k) := by
+    rw [hLineL, hLineK]
+    omega
+  exact
+    P.admissible.depthDifference_eq_of_checkpoint_add
+      hkM hlM hkl hMono hCheckpoint
 
 end PureBProfileObstruction.SingleExposedCornerRigidityPacket
 

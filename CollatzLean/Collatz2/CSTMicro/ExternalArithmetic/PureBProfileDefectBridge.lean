@@ -205,22 +205,8 @@ theorem firstPassage_twoSteps_eq_beattyIndex_oddSteps_add_one
       omega
     rw [hLenEq]
     exact Nat.le_of_lt hContract
-  have hBetaLe : beattyIndex (oddCount v) ≤ v.length - 1 := by
-    exact beattyIndex_le_of_upper hUpperCandidate
-  have hPredLeBeta : v.length - 1 ≤ beattyIndex (oddCount v) := by
-    by_contra hnot
-    have hBetaLt : beattyIndex (oddCount v) < v.length - 1 := by
-      omega
-    have hUpper := beattyIndex_upper (oddCount v)
-    have hExpLe : beattyIndex (oddCount v) + 1 ≤ v.length - 1 := by
-      omega
-    have hPowLe :
-        2 ^ (beattyIndex (oddCount v) + 1) ≤
-          2 ^ (v.length - 1) :=
-      Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hExpLe
-    omega
-  have hBeta : beattyIndex (oddCount v) = v.length - 1 := by
-    omega
+  have hBeta : beattyIndex (oddCount v) = v.length - 1 :=
+    beattyIndex_eq_of_adjacent_dyadic_bracket hLow hUpperCandidate
   rw [hTwo, hOdd, hBeta]
   omega
 
@@ -278,6 +264,64 @@ def criticalPrefixPhiNat
       2 ^ beattyIndex k *
         3 ^ (m - (k + 1)))
 
+/--
+`[0,b)` の depth が zero で、`[b,b+n)` の checkpoint が slope-one line なら、
+`b+n` prefix affine numerator は critical prefix と geometric middle block に exact 分解する。
+
+SingleCorner packet や scanner state を仮定しない pure affine interval formula。
+-/
+theorem profileAffineNumerator_eq_zeroPrefix_affineLine
+    {b n : ℕ}
+    {h : ℕ → ℕ}
+    (hZero :
+      ∀ k : ℕ, k < b → h k = 0)
+    (hLine :
+      ∀ i : ℕ, i < n →
+        profileCheckpoint h (b + i) =
+          beattyIndex b - 1 + i) :
+    profileAffineNumerator (b + n) h =
+      3 ^ n * criticalPrefixPhiNat b +
+        2 ^ (beattyIndex b - 1) *
+          Finset.sum (Finset.range n)
+            (fun i => 2 ^ i * 3 ^ (n - (i + 1))) := by
+  unfold profileAffineNumerator
+  rw [Finset.sum_range_add]
+  have hLeft :
+      Finset.sum (Finset.range b)
+          (fun k =>
+            2 ^ profileCheckpoint h k *
+              3 ^ (b + n - (k + 1))) =
+        3 ^ n * criticalPrefixPhiNat b := by
+    unfold criticalPrefixPhiNat
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro k hkMem
+    have hkb : k < b := Finset.mem_range.mp hkMem
+    have hExp :
+        b + n - (k + 1) = n + (b - (k + 1)) := by
+      omega
+    unfold profileCheckpoint
+    rw [hZero k hkb, Nat.sub_zero, hExp, pow_add]
+    ring
+  have hMiddle :
+      Finset.sum (Finset.range n)
+          (fun i =>
+            2 ^ profileCheckpoint h (b + i) *
+              3 ^ (b + n - (b + i + 1))) =
+        2 ^ (beattyIndex b - 1) *
+          Finset.sum (Finset.range n)
+            (fun i => 2 ^ i * 3 ^ (n - (i + 1))) := by
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro i hiMem
+    have hiN : i < n := Finset.mem_range.mp hiMem
+    have hExp :
+        b + n - (b + i + 1) = n - (i + 1) := by
+      omega
+    rw [hLine i hiN, hExp, pow_add]
+    ring
+  rw [hLeft, hMiddle]
+
 /-- Nat critical prefix numerator は Stage 2 の integer `Ψ` に cast すると一致。 -/
 theorem criticalPrefixPhiNat_cast_eq_criticalPrefixPhiZ
     (m : ℕ) :
@@ -293,6 +337,37 @@ theorem criticalPrefixPhiNat_cast_eq_criticalPrefixPhiZ
   rw [hExp]
 
 /--
+roof inequality だけから、checkpoint numerator と closed dyadic mass の和は
+critical numerator に exact 一致する。
+
+profile の checkpoint strictness は使わない。
+-/
+theorem profileAffineNumerator_add_profileDyadicClosedNumerator_eq_criticalPrefixPhiNat
+    {m : ℕ}
+    {h : ℕ → ℕ}
+    (hRoof : ∀ k : ℕ, k < m → h k ≤ beattyIndex k) :
+    profileAffineNumerator m h +
+        profileDyadicClosedNumerator m h =
+      criticalPrefixPhiNat m := by
+  unfold profileAffineNumerator
+    profileDyadicClosedNumerator
+    criticalPrefixPhiNat
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro k hk
+  have hkLt : k < m := Finset.mem_range.mp hk
+  have hDepth : h k ≤ beattyIndex k := hRoof k hkLt
+  have hExpLe :
+      beattyIndex k - h k ≤ beattyIndex k := by
+    omega
+  have hPowLe :
+      2 ^ (beattyIndex k - h k) ≤ 2 ^ beattyIndex k :=
+    Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hExpLe
+  unfold profileCheckpoint profileDyadicClosedColumn
+  rw [← Nat.add_mul]
+  rw [Nat.add_sub_of_le hPowLe]
+
+/--
 critical numerator は actual checkpoint numerator と removed dyadic profile mass の和。
 
   A(h) + N(h) = Ψ(m).
@@ -305,26 +380,9 @@ theorem profileAffineNumerator_add_profileDyadicCellNumerator_eq_criticalPrefixP
         profileDyadicCellNumerator m h =
       criticalPrefixPhiNat m := by
   rw [profileDyadicCellNumerator_eq_closed A]
-  unfold profileAffineNumerator
-    profileDyadicClosedNumerator
-    criticalPrefixPhiNat
-  rw [← Finset.sum_add_distrib]
-  apply Finset.sum_congr rfl
-  intro k hk
-  have hkLt : k < m := Finset.mem_range.mp hk
-  have hDepth : h k ≤ beattyIndex k := A.depth_le hkLt
-  have hCheckpoint :
-      profileCheckpoint h k = beattyIndex k - h k := rfl
-  have hExpLe :
-      beattyIndex k - h k ≤ beattyIndex k := by
-    omega
-  have hPowLe :
-      2 ^ (beattyIndex k - h k) ≤ 2 ^ beattyIndex k :=
-    Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hExpLe
-  rw [hCheckpoint]
-  unfold profileDyadicClosedColumn
-  rw [← Nat.add_mul]
-  rw [Nat.add_sub_of_le hPowLe]
+  exact
+    profileAffineNumerator_add_profileDyadicClosedNumerator_eq_criticalPrefixPhiNat
+      (fun k hk => A.depth_le hk)
 
 /-- integer form: `A(h) = Ψ(m) - N(h)`。 -/
 theorem profileAffineNumerator_cast_eq_criticalPrefixPhiZ_sub_profileDyadic

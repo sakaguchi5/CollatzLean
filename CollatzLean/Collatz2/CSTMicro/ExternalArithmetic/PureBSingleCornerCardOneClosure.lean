@@ -113,28 +113,9 @@ theorem beatty_entrance_jump_two
     omega
   obtain ⟨j, hj⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hbPos)
   have hbEq : S.b = j + 1 := hj
-  have hState := singleCornerCriticalStateAt_correct j
-  have hBeta :
-      (singleCornerCriticalStateAt j).beta =
-        beattyIndex j := by
-    simpa using hState.1
-  have hNext :
-      (singleCornerCriticalStateAt j).nextBeta =
-        beattyIndex (j + 1) := by
-    have h :=
-      SingleCornerCriticalState.nextBeta_eq hState
-    simpa using h
   have hAtSucc :
-      beattyIndex (j + 1) ≤ beattyIndex j + 2 := by
-    have hForm :
-        (singleCornerCriticalStateAt j).nextBeta =
-            (singleCornerCriticalStateAt j).beta + 1 ∨
-        (singleCornerCriticalStateAt j).nextBeta =
-            (singleCornerCriticalStateAt j).beta + 2 := by
-      unfold SingleCornerCriticalState.nextBeta
-      split <;> simp
-    rw [hNext, hBeta] at hForm
-    omega
+      beattyIndex (j + 1) ≤ beattyIndex j + 2 :=
+    beattyIndex_succ_le_add_two j
   rw [hbEq, show (j + 1) - 1 = j by omega] at hLower ⊢
   omega
 
@@ -168,71 +149,52 @@ theorem profileAffineNumerator_terminalStart_eq_henselInitial
   let b := S.b
   let n := S.width
   let c := P.terminalCriticalStart
-  have hbLtC : b < c := by simpa [b, c] using S.b_lt_c
   have hcEq : c = b + n := by
     have h := S.b_add_width_eq_terminalStart
     simpa [b, c, n] using h.symm
   have hcLeM : c ≤ P.m := P.terminalCriticalStart_spec.1
-  have hbM : b < P.m := lt_of_lt_of_le hbLtC hcLeM
-  have hBState := singleCornerCriticalStateAt_correct b
-  unfold profileAffineNumerator
-  change
-    (∑ k ∈ Finset.range c,
-      2 ^ profileCheckpoint P.h k *
-        3 ^ (c - (k + 1))) =
-      singleCornerInitialAffine
-        (singleCornerCriticalStateAt b) n
-
-  rw [hcEq, Finset.sum_range_add]
-
-  have hLeft :
-      Finset.sum (Finset.range b)
-          (fun k =>
-            2 ^ profileCheckpoint P.h k *
-              3 ^ (b + n - (k + 1))) =
-        3 ^ n * criticalPrefixPhiNat b := by
-    unfold criticalPrefixPhiNat
-    rw [Finset.mul_sum]
-    apply Finset.sum_congr rfl
-    intro k hkMem
-    have hkb : k < b := Finset.mem_range.mp hkMem
+  have hbM : b < P.m := by
+    have hbLtC : b < c := by
+      simpa [b, c] using S.b_lt_c
+    exact lt_of_lt_of_le hbLtC hcLeM
+  have hZero :
+      ∀ k : ℕ, k < b → P.h k = 0 := by
+    intro k hkb
     have hkM : k < P.m := lt_trans hkb hbM
-    have hZero := S.depth_eq_zero_of_outside hkM (Or.inl hkb)
-    have hExp :
-        b + n - (k + 1) = n + (b - (k + 1)) := by
-      omega
-    unfold profileCheckpoint
-    rw [hZero, Nat.sub_zero, hExp, pow_add]
-    ring
-
-  have hMiddle :
-      Finset.sum (Finset.range n)
-          (fun i =>
-            2 ^ profileCheckpoint P.h (b + i) *
-              3 ^ (b + n - (b + i + 1))) =
-        2 ^ (beattyIndex b - 1) * singleCornerTwoThreeSum n := by
-    rw [singleCornerTwoThreeSum_eq_sum, Finset.mul_sum]
-    apply Finset.sum_congr rfl
-    intro i hiMem
-    have hiN : i < n := Finset.mem_range.mp hiMem
+    exact S.depth_eq_zero_of_outside hkM (Or.inl hkb)
+  have hLine :
+      ∀ i : ℕ, i < n →
+        profileCheckpoint P.h (b + i) =
+          beattyIndex b - 1 + i := by
+    intro i hi
     have hbiC : b + i < c := by
       rw [hcEq]
       omega
-    have hLine := S.checkpoint_line (b + i) (by omega) (by simpa [c] using hbiC)
+    have hRaw :=
+      S.checkpoint_line
+        (b + i)
+        (by simp [b])
+        (by simpa [c] using hbiC)
     have hDiff : b + i - S.b = i := by
       dsimp [b]
       omega
-    have hCheckpoint :
-        profileCheckpoint P.h (b + i) = beattyIndex b - 1 + i := by
-      simpa [b, hDiff] using hLine
-    have hExp : b + n - (b + i + 1) = n - (i + 1) := by omega
-    rw [hCheckpoint, hExp, pow_add]
-    ring
-
-  rw [hLeft, hMiddle]
+    simpa [b, hDiff] using hRaw
+  have hStraight :=
+    profileAffineNumerator_eq_zeroPrefix_affineLine
+      (b := b) (n := n) (h := P.h) hZero hLine
+  have hBState := singleCornerCriticalStateAt_correct b
+  have hStraightC :
+      profileAffineNumerator c P.h =
+        3 ^ n * criticalPrefixPhiNat b +
+          2 ^ (beattyIndex b - 1) *
+            singleCornerTwoThreeSum n := by
+    rw [singleCornerTwoThreeSum_eq_sum]
+    simpa [hcEq] using hStraight
+  rw [hStraightC]
   unfold singleCornerInitialAffine
   rw [hBState.1, hBState.2.1]
   simp
+  rfl
 
 end PureBProfileObstruction.SingleExposedCornerRigidityPacket
 
@@ -650,24 +612,7 @@ theorem singleCorner_profileAffine_eq_actualWordAffine
     let P := M.toPureBProfileObstruction hL
     profileAffineNumerator P.m P.h =
       Collatz2.Word.affineConst M.actual.firstFailureEdge.upperExponentWord := by
-  let P := M.toPureBProfileObstruction hL
-  have hLen : 1 < M.word.length := by
-    rw [M.word_length_eq]
-    omega
-  have hProfile :=
-    firstPassage_profileAffineNumerator_eq_wordAffineConst
-      M.word_firstPassage hLen
-  have hmOdd :
-      P.m = Collatz2.Word.oddSteps (exponentWordOfParity M.word) := by
-    have hm := M.toPureBProfileObstruction_m_eq_wordOddCount hL
-    rw [oddSteps_exponentWordOfParity]
-    exact hm
-  have hh : P.h = parityExtraDepth M.word := by
-    funext k
-    exact M.toPureBProfileObstruction_h_apply hL k
-  rw [← hmOdd, ← hh] at hProfile
-  rw [← M.actualUpperExponentWord_eq_exponentWordOfParity] at hProfile
-  simpa [P] using hProfile
+  exact M.actualProfileAffine_eq_upperWordAffine hL
 
 /-- actual upper exponent word の total two-depth は `beta_m+1`。 -/
 theorem singleCorner_actual_twoSteps_eq_beta_add_one
@@ -676,16 +621,7 @@ theorem singleCorner_actual_twoSteps_eq_beta_add_one
     (hL : 2 < L) :
     Collatz2.Word.twoSteps M.actual.firstFailureEdge.upperExponentWord =
       beattyIndex (M.toPureBProfileObstruction hL).m + 1 := by
-  have hLen : 1 < M.word.length := by
-    rw [M.word_length_eq]
-    omega
-  have h :=
-    firstPassage_twoSteps_eq_beattyIndex_oddSteps_add_one
-      M.word_firstPassage hLen
-  rw [← M.actualUpperExponentWord_eq_exponentWordOfParity] at h
-  have hmW := M.actualUpperExponentWord_oddSteps_eq_profile_m hL
-  rw [hmW] at h
-  exact h
+  exact M.actualUpperTwoSteps_eq_beatty_add_one hL
 
 /-- actual edge modulus は scanner final modulus と同じ。 -/
 theorem singleCorner_actual_edge_modulus_eq
@@ -958,22 +894,9 @@ theorem singleCorner_card_one_impossible
       using hReal.symm
 
   rw [← hR] at hActualEq
-  have hQ : T.q = T.R + F.upperNormalizedDefectNat := by
-    have hPowPos : 0 < 2 ^ (beattyIndex P.m + 1) := by
-      positivity
-    have hEqMul :
-        2 ^ (beattyIndex P.m + 1) * T.q =
-          2 ^ (beattyIndex P.m + 1) *
-            (T.R + F.upperNormalizedDefectNat) := by
-      calc
-        2 ^ (beattyIndex P.m + 1) * T.q
-            =
-          3 ^ P.m * T.R +
-            profileAffineNumerator P.m P.h := hScanEq.symm
-        _ =
-          2 ^ (beattyIndex P.m + 1) *
-            (T.R + F.upperNormalizedDefectNat) := hActualEq
-    exact Nat.mul_left_cancel hPowPos hEqMul
+  have hQ : T.q = T.R + F.upperNormalizedDefectNat :=
+    twoPowerAffineQuotient_eq_of_same_realization
+      hScanEq hActualEq
   unfold SingleCornerHenselState.Safe at hSafe
   rw [hQ] at hSafe
   omega

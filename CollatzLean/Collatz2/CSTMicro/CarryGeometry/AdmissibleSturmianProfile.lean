@@ -87,15 +87,10 @@ end AdmissibleSturmianProfile
 theorem beattyIndex_succ_le_add_two
     (k : ℕ) :
     beattyIndex (k + 1) ≤ beattyIndex k + 2 := by
-  apply beattyIndex_le_of_upper
-  have hUpper := beattyIndex_upper k
-  calc
-    3 ^ (k + 1)
-        = 3 ^ k * 3 := by rw [pow_succ]
-    _ ≤ 2 ^ (beattyIndex k + 1) * 4 := by
-          exact Nat.mul_le_mul hUpper (by norm_num)
-    _ = 2 ^ ((beattyIndex k + 2) + 1) := by
-          rw [show (4 : ℕ) = 2 ^ 2 by norm_num, ← pow_add]
+  simpa using
+    (beattyIndex_add_upper_of_threePow_le_twoPow
+      (k := k) (r := 1) (s := 2)
+      (by norm_num : 3 ^ 1 ≤ 2 ^ 2))
 
 /-- Beatty gap は exact に 1 または 2。 -/
 theorem beattyIndex_succ_eq_add_one_or_two
@@ -205,6 +200,91 @@ theorem next_depth_le_add_one
   · have h := A.next_depth_le_of_gap_one hk hGap
     omega
   · exact A.next_depth_le_add_one_of_gap_two hk hGap
+
+/--
+admissible profile で `b` が最初の positive-depth index なら、その depth は exact に 1。
+
+SingleCorner 固有ではなく、Beatty roof と one-step depth bound だけの帰結。
+-/
+theorem firstPositiveDepth_eq_one
+    {m : ℕ}
+    {h : ℕ → ℕ}
+    (A : AdmissibleSturmianProfile m h)
+    {b : ℕ}
+    (hbM : b < m)
+    (hbPos : 0 < h b)
+    (hBefore : ∀ k : ℕ, k < b → h k = 0) :
+    h b = 1 := by
+  by_cases hb0 : b = 0
+  · subst b
+    have hDepth := A.depth_le hbM
+    rw [beattyIndex_zero] at hDepth
+    omega
+  · have hbPosIndex : 0 < b := Nat.pos_of_ne_zero hb0
+    have hbOneLe : 1 ≤ b := Nat.succ_le_iff.mpr hbPosIndex
+    have hPrevZero : h (b - 1) = 0 :=
+      hBefore (b - 1) (by omega)
+    have hIdx : (b - 1) + 1 < m := by
+      rw [Nat.sub_add_cancel hbOneLe]
+      exact hbM
+    have hStep :=
+      A.next_depth_le_add_one (k := b - 1) hIdx
+    rw [Nat.sub_add_cancel hbOneLe, hPrevZero] at hStep
+    omega
+
+/--
+二点の checkpoint 差が rank 差そのものなら、signed depth 差は
+signed Beatty excess そのもの。
+
+Nat subtraction の向きを仮定しない exact identity。
+-/
+theorem depthDifference_int_eq_of_checkpoint_add
+    {m : ℕ}
+    {h : ℕ → ℕ}
+    (A : AdmissibleSturmianProfile m h)
+    {k l : ℕ}
+    (hkM : k < m)
+    (hlM : l < m)
+    (_hkl : k ≤ l)
+    (hCheckpoint :
+      profileCheckpoint h l =
+        profileCheckpoint h k + (l - k)) :
+    (beattyIndex l : ℤ) - (beattyIndex k : ℤ) =
+      ((l - k : ℕ) : ℤ) + ((h l : ℤ) - (h k : ℤ)) := by
+  have hDepthK := A.depth_le hkM
+  have hDepthL := A.depth_le hlM
+  have hZ := congrArg (fun n : ℕ => (n : ℤ)) hCheckpoint
+  unfold profileCheckpoint at hZ
+  rw [
+    Nat.cast_add,
+    Nat.cast_sub hDepthL,
+    Nat.cast_sub hDepthK
+  ] at hZ
+  linarith
+
+/--
+二点の checkpoint 差が rank 差そのものなら、depth 差は Beatty excess そのもの。
+
+affine checkpoint line から使える SingleCorner 非依存の Nat form。
+-/
+theorem depthDifference_eq_of_checkpoint_add
+    {m : ℕ}
+    {h : ℕ → ℕ}
+    (A : AdmissibleSturmianProfile m h)
+    {k l : ℕ}
+    (hkM : k < m)
+    (hlM : l < m)
+    (hkl : k ≤ l)
+    (hMono : h k ≤ h l)
+    (hCheckpoint :
+      profileCheckpoint h l =
+        profileCheckpoint h k + (l - k)) :
+    beattyIndex l - beattyIndex k =
+      (l - k) + (h l - h k) := by
+  have hDepthK := A.depth_le hkM
+  have hDepthL := A.depth_le hlM
+  unfold profileCheckpoint at hCheckpoint
+  omega
 
 end AdmissibleSturmianProfile
 

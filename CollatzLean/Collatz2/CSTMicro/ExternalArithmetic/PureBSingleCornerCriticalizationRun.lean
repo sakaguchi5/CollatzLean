@@ -94,6 +94,70 @@ theorem wordAffineConst_replicate_one_cast
       ring
 
 /--
+consecutive exponent-1 block では shifted state `X+1` が exact に
+`3^r / 2^r` で transport される。
+
+これは divisibility より強い exact equality。
+-/
+theorem oneRun_exact_shift_transport
+    {w : Collatz2.Word}
+    {x y b r : ℕ}
+    (hReal : Collatz2.Word.Realizes w x y)
+    (hb : b ≤ Collatz2.Word.oddSteps w)
+    (hbr : b + r ≤ Collatz2.Word.oddSteps w)
+    (hRun : (w.drop b).take r = List.replicate r 1) :
+    2 ^ r *
+        (realizedPrefixState hReal (b + r) hbr + 1) =
+      3 ^ r *
+        (realizedPrefixState hReal b hb + 1) := by
+  let t : Collatz2.Word := (w.drop b).take r
+  let xb : ℕ := realizedPrefixState hReal b hb
+  let xe : ℕ := realizedPrefixState hReal (b + r) hbr
+
+  have hInterval :=
+    realizedPrefixState_interval_spec
+      (w := w) (x := x) (y := y)
+      (b := b) (r := r) hReal hb hbr
+
+  have htRun :
+      t = List.replicate r 1 := by
+    simpa [t] using hRun
+
+  have htTwo :
+      Collatz2.Word.twoSteps t = r := by
+    rw [htRun]
+    simp [Collatz2.Word.twoSteps]
+
+  change
+    2 ^ Collatz2.Word.twoSteps t * xe =
+      3 ^ r * xb + Collatz2.Word.affineConst t at hInterval
+
+  have hIntervalZ :=
+    congrArg (fun n : ℕ => (n : ℤ)) hInterval
+  push_cast at hIntervalZ
+  rw [htTwo] at hIntervalZ
+
+  have hAffineRun :
+      (Collatz2.Word.affineConst t : ℤ) =
+        (3 : ℤ) ^ r - (2 : ℤ) ^ r := by
+    rw [htRun]
+    exact wordAffineConst_replicate_one_cast r
+
+  rw [hAffineRun] at hIntervalZ
+
+  have hShiftZ :
+      (2 : ℤ) ^ r * ((xe : ℤ) + 1) =
+        (3 : ℤ) ^ r * ((xb : ℤ) + 1) := by
+    linarith
+
+  have hShiftNat :
+      2 ^ r * (xe + 1) =
+        3 ^ r * (xb + 1) := by
+    exact_mod_cast hShiftZ
+
+  simpa [xb, xe] using hShiftNat
+
+/--
 actual realization の consecutive exponent-1 block は、その block start state に
 `2^r | X+1` を強制する。
 -/
@@ -105,148 +169,18 @@ theorem oneRun_dvd_realizedPrefixState_add_one
     (hbr : b + r ≤ Collatz2.Word.oddSteps w)
     (hRun : (w.drop b).take r = List.replicate r 1) :
     2 ^ r ∣ realizedPrefixState hReal b hb + 1 := by
-  let u : Collatz2.Word := w.take b
-  let t : Collatz2.Word := (w.drop b).take r
   let xb : ℕ := realizedPrefixState hReal b hb
   let xe : ℕ := realizedPrefixState hReal (b + r) hbr
 
-  /-
-  `List.take_add` の引数は implicit なので、
-  関数のように `List.take_add b r w` とは適用しない。
-  型を明示して instance を確定する。
-  -/
-  have hTakeAdd :
-      w.take (b + r) = u ++ t := by
-    dsimp [u, t]
-    simpa using
-      (List.take_add :
-        w.take (b + r) =
-          w.take b ++ (w.drop b).take r)
+  have hShiftNat :=
+    oneRun_exact_shift_transport
+      (w := w) (x := x) (y := y)
+      (b := b) (r := r)
+      hReal hb hbr hRun
 
-  /-
-  `t` は let-bound なので、以後 hRun を直接 rw するのではなく
-  一度 t 自身についての等式に変換する。
-  -/
-  have htRun :
-      t = List.replicate r 1 := by
-    simpa [t] using hRun
-
-  have htOdd :
-      Collatz2.Word.oddSteps t = r := by
-    rw [htRun]
-    simp [Collatz2.Word.oddSteps]
-
-  have htTwo :
-      Collatz2.Word.twoSteps t = r := by
-    rw [htRun]
-    simp [Collatz2.Word.twoSteps]
-
-  have hSpecB :=
-    realizedPrefixState_spec hReal b hb
-  have hSpecE :=
-    realizedPrefixState_spec hReal (b + r) hbr
-
-  change
-    3 ^ b * x + Collatz2.Word.affineConst u =
-      2 ^ Collatz2.Word.twoSteps u * xb at hSpecB
-
-  /-
-  こちらも xe を明示する。
-  これをしておかないと後の ring / linear_combination が
-  realizedPrefixState ... と xe を同一視してくれないことがある。
-  -/
-  change
-    3 ^ (b + r) * x +
-        Collatz2.Word.affineConst (w.take (b + r)) =
-      2 ^ Collatz2.Word.twoSteps (w.take (b + r)) * xe at hSpecE
-
-  rw [
-    hTakeAdd,
-    Collatz2.Word.twoSteps_append,
-    Collatz2.Word.affineConst_append,
-    htOdd,
-    htTwo
-  ] at hSpecE
-
-  have hSpecBZ :=
-    congrArg (fun n : ℕ => (n : ℤ)) hSpecB
-  have hSpecEZ :=
-    congrArg (fun n : ℕ => (n : ℤ)) hSpecE
-
-  push_cast at hSpecBZ hSpecEZ
-  simp only [pow_add] at hSpecEZ
-
-  /-
-  realization at b と b+r を直接組み合わせて、
-  block 自身の affine relation を取り出す。
-  linear_combination より、この calc の方が安定。
-  -/
-  have hMul :
-      (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-          ((2 : ℤ) ^ r * (xe : ℤ)) =
-        (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-          ((3 : ℤ) ^ r * (xb : ℤ) +
-            (Collatz2.Word.affineConst t : ℤ)) := by
-    calc
-      (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-          ((2 : ℤ) ^ r * (xe : ℤ))
-          =
-        (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-          (2 : ℤ) ^ r * (xe : ℤ) := by
-            ring
-      _ =
-        (3 : ℤ) ^ b * (3 : ℤ) ^ r * (x : ℤ) +
-          ((3 : ℤ) ^ r *
-              (Collatz2.Word.affineConst u : ℤ) +
-            (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-              (Collatz2.Word.affineConst t : ℤ)) := by
-            exact hSpecEZ.symm
-      _ =
-        (3 : ℤ) ^ r *
-            ((3 : ℤ) ^ b * (x : ℤ) +
-              (Collatz2.Word.affineConst u : ℤ)) +
-          (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-            (Collatz2.Word.affineConst t : ℤ) := by
-              ring
-      _ =
-        (3 : ℤ) ^ r *
-            ((2 : ℤ) ^ Collatz2.Word.twoSteps u *
-              (xb : ℤ)) +
-          (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-            (Collatz2.Word.affineConst t : ℤ) := by
-              rw [hSpecBZ]
-      _ =
-        (2 : ℤ) ^ Collatz2.Word.twoSteps u *
-          ((3 : ℤ) ^ r * (xb : ℤ) +
-            (Collatz2.Word.affineConst t : ℤ)) := by
-              ring
-
-  have hPowNe :
-      (2 : ℤ) ^ Collatz2.Word.twoSteps u ≠ 0 := by
-    positivity
-
-  have hInterval :
-      (2 : ℤ) ^ r * (xe : ℤ) =
-        (3 : ℤ) ^ r * (xb : ℤ) +
-          (Collatz2.Word.affineConst t : ℤ) :=
-    mul_left_cancel₀ hPowNe hMul
-
-  /-
-  t = [1,...,1] はここでも htRun を使う。
-  hRun は t を展開しない限り rw 対象にならない。
-  -/
-  have hAffineRun :
-      (Collatz2.Word.affineConst t : ℤ) =
-        (3 : ℤ) ^ r - (2 : ℤ) ^ r := by
-    rw [htRun]
-    exact wordAffineConst_replicate_one_cast r
-
-  rw [hAffineRun] at hInterval
-
-  have hShift :
-      (2 : ℤ) ^ r * ((xe : ℤ) + 1) =
-        (3 : ℤ) ^ r * ((xb : ℤ) + 1) := by
-    linarith
+  have hShift :=
+    congrArg (fun n : ℕ => (n : ℤ)) hShiftNat
+  push_cast at hShift
 
   have hScaled :
       (2 : ℤ) ^ r ∣
@@ -279,6 +213,49 @@ theorem oneRun_dvd_realizedPrefixState_add_one
 
 
 /--
+roof 以下の odd-prefix affine constant は critical prefix numerator 以下。
+
+coarse bound `b * 3^b` に落とす前の exact comparison。
+-/
+theorem wordAffineConst_take_le_criticalPrefixPhiNat
+    {w : Collatz2.Word}
+    {b : ℕ}
+    (hb : b ≤ Collatz2.Word.oddSteps w)
+    (hRoof :
+      ∀ k : ℕ, k < b →
+        Collatz2.Word.prefixTwoDepth w k ≤ beattyIndex k) :
+    Collatz2.Word.affineConst (w.take b) ≤ criticalPrefixPhiNat b := by
+  let u : Collatz2.Word := w.take b
+  have hbLen : b ≤ w.length := by
+    simpa [Collatz2.Word.oddSteps] using hb
+  have huOdd : Collatz2.Word.oddSteps u = b := by
+    dsimp [u, Collatz2.Word.oddSteps]
+    exact List.length_take_of_le hbLen
+  rw [← wordAffinePrefixNumerator_eq_affineConst u]
+  unfold wordAffinePrefixNumerator criticalPrefixPhiNat
+  rw [huOdd]
+  apply Finset.sum_le_sum
+  intro k hkMem
+  have hk : k < b := Finset.mem_range.mp hkMem
+  have hTake :
+      Collatz2.Word.prefixTwoDepth u k =
+        Collatz2.Word.prefixTwoDepth w k := by
+    dsimp [u]
+    unfold Collatz2.Word.prefixTwoDepth
+    rw [List.take_take]
+    rw [min_eq_left (Nat.le_of_lt hk)]
+  have hDepth :
+      Collatz2.Word.prefixTwoDepth u k ≤ beattyIndex k := by
+    rw [hTake]
+    exact hRoof k hk
+  unfold wordAffinePrefixTerm
+  rw [huOdd]
+  exact
+    Nat.mul_le_mul_right
+      (3 ^ (b - (k + 1)))
+      (Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hDepth)
+
+/--
 roof 以下の odd-prefix affine constant は `b * 3^b` 以下。
 -/
 theorem wordAffineConst_take_le_b_mul_threePow
@@ -289,55 +266,34 @@ theorem wordAffineConst_take_le_b_mul_threePow
       ∀ k : ℕ, k < b →
         Collatz2.Word.prefixTwoDepth w k ≤ beattyIndex k) :
     Collatz2.Word.affineConst (w.take b) ≤ b * 3 ^ b := by
-  let u : Collatz2.Word := w.take b
-  have hbLen : b ≤ w.length := by
-    simpa [Collatz2.Word.oddSteps] using hb
-  have huOdd : Collatz2.Word.oddSteps u = b := by
-    dsimp [u, Collatz2.Word.oddSteps]
-    exact List.length_take_of_le hbLen
-  rw [← wordAffinePrefixNumerator_eq_affineConst u]
-  unfold wordAffinePrefixNumerator
-  rw [huOdd]
+  have hCritical :=
+    wordAffineConst_take_le_criticalPrefixPhiNat hb hRoof
   calc
-    Finset.sum (Finset.range b) (fun k => wordAffinePrefixTerm u k)
-        ≤ Finset.sum (Finset.range b) (fun _ => 3 ^ b) := by
-          apply Finset.sum_le_sum
-          intro k hkMem
-          have hk : k < b := Finset.mem_range.mp hkMem
-          have hTake :
-              Collatz2.Word.prefixTwoDepth u k =
-                Collatz2.Word.prefixTwoDepth w k := by
-            dsimp [u]
-            unfold Collatz2.Word.prefixTwoDepth
-            rw [List.take_take]
-            rw [min_eq_left (Nat.le_of_lt hk)]
-          have hDepth :
-              Collatz2.Word.prefixTwoDepth u k ≤ beattyIndex k := by
-            rw [hTake]
-            exact hRoof k hk
-          have hTwo :
-              2 ^ Collatz2.Word.prefixTwoDepth u k ≤ 3 ^ k := by
-            calc
-              2 ^ Collatz2.Word.prefixTwoDepth u k
-                  ≤ 2 ^ beattyIndex k :=
-                    Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hDepth
-              _ ≤ 3 ^ k := beattyIndex_lower k
-          have hExp : b - (k + 1) ≤ b - k := by omega
-          have hThree :
-              3 ^ (b - (k + 1)) ≤ 3 ^ (b - k) :=
-            Nat.pow_le_pow_right (by omega : 0 < (3 : ℕ)) hExp
-          unfold wordAffinePrefixTerm
-          rw [huOdd]
-          calc
-            2 ^ Collatz2.Word.prefixTwoDepth u k *
-                3 ^ (b - (k + 1))
-                ≤ 3 ^ k * 3 ^ (b - k) :=
-                  Nat.mul_le_mul hTwo hThree
-            _ = 3 ^ b := by
-                  rw [← pow_add]
-                  congr 1
-                  omega
-    _ = b * 3 ^ b := by simp
+    Collatz2.Word.affineConst (w.take b)
+        ≤ criticalPrefixPhiNat b := hCritical
+    _ ≤ Finset.sum (Finset.range b) (fun _ => 3 ^ b) := by
+      unfold criticalPrefixPhiNat
+      apply Finset.sum_le_sum
+      intro k hkMem
+      have hk : k < b := Finset.mem_range.mp hkMem
+      have hTwo :
+          2 ^ beattyIndex k ≤ 3 ^ k :=
+        beattyIndex_lower k
+      have hExp : b - (k + 1) ≤ b - k := by
+        omega
+      have hThree :
+          3 ^ (b - (k + 1)) ≤ 3 ^ (b - k) :=
+        Nat.pow_le_pow_right (by omega : 0 < (3 : ℕ)) hExp
+      calc
+        2 ^ beattyIndex k * 3 ^ (b - (k + 1))
+            ≤ 3 ^ k * 3 ^ (b - k) :=
+          Nat.mul_le_mul hTwo hThree
+        _ = 3 ^ b := by
+          rw [← pow_add]
+          congr 1
+          omega
+    _ = b * 3 ^ b := by
+      simp
 
 /-! ## 2. actual single-corner specialization -/
 

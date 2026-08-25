@@ -156,21 +156,9 @@ theorem SingleCornerCriticalState.nextBeta_eq
   have hLower : S.beta + 1 ≤ beattyIndex (S.m + 1) := by
     omega
 
-  have hUpperM := beattyIndex_upper S.m
-  rw [← hBeta] at hUpperM
-  have hCandidate :
-      3 ^ (S.m + 1) ≤ 2 ^ ((S.beta + 2) + 1) := by
-    rw [pow_succ]
-    calc
-      3 ^ S.m * 3
-          ≤ 2 ^ (S.beta + 1) * 3 :=
-        Nat.mul_le_mul_right 3 hUpperM
-      _ ≤ 2 ^ (S.beta + 1) * 4 := by
-        exact Nat.mul_le_mul_left _ (by norm_num : 3 ≤ 4)
-      _ = 2 ^ ((S.beta + 2) + 1) := by
-        rw [show (4 : ℕ) = 2 ^ 2 by norm_num, ← pow_add]
-  have hUpper : beattyIndex (S.m + 1) ≤ S.beta + 2 :=
-    beattyIndex_le_of_upper hCandidate
+  have hUpper0 := beattyIndex_succ_le_add_two S.m
+  have hUpper : beattyIndex (S.m + 1) ≤ S.beta + 2 := by
+    simpa [hBeta] using hUpper0
 
   by_cases hOne : S.three * 3 ≤ 2 ^ (S.beta + 2)
   · have hOne' : 3 ^ (S.m + 1) ≤ 2 ^ (S.beta + 2) := by
@@ -408,6 +396,28 @@ theorem twoPowerAffineRepresentative_unique
   rw [zmod_val_natCast_of_lt hR₁, zmod_val_natCast_of_lt hR₂] at hVal
   exact hVal
 
+/--
+同じ affine realization の quotient は一意。
+
+`3^m R + A = 2^H q` と
+`3^m R + A = 2^H (R + δ)` が同時に成り立てば `q = R + δ`。
+-/
+theorem twoPowerAffineQuotient_eq_of_same_realization
+    {m H A R q δ : ℕ}
+    (hQ :
+      3 ^ m * R + A = 2 ^ H * q)
+    (hEndpoint :
+      3 ^ m * R + A = 2 ^ H * (R + δ)) :
+    q = R + δ := by
+  have hPowPos : 0 < 2 ^ H := by
+    positivity
+  have hEqMul :
+      2 ^ H * q = 2 ^ H * (R + δ) := by
+    calc
+      2 ^ H * q = 3 ^ m * R + A := hQ.symm
+      _ = 2 ^ H * (R + δ) := hEndpoint
+  exact Nat.mul_left_cancel hPowPos hEqMul
+
 namespace SingleCornerHenselState
 
 /-- correct state では executable nextBeta が proof-oriented Beatty index と一致。 -/
@@ -422,21 +432,9 @@ theorem nextBeta_eq
     simpa [hBeta] using hStrict0
   have hLower : S.beta + 1 ≤ beattyIndex (S.m + 1) := by
     omega
-  have hUpperM := beattyIndex_upper S.m
-  rw [← hBeta] at hUpperM
-  have hCandidate :
-      3 ^ (S.m + 1) ≤ 2 ^ ((S.beta + 2) + 1) := by
-    rw [pow_succ]
-    calc
-      3 ^ S.m * 3
-          ≤ 2 ^ (S.beta + 1) * 3 :=
-        Nat.mul_le_mul_right 3 hUpperM
-      _ ≤ 2 ^ (S.beta + 1) * 4 := by
-        exact Nat.mul_le_mul_left _ (by norm_num : 3 ≤ 4)
-      _ = 2 ^ ((S.beta + 2) + 1) := by
-        rw [show (4 : ℕ) = 2 ^ 2 by norm_num, ← pow_add]
-  have hUpper : beattyIndex (S.m + 1) ≤ S.beta + 2 :=
-    beattyIndex_le_of_upper hCandidate
+  have hUpper0 := beattyIndex_succ_le_add_two S.m
+  have hUpper : beattyIndex (S.m + 1) ≤ S.beta + 2 := by
+    simpa [hBeta] using hUpper0
   by_cases hOne : S.three * 3 ≤ 2 ^ (S.beta + 2)
   · have hOne' : 3 ^ (S.m + 1) ≤ 2 ^ (S.beta + 2) := by
       rw [pow_succ, ← hThree]
@@ -1062,25 +1060,28 @@ theorem beta_le_next_beta
   split <;> omega
 
 /--
-`beta ≥ 205` なら、一回の Hensel lift は representative の下位 205 bit を変えない。
+`e ≤ beta` なら、一回の Hensel lift は representative の下位 `e` bit を変えない。
+
+205-bit freeze はこの一般 filtration invariance の specialization。
 -/
-theorem frozen205Residue_next_eq
+theorem residue_next_eq_of_le_beta
     {S : SingleCornerHenselState}
-    (hBeta : 205 ≤ S.beta) :
-    S.next.frozen205Residue = S.frozen205Residue := by
+    {e : ℕ}
+    (hBeta : e ≤ S.beta) :
+    S.next.R % (2 ^ e) = S.R % (2 ^ e) := by
   have hHalfZero :
-      (S.halfModulus : ZMod (2 ^ 205)) = 0 := by
+      (S.halfModulus : ZMod (2 ^ e)) = 0 := by
     unfold halfModulus
     push_cast
     exact ZMod.natCast_pow_eq_zero_of_le 2 hBeta
 
   have hCast :
-      (S.next.R : ZMod (2 ^ 205)) =
-        (S.R : ZMod (2 ^ 205)) := by
+      (S.next.R : ZMod (2 ^ e)) =
+        (S.R : ZMod (2 ^ e)) := by
     change
       ((S.lowR + S.liftDigit * S.halfModulus : ℕ) :
-          ZMod (2 ^ 205)) =
-        (S.R : ZMod (2 ^ 205))
+          ZMod (2 ^ e)) =
+        (S.R : ZMod (2 ^ e))
     rw [R_eq_low_add_top (S := S)]
     push_cast
     rw [hHalfZero]
@@ -1091,6 +1092,41 @@ theorem frozen205Residue_next_eq
   exact hVal
 
 /--
+一度 `e ≤ beta` に入れば、その後の任意 iterate で下位 `e` bit は固定される。
+-/
+theorem iterate_residue_eq_of_le_beta
+    (n : ℕ)
+    {S : SingleCornerHenselState}
+    {e : ℕ}
+    (hBeta : e ≤ S.beta) :
+    (iterate n S).R % (2 ^ e) = S.R % (2 ^ e) := by
+  induction n generalizing S with
+  | zero =>
+      rfl
+  | succ n ih =>
+      change
+        (iterate n S.next).R % (2 ^ e) =
+          S.R % (2 ^ e)
+      have hBetaNext : e ≤ S.next.beta :=
+        le_trans hBeta (S.beta_le_next_beta)
+      calc
+        (iterate n S.next).R % (2 ^ e)
+            = S.next.R % (2 ^ e) :=
+          ih (S := S.next) hBetaNext
+        _ = S.R % (2 ^ e) :=
+          residue_next_eq_of_le_beta hBeta
+
+/--
+`beta ≥ 205` なら、一回の Hensel lift は representative の下位 205 bit を変えない。
+-/
+theorem frozen205Residue_next_eq
+    {S : SingleCornerHenselState}
+    (hBeta : 205 ≤ S.beta) :
+    S.next.frozen205Residue = S.frozen205Residue := by
+  simpa [frozen205Residue] using
+    (residue_next_eq_of_le_beta (S := S) (e := 205) hBeta)
+
+/--
 一度 `beta ≥ 205` に入れば、その後の任意 iterate で 205-bit residue は固定される。
 -/
 theorem iterate_frozen205Residue_eq
@@ -1098,21 +1134,8 @@ theorem iterate_frozen205Residue_eq
     {S : SingleCornerHenselState}
     (hBeta : 205 ≤ S.beta) :
     (iterate n S).frozen205Residue = S.frozen205Residue := by
-  induction n generalizing S with
-  | zero =>
-      rfl
-  | succ n ih =>
-      change
-        (iterate n S.next).frozen205Residue =
-          S.frozen205Residue
-      have hBetaNext : 205 ≤ S.next.beta :=
-        le_trans hBeta (S.beta_le_next_beta)
-      calc
-        (iterate n S.next).frozen205Residue
-            = S.next.frozen205Residue :=
-          ih (S := S.next) hBetaNext
-        _ = S.frozen205Residue :=
-          frozen205Residue_next_eq hBeta
+  simpa [frozen205Residue] using
+    (iterate_residue_eq_of_le_beta (n := n) (S := S) (e := 205) hBeta)
 
 /-- iterate の加法則。freeze point から残り tail を切り出すために使う。 -/
 theorem iterate_add

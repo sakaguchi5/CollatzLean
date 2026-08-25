@@ -366,53 +366,16 @@ private theorem singleExposedCornerStart_depth_eq_one
   have hbLtM :
       b < P.m :=
     lt_of_lt_of_le hbSpec.1 hcLeM
-  have hbNeZero :
-      b ≠ 0 := by
-    intro hb0
-    have hDepth :
-        P.h b ≤ beattyIndex b :=
-      P.admissible.depth_le hbLtM
-    have hDepth0 :
-        P.h 0 ≤ beattyIndex 0 := by
-      simpa [hb0] using hDepth
-    have hPos0 :
-        0 < P.h 0 := by
-      simpa [hb0] using hbSpec.2
-    rw [beattyIndex_zero] at hDepth0
-    omega
-  have hbPos :
-      0 < b :=
-    Nat.pos_of_ne_zero hbNeZero
-  have hPrevZero :
-      P.h (b - 1) = 0 := by
-    apply
+  have hBefore :
+      ∀ k : ℕ, k < b → P.h k = 0 := by
+    intro k hk
+    exact
       singleExposedCornerStart_before_zero
         R M hL
-    simpa [b] using
-      (show b - 1 < b by omega)
-  have hIdx :
-      (b - 1) + 1 < P.m := by
-    have hbOneLe :
-        1 ≤ b := by
-      exact Nat.succ_le_iff.mpr hbPos
-    rw [Nat.sub_add_cancel hbOneLe]
-    exact hbLtM
-  have hStepBound :
-      P.h b ≤ P.h (b - 1) + 1 := by
-    have h :=
-      P.admissible.next_depth_le_add_one
-        (k := b - 1) hIdx
-    have hbOneLe :
-        1 ≤ b := by
-      exact Nat.succ_le_iff.mpr hbPos
-    simpa [Nat.sub_add_cancel hbOneLe] using h
-  rw [hPrevZero, zero_add] at hStepBound
-  have hbPosDepth :
-      0 < P.h b :=
-    hbSpec.2
-  have hbOne :
-      P.h b = 1 := by
-    omega
+        (by simpa [b] using hk)
+  have hbOne :=
+    P.admissible.firstPositiveDepth_eq_one
+      hbLtM hbSpec.2 hBefore
   simpa [P, b] using hbOne
 
 

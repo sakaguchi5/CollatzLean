@@ -41,51 +41,15 @@ theorem beattyIndex_add_le
 /--
 二 odd-step では Beatty depth は少なくとも 3 増える。
 
-もし増分が 2 しかなければ
-
-  3^(k+2) ≤ 2^(beattyIndex k + 3)
-
-となる一方、`2^beattyIndex k ≤ 3^k` と `9 > 8` から逆向き strict inequality が出る。
+一般 power-form 増分下界を `8 < 9` に specialize したもの。
 -/
 theorem beattyIndex_add_two_ge_add_three
     (k : ℕ) :
     beattyIndex k + 3 ≤ beattyIndex (k + 2) := by
-  have hCoarse :
-      beattyIndex k + 2 ≤ beattyIndex (k + 2) := by
-    simpa using beattyIndex_add_le k 2
-  by_contra hnot
-  have hUpperIndex :
-      beattyIndex (k + 2) ≤ beattyIndex k + 2 := by
-    omega
-  have hEq :
-      beattyIndex (k + 2) = beattyIndex k + 2 := by
-    omega
-  have hUpper := beattyIndex_upper (k + 2)
-  rw [hEq] at hUpper
-  have hLower := beattyIndex_lower k
-  have hThree :
-      3 ^ (k + 2) = 3 ^ k * 9 := by
-    rw [pow_add]
-    norm_num
-  have hTwo :
-      2 ^ (beattyIndex k + 3) =
-        2 ^ beattyIndex k * 8 := by
-    rw [pow_add]
-    norm_num
-  rw [hThree, hTwo] at hUpper
-  have hUpper' :
-      3 ^ k * 9 ≤ 3 ^ k * 8 := by
-    calc
-      3 ^ k * 9
-          ≤ 2 ^ beattyIndex k * 8 := hUpper
-      _ ≤ 3 ^ k * 8 := by
-          exact Nat.mul_le_mul_right 8 hLower
-  have hStrict :
-      3 ^ k * 8 < 3 ^ k * 9 := by
-    exact Nat.mul_lt_mul_of_pos_left
-      (by norm_num : 8 < 9)
-      (pow_pos (by norm_num : 0 < (3 : ℕ)) k)
-  exact (not_lt_of_ge hUpper') hStrict
+  simpa using
+    (beattyIndex_add_lower_of_twoPow_lt_threePow
+      (k := k) (r := 2) (s := 3)
+      (by norm_num : 2 ^ 3 < 3 ^ 2))
 
 /-- gap 1 が二回連続することはない。 -/
 theorem not_two_consecutive_beatty_gap_one

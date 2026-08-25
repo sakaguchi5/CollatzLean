@@ -133,6 +133,86 @@ theorem beattyIndex_lower_strict_of_pos
     exact Nat.lt_of_not_ge hnot'
   simpa [q] using hlt
 
+/--
+`2^s < 3^r` なら、`r` rank 進む間に Beatty index は少なくとも `s` 増える。
+
+特定の `r=2, s=3` に依存しない power-form の増分下界。
+-/
+theorem beattyIndex_add_lower_of_twoPow_lt_threePow
+    {k r s : ℕ}
+    (h : 2 ^ s < 3 ^ r) :
+    beattyIndex k + s ≤ beattyIndex (k + r) := by
+  have hLower := beattyIndex_lower k
+  have hStrict :
+      2 ^ (beattyIndex k + s) < 3 ^ (k + r) := by
+    calc
+      2 ^ (beattyIndex k + s)
+          = 2 ^ beattyIndex k * 2 ^ s := by
+              rw [pow_add]
+      _ ≤ 3 ^ k * 2 ^ s := by
+            exact Nat.mul_le_mul_right (2 ^ s) hLower
+      _ < 3 ^ k * 3 ^ r := by
+            exact Nat.mul_lt_mul_of_pos_left h (by positivity)
+      _ = 3 ^ (k + r) := by
+            rw [pow_add]
+  by_contra hnot
+  have hIndex :
+      beattyIndex (k + r) < beattyIndex k + s := by
+    omega
+  have hUpper := beattyIndex_upper (k + r)
+  have hExpLe :
+      beattyIndex (k + r) + 1 ≤ beattyIndex k + s := by
+    omega
+  have hPowLe :
+      2 ^ (beattyIndex (k + r) + 1) ≤
+        2 ^ (beattyIndex k + s) :=
+    Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hExpLe
+  exact (not_lt_of_ge (le_trans hUpper hPowLe)) hStrict
+
+/--
+`3^r ≤ 2^s` なら、`r` rank 進む間の Beatty index 増分は高々 `s`。
+
+一 step `+2` upper bound を含む一般形。
+-/
+theorem beattyIndex_add_upper_of_threePow_le_twoPow
+    {k r s : ℕ}
+    (h : 3 ^ r ≤ 2 ^ s) :
+    beattyIndex (k + r) ≤ beattyIndex k + s := by
+  apply beattyIndex_le_of_upper
+  have hUpper := beattyIndex_upper k
+  calc
+    3 ^ (k + r)
+        = 3 ^ k * 3 ^ r := by
+            rw [pow_add]
+    _ ≤ 2 ^ (beattyIndex k + 1) * 2 ^ s :=
+      Nat.mul_le_mul hUpper h
+    _ = 2 ^ ((beattyIndex k + s) + 1) := by
+      rw [← pow_add]
+      congr 1
+      omega
+
+/--
+隣接する dyadic bracket
+`2^t < 3^m ≤ 2^(t+1)` は Beatty index を exact に `t` へ固定する。
+-/
+theorem beattyIndex_eq_of_adjacent_dyadic_bracket
+    {m t : ℕ}
+    (hLow : 2 ^ t < 3 ^ m)
+    (hHigh : 3 ^ m ≤ 2 ^ (t + 1)) :
+    beattyIndex m = t := by
+  apply Nat.le_antisymm
+  · exact beattyIndex_le_of_upper hHigh
+  · by_contra hnot
+    have hLt : beattyIndex m < t := by
+      omega
+    have hUpper := beattyIndex_upper m
+    have hExpLe : beattyIndex m + 1 ≤ t := by
+      omega
+    have hPowLe :
+        2 ^ (beattyIndex m + 1) ≤ 2 ^ t :=
+      Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hExpLe
+    exact (not_lt_of_ge (le_trans hUpper hPowLe)) hLow
+
 /-- `beattyIndex 0 = 0`。 -/
 @[simp] theorem beattyIndex_zero : beattyIndex 0 = 0 := by
   apply Nat.eq_zero_of_le_zero
