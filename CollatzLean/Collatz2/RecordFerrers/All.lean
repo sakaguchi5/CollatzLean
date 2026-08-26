@@ -53,6 +53,12 @@ import CollatzLean.Collatz2.RecordFerrers.Matrix.TwoByTwoPlanarNetwork
 import CollatzLean.Collatz2.RecordFerrers.Matrix.ExchangeMinor
 import CollatzLean.Collatz2.RecordFerrers.Matrix.TotalNonnegativeObstruction
 
+-- RF-D1 ... RF-D3: 有限候補族に対する既存分配束不等式、
+-- 臨界屋根の整数倍格子点計数、family-level の容量矛盾。
+import CollatzLean.Collatz2.RecordFerrers.Family.FourFunctionsFKG
+import CollatzLean.Collatz2.RecordFerrers.Counting.EhrhartCounting
+import CollatzLean.Collatz2.RecordFerrers.Family.FamilyObstruction
+
 
 /-!
 # Record–Ferrers Phase A umbrella (pre-record stage)
@@ -163,4 +169,25 @@ RF-B2〜B4 の累積整数座標へ輸送する。
 RF-C2 では一般の平面グラフや LGV 補題そのものはまだ formalize しない。
 具体的な network 構成が得られた場合、その path matrix の全非負性証明を
 `ExchangePlanarNetworkCertificate` に渡せば RF-C4 の符号障害へ直結する。
+-/
+
+
+/-!
+# Record–Ferrers RF-D1 ... RF-D3
+
+有限な候補族全体へ既存数学の制約を掛け、単一図形の局所制約とは別の
+「候補空間の容量不足」を矛盾の種として導入する。
+
+* RF-D1: Mathlib の四関数定理・Daykin 不等式・FKG 不等式を Ferrers 分配束へ接続
+* RF-D2: critical roof を整数倍した領域の格子点数 `ehrhartCount` を定義し、
+  倍率単調性・有限箱上界・倍率1での FirstCrossing 整数点との exact 同値を証明
+* RF-D3: 元の候補状態から critical Ferrers shape への単射証明書を導入し、
+  - 候補数が倍率1の格子点数を超える場合の容量矛盾
+  - Daykin が要求する meet/join 生成族の容量積との矛盾
+  - FKG と strict に逆向きの family-level 不等式との矛盾
+  を `False` まで閉じる
+
+D2 の名称は Ehrhart 型計数を意識するが、この段階では一般の Ehrhart 多項式性を
+仮定も主張もしない。後続でより強い既存計数定理が得られた場合、
+`ehrhartCount` に対する上界・下界・漸近評価として差し込む。
 -/
