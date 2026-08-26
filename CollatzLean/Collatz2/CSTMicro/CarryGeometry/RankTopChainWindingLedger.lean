@@ -62,9 +62,9 @@ theorem normalizedCarryIndicator_cases
   classical
   unfold normalizedCarryIndicator
   by_cases h : S.edge.HasCarry
-  · rw [if_pos h]
+  · rw [ite_eq_left h]
     exact Or.inr rfl
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     exact Or.inl rfl
 
 end FerrersStep

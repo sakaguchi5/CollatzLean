@@ -80,7 +80,7 @@ theorem beattyCarryValue_eq_indicator
     beattyCarryValue s r =
       if BeattyCarryOne s r then 1 else 0 := by
   by_cases hCarry : BeattyCarryOne s r
-  · rw [if_pos hCarry]
+  · rw [ite_eq_left hCarry]
     unfold beattyCarryValue
     change
       beattyIndex (s + r) =

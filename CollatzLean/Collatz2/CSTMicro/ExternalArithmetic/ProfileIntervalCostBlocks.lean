@@ -100,7 +100,7 @@ theorem profileCellLocalInverse_lt
     {H k j : ℕ} :
     profileCellLocalInverse H k j <
       2 ^ profileCellTailDepth H k j := by
-  haveI : NeZero (2 ^ profileCellTailDepth H k j) :=
+  have : NeZero (2 ^ profileCellTailDepth H k j) :=
     ⟨by positivity⟩
   unfold profileCellLocalInverse
   exact ZMod.val_lt _
@@ -111,7 +111,7 @@ theorem profileCellLocalInverse_cast
     ((profileCellLocalInverse H k j : ℕ) :
         ZMod (2 ^ profileCellTailDepth H k j)) =
       invThreePow (profileCellTailDepth H k j) (k + 1) := by
-  haveI : NeZero (2 ^ profileCellTailDepth H k j) :=
+  have : NeZero (2 ^ profileCellTailDepth H k j) :=
     ⟨by positivity⟩
   unfold profileCellLocalInverse
   exact ZMod.natCast_zmod_val _

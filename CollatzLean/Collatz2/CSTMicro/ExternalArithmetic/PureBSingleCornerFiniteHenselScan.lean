@@ -359,7 +359,7 @@ theorem twoPowerAffineRepresentative_unique
     (hR₁ : R₁ < 2 ^ H)
     (hR₂ : R₂ < 2 ^ H) :
     R₁ = R₂ := by
-  letI : NeZero (2 ^ H) := ⟨by positivity⟩
+  let : NeZero (2 ^ H) := ⟨by positivity⟩
   have hcast₁ := congrArg (fun n : ℕ => (n : ZMod (2 ^ H))) h₁
   have hcast₂ := congrArg (fun n : ℕ => (n : ZMod (2 ^ H))) h₂
   have hEqMul :
@@ -533,7 +533,7 @@ theorem liftDigit_lt_den
     (S : SingleCornerHenselState) :
     S.liftDigit < S.liftDen := by
   unfold liftDigit
-  haveI : NeZero S.liftDen := ⟨by simp [liftDen]⟩
+  have : NeZero S.liftDen := ⟨by simp [liftDen]⟩
   exact ZMod.val_lt _
 
 /--
@@ -556,7 +556,7 @@ theorem liftDigit_cast_eq
     (S.liftDigit : ZMod (2 ^ S.liftBits)) =
       (-(S.liftBase : ZMod (2 ^ S.liftBits))) *
         invThreePow S.liftBits (S.m + 1) := by
-  letI : NeZero (2 ^ S.liftBits) := ⟨by positivity⟩
+  let : NeZero (2 ^ S.liftBits) := ⟨by positivity⟩
   unfold liftDigit
   exact ZMod.natCast_zmod_val
     ((-(S.liftBase : ZMod (2 ^ S.liftBits))) *
@@ -574,7 +574,7 @@ theorem liftBase_add_liftDigit_mul_nextThree_eq_zero_zmod
     (hS : S.Correct) :
     ((S.liftBase + S.liftDigit * S.nextThree : ℕ) :
         ZMod (2 ^ S.liftBits)) = 0 := by
-  letI : NeZero (2 ^ S.liftBits) := ⟨by positivity⟩
+  let : NeZero (2 ^ S.liftBits) := ⟨by positivity⟩
 
   have hThreeNext :
       S.nextThree = 3 ^ (S.m + 1) :=
@@ -910,7 +910,7 @@ theorem init_correct
   let R := ((-(A : ZMod modulus)) * invThreePow H C.m).val
   let numerator := C.three * R + A
   have hModPos : 0 < modulus := by simp [modulus]
-  haveI : NeZero modulus := ⟨Nat.ne_of_gt hModPos⟩
+  have : NeZero modulus := ⟨Nat.ne_of_gt hModPos⟩
   have hRlt : R < modulus := by
     dsimp [R]
     exact ZMod.val_lt _
@@ -1403,7 +1403,7 @@ theorem singleCornerHenselCandidateCheck_of_bounds
   have hEntranceBool : singleCornerHenselEntranceBool b = true := by
     simp [singleCornerHenselEntranceBool, Nat.ne_of_gt hbPos, hEntrance]
   unfold singleCornerHenselCheckB at hB
-  rw [if_pos hEntranceBool] at hB
+  rw [ite_eq_left hEntranceBool] at hB
   have hN :=
     singleCornerAllNat_sound 1 213
       (fun n => singleCornerHenselCandidateCheck b n)

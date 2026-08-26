@@ -954,7 +954,11 @@ theorem CriticalRecordChain.recordCount_div_le_phase
       criticalRealPhase start := by
   induction C with
   | final fragment =>
-      simp only [recordCount, CharP.cast_eq_zero, Nat.cast_mul, Nat.cast_ofNat, zero_div]
+      have hCount :
+          (CriticalRecordChain.final fragment).recordCount = 0 := by
+        rfl
+      rw [hCount]
+      simp only [CharP.cast_eq_zero, Nat.cast_mul, Nat.cast_ofNat, zero_div, ge_iff_le]
       exact criticalRealPhase_nonneg _
   | @step start remaining r hrPos hrLe piece tail ih =>
       have hrL : r ≤ L := by

@@ -59,7 +59,7 @@ theorem FirstCrossing.rankResidue_ne_zero_of_coprime
   have hpPos : 0 < p := by
     dsimp [p, oddSteps]
     exact List.length_pos_iff.mpr hF.nonempty
-  haveI : NeZero p := ⟨Nat.ne_of_gt hpPos⟩
+  have : NeZero p := ⟨Nat.ne_of_gt hpPos⟩
   have hResid :=
     hF.rankResidue_cast_eq_twoSteps_mul (by simpa [p] using hkLt)
   have hMulZero : (((H * k : ℕ) : ZMod p)) = 0 := by

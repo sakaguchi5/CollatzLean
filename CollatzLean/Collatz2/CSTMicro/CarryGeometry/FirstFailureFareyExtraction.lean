@@ -110,7 +110,7 @@ theorem one_lt_twoPow_fareyTailDepth
 theorem fareyLocalInverse_lt
     (S : AdjacentFerrersSwap) :
     S.fareyLocalInverse < 2 ^ S.fareyTailDepth := by
-  haveI : NeZero (2 ^ S.fareyTailDepth) := ⟨by positivity⟩
+  have : NeZero (2 ^ S.fareyTailDepth) := ⟨by positivity⟩
   unfold fareyLocalInverse
   exact ZMod.val_lt _
 
@@ -122,8 +122,8 @@ theorem fareyLocalInverse_pos
   let a := S.fareyLeftExponent
   have hmod : 1 < 2 ^ d := by
     simpa [d] using S.one_lt_twoPow_fareyTailDepth
-  haveI : NeZero (2 ^ d) := ⟨by omega⟩
-  haveI : Fact (1 < 2 ^ d) := ⟨hmod⟩
+  have : NeZero (2 ^ d) := ⟨by omega⟩
+  have : Fact (1 < 2 ^ d) := ⟨hmod⟩
   have hInv := threePow_mul_invThreePow d a
   have hne : invThreePow d a ≠ 0 := by
     intro hz
@@ -141,7 +141,7 @@ theorem fareyLocalInverse_cast
     ((S.fareyLocalInverse : ℕ) :
         ZMod (2 ^ S.fareyTailDepth)) =
       invThreePow S.fareyTailDepth S.fareyLeftExponent := by
-  haveI : NeZero (2 ^ S.fareyTailDepth) := ⟨by positivity⟩
+  have : NeZero (2 ^ S.fareyTailDepth) := ⟨by positivity⟩
   unfold fareyLocalInverse
   exact ZMod.natCast_zmod_val _
 

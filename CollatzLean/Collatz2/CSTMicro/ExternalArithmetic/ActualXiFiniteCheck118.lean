@@ -458,7 +458,7 @@ theorem criticalXiResidue_gt_boundaryFailureBound_of_118_le_lt_1538
           rhinGapK rhinGapA S.beta <
         S.residue := by
     unfold Xi118ScanState.good at hGood
-    rw [if_pos hRange] at hGood
+    rw [ite_eq_left hRange] at hGood
     exact of_decide_eq_true hGood
 
   have hResidue :=

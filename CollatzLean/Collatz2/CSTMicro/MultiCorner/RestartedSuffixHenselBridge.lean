@@ -423,7 +423,7 @@ theorem suffixHenselQuotient_spec
       (3 : ℤ) ^ (S.width - i) *
         S.suffixHenselQuotient hStart i := by
   unfold suffixHenselQuotient
-  simp only [dif_pos hi]
+  simp only [dite_eq_left hi]
   exact
     Classical.choose_spec
       (S.suffixHenselUnit_threePow_dvd hStart hi)

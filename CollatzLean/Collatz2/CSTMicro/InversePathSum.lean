@@ -343,7 +343,7 @@ theorem inverseZeroPathSum_eq_parityStartClass (v : ParityWord) :
 theorem leastRepresentative_cast (v : ParityWord) :
     ((leastRepresentative v : ℕ) : ZMod (parityModulus v)) =
       parityStartClass v := by
-  haveI : NeZero (parityModulus v) :=
+  have : NeZero (parityModulus v) :=
     ⟨by simp [parityModulus]⟩
   simp only [leastRepresentative, ZMod.natCast_val, ZMod.cast_id', id_eq]
 

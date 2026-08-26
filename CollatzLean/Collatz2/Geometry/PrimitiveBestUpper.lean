@@ -292,7 +292,7 @@ theorem stripRankResidue_injective_of_primitive
     r = s := by
   let p := P.oddCount
   let H := P.twoDepth
-  haveI : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using P.oddCount_pos)⟩
+  have : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using P.oddCount_pos)⟩
   have hMul :
       (((H * r : ℕ) : ZMod p)) =
         (((H * s : ℕ) : ZMod p)) := by
@@ -330,7 +330,7 @@ theorem stripRank_ne_oddCount_of_primitive
   intro hEq
   let p := P.oddCount
   let H := P.twoDepth
-  haveI : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using P.oddCount_pos)⟩
+  have : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using P.oddCount_pos)⟩
   have hResid := P.stripRankResidue_eq hrPos
   have hZero : (((H * r : ℕ) : ZMod p)) = 0 := by
     have hRankZero : P.stripRankResidue r = 0 := by
@@ -385,7 +385,7 @@ theorem exists_unique_proper_denominator_of_stripRank
       0 < r ∧ r < P.oddCount ∧ P.stripRank r = q := by
   let p := P.oddCount
   let H := P.twoDepth
-  haveI : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using P.oddCount_pos)⟩
+  have : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using P.oddCount_pos)⟩
   let U : (ZMod p)ˣ :=
     ZMod.unitOfCoprime H (by simpa [p, H, IsPrimitive] using hPrimitive)
   let z : ZMod p :=

@@ -430,7 +430,7 @@ theorem selected_rankTopRepresentative_upper_eq_residue3
     exact
       Collatz2.AffineTransfer.centerGap_pos_of_negative
         hF.terminalNegative
-  letI : NeZero G :=
+  let : NeZero G :=
     ⟨Nat.ne_of_gt hGPos⟩
   have hU :=
     S.edge.universalCutWeight_rankCut_eq_three_mul_fareyCellCost
@@ -499,7 +499,7 @@ theorem selected_rankTopRepresentative_lower_eq_residue6
     exact
       Collatz2.AffineTransfer.centerGap_pos_of_negative
         hF.terminalNegative
-  letI : NeZero G :=
+  let : NeZero G :=
     ⟨Nat.ne_of_gt hGPos⟩
   have hU :=
     S.edge.rankLower_universalCutWeight_rankCut_eq_six_mul_fareyCellCost
@@ -704,12 +704,12 @@ theorem rankTopRepresentative_upper_eq_lower_of_ne_rankCut
     exact
       Collatz2.AffineTransfer.centerGap_pos_of_negative
         hUpperF.terminalNegative
-  letI :
+  let :
       NeZero
         (Collatz2.Word.terminalGap
           S.edge.rankLowerExponentWord) :=
     ⟨Nat.ne_of_gt hLowerGapPos⟩
-  letI :
+  let :
       NeZero
         (Collatz2.Word.terminalGap
           S.edge.rankUpperExponentWord) :=

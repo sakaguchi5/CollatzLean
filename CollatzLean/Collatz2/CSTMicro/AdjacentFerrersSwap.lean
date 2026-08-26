@@ -188,13 +188,13 @@ theorem threePow_mul_deltaClass (S : AdjacentFerrersSwap) :
 
 @[simp] theorem deltaR_lt_modulus (S : AdjacentFerrersSwap) :
     S.deltaR < S.modulus := by
-  haveI : NeZero S.modulus := ⟨by simp [modulus]⟩
+  have : NeZero S.modulus := ⟨by simp [modulus]⟩
   exact ZMod.val_lt S.deltaClass
 
 /-- `deltaR` を common modulus に戻すと `deltaClass`。 -/
 theorem deltaR_cast (S : AdjacentFerrersSwap) :
     ((S.deltaR : ℕ) : ZMod S.modulus) = S.deltaClass := by
-  haveI : NeZero S.modulus := ⟨by simp [modulus]⟩
+  have : NeZero S.modulus := ⟨by simp [modulus]⟩
   simp only [deltaR, ZMod.natCast_val, ZMod.cast_id', id_eq]
 
 /-- lower representative の common-modulus defining equation。 -/
@@ -309,7 +309,7 @@ theorem upperR_cast_eq_lowerR_add_deltaClass
 /-- ordinary representatives では addition modulo common modulus。 -/
 theorem upperR_eq_mod_add (S : AdjacentFerrersSwap) :
     S.upperR = (S.lowerR + S.deltaR) % S.modulus := by
-  haveI : NeZero S.modulus := ⟨by simp [modulus]⟩
+  have : NeZero S.modulus := ⟨by simp [modulus]⟩
   have hcast := S.upperR_cast_eq_lowerR_add_deltaClass
   rw [← S.deltaR_cast] at hcast
   have hcast' :

@@ -47,6 +47,12 @@ import CollatzLean.Collatz2.RecordFerrers.Lattice.PrefixPolytope
 -- `affineConst` に関する制約を word 側へ exact に戻す最初の試験層。
 import CollatzLean.Collatz2.RecordFerrers.Lattice.AffineValuationTransport
 
+-- RF-C1 ... RF-C4: 三ブロック交換整合性と 2×2 行列式の符号障害。
+import CollatzLean.Collatz2.RecordFerrers.Deformation.ThreeBlockBraid
+import CollatzLean.Collatz2.RecordFerrers.Matrix.TwoByTwoPlanarNetwork
+import CollatzLean.Collatz2.RecordFerrers.Matrix.ExchangeMinor
+import CollatzLean.Collatz2.RecordFerrers.Matrix.TotalNonnegativeObstruction
+
 
 /-!
 # Record–Ferrers Phase A umbrella (pre-record stage)
@@ -138,4 +144,23 @@ RF-B2〜B4 の累積整数座標へ輸送する。
 
 これにより、後続の既存整数数学から affine 値に対する不可能条件が得られた場合、
 その矛盾を fixed-chord / FirstCrossing word 側へ戻す正式な経路ができる。
+-/
+
+
+/-!
+# Record–Ferrers RF-C1 ... RF-C4
+
+既存の block permutation / contextual swap law を、三ブロック整合性と
+2×2 行列式の符号制約へ接続する。
+
+* RF-C1: 三ブロックの braid 型交換経路から、元の三ブロックだけに残る exact 恒等式を抽出
+* RF-C2: `affineConst` と `coefficientGap` から 2×2 exchange path matrix を構成し、
+  平面非交差経路網の全非負性を受け取る証明書を用意
+* RF-C3: `blockExchangeDeterminant` を exchange 行列の 2×2 minor と exact に同一視
+* RF-C4: 全非負性から determinant 非負を引き戻し、
+  contextual block swap の向きまで Record–Ferrers / word 側へ戻す
+
+RF-C2 では一般の平面グラフや LGV 補題そのものはまだ formalize しない。
+具体的な network 構成が得られた場合、その path matrix の全非負性証明を
+`ExchangePlanarNetworkCertificate` に渡せば RF-C4 の符号障害へ直結する。
 -/

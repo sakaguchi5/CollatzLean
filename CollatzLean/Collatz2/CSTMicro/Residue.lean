@@ -97,7 +97,7 @@ def leastRepresentative
 theorem leastRepresentative_lt_modulus
     (v : ParityWord) :
     leastRepresentative v < parityModulus v := by
-  haveI : NeZero (parityModulus v) :=
+  have : NeZero (parityModulus v) :=
     ⟨by simp [parityModulus]⟩
   exact ZMod.val_lt (parityStartClass v)
 

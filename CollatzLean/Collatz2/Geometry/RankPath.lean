@@ -181,7 +181,7 @@ theorem FirstCrossing.chordRankResidue_injective
     simpa [oddSteps] using List.length_pos_iff.mpr hF.nonempty
   let p := oddSteps w
   let H := twoSteps w
-  haveI : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using hpPos)⟩
+  have : NeZero p := ⟨Nat.ne_of_gt (by simpa [p] using hpPos)⟩
   have hMul :
       (((H * k : ℕ) : ZMod p)) =
         (((H * l : ℕ) : ZMod p)) := by

@@ -280,7 +280,7 @@ theorem straightCriticalFusedState_terminalPred_anchor
   dsimp at hPred hRhs
   rw [hRhs] at hPred
   unfold straightCriticalFusedState
-  rw [dif_pos hi]
+  rw [dite_eq_left hi]
   dsimp [toFreeBaseMonotoneHenselChain, FreeBaseMonotoneHenselChain.qOne]
   simpa only [hPredIdx] using hPred
 

@@ -100,7 +100,7 @@ theorem terminalCarryTailQuotient_spec
         k ≤ P.terminalCriticalStart :=
     ⟨hsk, hkc⟩
   unfold terminalCarryTailQuotient
-  rw [dif_pos hk]
+  rw [dite_eq_left hk]
   exact
     Classical.choose_spec
       (exists_terminalCarryTailQuotient

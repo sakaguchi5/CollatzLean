@@ -12,7 +12,7 @@ maxSynthPendingDepth = 3
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "v4.32.2"
+rev = "64fbe722961f672fe20c1b43539821feedd1f36d"
 
 [[lean_lib]]
 name = "CollatzLean"

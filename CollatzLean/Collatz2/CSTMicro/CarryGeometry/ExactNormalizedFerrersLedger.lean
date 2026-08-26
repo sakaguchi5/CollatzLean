@@ -205,7 +205,7 @@ theorem normalizedNoCarryIndicator_eq_one_of_noCarry
     S.normalizedNoCarryIndicator = 1 := by
   classical
   unfold normalizedNoCarryIndicator
-  rw [if_pos hNoCarry]
+  rw [ite_eq_left hNoCarry]
 
 /-- carry step の indicator は 0。 -/
 theorem normalizedNoCarryIndicator_eq_zero_of_hasCarry
@@ -215,7 +215,7 @@ theorem normalizedNoCarryIndicator_eq_zero_of_hasCarry
     S.normalizedNoCarryIndicator = 0 := by
   classical
   unfold normalizedNoCarryIndicator
-  rw [if_neg (S.edge.not_noCarry_of_hasCarry hCarry)]
+  rw [ite_eq_right (S.edge.not_noCarry_of_hasCarry hCarry)]
 
 /--
 一つの first-passage Ferrers step の exact lifted Farey law。

@@ -65,7 +65,12 @@ critical prefix height がその step で exact に 1 増えることと同値�
     criticalSturmianBit i = true ↔
       criticalPrefixHeight (i + 1) =
         criticalPrefixHeight i + 1 := by
-  simp [criticalSturmianBit]
+  unfold criticalSturmianBit
+  by_cases h :
+      criticalHeight (i + 1) =
+        criticalPrefixHeight i + 1
+  · simp [h]
+  · simp [h]
 
 /--
 critical Sturmian bit が false であることは、
@@ -76,7 +81,12 @@ critical prefix height がその step で 1 増えないことと同値。
     criticalSturmianBit i = false ↔
       criticalPrefixHeight (i + 1) ≠
         criticalPrefixHeight i + 1 := by
-  simp [criticalSturmianBit]
+  unfold criticalSturmianBit
+  by_cases h :
+      criticalHeight (i + 1) =
+        criticalPrefixHeight i + 1
+  · simp [h]
+  · simp [h]
 
 /-- critical height increment は bitNat と exact に一致する。 -/
 theorem criticalPrefixHeight_step (i : ℕ) :

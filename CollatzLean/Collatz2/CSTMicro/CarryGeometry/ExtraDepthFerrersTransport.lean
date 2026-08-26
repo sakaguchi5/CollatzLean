@@ -114,9 +114,9 @@ theorem parityExtraDepth_step
       parityExtraDepth lower k + if k = S.edge.rankCut then 1 else 0 := by
   by_cases hk : k = S.edge.rankCut
   · subst k
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     exact S.parityExtraDepth_selected_step hLowerFP
-  · rw [if_neg hk]
+  · rw [ite_eq_right hk]
     simp only [Nat.add_zero]
     exact S.parityExtraDepth_step_of_ne_rankCut hLowerFP hk
 

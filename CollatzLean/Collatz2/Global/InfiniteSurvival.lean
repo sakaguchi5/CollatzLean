@@ -470,8 +470,8 @@ theorem barrierEnvelopeEventuallyConstant
     apply Subtype.ext
     apply haperiodic
     exact congrArg Fin.val hrs
-  letI : Finite RecordIndex := Finite.of_injective f hfInjective
-  letI : Fintype RecordIndex := Fintype.ofFinite RecordIndex
+  let : Finite RecordIndex := Finite.of_injective f hfInjective
+  let : Fintype RecordIndex := Fintype.ofFinite RecordIndex
   let recordValues : Finset ℕ :=
     Finset.univ.image (fun r : RecordIndex => r.1)
   have hrecordValuesNonempty : recordValues.Nonempty := by

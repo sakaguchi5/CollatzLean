@@ -909,7 +909,7 @@ theorem actualCriticalPartialQuotient_spec
   have hEq :
       actualCriticalPartialQuotient r = a := by
     unfold actualCriticalPartialQuotient
-    simp only [if_pos hr]
+    simp only [ite_eq_left hr]
     rw [hSub]
     -- ここは既存の criticalPowerQ の positivity 補題を使う。
     have hQr : 0 < criticalPowerQ r := by

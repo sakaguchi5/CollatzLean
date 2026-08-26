@@ -23,7 +23,7 @@ def swapResidueDisplacement (u v : Word) : ℕ :=
 theorem swapResidueDisplacement_lt_modulus
     (u v : Word) :
     swapResidueDisplacement u v < residueModulus (u ++ v) := by
-  haveI : NeZero (residueModulus (u ++ v)) :=
+  have : NeZero (residueModulus (u ++ v)) :=
     ⟨Nat.ne_of_gt (residueModulus_pos (u ++ v))⟩
   unfold swapResidueDisplacement
   exact ZMod.val_lt _
@@ -37,7 +37,7 @@ theorem swapResidueDisplacement_cast_eq_start_sub
           ZMod (residueModulus (u ++ v))) -
         ((canonicalStart (v ++ u) : ℕ) :
           ZMod (residueModulus (u ++ v)))) := by
-  haveI : NeZero (residueModulus (u ++ v)) :=
+  have : NeZero (residueModulus (u ++ v)) :=
     ⟨Nat.ne_of_gt (residueModulus_pos (u ++ v))⟩
   unfold swapResidueDisplacement
   exact ZMod.natCast_zmod_val _
@@ -74,7 +74,7 @@ theorem canonicalStart_swap_add_displacement_mod
         residueModulus (u ++ v) =
       canonicalStart (u ++ v) := by
   let m := residueModulus (u ++ v)
-  haveI : NeZero m :=
+  have : NeZero m :=
     ⟨Nat.ne_of_gt (by simp only [residueModulus_pos, m])⟩
   have hshift := swapResidueDisplacement_cast_eq_start_sub u v
   have hcast :

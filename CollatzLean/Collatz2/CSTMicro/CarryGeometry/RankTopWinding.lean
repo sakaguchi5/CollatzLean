@@ -49,7 +49,7 @@ theorem FirstCrossing.rankTopSum_cast_eq_universalCutWeightSum
   have hGapPos : 0 < terminalGap w := by
     unfold terminalGap
     omega
-  letI : NeZero (terminalGap w) :=
+  let : NeZero (terminalGap w) :=
     ⟨Nat.ne_of_gt hGapPos⟩
   unfold rankTopSum universalCutWeightSum
   push_cast
@@ -98,7 +98,7 @@ theorem FirstCrossing.rankTopSum_lt_oddSteps_mul_gap
   have hGPos : 0 < G := by
     dsimp [G]
     omega
-  haveI : NeZero G := ⟨Nat.ne_of_gt hGPos⟩
+  have : NeZero G := ⟨Nat.ne_of_gt hGPos⟩
   have hLe :
       rankTopSum hF ≤ oddSteps w * (G - 1) := by
     unfold rankTopSum

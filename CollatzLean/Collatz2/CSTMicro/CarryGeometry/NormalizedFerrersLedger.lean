@@ -114,7 +114,7 @@ theorem normalizedCarryContribution_eq_zero_of_noCarry
     S.normalizedCarryContribution = 0 := by
   classical
   unfold normalizedCarryContribution
-  rw [if_neg (S.edge.not_hasCarry_of_noCarry hNo)]
+  rw [ite_eq_right (S.edge.not_hasCarry_of_noCarry hNo)]
 
 /-- carry step の carry contribution は canonical Farey residue。 -/
 theorem normalizedCarryContribution_eq_fareyResidue_of_hasCarry
@@ -125,7 +125,7 @@ theorem normalizedCarryContribution_eq_fareyResidue_of_hasCarry
       S.edge.toFareyCellPacket.residue := by
   classical
   unfold normalizedCarryContribution
-  rw [if_pos hCarry]
+  rw [ite_eq_left hCarry]
 
 /-- no-carry step の loss は `- delta q`。 -/
 theorem normalizedNoCarryLoss_eq_neg_delta_of_noCarry
@@ -136,7 +136,7 @@ theorem normalizedNoCarryLoss_eq_neg_delta_of_noCarry
       - normalizedStepDelta lower upper := by
   classical
   unfold normalizedNoCarryLoss
-  rw [if_pos hNo]
+  rw [ite_eq_left hNo]
 
 /-- carry step の no-carry loss は zero。 -/
 theorem normalizedNoCarryLoss_eq_zero_of_hasCarry
@@ -146,7 +146,7 @@ theorem normalizedNoCarryLoss_eq_zero_of_hasCarry
     S.normalizedNoCarryLoss = 0 := by
   classical
   unfold normalizedNoCarryLoss
-  rw [if_neg (S.edge.not_noCarry_of_hasCarry hCarry)]
+  rw [ite_eq_right (S.edge.not_noCarry_of_hasCarry hCarry)]
 
 /--
 一つの first-passage Ferrers step の exact ledger law。

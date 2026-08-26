@@ -213,8 +213,8 @@ theorem escapesToInfinity_of_unbounded
     apply Subtype.ext
     apply hinj
     exact congrArg Fin.val hab
-  letI : Finite Bad := Finite.of_injective toFin htoFin
-  letI : Fintype Bad := Fintype.ofFinite Bad
+  let : Finite Bad := Finite.of_injective toFin htoFin
+  let : Fintype Bad := Fintype.ofFinite Bad
   let N : ℕ :=
     Finset.sum Finset.univ (fun x : Bad => x.1 + 1)
   refine ⟨N, ?_⟩

@@ -134,7 +134,7 @@ theorem normalizedCarryIndicator_eq_one_of_hasCarry
     S.normalizedCarryIndicator = 1 := by
   classical
   unfold normalizedCarryIndicator
-  rw [if_pos hCarry]
+  rw [ite_eq_left hCarry]
 
 /-- no-carry branch の indicator。 -/
 theorem normalizedCarryIndicator_eq_zero_of_noCarry
@@ -152,7 +152,7 @@ theorem normalizedCarryIndicator_eq_zero_of_noCarry
       exact hCarry
     omega
   unfold normalizedCarryIndicator
-  rw [if_neg hNotCarry]
+  rw [ite_eq_right hNotCarry]
 
 /-- 一 step では carry/no-carry indicator の和は exact に1。 -/
 theorem normalizedCarryIndicator_add_noCarryIndicator_eq_one

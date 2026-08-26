@@ -18,13 +18,13 @@ def canonicalStart (w : Word) : ℕ :=
 /-- canonical start は residue modulus より小さい。 -/
 theorem canonicalStart_lt_modulus (w : Word) :
     canonicalStart w < residueModulus w := by
-  haveI : NeZero (residueModulus w) := ⟨by simp [residueModulus]⟩
+  have : NeZero (residueModulus w) := ⟨by simp [residueModulus]⟩
   exact ZMod.val_lt (oddStartClass w)
 
 /-- canonical representative を modulus に戻すと元の odd-start class。 -/
 theorem canonicalStart_cast (w : Word) :
     ((canonicalStart w : ℕ) : ZMod (residueModulus w)) = oddStartClass w := by
-  haveI : NeZero (residueModulus w) := ⟨by simp [residueModulus]⟩
+  have : NeZero (residueModulus w) := ⟨by simp [residueModulus]⟩
   exact ZMod.natCast_zmod_val (oddStartClass w)
 
 /-- 奇数 endpoint realization の start の剰余は canonical representative。 -/
@@ -65,7 +65,7 @@ def canonicalNumerator (w : Word) : ℕ :=
 /-- canonical numerator は modulus に対し `2^H` の剰余を持つ。 -/
 theorem canonicalNumerator_mod_residueModulus (w : Word) :
     canonicalNumerator w % residueModulus w = 2 ^ twoSteps w := by
-  haveI : NeZero (residueModulus w) := ⟨by simp [residueModulus]⟩
+  have : NeZero (residueModulus w) := ⟨by simp [residueModulus]⟩
   have hcast :
       ((canonicalNumerator w : ℕ) : ZMod (residueModulus w)) =
         ((2 ^ twoSteps w : ℕ) : ZMod (residueModulus w)) := by

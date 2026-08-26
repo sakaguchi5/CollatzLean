@@ -186,7 +186,7 @@ theorem FirstCrossing.exists_unique_proper_cut_of_rankResidue
   have hpPos : 0 < p := by
     dsimp [p, oddSteps]
     exact List.length_pos_iff.mpr hF.nonempty
-  haveI : NeZero p := ⟨Nat.ne_of_gt hpPos⟩
+  have : NeZero p := ⟨Nat.ne_of_gt hpPos⟩
   let U : (ZMod p)ˣ :=
     ZMod.unitOfCoprime H (by simpa [p, H] using hcop)
   let z : ZMod p :=

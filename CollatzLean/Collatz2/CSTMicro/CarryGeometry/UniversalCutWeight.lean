@@ -198,7 +198,7 @@ theorem FirstCrossing.universalCutWeight_ne_zero
   let G := terminalGap w
   let U2 : (ZMod G)ˣ := hF.terminalTwoUnit
   let U3 : (ZMod G)ˣ := hF.terminalThreeUnit
-  haveI : Nontrivial (ZMod G) :=
+  have : Nontrivial (ZMod G) :=
     (ZMod.nontrivial_iff.mpr (by omega : G ≠ 1))
   have hTerm :
       ((normalizedCutTerm w k : ℕ) : ZMod G) =

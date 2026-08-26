@@ -47,7 +47,7 @@ private theorem restrictedCriticalPhaseDefectFold_cons_of_cut_le_left
       actualCriticalPhaseDefectFold left (r :: rs) y := by
   simp only [
     restrictedCriticalPhaseDefectFold,
-    if_pos hCutLeft
+    ite_eq_left hCutLeft
   ]
 
 
@@ -65,8 +65,8 @@ private theorem restrictedCriticalPhaseDefectFold_cons_of_mid_le_cut
     omega
   simp only [
     restrictedCriticalPhaseDefectFold,
-    if_neg hNotLeft,
-    if_pos hMidCut
+    ite_eq_right hNotLeft,
+    ite_eq_left hMidCut
   ]
 
 
@@ -91,8 +91,8 @@ private theorem restrictedCriticalPhaseDefectFold_cons_of_cut_inside
     omega
   simp only [
     restrictedCriticalPhaseDefectFold,
-    if_neg hNotLeft,
-    if_neg hNotMid
+    ite_eq_right hNotLeft,
+    ite_eq_right hNotMid
   ]
 
 

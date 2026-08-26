@@ -55,7 +55,7 @@ theorem parityNumerator_mod_eq_zero
     (v : ParityWord) :
     (3 ^ oddCount v * leastRepresentative v + affineConst v) %
         parityModulus v = 0 := by
-  haveI : NeZero (parityModulus v) :=
+  have : NeZero (parityModulus v) :=
     ⟨Nat.ne_of_gt (parityModulus_pos v)⟩
   have hc := leastRepresentative_cast v
   have hs := parityStartClass_spec v

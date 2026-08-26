@@ -61,7 +61,7 @@ theorem matches_of_candidate
       (correctedChristoffelQ D j)
       R := by
   rcases hCandidate with ⟨m, hem, hResidue⟩
-  letI : NeZero (2 ^ e) := ⟨by positivity⟩
+  let : NeZero (2 ^ e) := ⟨by positivity⟩
   have hRcast :
       (R : ZMod (2 ^ e)) =
         criticalXiTruncationClass e m := by
