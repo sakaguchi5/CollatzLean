@@ -60,6 +60,9 @@ import CollatzLean.Collatz2.RecordFerrers.Counting.EhrhartCounting
 import CollatzLean.Collatz2.RecordFerrers.Family.FamilyObstruction
 
 
+--Record–Ferrers 摂動理論
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.All
+
 /-!
 # Record–Ferrers Phase A umbrella (pre-record stage)
 
