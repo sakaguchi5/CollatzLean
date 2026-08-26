@@ -434,6 +434,7 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselLe
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselAdjacentReturn
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselTerminalReturn
 
+import CollatzLean.Collatz2.RecordFerrers.All
 
 
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.MultiCorner
