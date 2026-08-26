@@ -22,13 +22,18 @@ import CollatzLean.Collatz2.RecordFerrers.Factorization.BlockFerrersDeficit
 import CollatzLean.Collatz2.RecordFerrers.Reconstruction.FerrersReconstruction
 import CollatzLean.Collatz2.RecordFerrers.Reconstruction.LocalTranslationSet
 import CollatzLean.Collatz2.RecordFerrers.Reconstruction.InformationBoundary
+
 -- RF-A+1 ... RF-A+4: specialist-theory completion before Phase B migration.
 import CollatzLean.Collatz2.RecordFerrers.Extensions.PublicAPI
 import CollatzLean.Collatz2.RecordFerrers.Record.Canonicality
 import CollatzLean.Collatz2.RecordFerrers.Lattice.MetricCompletion
 import CollatzLean.Collatz2.RecordFerrers.Lattice.WeightedPotential
-
-
+-- RF-A+5 ... RF-A+8: carry statistics, permutation symmetry,
+-- H-independent FirstCrossing geometry, and lossless local translation coordinates.
+import CollatzLean.Collatz2.RecordFerrers.Record.CarryStatistics
+import CollatzLean.Collatz2.RecordFerrers.Deformation.InteriorPermutation
+import CollatzLean.Collatz2.RecordFerrers.Lattice.UniversalFirstCrossingFiber
+import CollatzLean.Collatz2.RecordFerrers.Reconstruction.TranslationCoordinates
 
 
 /-!
@@ -68,6 +73,7 @@ final:
 -/
 
 
+
 /-!
 # Record–Ferrers RF-A+1 ... RF-A+4 extension
 
@@ -77,4 +83,15 @@ Phase B の import migration より前に、専門層内部で以下を完成さ
 * canonical record length / skeleton theory
 * distributive Ferrers lattice + metric / unit-chain geometry
 * weighted affine potential / bottom-top extremal theory
+-/
+
+
+
+/-!
+# Record–Ferrers RF-A+5 ... RF-A+8 extension
+
+* RF-A+5: arbitrary carry statistics / zero-carry telescope / permutation invariant
+* RF-A+6: arbitrary interior `List.Perm` symmetry and contextual affine exchange law
+* RF-A+7: universal H-independent FirstCrossing fiber and terminal-depth chord shear
+* RF-A+8: local decoration `≃` local translation spectrum and global `(length,B)` coordinates
 -/
