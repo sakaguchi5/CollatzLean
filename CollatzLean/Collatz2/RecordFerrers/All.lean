@@ -43,6 +43,10 @@ import CollatzLean.Collatz2.RecordFerrers.Lattice.PrefixCoordinates
 import CollatzLean.Collatz2.RecordFerrers.Lattice.ClearanceSlack
 import CollatzLean.Collatz2.RecordFerrers.Lattice.PrefixPolytope
 
+-- RF-B5: Phase A の affine 加法保存則を整数座標へ輸送し、
+-- `affineConst` に関する制約を word 側へ exact に戻す最初の試験層。
+import CollatzLean.Collatz2.RecordFerrers.Lattice.AffineValuationTransport
+
 
 /-!
 # Record–Ferrers Phase A umbrella (pre-record stage)
@@ -116,4 +120,22 @@ Phase B の import migration より前に、専門層内部で以下を完成さ
 
 この段階では外部の多面体定理そのものは仮定しない。
 後続段階では RF-B4 の整数点空間を入口として、既存の整数幾何・行列式制約を接続する。
+-/
+
+
+/-!
+# Record–Ferrers RF-B5
+
+Phase A ですでに証明済みの weighted-area / `affineConst` 加法保存則を、
+RF-B2〜B4 の累積整数座標へ輸送する。
+
+* 累積整数座標に meet / join を導入
+* 整数座標上の affine 値が4項保存則を満たすことを証明
+* 累積整数座標だけで fixed-chord word の `affineConst` が決まることを証明書化
+* `affineConst` に依存する任意の性質を整数座標へ完全翻訳
+* 臨界上限制約つき整数点の meet / join と affine 4項保存則
+* 任意の contracting depth に実現した FirstCrossing word へ4項等式を exact に戻す
+
+これにより、後続の既存整数数学から affine 値に対する不可能条件が得られた場合、
+その矛盾を fixed-chord / FirstCrossing word 側へ戻す正式な経路ができる。
 -/
