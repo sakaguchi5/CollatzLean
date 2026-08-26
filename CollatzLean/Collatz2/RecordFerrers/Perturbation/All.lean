@@ -15,16 +15,14 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P14RoofContactSaturation
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P15CanonicalRepairCut
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P16PrimitiveReducedChristoffelRepair
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P17FirstFundamentalStripReturn
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P18DefectPhaseBridge
+
 /-!
-# Record–Ferrers 摂動理論 1–16
+# Record–Ferrers 摂動理論 1–18
 
-1–11 の fixed-skeleton locality / one-bit defect / old-boundary destruction に続き、
-12–16 では defect 後の一般単調性から canonical repair cut、
-primitive + reduced における Christoffel floor/mod 条件までをまとめる。
-
-12. boundary excess の一般単調性
-13. 正の defect 後は旧 block-aligned boundary へ永久に戻れない
-14. roof contact と `displacement = clearance` の exact 同値
-15. 最初の roof contact としての canonical repair cut、その一意性
-16. primitive + reduced repair の Christoffel floor / remainder 座標化
+1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
+12–17 では欠陥後の単調性から canonical repair cut、Christoffel 座標、
+fundamental rank strip への最初の復帰まで進める。
+18 では欠陥側の二値 carry 位相と repair 側の有限剰余位相を結び、
+局所欠陥と clearance 飽和を同じ位相言語へ翻訳する。
 -/
