@@ -14,7 +14,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P13PermanentOldBoundaryFa
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P14RoofContactSaturation
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P15CanonicalRepairCut
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P16PrimitiveReducedChristoffelRepair
-
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P17FirstFundamentalStripReturn
 /-!
 # Record–Ferrers 摂動理論 1–16
 
