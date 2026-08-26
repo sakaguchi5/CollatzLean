@@ -22,6 +22,11 @@ import CollatzLean.Collatz2.RecordFerrers.Factorization.BlockFerrersDeficit
 import CollatzLean.Collatz2.RecordFerrers.Reconstruction.FerrersReconstruction
 import CollatzLean.Collatz2.RecordFerrers.Reconstruction.LocalTranslationSet
 import CollatzLean.Collatz2.RecordFerrers.Reconstruction.InformationBoundary
+-- RF-A+1 ... RF-A+4: specialist-theory completion before Phase B migration.
+import CollatzLean.Collatz2.RecordFerrers.Extensions.PublicAPI
+import CollatzLean.Collatz2.RecordFerrers.Record.Canonicality
+import CollatzLean.Collatz2.RecordFerrers.Lattice.MetricCompletion
+import CollatzLean.Collatz2.RecordFerrers.Lattice.WeightedPotential
 
 
 
@@ -60,4 +65,16 @@ final:
 `Factorization (forward + generic inverse + primitive/reduced inverse) -> Reconstruction`
 
 既存 `Collatz2.RecordFerrers` facade や `Collatz2.lean` の import 切替は Phase B で行う。
+-/
+
+
+/-!
+# Record–Ferrers RF-A+1 ... RF-A+4 extension
+
+Phase B の import migration より前に、専門層内部で以下を完成させる。
+
+* public API extraction
+* canonical record length / skeleton theory
+* distributive Ferrers lattice + metric / unit-chain geometry
+* weighted affine potential / bottom-top extremal theory
 -/
