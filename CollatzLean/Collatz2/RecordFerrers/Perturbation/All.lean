@@ -16,13 +16,21 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P15CanonicalRepairCut
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P16PrimitiveReducedChristoffelRepair
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P17FirstFundamentalStripReturn
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P18DefectPhaseBridge
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P19AdmissibleRecordContact
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P20PrimitiveReducedResegmentationExistence
 
 /-!
-# Record–Ferrers 摂動理論 1–18
+# Record–Ferrers 摂動理論 1–20
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
-12–17 では欠陥後の単調性から canonical repair cut、Christoffel 座標、
-fundamental rank strip への最初の復帰まで進める。
-18 では欠陥側の二値 carry 位相と repair 側の有限剰余位相を結び、
-局所欠陥と clearance 飽和を同じ位相言語へ翻訳する。
+12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
+fundamental rank strip への最初の復帰、欠陥位相と repair 位相の橋まで進める。
+
+19 では単なる roof contact と genuine record endpoint を分離し、
+`RoofContact + anchor-relative carry = 1` を admissible contact とする。
+最初の admissible contact が interior RecordBlock を与え、存在しない場合は
+terminal absorption が一つの terminal RecordBlock を与える。
+
+20 ではこの一歩存在定理を残り長さで反復し、primitive + StripReduced
+FirstCrossing target が正の roof anchor から genuine RecordDecomposition を持つことを示す。
 -/
