@@ -18,9 +18,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P17FirstFundamentalStripR
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P18DefectPhaseBridge
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P19AdmissibleRecordContact
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P20PrimitiveReducedResegmentationExistence
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P21AdjacentCutRealization
 
 /-!
-# Record–Ferrers 摂動理論 1–20
+# Record–Ferrers 摂動理論 1–21
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -31,6 +32,10 @@ fundamental rank strip への最初の復帰、欠陥位相と repair 位相の�
 最初の admissible contact が interior RecordBlock を与え、存在しない場合は
 terminal absorption が一つの terminal RecordBlock を与える。
 
-20 ではこの一歩存在定理を残り長さで反復し、primitive + StripReduced
+20 ではこの target-side の一歩存在定理を残り長さで反復し、primitive + StripReduced
 FirstCrossing target が正の roof anchor から genuine RecordDecomposition を持つことを示す。
+
+21 では source の genuine adjacent RecordBlocks と actual BlockReplacement、target middle cut から
+P08 の `AdjacentLengthTransfer` を導出する realization bridge を構成する。
+さらに P09 の一ビット欠陥を actual block depth と P19 の admissibility dichotomy へ戻す。
 -/

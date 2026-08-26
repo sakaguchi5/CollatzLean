@@ -5,8 +5,8 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P17FirstFundamentalStripR
 
 P09–P10 では、隣接長さ移送による一ビット欠陥について
 
-* 欠陥が生じるかどうかは新しい二 block 自身の `criticalCarry r' s'`
-* 欠陥が左か右かは開始位置 `a` から最初の新 block への `criticalCarry a r'`
+* 欠陥が生じるかどうかは候補二長自身の `criticalCarry r' s'`
+* 欠陥が左か右かは開始位置 `a` から候補 middle cut までの `criticalCarry a r'`
 * 欠陥位置は局所 boundary excess の位置と正確に一致
 
 まで分解した。
@@ -38,8 +38,11 @@ P09–P10 では、隣接長さ移送による一ビット欠陥について
 最後に、局所 carry 欠陥と geometric saturation の組を、
 「欠陥側の二値位相 + repair 側の剰余位相」へ lossless に翻訳する。
 
-注意: この段階では `AdjacentLengthTransfer` と具体的な `FiberPoint` deformation が
-同じ実現から来ること自体は新たに主張しない。その realization bridge は後段の課題である。
+注意: このファイル単独では `AdjacentLengthTransfer` を actual `FiberPoint` deformation と同一視しない。
+`r',s'` はここでは候補二分割の長さ座標である。
+source の genuine adjacent `RecordBlock`、actual `BlockReplacement u v`、target middle cut `k`
+から `AdjacentLengthTransfer` を導出し、一ビット欠陥を actual depth / P19 admissibility へ戻す
+realization bridge は P21 で与える。
 -/
 
 namespace Collatz2

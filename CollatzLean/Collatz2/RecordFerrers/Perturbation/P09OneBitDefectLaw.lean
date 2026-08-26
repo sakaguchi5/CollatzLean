@@ -3,15 +3,15 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P08AdjacentTransferCarryS
 /-!
 # Record–Ferrers 摂動理論 9: 一ビット欠陥則と左右位置の決定
 
-元の隣接二 block がともに内部 carry 1 であるとする。
-全長を保存する隣接長さ移送の後でも外側 carry は 1 のままなので、
-carry cocycle により、変形後の二つの境界 carry の和は
-変形後の局所 carry `criticalCarry r' s'` に 1 を足したものに正確に一致する。
+source の隣接二 block がともに interior carry 1 であるとする。
+ここで `r',s'` は actual target block と仮定せず、同じ outer interval の候補二分割長として扱う。
+全長保存により outer carry は 1 のままなので、carry cocycle から、
+候補二境界の carry の和は局所 carry `criticalCarry r' s'` に 1 を足したものと正確に一致する。
 
-したがって、変形後の局所 carry が 1 なら欠陥は生じず、
-0 なら左右どちらか一方だけに carry 0 が生じる。
-さらに、欠陥が生じた場合に左か右かは、開始位置 `a` から最初の新 block `r'`
-への carry だけで決まる。
+したがって局所 carry が 1 なら候補二分割は両側 carry 1、
+0 なら左右どちらか一方だけが carry 0 になる。
+この「一ビット欠陥」はまだ pure skeleton arithmetic であり、
+actual target depth / admissibility への解釈は P21 で与える。
 -/
 
 namespace Collatz2
@@ -23,21 +23,21 @@ open Word
 def pairCarrySum (a r s : ℕ) : ℕ :=
   criticalCarry a r + criticalCarry (a + r) s
 
-/-- 左側の新境界だけで carry 0 が生じた状態。 -/
+/-- 候補二分割の左側だけで carry 0 が生じた pure skeleton 状態。 -/
 def LeftCarryDefect (a r s : ℕ) : Prop :=
   criticalCarry a r = 0 ∧
     criticalCarry (a + r) s = 1
 
-/-- 右側の新境界だけで carry 0 が生じた状態。 -/
+/-- 候補二分割の右側だけで carry 0 が生じた pure skeleton 状態。 -/
 def RightCarryDefect (a r s : ℕ) : Prop :=
   criticalCarry a r = 1 ∧
     criticalCarry (a + r) s = 0
 
 /--
 全長保存移送後の二境界 carry の和は、
-新しい二 block 自身の局所 carry に 1 を足したものに正確に一致する。
+候補二長自身の局所 carry に 1 を足したものに正確に一致する。
 
-これは一ビット欠陥則の基本恒等式である。
+これは一ビット欠陥則の pure skeleton-level 基本恒等式である。
 -/
 theorem adjacentTransfer_pairCarrySum_eq_localCarry_add_one
     {a r s r' s' : ℕ}
@@ -103,8 +103,8 @@ theorem adjacentTransfer_interiorPairCarry_iff_localCarry_one
     constructor <;> omega
 
 /--
-新しい二 block 自身の局所 carry が 0 であることは、
-左右どちらか一方だけに carry 欠陥が生じることと同値。
+候補二長自身の局所 carry が 0 であることは、
+候補二分割の左右どちらか一方だけに carry 欠陥が生じることと同値。
 二つ同時に 0 になることはない。
 -/
 theorem adjacentTransfer_localCarry_zero_iff_left_or_right_defect

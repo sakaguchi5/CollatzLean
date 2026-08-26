@@ -26,6 +26,12 @@ anchor から terminal までの suffix 全体が一つの terminal `RecordBlock
 
 従って primitive + StripReduced の FirstCrossing fiber では、
 正の roof anchor から必ず次の genuine record block が存在する。
+
+重要: P19 は target-side の定理層である。
+`v : FiberPoint p H`、`FirstCrossing v.word`、roof anchor がすでに与えられた後の
+record eligibility / existence を扱い、source deformation や `AdjacentLengthTransfer` の
+実現方法は前提に含めない。actual `BlockReplacement` と target middle cut から
+P19 の admissibility へ入る realization bridge は P21 が担当する。
 -/
 
 namespace Collatz2
@@ -37,6 +43,8 @@ open Word
 `anchor` より後の genuine interior record endpoint 候補。
 
 単なる roof 接触に加えて、anchor-relative critical carry が 1 であることを要求する。
+この定義だけで `RecordBlock` を主張するわけではなく、最初の admissible contact と
+FirstCrossing 条件を組み合わせて後続 theorem で genuine block へ昇格する。
 -/
 def AdmissibleRecordContact
     {p H : ℕ}

@@ -4,10 +4,11 @@ import CollatzLean.Collatz2.RecordFerrers.Record.Canonicality
 /-!
 # Record–Ferrers 摂動理論 20: primitive/reduced target の canonical 再分割存在
 
-P19 では、primitive + StripReduced FirstCrossing fiber の正の roof anchor から
-必ず次の genuine `RecordBlock` が存在することを示した。
+P19 では、すでに与えられた target `v` 上で、primitive + StripReduced + FirstCrossing と
+正の roof anchor から必ず次の genuine `RecordBlock` が存在することを示した。
+この主張は source deformation や `AdjacentLengthTransfer` の実現方法には依存しない。
 
-本ファイルでは、その一歩存在定理を terminal まで反復する。
+本ファイルでは、その target-side の一歩存在定理を terminal まで反復する。
 残り odd length `p-anchor` に関する強帰納法を使い、
 
   positive roof anchor
@@ -21,8 +22,9 @@ P19 では、primitive + StripReduced FirstCrossing fiber の正の roof anchor 
 外部から block list や carry-compatible factorization を与えなくても、
 任意の正の roof anchor から genuine `RecordDecomposition` を持つ。
 
-P19 の `RecordBlock.length_unique` と既存 canonicality により、
-構成された length skeleton は自動的に一意である。
+P19 の一歩存在と既存 canonicality により、構成された length skeleton は自動的に一意である。
+actual deformation からこの target-side layer へ入るための realization bridge は P21 が担当する。
+したがって P20 自体の仮定・定理は P21 によって変更されない。
 -/
 
 namespace Collatz2
@@ -31,8 +33,9 @@ namespace RecordFerrers
 open Word
 
 /--
-primitive + StripReduced FirstCrossing fiber では、任意の正の proper roof anchor から
+primitive + StripReduced FirstCrossing target では、任意の正の proper roof anchor から
 terminal までを覆う genuine `RecordChain` が存在する。
+source から target がどう作られたかはこの theorem の前提ではない。
 -/
 theorem exists_recordChain_from_positive_roof_of_primitiveReduced
     (P : Word.ContractingExponentPair)

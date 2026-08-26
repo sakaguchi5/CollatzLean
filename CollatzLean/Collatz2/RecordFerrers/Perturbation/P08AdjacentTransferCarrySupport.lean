@@ -4,9 +4,13 @@ import CollatzLean.Collatz2.RecordFerrers.Deformation.BlockPermutation
 /-!
 # Record–Ferrers 摂動理論 8: 隣接長さ移送の carry 支持
 
-隣接する二つの block の全長を保存して長さだけを移すと、
-二 block 通過後の開始位置は元に戻る。
-したがって、その先の critical carry と、二 block をまとめた外側 carry は変化しない。
+このファイルの `AdjacentLengthTransfer r s r' s'` は、actual `FiberPoint` deformation ではなく、
+同じ outer interval を二つに切る長さ座標の変更だけを保持する pure skeleton-level object である。
+特に `r',s'` が target の genuine `RecordBlock` 長であることはここでは仮定しない。
+
+全長 `r+s=r'+s'` だけを保存すると、候補二分割を通過した後の開始位置は元に戻る。
+したがって、その先の critical carry と、二候補をまとめた外側 carry は変化しない。
+actual `BlockReplacement` と target cut からこの object を導出する bridge は P21 で与える。
 -/
 
 namespace Collatz2
@@ -14,7 +18,10 @@ namespace RecordFerrers
 
 open Word
 
-/-- 隣接二 block の全長を保存する純粋な長さ移送。 -/
+/--
+同じ outer interval の候補二分割について、total odd length だけを保存する純粋な長さ移送。
+actual deformation や target `RecordBlock` の存在はこの structure の意味に含めない。
+-/
 structure AdjacentLengthTransfer (r s r' s' : ℕ) : Prop where
   total_eq : r + s = r' + s'
 
