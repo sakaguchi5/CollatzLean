@@ -35,6 +35,14 @@ import CollatzLean.Collatz2.RecordFerrers.Deformation.InteriorPermutation
 import CollatzLean.Collatz2.RecordFerrers.Lattice.UniversalFirstCrossingFiber
 import CollatzLean.Collatz2.RecordFerrers.Reconstruction.TranslationCoordinates
 
+-- RF-B0 ... RF-B4: 既存数学から得る制約を、どの情報からどこまで戻せるかを
+-- 明示する輸送基盤と、FirstCrossing の整数座標化。
+import CollatzLean.Collatz2.RecordFerrers.Transport.Certificates
+import CollatzLean.Collatz2.RecordFerrers.Transport.InformationLedger
+import CollatzLean.Collatz2.RecordFerrers.Lattice.PrefixCoordinates
+import CollatzLean.Collatz2.RecordFerrers.Lattice.ClearanceSlack
+import CollatzLean.Collatz2.RecordFerrers.Lattice.PrefixPolytope
+
 
 /-!
 # Record–Ferrers Phase A umbrella (pre-record stage)
@@ -73,7 +81,6 @@ final:
 -/
 
 
-
 /-!
 # Record–Ferrers RF-A+1 ... RF-A+4 extension
 
@@ -86,7 +93,6 @@ Phase B の import migration より前に、専門層内部で以下を完成さ
 -/
 
 
-
 /-!
 # Record–Ferrers RF-A+5 ... RF-A+8 extension
 
@@ -94,4 +100,20 @@ Phase B の import migration より前に、専門層内部で以下を完成さ
 * RF-A+6: arbitrary interior `List.Perm` symmetry and contextual affine exchange law
 * RF-A+7: universal H-independent FirstCrossing fiber and terminal-depth chord shear
 * RF-A+8: local decoration `≃` local translation spectrum and global `(length,B)` coordinates
+-/
+
+
+/-!
+# Record–Ferrers RF-B0 ... RF-B4
+
+既存数学を取り込む前に、制約を Collatz 側へ戻すための受け皿を整える。
+
+* RF-B0: 性質決定・数値決定・必要条件・完全翻訳を区別する証明書語彙
+* RF-B1: Phase A までに得た情報境界を証明書として台帳化
+* RF-B2: Ferrers 図形と累積整数座標の exact 同値
+* RF-B3: critical clearance と整数上限制約の余裕の exact 同一視
+* RF-B4: universal FirstCrossing object と臨界上限制約つき整数点の exact 同値
+
+この段階では外部の多面体定理そのものは仮定しない。
+後続段階では RF-B4 の整数点空間を入口として、既存の整数幾何・行列式制約を接続する。
 -/
