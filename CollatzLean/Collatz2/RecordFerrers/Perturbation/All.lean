@@ -9,22 +9,22 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P08AdjacentTransferCarryS
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P09OneBitDefectLaw
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P10PersistentExcess
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P11OldBoundaryDestruction
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P12BoundaryExcessMonotonicity
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P13PermanentOldBoundaryFailure
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P14RoofContactSaturation
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P15CanonicalRepairCut
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P16PrimitiveReducedChristoffelRepair
 
 /-!
-# Record–Ferrers 摂動理論 1–11
+# Record–Ferrers 摂動理論 1–16
 
-固定 skeleton 上の decoration 局所性と、skeleton を動かしたときの
-carry defect / persistent excess / record 境界再分割を一つの入口から読み込む。
+1–11 の fixed-skeleton locality / one-bit defect / old-boundary destruction に続き、
+12–16 では defect 後の一般単調性から canonical repair cut、
+primitive + reduced における Christoffel floor/mod 条件までをまとめる。
 
-1. boundary excess
-2. 一段 recurrence
-3. `Σ (1-carry)` 閉形式
-4. carry 条件との同値
-5. minimal block splice の局所性
-6. block 外の residue / quotient 座標不変性
-7. disjoint support の L1 距離加法性
-8. adjacent length transfer の raw carry support
-9. one-bit defect law
-10. excess の後方持続
-11. defect 後の旧 record 境界崩壊
+12. boundary excess の一般単調性
+13. 正の defect 後は旧 block-aligned boundary へ永久に戻れない
+14. roof contact と `displacement = clearance` の exact 同値
+15. 最初の roof contact としての canonical repair cut、その一意性
+16. primitive + reduced repair の Christoffel floor / remainder 座標化
 -/
