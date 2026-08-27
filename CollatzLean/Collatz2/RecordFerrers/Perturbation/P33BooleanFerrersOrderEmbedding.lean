@@ -1,4 +1,5 @@
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P32CanonicalDeletionConfluence
+import CollatzLean.Collatz2.RecordFerrers.Lattice.AffineValuationTransport
 
 /-!
 # Record–Ferrers 摂動理論 33: Boolean 境界順序の Ferrers 幾何への埋め込み
@@ -938,6 +939,126 @@ theorem canonicalFlatPoint_preserves_join
         (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape :=
   canonicalFlatPoint_retainedJoin_shape
     P hPrimitive hReduced u D R S
+
+
+/-! ## 7. Boolean meet defect と submodularity -/
+
+/--
+Boolean meet の標準平坦代表は、ambient Ferrers meet 以下にある。
+P33 では join は exact に保存されるが、meet 側にはこの one-sided defect が残る。
+-/
+theorem canonicalFlatPoint_retainedMeet_shape_le
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (R S : RetainedBoundaryPattern D) :
+    FerrersShape.Le
+      (canonicalFlatPoint P hPrimitive hReduced u D
+        (retainedMeet R S)).toFerrersShape
+      (FerrersShape.meet
+        (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape
+        (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape) := by
+  have hR :=
+    canonicalFlatPoint_ferrersLe_of_retainedLe
+      P hPrimitive hReduced u D
+      (RetainedBoundaryPattern.meet_le_left R S)
+  have hS :=
+    canonicalFlatPoint_ferrersLe_of_retainedLe
+      P hPrimitive hReduced u D
+      (RetainedBoundaryPattern.meet_le_right R S)
+  intro i
+  simp only [FerrersShape.meet_column]
+  exact le_min (hR i) (hS i)
+
+/--
+標準平坦 Boolean family 上の weighted area は submodular。
+差は Boolean meet と ambient Ferrers meet のずれだけから生じる。
+-/
+theorem canonicalFlatPoint_weightedArea_submodular
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (R S : RetainedBoundaryPattern D) :
+    weightedArea
+        (canonicalFlatPoint P hPrimitive hReduced u D
+          (retainedMeet R S)).toFerrersShape +
+      weightedArea
+        (canonicalFlatPoint P hPrimitive hReduced u D
+          (retainedJoin R S)).toFerrersShape ≤
+    weightedArea
+        (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape +
+      weightedArea
+        (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape := by
+  have hMeet :=
+    canonicalFlatPoint_retainedMeet_shape_le
+      P hPrimitive hReduced u D R S
+  have hAreaMeet := weightedArea_mono hMeet
+  have hJoin :=
+    canonicalFlatPoint_preserves_join
+      P hPrimitive hReduced u D R S
+  calc
+    weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D
+            (retainedMeet R S)).toFerrersShape +
+        weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D
+            (retainedJoin R S)).toFerrersShape
+        =
+      weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D
+            (retainedMeet R S)).toFerrersShape +
+        weightedArea
+          (FerrersShape.join
+            (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape
+            (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape) := by
+          rw [hJoin]
+    _ ≤
+      weightedArea
+          (FerrersShape.meet
+            (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape
+            (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape) +
+        weightedArea
+          (FerrersShape.join
+            (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape
+            (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape) := by
+          exact Nat.add_le_add_right hAreaMeet _
+    _ =
+      weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape +
+        weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape := by
+          exact weightedArea_meet_add_join _ _
+
+/-- affineConst も同じ Boolean family 上で submodular。 -/
+theorem canonicalFlatPoint_affineConst_submodular
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (R S : RetainedBoundaryPattern D) :
+    affineConst
+        (canonicalFlatPoint P hPrimitive hReduced u D
+          (retainedMeet R S)).word +
+      affineConst
+        (canonicalFlatPoint P hPrimitive hReduced u D
+          (retainedJoin R S)).word ≤
+    affineConst
+        (canonicalFlatPoint P hPrimitive hReduced u D R).word +
+      affineConst
+        (canonicalFlatPoint P hPrimitive hReduced u D S).word := by
+  have hArea :=
+    canonicalFlatPoint_weightedArea_submodular
+      P hPrimitive hReduced u D R S
+  rw [affineConst_eq_base_add_weightedArea,
+      affineConst_eq_base_add_weightedArea,
+      affineConst_eq_base_add_weightedArea,
+      affineConst_eq_base_add_weightedArea]
+  omega
 
 end RecordFerrers
 end Collatz2

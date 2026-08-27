@@ -633,7 +633,71 @@ theorem actualCanonicalBoundaryDeletion_localConfluence
       actualCanonicalBoundaryDeletion_of_pattern
         P hPrimitive hReduced u D hTU⟩
 
-/-! ## 6. 最終 closure theorem -/
+
+/-! ## 6. meet-confluence と canonical family の幾何学的 bottom -/
+
+/--
+二つの pattern の common descendant は、Boolean meet から到達できるものと exact に一致する。
+従って `retainedMeet R S` は actual deletion 順序における greatest common descendant である。
+-/
+theorem actualReachable_from_meet_iff_common_descendant
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (R S T : RetainedBoundaryPattern D) :
+    ActualCanonicalDeletionReachable
+        P hPrimitive hReduced u D (retainedMeet R S) T ↔
+      ActualCanonicalDeletionReachable
+          P hPrimitive hReduced u D R T ∧
+        ActualCanonicalDeletionReachable
+          P hPrimitive hReduced u D S T := by
+  constructor
+  · intro hMeetT
+    have hTMeet :=
+      (actualReachable_iff_retainedLe
+        P hPrimitive hReduced u D (retainedMeet R S) T).1 hMeetT
+    have hTR : T.Le R :=
+      RetainedBoundaryPattern.le_trans hTMeet
+        (RetainedBoundaryPattern.meet_le_left R S)
+    have hTS : T.Le S :=
+      RetainedBoundaryPattern.le_trans hTMeet
+        (RetainedBoundaryPattern.meet_le_right R S)
+    exact ⟨
+      (actualReachable_iff_retainedLe
+        P hPrimitive hReduced u D R T).2 hTR,
+      (actualReachable_iff_retainedLe
+        P hPrimitive hReduced u D S T).2 hTS⟩
+  · rintro ⟨hRT, hST⟩
+    have hTR :=
+      (actualReachable_iff_retainedLe
+        P hPrimitive hReduced u D R T).1 hRT
+    have hTS :=
+      (actualReachable_iff_retainedLe
+        P hPrimitive hReduced u D S T).1 hST
+    have hTMeet := RetainedBoundaryPattern.le_meet hTR hTS
+    exact
+      (actualReachable_iff_retainedLe
+        P hPrimitive hReduced u D (retainedMeet R S) T).2 hTMeet
+
+/-- 全消去 normal form は canonical flat family の Ferrers 最小元。 -/
+theorem canonicalNoBoundaryPoint_ferrersLe
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (R : RetainedBoundaryPattern D) :
+    FiberPoint.FerrersLe
+      (canonicalNoBoundaryPoint P hPrimitive hReduced u D)
+      (canonicalFlatPoint P hPrimitive hReduced u D R) := by
+  unfold canonicalNoBoundaryPoint
+  exact canonicalFlatPoint_ferrersLe_of_retainedLe
+    P hPrimitive hReduced u D
+    (RetainedBoundaryPattern.none_le D R)
+
+/-! ## 7. 最終 closure theorem -/
 
 /--
 P29--P35 の canonical Boolean / Ferrers deformation family が満たす閉包データ。

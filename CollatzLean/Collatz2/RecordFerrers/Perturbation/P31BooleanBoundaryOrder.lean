@@ -232,6 +232,61 @@ theorem eraseRetainedBoundary_comm
   by_cases hia : i = a <;> by_cases hib : i = b <;>
     simp [eraseRetainedBoundary, hia, hib]
 
+/-- 一境界削除が何も変えないことと、その境界が既に消えていることは同値。 -/
+theorem eraseRetainedBoundary_eq_self_iff
+    {p H : ℕ}
+    {u : FiberPoint p H}
+    {D : RecordDecomposition u 1}
+    (R : RetainedBoundaryPattern D)
+    (b : InternalRecordBoundary D) :
+    eraseRetainedBoundary R b = R ↔ R b = false := by
+  constructor
+  · intro hEq
+    have hAt := congrArg (fun T : RetainedBoundaryPattern D => T b) hEq
+    simpa [eraseRetainedBoundary] using hAt
+  · intro hb
+    funext i
+    by_cases hib : i = b
+    · subst i
+      simp [eraseRetainedBoundary, hb]
+    · simp [eraseRetainedBoundary, hib]
+
+/-- Boolean meet が左入力に一致することは、左入力が右入力以下であることと同値。 -/
+theorem retainedMeet_eq_left_iff_le
+    {p H : ℕ}
+    {u : FiberPoint p H}
+    {D : RecordDecomposition u 1}
+    (R S : RetainedBoundaryPattern D) :
+    retainedMeet R S = R ↔ R.Le S := by
+  constructor
+  · intro hEq
+    have h := RetainedBoundaryPattern.meet_le_right R S
+    rw [hEq] at h
+    exact h
+  · intro hRS
+    apply RetainedBoundaryPattern.le_antisymm
+    · exact RetainedBoundaryPattern.meet_le_left R S
+    · exact RetainedBoundaryPattern.le_meet
+        (RetainedBoundaryPattern.le_refl R) hRS
+
+/-- Boolean join が右入力に一致することは、左入力が右入力以下であることと同値。 -/
+theorem retainedJoin_eq_right_iff_le
+    {p H : ℕ}
+    {u : FiberPoint p H}
+    {D : RecordDecomposition u 1}
+    (R S : RetainedBoundaryPattern D) :
+    retainedJoin R S = S ↔ R.Le S := by
+  constructor
+  · intro hEq
+    have h := RetainedBoundaryPattern.left_le_join R S
+    rw [hEq] at h
+    exact h
+  · intro hRS
+    apply RetainedBoundaryPattern.le_antisymm
+    · exact RetainedBoundaryPattern.join_le
+        hRS (RetainedBoundaryPattern.le_refl S)
+    · exact RetainedBoundaryPattern.right_le_join R S
+
 /-- P30 の標準平坦代表写像を短い名前で固定する。 -/
 def canonicalFlatPoint
     (P : Word.ContractingExponentPair)

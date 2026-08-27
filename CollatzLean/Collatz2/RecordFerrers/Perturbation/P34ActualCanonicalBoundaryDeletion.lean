@@ -222,6 +222,63 @@ theorem ActualCanonicalBoundaryDeletion.pattern_ne
     S ≠ R :=
   A.pattern_step.ne
 
+/-- actual 一境界削除では weighted area が strict に減少する。 -/
+theorem ActualCanonicalBoundaryDeletion.weightedArea_lt
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    {R S : RetainedBoundaryPattern D}
+    (A : ActualCanonicalBoundaryDeletion
+      P hPrimitive hReduced u D R S) :
+    weightedArea
+        (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape <
+      weightedArea
+        (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape := by
+  have hLe :
+      weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape ≤
+        weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape :=
+    weightedArea_mono A.ferrers_down
+  have hNe :
+      weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D S).toFerrersShape ≠
+        weightedArea
+          (canonicalFlatPoint P hPrimitive hReduced u D R).toFerrersShape := by
+    intro hEq
+    have hAffine :
+        affineConst
+            (canonicalFlatPoint P hPrimitive hReduced u D S).word =
+          affineConst
+            (canonicalFlatPoint P hPrimitive hReduced u D R).word := by
+      rw [affineConst_eq_base_add_weightedArea,
+          affineConst_eq_base_add_weightedArea,
+          hEq]
+    have hPoint := fiberPoint_eq_of_same_affineConst hAffine
+    exact A.point_ne hPoint
+  exact lt_of_le_of_ne hLe hNe
+
+/-- actual 一境界削除では genuine affineConst も strict に減少する。 -/
+theorem ActualCanonicalBoundaryDeletion.affineConst_lt
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    {R S : RetainedBoundaryPattern D}
+    (A : ActualCanonicalBoundaryDeletion
+      P hPrimitive hReduced u D R S) :
+    affineConst
+        (canonicalFlatPoint P hPrimitive hReduced u D S).word <
+      affineConst
+        (canonicalFlatPoint P hPrimitive hReduced u D R).word := by
+  have hArea := A.weightedArea_lt P hPrimitive hReduced u D
+  rw [affineConst_eq_base_add_weightedArea,
+      affineConst_eq_base_add_weightedArea]
+  exact Nat.add_lt_add_left hArea _
+
 /-!
 ## 主定理
 

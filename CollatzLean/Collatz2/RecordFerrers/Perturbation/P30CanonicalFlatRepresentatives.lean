@@ -1,4 +1,5 @@
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P29BooleanCoarsening
+import CollatzLean.Collatz2.RecordFerrers.Lattice.WeightedPotential
 
 /-!
 # Record–Ferrers 摂動理論 30: 粗視化骨格の標準平坦代表
@@ -702,6 +703,38 @@ theorem canonicalFlatRepresentative_unique_minimal
   apply FiberPoint.toFerrersShape_injective
   exact FerrersShape.le_antisymm hxLe hFlatLe
 
+
+/--
+同じ canonical length skeleton を持つ全実現の中で、標準平坦代表は
+Ferrers inclusion だけでなく genuine `affineConst` についても最小である。
+-/
+theorem canonicalFlatRepresentative_affineConst_le_of_same_skeleton
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (R : RetainedBoundaryPattern D)
+    (x : FiberPoint P.oddCount P.twoDepth)
+    (E : RecordDecomposition x 1)
+    (hE : E.lengths = coarsenedLengthsFor D R) :
+    affineConst
+        (canonicalFlatRepresentative
+          P hPrimitive hReduced u D R).word ≤
+      affineConst x.word := by
+  have hFerrers :=
+    canonicalFlatRepresentative_le_of_same_skeleton
+      P hPrimitive hReduced u D R x E hE
+  have hArea :
+      weightedArea
+          (canonicalFlatRepresentative
+            P hPrimitive hReduced u D R).toFerrersShape ≤
+        weightedArea x.toFerrersShape := by
+    exact weightedArea_mono hFerrers
+  rw [affineConst_eq_base_add_weightedArea,
+      affineConst_eq_base_add_weightedArea]
+  exact Nat.add_le_add_left hArea _
+
 /-- 異なる Boolean pattern は標準平坦 FiberPoint も異なる。 -/
 theorem canonicalFlatRepresentative_injective
     (P : Word.ContractingExponentPair)
@@ -721,7 +754,8 @@ theorem canonicalFlatRepresentative_injective
     exists_canonicalFlatRecordDecomposition
       P hPrimitive hReduced u D S
   have hLengths :
-      coarsenedLengthsFor D R = coarsenedLengthsFor D S := by
+      coarsenedLengthsFor D R =
+        coarsenedLengthsFor D S := by
     have hCanon :=
       RecordDecomposition.lengths_unique_of_point_eq
         hPoint ER ES
