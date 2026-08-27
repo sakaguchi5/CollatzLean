@@ -31,9 +31,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P30CanonicalFlatRepresent
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P31BooleanBoundaryOrder
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P32CanonicalDeletionConfluence
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P33BooleanFerrersOrderEmbedding
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P34ActualCanonicalBoundaryDeletion
 
 /-!
-# Record–Ferrers 摂動理論 1–33
+# Record–Ferrers 摂動理論 1–34
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -116,4 +117,9 @@ P30 の choice-free 標準平坦代表へ写した後も最終 FiberPoint が ex
 標準平坦代表について Boolean 境界順序と Ferrers inclusion が exact に同値であることを証明し、
 さらに Boolean join の標準平坦代表が ambient Ferrers join と exact に一致することを示す。
 これにより標準平坦 family は Boolean 順序を忠実に実現し、Ferrers join に閉じる。
+
+34 では P32 の一境界削除を actual fixed-chord Ferrers 変形へ持ち上げる。
+cut 1 の genuine RecordDecomposition どうしが `[1,p]` support の `BlockReplacement` で結ばれることを示し、
+標準平坦 family 上の一境界削除が source / target の FirstCrossing を保ち、Ferrers inclusion では
+strict downward に進む genuine deformation であることを `ActualCanonicalBoundaryDeletion` として bundle する。
 -/
