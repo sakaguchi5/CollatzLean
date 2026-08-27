@@ -32,9 +32,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P31BooleanBoundaryOrder
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P32CanonicalDeletionConfluence
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P33BooleanFerrersOrderEmbedding
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P34ActualCanonicalBoundaryDeletion
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P35ActualDeletionSystemClosure
 
 /-!
-# Record–Ferrers 摂動理論 1–34
+# Record–Ferrers 摂動理論 1–35
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -122,4 +123,11 @@ P30 の choice-free 標準平坦代表へ写した後も最終 FiberPoint が ex
 cut 1 の genuine RecordDecomposition どうしが `[1,p]` support の `BlockReplacement` で結ばれることを示し、
 標準平坦 family 上の一境界削除が source / target の FirstCrossing を保ち、Ferrers inclusion では
 strict downward に進む genuine deformation であることを `ActualCanonicalBoundaryDeletion` として bundle する。
+
+35 では P34 の actual 一段削除を有限書き換え系として閉じる。保持境界数を測度として一段ごとに
+exact に 1 減ることを示し、actual deletion relation の well-foundedness を得る。さらに finite set による
+複数境界削除を導入し、操作の合成が削除集合の union と exact に一致することを証明する。
+actual 一段削除の有限反復は Boolean inclusion `S.Le R` と同値で、全消去 pattern だけが normal form となる。
+任意の pattern は `canonicalNoBoundaryPoint` へ到達し、任意の二経路は共通 descendant を持つため、
+標準平坦 Boolean family は有限・停止・合流的で一意な幾何学的 normal form を持つ actual deformation system として閉じる。
 -/
