@@ -19,9 +19,11 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P18DefectPhaseBridge
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P19AdmissibleRecordContact
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P20PrimitiveReducedResegmentationExistence
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P21AdjacentCutRealization
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P22DefectSplitBestLower
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P23FlexibleAdjacentPairPerturbation
 
 /-!
-# Record–Ferrers 摂動理論 1–21
+# Record–Ferrers 摂動理論 1–23
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -38,4 +40,15 @@ FirstCrossing target が正の roof anchor から genuine RecordDecomposition �
 21 では source の genuine adjacent RecordBlocks と actual BlockReplacement、target middle cut から
 P08 の `AdjacentLengthTransfer` を導出する realization bridge を構成する。
 さらに P09 の一ビット欠陥を actual block depth と P19 の admissibility dichotomy へ戻す。
+
+22 では outer length の defect split
+
+  criticalCarry x (L-x) = 0
+
+を `log₂ 3` の lower phase record 条件へ exact に翻訳し、
+`DefectSplit ⇔ not CriticalLowerBestDenominator` を pure integer arithmetic で証明する。
+
+23 では flexible defect split から二段 plateau Ferrers target を実際に構成する。
+この target は actual BlockReplacement、FirstCrossing、P21 one-bit defect を同時に満たし、
+P20 canonical resegmentation を通して source と target の record length skeleton が異なることまで示す。
 -/
