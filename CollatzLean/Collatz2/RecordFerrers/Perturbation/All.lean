@@ -21,9 +21,11 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P20PrimitiveReducedResegm
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P21AdjacentCutRealization
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P22DefectSplitBestLower
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P23FlexibleAdjacentPairPerturbation
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P24CanonicalInteriorFlexibility
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P25TerminalRigidityAndGlobalDefect
 
 /-!
-# Record–Ferrers 摂動理論 1–23
+# Record–Ferrers 摂動理論 1–25
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -51,4 +53,14 @@ P08 の `AdjacentLengthTransfer` を導出する realization bridge を構成す
 23 では flexible defect split から二段 plateau Ferrers target を実際に構成する。
 この target は actual BlockReplacement、FirstCrossing、P21 one-bit defect を同時に満たし、
 P20 canonical resegmentation を通して source と target の record length skeleton が異なることまで示す。
+
+24 では cut 1 以下の critical phase にある canonical anchor 上で、
+adjacent interior RecordBlock pair の lower-best rigid branch を pure carry arithmetic で排除する。
+従って P22 defect split が自動存在し、primitive + StripReduced + FirstCrossing では
+P23 actual perturbation と canonical skeleton change まで自動化される。
+
+25 では P19 complement identity と P20 terminal-depth identity から whole denominator が
+strict upper-best phase denominator であることを証明する。これにより terminal rigid pair は `p=3`
+にしか残れず、`p>3` の cut-1 canonical RecordDecomposition では terminal を含む全 adjacent pair が
+defect split を持つ。
 -/
