@@ -24,9 +24,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P23FlexibleAdjacentPairPe
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P24CanonicalInteriorFlexibility
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P25TerminalRigidityAndGlobalDefect
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P26CanonicalAdjacentPairFlexibility
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P27DirectRecordRunMerge
 
 /-!
-# Record–Ferrers 摂動理論 1–26
+# Record–Ferrers 摂動理論 1–27
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -71,4 +72,11 @@ new cut は roof だが admissible ではない。target では proper admissibl
 terminal absorption が発動し、source `[r,s]` は target `[r+s]` へ exact に merge する。
 最後に P24 の interior branch と合わせ、`p>3` の canonical phase 領域では任意の adjacent pair が
 actual fixed-chord deformation を持つことを一つの theorem にまとめる。
+
+27 では defect split を使わない直接併合を導入する。Record 区間内部の Ferrers excess を
+左端 roof の高さへ一枚に平坦化する `flatIntervalTarget` を構成し、FirstCrossing を保ったまま
+連続する interior Record 区間、または terminal までの RecordChain 全体を一つの RecordBlock へ
+直接併合できることを示す。特に genuine adjacent pair は interior / terminal を問わず `[r,s]` から
+`[r+s]` へ直接併合できる。さらに replacement 区間の完全な左側・右側にある RecordBlock と
+連続 Record 区間が保存されることを証明し、次段の全体 RecordDecomposition 貼り直しに備える。
 -/
