@@ -25,9 +25,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P24CanonicalInteriorFlexi
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P25TerminalRigidityAndGlobalDefect
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P26CanonicalAdjacentPairFlexibility
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P27DirectRecordRunMerge
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P28CanonicalCoarseningNormalization
 
 /-!
-# Record–Ferrers 摂動理論 1–27
+# Record–Ferrers 摂動理論 1–28
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -79,4 +80,11 @@ actual fixed-chord deformation を持つことを一つの theorem にまとめ�
 直接併合できることを示す。特に genuine adjacent pair は interior / terminal を問わず `[r,s]` から
 `[r+s]` へ直接併合できる。さらに replacement 区間の完全な左側・右側にある RecordBlock と
 連続 Record 区間が保存されることを証明し、次段の全体 RecordDecomposition 貼り直しに備える。
+
+28 では P27 の局所併合を全体の RecordDecomposition へ貼り戻す。
+0 個以上の左側 RecordBlock を保持する `RecordLeftSegment` を導入し、中央の連続区間だけを
+一つへ併合して `left ++ [middle.sum] ++ right` という標準分解を actual に構成する。
+終端側の連続区間についても左側を保存したまま一つへ併合できる。
+さらに cut 1 からの標準分解全体を一回の actual deformation で `[p-1]` へ移し、
+primitive + StripReduced FirstCrossing fiber が一ブロック標準形へ直接到達することを示す。
 -/
