@@ -79,7 +79,7 @@ theorem start_le_stop
 /--
 左側区間の後ろに terminal までの RecordChain を接続する。
 -/
-noncomputable def attachChain
+theorem attachChain
     {p H : ℕ}
     {u : FiberPoint p H}
     {start stop : ℕ}
@@ -139,7 +139,7 @@ end RecordLeftSegment
 namespace RecordChain
 
 /-- replacement 区間の完全な右側にある RecordChain 全体は保存される。 -/
-noncomputable def preserved_on_right
+theorem preserved_on_right
     {p H a c : ℕ}
     {u v : FiberPoint p H}
     (BRep : BlockReplacement u v a c)

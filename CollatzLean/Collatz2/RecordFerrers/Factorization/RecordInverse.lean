@@ -216,7 +216,7 @@ theorem recordBlock_of_minimal_head
 minimal head が whole factorization の最後の block なら、
 それ単独で terminal `RecordChain` を構成できる。
 -/
-def recordChain_last_of_minimal_head
+theorem recordChain_last_of_minimal_head
     {p H : ℕ}
     (x : FiberPoint p H)
     (anchor b : Word)
@@ -275,7 +275,7 @@ head の右 endpoint が次の critical roof 上にあり、
 tail の `RecordChain` がすでに構成されていれば、
 head block を prepend して whole `RecordChain` を構成できる。
 -/
-def recordChain_cons_of_minimal_head
+theorem recordChain_cons_of_minimal_head
     {p H : ℕ}
     (x : FiberPoint p H)
     (anchor b : Word)
@@ -373,7 +373,7 @@ fixed whole fiber `x` の suffix factorization
 - 各 local terminal drop、
 だけ。
 -/
-def recordChain_of_minimalBlocks
+theorem recordChain_of_minimalBlocks
     {p H : ℕ}
     (x : FiberPoint p H)
     (anchor : Word)

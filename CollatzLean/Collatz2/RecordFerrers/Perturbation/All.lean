@@ -26,9 +26,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P25TerminalRigidityAndGlo
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P26CanonicalAdjacentPairFlexibility
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P27DirectRecordRunMerge
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P28CanonicalCoarseningNormalization
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P29BooleanCoarsening
 
 /-!
-# Record–Ferrers 摂動理論 1–28
+# Record–Ferrers 摂動理論 1–29
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -87,4 +88,9 @@ actual fixed-chord deformation を持つことを一つの theorem にまとめ�
 終端側の連続区間についても左側を保存したまま一つへ併合できる。
 さらに cut 1 からの標準分解全体を一回の actual deformation で `[p-1]` へ移し、
 primitive + StripReduced FirstCrossing fiber が一ブロック標準形へ直接到達することを示す。
+
+29 では cut 1 標準分解の内部 Record 境界を Bool で保持 / 削除する pattern を導入する。
+`m` blocks なら pattern は exact に `2^(m-1)` 個あり、異なる pattern は異なる粗視化長さ列を与える。
+この Boolean 粗視化を P28 actual deformation に持ち上げ、全 pattern が同じ fixed chord 内の
+相異なる FirstCrossing FiberPoint として実現されることを示す。
 -/

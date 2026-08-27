@@ -18,7 +18,7 @@ open Word
 -/
 inductive RecordChain
     {p H : ℕ}
-    (x : FiberPoint p H) : ℕ → List ℕ → Type
+    (x : FiberPoint p H) : ℕ → List ℕ → Prop
   | last
       {start len : ℕ}
       (block : RecordBlock x start len)
