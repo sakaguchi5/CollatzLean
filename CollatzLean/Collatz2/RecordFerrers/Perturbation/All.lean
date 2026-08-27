@@ -27,9 +27,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P26CanonicalAdjacentPairF
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P27DirectRecordRunMerge
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P28CanonicalCoarseningNormalization
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P29BooleanCoarsening
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P30CanonicalFlatRepresentatives
 
 /-!
-# Record–Ferrers 摂動理論 1–29
+# Record–Ferrers 摂動理論 1–30
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -93,4 +94,10 @@ primitive + StripReduced FirstCrossing fiber が一ブロック標準形へ直�
 `m` blocks なら pattern は exact に `2^(m-1)` 個あり、異なる pattern は異なる粗視化長さ列を与える。
 この Boolean 粗視化を P28 actual deformation に持ち上げ、全 pattern が同じ fixed chord 内の
 相異なる FirstCrossing FiberPoint として実現されることを示す。
+
+30 では P29 の各粗視化骨格に、length skeleton だけから直接決まる標準平坦代表を与える。
+各 coarse RecordBlock 内部の excess を左端 critical roof の高さに固定し、その代表が FirstCrossing
+で、canonical RecordDecomposition が指定した粗視化 length list と exact に一致することを示す。
+さらに同じ canonical skeleton を持つ全 FiberPoint の中で、この標準平坦代表が Ferrers inclusion
+に関する一意な最小元であることを証明し、Boolean 粗視化 family に canonical representatives を与える。
 -/
