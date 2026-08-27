@@ -23,9 +23,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P22DefectSplitBestLower
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P23FlexibleAdjacentPairPerturbation
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P24CanonicalInteriorFlexibility
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P25TerminalRigidityAndGlobalDefect
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P26CanonicalAdjacentPairFlexibility
 
 /-!
-# Record–Ferrers 摂動理論 1–25
+# Record–Ferrers 摂動理論 1–26
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -63,4 +64,11 @@ P23 actual perturbation と canonical skeleton change まで自動化される�
 strict upper-best phase denominator であることを証明する。これにより terminal rigid pair は `p=3`
 にしか残れず、`p>3` の cut-1 canonical RecordDecomposition では terminal を含む全 adjacent pair が
 defect split を持つ。
+
+26 では terminal defect split を terminal 専用 two-plateau Ferrers target として actual に実現する。
+terminal outer carry=0 と local defect carry=0 から new cut 左右の carry は両方 0 となり、
+new cut は roof だが admissible ではない。target では proper admissible contact が消えるため P19 の
+terminal absorption が発動し、source `[r,s]` は target `[r+s]` へ exact に merge する。
+最後に P24 の interior branch と合わせ、`p>3` の canonical phase 領域では任意の adjacent pair が
+actual fixed-chord deformation を持つことを一つの theorem にまとめる。
 -/
