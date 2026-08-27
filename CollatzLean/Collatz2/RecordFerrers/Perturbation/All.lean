@@ -30,9 +30,10 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.P29BooleanCoarsening
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P30CanonicalFlatRepresentatives
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P31BooleanBoundaryOrder
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.P32CanonicalDeletionConfluence
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.P33BooleanFerrersOrderEmbedding
 
 /-!
-# Record–Ferrers 摂動理論 1–32
+# Record–Ferrers 摂動理論 1–33
 
 1–11 では fixed-skeleton locality、一ビット欠陥、旧境界破壊を構築する。
 12–18 では欠陥後の単調性から幾何学的 repair cut、Christoffel 座標、
@@ -103,7 +104,6 @@ primitive + StripReduced FirstCrossing fiber が一ブロック標準形へ直�
 さらに同じ canonical skeleton を持つ全 FiberPoint の中で、この標準平坦代表が Ferrers inclusion
 に関する一意な最小元であることを証明し、Boolean 粗視化 family に canonical representatives を与える。
 
-
 31 では内部 Record 境界の保持 pattern 上の包含順序を整理し、meet / join がそれぞれ
 最大下界 / 最小上界であること、一境界削除が下向きで冪等かつ可換であることを示す。
 また P30 の標準平坦代表写像をこの Boolean family 上の単射として固定する。
@@ -111,4 +111,9 @@ primitive + StripReduced FirstCrossing fiber が一ブロック標準形へ直�
 32 では一境界削除を標準粗視化 step として定義する。異なる二境界の削除順序は pattern 上で可換で、
 P30 の choice-free 標準平坦代表へ写した後も最終 FiberPoint が exact に一致する。
 従って標準平坦 family 上で二境界削除の diamond が FiberPoint equality として閉じる。
+
+33 では length skeleton の実 cut 座標列を用いて、Bool pattern の保持境界を Ferrers column に直接読む。
+標準平坦代表について Boolean 境界順序と Ferrers inclusion が exact に同値であることを証明し、
+さらに Boolean join の標準平坦代表が ambient Ferrers join と exact に一致することを示す。
+これにより標準平坦 family は Boolean 順序を忠実に実現し、Ferrers join に閉じる。
 -/
