@@ -5,6 +5,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BooleanFamilyCanon
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationCoordinates
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationReconstruction
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationSeparation
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationGap
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -25,6 +26,8 @@ decoration 側へ接続するファイルだけを集約するための独立入
   lossless reconstruction
 * full `(length,B)` coordinates を canonical flat geometry と pure local `B`-vector に
   exact に分離する nonredundant arithmetic decoration separation
+* scalar `decorationGap` を canonical flat baseline に対する local translation defects の
+  signed weighted sumへ exact に展開する local decoration gap formula
 
 までを束ねる。
 -/
