@@ -9,6 +9,9 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationGap
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationPositivity
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationAreaDecomposition
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecoratedDeletionSystem
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationCriticalSubshape
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationDeletionSystem
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.GlobalLocalDecorationDeletion
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -33,14 +36,19 @@ decoration 側へ接続するファイルだけを集約するための独立入
   signed weighted sumへ exact に展開する local decoration gap formula
 * flat local baseline を `3^r - 2^r` と同定し、全 local decoration defects の
   componentwise nonnegativity を閉じる local decoration positivity
-- signed defect evaluator を RecordDecomposition 自体に付随する自然数 local Ferrers weighted area
+* signed defect evaluator を RecordDecomposition 自体に付随する自然数 local Ferrers weighted area
   へ完全に置換し、`decorationGap = 2 * localWeightedDecorationArea` を得る
   local area decomposition
-- actual → canonical flat top → absolute bottom の二段階 positive normalization と、
-  finite / terminating / confluent Boolean deletion、
-  path-independent arithmetic cocycle、
-  lossless source separation を一つに束ねる
-  arithmetic decorated deletion system
+* actual → canonical flat top → absolute bottom の二段階 positive normalization と、
+  finite / terminating / confluent Boolean deletion、path-independent arithmetic cocycle、
+  lossless source separation を一つに束ねる arithmetic decorated deletion system
+* positive local decoration を universal critical Ferrers subshape と exact に同一視し、
+  Ferrers interval の one-cell unit-chain existence を与える local critical-subshape layer
+* local decoration space 上で zero critical shape を唯一の normal form とする
+  terminating / joinable one-cell deletion system
+* actual fixed fiber 上で source → canonical flat top を genuine one-cell Ferrers deletions として
+  実現し、任意 trace cost を `decorationGap = 2 * localWeightedDecorationArea` と同定する
+  global local-decoration deletion layer
 
 までを束ねる。
 -/
