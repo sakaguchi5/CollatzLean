@@ -20,6 +20,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalAreaProduct
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProductDecorationDeletionSystem
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationBundle
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationArithmeticExactness
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationInterfiberMerge
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -81,6 +82,9 @@ decoration 側へ接続するファイルだけを集約するための独立入
   `affineConst = absoluteBase + bundleTotalExcess` を bundle 全域で exact に証明するとともに、
   total excess 自体の injectivity と canonical bottom の unique-zero 性を閉じる
   boundary-decoration arithmetic exactness
+* nested Boolean coarsening の exact relative-flags composition を構成し、P27--P29 の
+  actual direct merge engine により arbitrary decorated source を任意の下位 boundary fiber へ
+  transport するとともに、一境界削除を bundle fiber 間 map として取り出す inter-fiber merge layer
 
 までを束ねる。
 -/
