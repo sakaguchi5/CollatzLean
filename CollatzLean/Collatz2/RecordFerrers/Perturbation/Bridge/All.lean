@@ -17,6 +17,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProperLocalDecorat
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationAssembly
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationEquivalence
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalAreaProduct
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProductDecorationDeletionSystem
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -67,6 +68,10 @@ decoration 側へ接続するファイルだけを集約するための独立入
   fixed-skeleton actual state space を local-area dependent product へ移すとともに、
   product weighted area を既存 `localWeightedDecorationArea` / `decorationGap` と同定する
   local-area product layer
+* local one-cell rewrite を fixed skeleton 全体の asynchronous product rewrite へ持ち上げ、
+  reachability の componentwise characterization、termination、all-flat unique normal form、
+  joinability、weighted-area strict descent を閉じ、その dynamics を actual fixed-skeleton
+  state space へ exact transport する product decoration deletion system
 
 までを束ねる。
 -/
