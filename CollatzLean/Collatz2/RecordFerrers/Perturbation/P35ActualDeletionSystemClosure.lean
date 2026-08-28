@@ -14,9 +14,14 @@ strict downward `BlockReplacement` として actual に実現した。
 * actual 一段削除の反射推移閉包を定義し、Boolean 順序 `S.Le R` と reachability が exact に同値であることを示す。
 * 一段関係が well-founded であり、全消去 pattern だけが normal form であることを示す。
 * 任意の pattern は全消去 pattern へ到達し、その FiberPoint は `canonicalNoBoundaryPoint` に exact に一致する。
-* 任意の二つの削除経路は共通 descendant を持ち、削除順序によらず同じ canonical endpoint に到達する。
+* 任意の二つの削除経路は common descendant を持ち、Boolean meet が greatest common descendant になる。
+* `canonicalNoBoundaryPoint` は canonical family 内だけの最小元ではなく、
+  fixed `(p,H)` fiber 全体の `FiberShape.bottom` と exact に一致する。
+* 従って normal form は source / decomposition に依存しない absolute endpoint であり、
+  weighted area と genuine `affineConst` の global minimum でもある。
 
-したがって P29--P35 の Boolean 粗視化 family は、有限・停止・合流的で一意な幾何学的 normal form を持つ
+したがって P29--P35 の Boolean 粗視化 family は、有限・停止・合流的で、
+ambient fixed-fiber Ferrers geometry の absolute bottom を一意な normal form として持つ
 actual Record--Ferrers deformation system として閉じる。
 -/
 
@@ -681,7 +686,173 @@ theorem actualReachable_from_meet_iff_common_descendant
       (actualReachable_iff_retainedLe
         P hPrimitive hReduced u D (retainedMeet R S) T).2 hTMeet
 
-/-- 全消去 normal form は canonical flat family の Ferrers 最小元。 -/
+/-! ## 6.5. 全消去 endpoint = fixed fiber 全体の absolute bottom -/
+
+/--
+Bool 列の全要素が `false` なら、`selectCutsByFlags` は cut を一つも残さない。
+全消去 pattern の標準平坦 profile を読むための純粋な list 補題。
+-/
+private theorem selectCutsByFlags_eq_nil_of_all_false
+    (cuts : List ℕ)
+    (flags : List Bool)
+    (hFalse : ∀ b ∈ flags, b = false) :
+    selectCutsByFlags cuts flags = [] := by
+  induction cuts generalizing flags with
+  | nil =>
+      simp [selectCutsByFlags]
+  | cons c cs ih =>
+      cases flags with
+      | nil =>
+          simp [selectCutsByFlags]
+      | cons b bs =>
+          have hb : b = false := hFalse b (by simp)
+          have hbs : ∀ x ∈ bs, x = false := by
+            intro x hx
+            exact hFalse x (by simp [hx])
+          subst b
+          simpa [selectCutsByFlags] using ih bs hbs
+
+/-- 全消去 pattern の retained flag は全て `false`。 -/
+private theorem retainedFlags_retainNo_all_false
+    {p H : ℕ}
+    {u : FiberPoint p H}
+    (D : RecordDecomposition u 1) :
+    ∀ b ∈ retainedFlags (retainNoBoundaries D), b = false := by
+  intro b hb
+  unfold retainedFlags at hb
+  rcases List.mem_ofFn.mp hb with ⟨i, hi⟩
+  have hiFalse : false = b := by
+    simpa [retainNoBoundaries] using hi
+  exact hiFalse.symm
+
+/-- `criticalExcess 1 = 0`。cut 1 の critical roof は baseline と一致する。 -/
+private theorem criticalExcess_one_eq_zero :
+    criticalExcess 1 = 0 := by
+  have hLower : 1 ≤ criticalHeight 1 :=
+    index_le_criticalHeight 1
+  have hCritPow :
+      2 ^ criticalHeight 1 < 3 ^ (1 : ℕ) :=
+    criticalHeight_pow_lt_threePow (by omega)
+  have hUpper : criticalHeight 1 < 2 := by
+    by_contra hNot
+    have hTwo : 2 ≤ criticalHeight 1 :=
+      Nat.le_of_not_gt hNot
+    have hPowLe :
+        2 ^ (2 : ℕ) ≤ 2 ^ criticalHeight 1 :=
+      Nat.pow_le_pow_right (by omega : 0 < (2 : ℕ)) hTwo
+    norm_num at hCritPow hPowLe
+  have hEq : criticalHeight 1 = 1 := by
+    omega
+  unfold criticalExcess
+  rw [hEq]
+
+/--
+全消去 normal form の Ferrers profile は all-zero profile そのもの。
+
+したがってこれは canonical Boolean family 内だけの最小元ではなく、
+fixed `(p,H)` fiber 全体の absolute Ferrers bottom である。
+-/
+theorem canonicalNoBoundaryPoint_toFerrersShape_eq_zero
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1) :
+    (canonicalNoBoundaryPoint
+      P hPrimitive hReduced u D).toFerrersShape =
+      FerrersShape.zero P.oddCount := by
+  apply FerrersShape.ext
+  intro i
+  change
+    (canonicalNoBoundaryPoint
+      P hPrimitive hReduced u D).excessAt i.1 = 0
+  by_cases hi0 : i.1 = 0
+  · rw [hi0]
+    simp
+  · have hiPos : 0 < i.1 := Nat.pos_of_ne_zero hi0
+    unfold canonicalNoBoundaryPoint
+    rw [canonicalFlatRepresentative_excessAt_eq_lastRetainedCut
+      P hPrimitive hReduced u D
+      (retainNoBoundaries D) hiPos i.isLt]
+    have hSelected :
+        selectCutsByFlags
+            (skeletonInternalCuts 1 D.lengths)
+            (retainedFlags (retainNoBoundaries D)) = [] := by
+      exact selectCutsByFlags_eq_nil_of_all_false
+        (skeletonInternalCuts 1 D.lengths)
+        (retainedFlags (retainNoBoundaries D))
+        (retainedFlags_retainNo_all_false D)
+    rw [hSelected]
+    simp [lastCutAt, criticalExcess_one_eq_zero]
+
+/--
+全消去 endpoint は `FiberShape.bottom` の decoded FiberPoint と exact に一致する。
+これが「fixed fiber 全体の global bottom と equality」の formal statement。
+-/
+theorem canonicalNoBoundaryPoint_eq_fiberBottom
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (hp : 0 < P.oddCount)
+    (hpH : P.oddCount ≤ P.twoDepth) :
+    canonicalNoBoundaryPoint P hPrimitive hReduced u D =
+      (FiberShape.bottom
+        P.oddCount P.twoDepth hp hpH).toFiberPoint := by
+  apply FiberPoint.toFerrersShape_injective
+  calc
+    (canonicalNoBoundaryPoint
+      P hPrimitive hReduced u D).toFerrersShape
+        = FerrersShape.zero P.oddCount :=
+      canonicalNoBoundaryPoint_toFerrersShape_eq_zero
+        P hPrimitive hReduced u D
+    _ =
+        (FiberShape.bottom
+          P.oddCount P.twoDepth hp hpH).shape := rfl
+    _ =
+        ((FiberShape.bottom
+          P.oddCount P.twoDepth hp hpH).toFiberPoint).toFerrersShape :=
+      (FiberShape.bottom
+        P.oddCount P.twoDepth hp hpH).toFerrersShape_toFiberPoint.symm
+
+/--
+global bottom equality の順序論的コロラリー。
+`canonicalNoBoundaryPoint` は canonical family に限らず、
+同じ fixed fiber の任意の FiberPoint 以下にある。
+-/
+theorem canonicalNoBoundaryPoint_global_ferrersLe
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (x : FiberPoint P.oddCount P.twoDepth) :
+    FiberPoint.FerrersLe
+      (canonicalNoBoundaryPoint P hPrimitive hReduced u D) x := by
+  have hp : 0 < P.oddCount := by
+    have hEnd := D.chain.start_add_sum_eq_terminal
+    have hSumPos := D.chain.sum_pos
+    omega
+  have hpH : P.oddCount ≤ P.twoDepth := by
+    have h := FiberPoint.oddSteps_le_twoSteps_of_valid u.valid
+    rw [u.oddSteps_eq, u.twoSteps_eq] at h
+    exact h
+  rw [canonicalNoBoundaryPoint_eq_fiberBottom
+    P hPrimitive hReduced u D hp hpH]
+  change
+    ((FiberShape.bottom
+      P.oddCount P.twoDepth hp hpH).toFiberPoint).toFerrersShape.Le
+      x.toFerrersShape
+  rw [(FiberShape.bottom
+    P.oddCount P.twoDepth hp hpH).toFerrersShape_toFiberPoint]
+  intro i
+  simp [FiberShape.bottom, FerrersShape.zero]
+
+/--
+従来の `canonicalNoBoundaryPoint_ferrersLe` は、
+fixed fiber 全体での global bottom 性を canonical flat family に特殊化しただけのコロラリー。
+-/
 theorem canonicalNoBoundaryPoint_ferrersLe
     (P : Word.ContractingExponentPair)
     (hPrimitive : P.IsPrimitive)
@@ -691,11 +862,125 @@ theorem canonicalNoBoundaryPoint_ferrersLe
     (R : RetainedBoundaryPattern D) :
     FiberPoint.FerrersLe
       (canonicalNoBoundaryPoint P hPrimitive hReduced u D)
-      (canonicalFlatPoint P hPrimitive hReduced u D R) := by
-  unfold canonicalNoBoundaryPoint
-  exact canonicalFlatPoint_ferrersLe_of_retainedLe
+      (canonicalFlatPoint P hPrimitive hReduced u D R) :=
+  canonicalNoBoundaryPoint_global_ferrersLe
     P hPrimitive hReduced u D
-    (RetainedBoundaryPattern.none_le D R)
+    (canonicalFlatPoint P hPrimitive hReduced u D R)
+
+/-! ### 帰結 1: normal form は source / decomposition に依存しない -/
+
+/--
+同じ fixed `(p,H)` fiber から作られた全消去 endpoint は、
+source FiberPoint やその RecordDecomposition の選び方に依存しない。
+両者は同じ absolute `FiberShape.bottom` だからである。
+-/
+theorem canonicalNoBoundaryPoint_independent_of_decomposition
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u v : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (E : RecordDecomposition v 1) :
+    canonicalNoBoundaryPoint P hPrimitive hReduced u D =
+      canonicalNoBoundaryPoint P hPrimitive hReduced v E := by
+  have hp : 0 < P.oddCount := by
+    have hEnd := D.chain.start_add_sum_eq_terminal
+    have hSumPos := D.chain.sum_pos
+    omega
+  have hpH : P.oddCount ≤ P.twoDepth := by
+    have h := FiberPoint.oddSteps_le_twoSteps_of_valid u.valid
+    rw [u.oddSteps_eq, u.twoSteps_eq] at h
+    exact h
+  calc
+    canonicalNoBoundaryPoint P hPrimitive hReduced u D =
+        (FiberShape.bottom
+          P.oddCount P.twoDepth hp hpH).toFiberPoint :=
+      canonicalNoBoundaryPoint_eq_fiberBottom
+        P hPrimitive hReduced u D hp hpH
+    _ = canonicalNoBoundaryPoint P hPrimitive hReduced v E :=
+      (canonicalNoBoundaryPoint_eq_fiberBottom
+        P hPrimitive hReduced v E hp hpH).symm
+
+/-! ### 帰結 2: weightedArea / affineConst の global minimum -/
+
+/--
+absolute bottom では weighted area が 0、genuine `affineConst` が
+`3^p - 2^p` に exact に一致し、これは fixed fiber 全体の global minimum である。
+-/
+theorem canonicalNoBoundaryPoint_global_potential_minimum
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1) :
+    weightedArea
+        (canonicalNoBoundaryPoint
+          P hPrimitive hReduced u D).toFerrersShape = 0 ∧
+      affineConst
+        (canonicalNoBoundaryPoint
+          P hPrimitive hReduced u D).word =
+          3 ^ P.oddCount - 2 ^ P.oddCount ∧
+      (∀ x : FiberPoint P.oddCount P.twoDepth,
+        weightedArea
+            (canonicalNoBoundaryPoint
+              P hPrimitive hReduced u D).toFerrersShape ≤
+          weightedArea x.toFerrersShape) ∧
+      ∀ x : FiberPoint P.oddCount P.twoDepth,
+        affineConst
+            (canonicalNoBoundaryPoint
+              P hPrimitive hReduced u D).word ≤
+          affineConst x.word := by
+  have hShape :=
+    canonicalNoBoundaryPoint_toFerrersShape_eq_zero
+      P hPrimitive hReduced u D
+  have hArea :
+      weightedArea
+          (canonicalNoBoundaryPoint
+            P hPrimitive hReduced u D).toFerrersShape = 0 := by
+    rw [hShape]
+    exact FerrersShape.weightedArea_zero P.oddCount
+  have hAffine :
+      affineConst
+          (canonicalNoBoundaryPoint
+            P hPrimitive hReduced u D).word =
+        3 ^ P.oddCount - 2 ^ P.oddCount := by
+    rw [affineConst_eq_base_add_weightedArea, hArea,
+        baseAffineConst_eq_threePow_sub_twoPow]
+    simp
+  refine ⟨hArea, hAffine, ?_, ?_⟩
+  · intro x
+    rw [hArea]
+    exact Nat.zero_le _
+  · intro x
+    rw [hAffine]
+    exact affineConst_lower_bound x
+
+/-! ### 帰結 3: actual deletion system の normal form = ambient absolute bottom -/
+
+/--
+任意の canonical pattern は actual deletion により全消去 pattern へ到達し、
+その endpoint FiberPoint は ambient fixed fiber の `FiberShape.bottom` そのものである。
+-/
+theorem actualDeletion_normalizes_to_fiberBottom
+    (P : Word.ContractingExponentPair)
+    (hPrimitive : P.IsPrimitive)
+    (hReduced : P.StripReduced)
+    (u : FiberPoint P.oddCount P.twoDepth)
+    (D : RecordDecomposition u 1)
+    (R : RetainedBoundaryPattern D)
+    (hp : 0 < P.oddCount)
+    (hpH : P.oddCount ≤ P.twoDepth) :
+    ActualCanonicalDeletionReachable
+        P hPrimitive hReduced u D R (retainNoBoundaries D) ∧
+      canonicalFlatPoint
+          P hPrimitive hReduced u D (retainNoBoundaries D) =
+        (FiberShape.bottom
+          P.oddCount P.twoDepth hp hpH).toFiberPoint := by
+  refine ⟨actualReachable_to_none
+    P hPrimitive hReduced u D R, ?_⟩
+  simpa [canonicalNoBoundaryPoint] using
+    canonicalNoBoundaryPoint_eq_fiberBottom
+      P hPrimitive hReduced u D hp hpH
 
 /-! ## 7. 最終 closure theorem -/
 
@@ -704,7 +989,9 @@ P29--P35 の canonical Boolean / Ferrers deformation family が満たす閉包�
 
 `termination` は actual 一段 relation の well-foundedness、`reachability_exact` は
 その有限反復と Boolean inclusion の exact equivalence、`normal_form_exact` は全消去の一意性、
-`confluence` は任意の二経路の共通 descendant を記録する。
+`confluence` は任意の二経路の common descendant を記録する。
+上で証明した global-bottom equality により、この全消去 endpoint は
+ambient fixed `(p,H)` fiber の `FiberShape.bottom` そのものである。
 -/
 structure CanonicalActualDeletionSystemClosed
     (P : Word.ContractingExponentPair)
