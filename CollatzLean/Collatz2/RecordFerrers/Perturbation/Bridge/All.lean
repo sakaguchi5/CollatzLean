@@ -6,6 +6,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorati
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationReconstruction
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationSeparation
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationGap
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationPositivity
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -28,6 +29,8 @@ decoration 側へ接続するファイルだけを集約するための独立入
   exact に分離する nonredundant arithmetic decoration separation
 * scalar `decorationGap` を canonical flat baseline に対する local translation defects の
   signed weighted sumへ exact に展開する local decoration gap formula
+* flat local baseline を `3^r - 2^r` と同定し、全 local decoration defects の
+  componentwise nonnegativity を閉じる local decoration positivity
 
 までを束ねる。
 -/
