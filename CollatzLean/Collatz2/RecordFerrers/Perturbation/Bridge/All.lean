@@ -12,6 +12,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorate
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationCriticalSubshape
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationDeletionSystem
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.GlobalLocalDecorationDeletion
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.DecorationIntervalSkeletonPreservation
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -49,6 +50,8 @@ decoration 側へ接続するファイルだけを集約するための独立入
 * actual fixed fiber 上で source → canonical flat top を genuine one-cell Ferrers deletions として
   実現し、任意 trace cost を `decorationGap = 2 * localWeightedDecorationArea` と同定する
   global local-decoration deletion layer
+* actual→flat-top decoration interval の全中間点が元 source と同じ canonical record
+  length skeleton を持つことを閉じる decoration-interval skeleton preservation
 
 までを束ねる。
 -/
