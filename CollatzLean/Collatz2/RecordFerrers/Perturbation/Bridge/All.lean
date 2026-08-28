@@ -15,6 +15,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.GlobalLocalDecorat
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.DecorationIntervalSkeletonPreservation
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProperLocalDecorationSupport
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationAssembly
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationEquivalence
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -59,6 +60,8 @@ decoration 側へ接続するファイルだけを集約するための独立入
 * fixed genuine record skeleton の各 `LocalDecoration` を mutually independently 選び、
   chosen block list を exact に保った genuine FirstCrossing / RecordDecomposition へ戻す
   fixed-skeleton decoration assembly
+* fixed-skeleton actual source space 自体を `LocalDecorationTuple D.lengths` と exact に同一視し、
+  independent assembly を state-space product equivalence に昇格する fixed-skeleton equivalence
 
 までを束ねる。
 -/
