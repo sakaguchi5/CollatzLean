@@ -1,4 +1,5 @@
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationBridge
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationCanonicity
 
 /-!
 # Record–Ferrers Perturbation Bridge
