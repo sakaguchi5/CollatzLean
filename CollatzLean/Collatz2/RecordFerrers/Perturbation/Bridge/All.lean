@@ -16,6 +16,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.DecorationInterval
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProperLocalDecorationSupport
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationAssembly
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationEquivalence
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalAreaProduct
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -62,6 +63,10 @@ decoration 側へ接続するファイルだけを集約するための独立入
   fixed-skeleton decoration assembly
 * fixed-skeleton actual source space 自体を `LocalDecorationTuple D.lengths` と exact に同一視し、
   independent assembly を state-space product equivalence に昇格する fixed-skeleton equivalence
+* 各 local decoration を realizable Ferrers-area spectrum point と exact に同一視し、
+  fixed-skeleton actual state space を local-area dependent product へ移すとともに、
+  product weighted area を既存 `localWeightedDecorationArea` / `decorationGap` と同定する
+  local-area product layer
 
 までを束ねる。
 -/
