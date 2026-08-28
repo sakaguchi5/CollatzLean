@@ -14,6 +14,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalDecorationDel
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.GlobalLocalDecorationDeletion
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.DecorationIntervalSkeletonPreservation
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProperLocalDecorationSupport
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationAssembly
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -55,6 +56,9 @@ decoration 側へ接続するファイルだけを集約するための独立入
   length skeleton を持つことを閉じる decoration-interval skeleton preservation
 * one-cell edge の唯一 changed Ferrers column を抽出し、その column を strict interior に持つ
   genuine canonical record block 内へ `BlockReplacement` support を縮める proper local support
+* fixed genuine record skeleton の各 `LocalDecoration` を mutually independently 選び、
+  chosen block list を exact に保った genuine FirstCrossing / RecordDecomposition へ戻す
+  fixed-skeleton decoration assembly
 
 までを束ねる。
 -/
