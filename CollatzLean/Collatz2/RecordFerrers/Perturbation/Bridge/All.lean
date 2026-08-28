@@ -21,6 +21,9 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProductDecorationD
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationBundle
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationArithmeticExactness
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationInterfiberMerge
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationCanonicalInterfiberMerge
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationInterfiberMergeExactness
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationInterfiberMergeCoherence
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -31,60 +34,28 @@ decoration 側へ接続するファイルだけを集約するための独立入
 
 現在の Bridge 層では、
 
-* actual source → canonical flat top の arithmetic decoration canonicity
+* actual source -> canonical flat top の arithmetic decoration canonicity
 * canonical Boolean deletion family 上の path-independent affine cocycle
-* Boolean family / flat geometry / arithmetic deletion system 全体の
-  RecordDecomposition-independence
-* actual record decoration の canonical local translation coordinates と、
-  scalar `decorationGap` の coordinate reconstruction
-* fine arithmetic coordinate vector から actual source 全体を一意に戻す
-  lossless reconstruction
-* full `(length,B)` coordinates を canonical flat geometry と pure local `B`-vector に
-  exact に分離する nonredundant arithmetic decoration separation
-* scalar `decorationGap` を canonical flat baseline に対する local translation defects の
-  signed weighted sumへ exact に展開する local decoration gap formula
-* flat local baseline を `3^r - 2^r` と同定し、全 local decoration defects の
-  componentwise nonnegativity を閉じる local decoration positivity
-* signed defect evaluator を RecordDecomposition 自体に付随する自然数 local Ferrers weighted area
-  へ完全に置換し、`decorationGap = 2 * localWeightedDecorationArea` を得る
-  local area decomposition
-* actual → canonical flat top → absolute bottom の二段階 positive normalization と、
-  finite / terminating / confluent Boolean deletion、path-independent arithmetic cocycle、
-  lossless source separation を一つに束ねる arithmetic decorated deletion system
-* positive local decoration を universal critical Ferrers subshape と exact に同一視し、
-  Ferrers interval の one-cell unit-chain existence を与える local critical-subshape layer
-* local decoration space 上で zero critical shape を唯一の normal form とする
-  terminating / joinable one-cell deletion system
-* actual fixed fiber 上で source → canonical flat top を genuine one-cell Ferrers deletions として
-  実現し、任意 trace cost を `decorationGap = 2 * localWeightedDecorationArea` と同定する
-  global local-decoration deletion layer
-* actual→flat-top decoration interval の全中間点が元 source と同じ canonical record
-  length skeleton を持つことを閉じる decoration-interval skeleton preservation
-* one-cell edge の唯一 changed Ferrers column を抽出し、その column を strict interior に持つ
-  genuine canonical record block 内へ `BlockReplacement` support を縮める proper local support
-* fixed genuine record skeleton の各 `LocalDecoration` を mutually independently 選び、
-  chosen block list を exact に保った genuine FirstCrossing / RecordDecomposition へ戻す
-  fixed-skeleton decoration assembly
-* fixed-skeleton actual source space 自体を `LocalDecorationTuple D.lengths` と exact に同一視し、
-  independent assembly を state-space product equivalence に昇格する fixed-skeleton equivalence
-* 各 local decoration を realizable Ferrers-area spectrum point と exact に同一視し、
-  fixed-skeleton actual state space を local-area dependent product へ移すとともに、
-  product weighted area を既存 `localWeightedDecorationArea` / `decorationGap` と同定する
-  local-area product layer
-* local one-cell rewrite を fixed skeleton 全体の asynchronous product rewrite へ持ち上げ、
-  reachability の componentwise characterization、termination、all-flat unique normal form、
-  joinability、weighted-area strict descent を閉じ、その dynamics を actual fixed-skeleton
-  state space へ exact transport する product decoration deletion system
-* Boolean retained-boundary pattern を base、各 `coarsenedLengthsFor` 上の local-area product を
-  fiber とする dependent bundle を構成し、各 fiber の actual realization / product dynamics、
-  flat-section boundary cocycle、source total excess を一つに束ねる boundary-decoration bundle
-* dependent bundle の任意点を canonical actual fixed-fiber point へ realization し、
-  `affineConst = absoluteBase + bundleTotalExcess` を bundle 全域で exact に証明するとともに、
-  total excess 自体の injectivity と canonical bottom の unique-zero 性を閉じる
-  boundary-decoration arithmetic exactness
-* nested Boolean coarsening の exact relative-flags composition を構成し、P27--P29 の
-  actual direct merge engine により arbitrary decorated source を任意の下位 boundary fiber へ
-  transport するとともに、一境界削除を bundle fiber 間 map として取り出す inter-fiber merge layer
+* Boolean family / flat geometry / arithmetic deletion system 全体の RecordDecomposition-independence
+* actual record decoration の canonical local translation coordinates と
+  scalar `decorationGap` の reconstruction
+* fine arithmetic coordinate vector から actual source 全体を一意に戻す lossless reconstruction
+* full `(length,B)` coordinates の nonredundant arithmetic decoration separation
+* local decoration gap formula と componentwise positivity
+* `decorationGap = 2 * localWeightedDecorationArea` の local area decomposition
+* actual -> flat top -> absolute bottom の arithmetic decorated deletion system
+* local critical-subshape / local one-cell deletion / global actual one-cell deletion
+* decoration interval 全体の skeleton preservation と genuine record-block support
+* fixed-skeleton arbitrary local-decoration assembly と exact state-space product equivalence
+* local-area product coordinate と product decoration deletion system
+* Boolean retained-boundary base 上の dependent `BoundaryDecorationBundle`
+* bundle 全域の `affineConst = absoluteBase + bundleTotalExcess` arithmetic exactness
+* P27--P29 actual merge engine を任意の下位 boundary fiber へ持ち上げる existence-level inter-fiber layer
+* relative flags と local-area product recursionを同期させ、existential target choiceを使わず
+  `R -> S` の canonical fiber map を直接定義する canonical inter-fiber merge
+* canonical merge の area-vector action と genuine affine loss を exact に読む inter-fiber merge exactness
+* canonical downward maps の identity / composition と
+  Boolean base diamond を閉じる inter-fiber merge coherence
 
 までを束ねる。
 -/

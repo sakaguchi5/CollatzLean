@@ -588,7 +588,6 @@ theorem boundaryDecorationActualInterfiberCoarsening_firstCrossing
 
 /--
 保持されている一境界 `b` を消す actual inter-fiber merge。
-`hb` は genuine deletion であることを API 上に明示するため保持する。
 -/
 noncomputable def boundaryDecorationActualInterfiberMerge
     (P : Word.ContractingExponentPair)
@@ -598,7 +597,6 @@ noncomputable def boundaryDecorationActualInterfiberMerge
     (D : RecordDecomposition u 1)
     (R : RetainedBoundaryPattern D)
     (b : InternalRecordBoundary D)
-    (_hb : R b = true)
     (X : BoundaryDecorationActualFiber
       P hPrimitive hReduced u D R) :
     BoundaryDecorationActualFiber
@@ -617,12 +615,11 @@ theorem boundaryDecorationActualInterfiberMerge_firstCrossing
     (D : RecordDecomposition u 1)
     (R : RetainedBoundaryPattern D)
     (b : InternalRecordBoundary D)
-    (hb : R b = true)
     (X : BoundaryDecorationActualFiber
       P hPrimitive hReduced u D R) :
     FirstCrossing
       (boundaryDecorationActualInterfiberMerge
-        P hPrimitive hReduced u D R b hb X).1.word := by
+        P hPrimitive hReduced u D R b X).1.word := by
   exact boundaryDecorationActualInterfiberCoarsening_firstCrossing
     P hPrimitive hReduced u D
     (eraseRetainedBoundary_le R b) X
