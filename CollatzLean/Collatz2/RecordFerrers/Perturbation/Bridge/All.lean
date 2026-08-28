@@ -19,6 +19,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecor
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalAreaProduct
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProductDecorationDeletionSystem
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationBundle
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationArithmeticExactness
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -76,6 +77,10 @@ decoration 側へ接続するファイルだけを集約するための独立入
 * Boolean retained-boundary pattern を base、各 `coarsenedLengthsFor` 上の local-area product を
   fiber とする dependent bundle を構成し、各 fiber の actual realization / product dynamics、
   flat-section boundary cocycle、source total excess を一つに束ねる boundary-decoration bundle
+* dependent bundle の任意点を canonical actual fixed-fiber point へ realization し、
+  `affineConst = absoluteBase + bundleTotalExcess` を bundle 全域で exact に証明するとともに、
+  total excess 自体の injectivity と canonical bottom の unique-zero 性を閉じる
+  boundary-decoration arithmetic exactness
 
 までを束ねる。
 -/
