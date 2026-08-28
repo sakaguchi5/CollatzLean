@@ -3,6 +3,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorati
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.DeletionPotentialCocycle
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BooleanFamilyCanonicity
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationCoordinates
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationReconstruction
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -19,6 +20,8 @@ decoration 側へ接続するファイルだけを集約するための独立入
   RecordDecomposition-independence
 * actual record decoration の canonical local translation coordinates と、
   scalar `decorationGap` の coordinate reconstruction
+* fine arithmetic coordinate vector から actual source 全体を一意に戻す
+  lossless reconstruction
 
 までを束ねる。
 -/
