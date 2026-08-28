@@ -2,6 +2,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorati
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationCanonicity
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.DeletionPotentialCocycle
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BooleanFamilyCanonicity
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ArithmeticDecorationCoordinates
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -16,6 +17,8 @@ decoration 側へ接続するファイルだけを集約するための独立入
 * canonical Boolean deletion family 上の path-independent affine cocycle
 * Boolean family / flat geometry / arithmetic deletion system 全体の
   RecordDecomposition-independence
+* actual record decoration の canonical local translation coordinates と、
+  scalar `decorationGap` の coordinate reconstruction
 
 までを束ねる。
 -/
