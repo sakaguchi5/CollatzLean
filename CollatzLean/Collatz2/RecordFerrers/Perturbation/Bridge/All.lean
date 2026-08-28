@@ -18,6 +18,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecor
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.FixedSkeletonDecorationEquivalence
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.LocalAreaProduct
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.ProductDecorationDeletionSystem
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationBundle
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -72,6 +73,9 @@ decoration 側へ接続するファイルだけを集約するための独立入
   reachability の componentwise characterization、termination、all-flat unique normal form、
   joinability、weighted-area strict descent を閉じ、その dynamics を actual fixed-skeleton
   state space へ exact transport する product decoration deletion system
+* Boolean retained-boundary pattern を base、各 `coarsenedLengthsFor` 上の local-area product を
+  fiber とする dependent bundle を構成し、各 fiber の actual realization / product dynamics、
+  flat-section boundary cocycle、source total excess を一つに束ねる boundary-decoration bundle
 
 までを束ねる。
 -/
