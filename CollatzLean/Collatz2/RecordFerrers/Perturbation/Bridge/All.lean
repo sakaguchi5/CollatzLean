@@ -28,6 +28,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecoration
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationCanonicalMergeCompactSupport
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationFiberDeletionActualCompatibility
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationMixedMoveCoherence
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationGlobalNormalization
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -67,9 +68,13 @@ decoration 側へ接続するファイルだけを集約するための独立入
   source の隣接二 RecordBlock の外端だけを support に持つ `BlockReplacement` と
   merged local area zero を arbitrary decorated fiber 上で閉じる canonical merge compact support
 * fixed-skeleton product one-cell deletion を actual whole-Ferrers unit cover と同一方向へ接続し、
-  各 boundary fiber で genuine common RecordBlock compact support まで閉じる fiber deletion actual compatibility
+  各 boundary fiber で genuine common RecordBlock compact support まで閉じる
+  fiber deletion actual compatibility
 * canonical boundary merge が fiber-local one-cell edge を target edge として保存するか
   一点へ吸収する `edge -> edge or point` mixed-move coherence
+* fiber one-cell deletion と genuine canonical boundary merge を一つの global rewrite に束ね、
+  lexicographic termination、absolute bundle bottom への normalization、unique normal form、
+  global joinability / confluence を閉じる global normalization
 
 までを束ねる。
 -/

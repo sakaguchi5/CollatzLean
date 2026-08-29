@@ -62,6 +62,8 @@ import CollatzLean.Collatz2.RecordFerrers.Family.FamilyObstruction
 
 --Record–Ferrers 摂動理論
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.All
+--
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.All
 
 /-!
 # Record–Ferrers Phase A umbrella (pre-record stage)
