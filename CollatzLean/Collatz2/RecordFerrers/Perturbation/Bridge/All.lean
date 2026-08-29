@@ -24,6 +24,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecoration
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationCanonicalInterfiberMerge
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationInterfiberMergeExactness
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationInterfiberMergeCoherence
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationCanonicalMergeActualCompatibility
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -56,6 +57,9 @@ decoration 側へ接続するファイルだけを集約するための独立入
 * canonical merge の area-vector action と genuine affine loss を exact に読む inter-fiber merge exactness
 * canonical downward maps の identity / composition と
   Boolean base diamond を閉じる inter-fiber merge coherence
+* P27 compact-support merge の外側 local-area 保存と merged-area zero を canonical area coordinates へ接続し、
+  canonical target の area-vector uniqueness と flat-section actual compatibility を閉じる
+  canonical merge actual compatibility
 
 までを束ねる。
 -/
