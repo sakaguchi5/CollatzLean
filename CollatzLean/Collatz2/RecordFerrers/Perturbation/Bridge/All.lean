@@ -29,6 +29,7 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecoration
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationFiberDeletionActualCompatibility
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationMixedMoveCoherence
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationGlobalNormalization
+import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.BoundaryDecorationGlobalTotalExcess
 
 /-!
 # Record–Ferrers Perturbation Bridge
@@ -75,6 +76,9 @@ decoration 側へ接続するファイルだけを集約するための独立入
 * fiber one-cell deletion と genuine canonical boundary merge を一つの global rewrite に束ね、
   lexicographic termination、absolute bundle bottom への normalization、unique normal form、
   global joinability / confluence を閉じる global normalization
+* bundle 全点を一意に識別する `boundaryDecorationBundleTotalExcess : Bundle -> ℕ` が
+  fiber / boundary の全 global edge で strict に下降し、その一個の自然数だけで termination を証明する
+  global total-excess orientation と、mixed finite path 上の endpoint loss の加法 cocycle
 
 までを束ねる。
 -/
