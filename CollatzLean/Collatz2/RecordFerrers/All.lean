@@ -65,6 +65,9 @@ import CollatzLean.Collatz2.RecordFerrers.Perturbation.All
 --
 import CollatzLean.Collatz2.RecordFerrers.Perturbation.Bridge.All
 
+--
+import CollatzLean.Collatz2.RecordFerrers.Matrix.UniversalExcessRepresentation
+
 /-!
 # Record–Ferrers Phase A umbrella (pre-record stage)
 
