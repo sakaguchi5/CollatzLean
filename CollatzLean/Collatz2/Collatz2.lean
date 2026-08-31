@@ -443,6 +443,7 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersEffectiveWinding
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersZeroStartSanity
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersGenericStartCoarsening
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.IntervalFerrersDeficitCostBridge
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnLayerScaledExactIntervalRealization
 
 
 
