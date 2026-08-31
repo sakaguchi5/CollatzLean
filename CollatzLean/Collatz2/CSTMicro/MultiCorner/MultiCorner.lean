@@ -51,6 +51,8 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostTransfer
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedEntranceDepthHensel
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostCheckpoint
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostRhoDepthCompatibility
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualAttachedSharedCostPairAssembly
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualAttachedDoublePredecessorSafety
 
 
 
