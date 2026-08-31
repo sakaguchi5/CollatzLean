@@ -440,6 +440,9 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualPureBEffectiveWind
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.QuantitativeBoundaryAResidualBound
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersResidualCoarsening
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersEffectiveWindingBridge
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersZeroStartSanity
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersGenericStartCoarsening
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.IntervalFerrersDeficitCostBridge
 
 
 
