@@ -55,6 +55,8 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualAttachedSharedCostPairAss
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualAttachedDoublePredecessorSafety
 --
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedIntervalFerrersDefectBridge
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedIntervalFerrersHenselBridge
+
 
 
 
