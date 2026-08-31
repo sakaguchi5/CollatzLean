@@ -53,6 +53,8 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostCheckpoint
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostRhoDepthCompatibility
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualAttachedSharedCostPairAssembly
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualAttachedDoublePredecessorSafety
+--
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedIntervalFerrersDefectBridge
 
 
 

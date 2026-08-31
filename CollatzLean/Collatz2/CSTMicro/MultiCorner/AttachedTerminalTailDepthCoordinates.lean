@@ -108,7 +108,7 @@ private theorem straightStart_depth_le_offset
 attached straight suffix の profile checkpoint は一列ごとに exact に `+1`。
 したがって offset `i` の checkpoint は start checkpoint `+ i` になる。
 -/
-private theorem straight_profileCheckpoint_eq_start_add
+theorem straight_profileCheckpoint_eq_start_add
     {P : PureBProfileObstruction}
     (A : AttachedTwoCornerPacket P)
     {i : ℕ}
