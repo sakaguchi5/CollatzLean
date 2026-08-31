@@ -438,6 +438,8 @@ import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.FreeBaseMonotoneHenselTe
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.EffectiveWindingResidualBound
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.ActualPureBEffectiveWindingBridge
 import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.QuantitativeBoundaryAResidualBound
+import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersResidualCoarsening
+
 
 
 import CollatzLean.Collatz2.RecordFerrers.All
