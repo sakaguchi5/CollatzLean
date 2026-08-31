@@ -37,6 +37,22 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedActualTerminalMountain
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedMountainParameterLeftIdentity
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedMountainParameterTerminalInverse
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedActualMountainBridge
+/-
+# MultiCorner attached Shared-Cost checkpoint umbrella
+
+attached branch の数学的 Shared-Cost 方針をまとめて import する入口。
+
+この段階では attached impossibility 自体は主張しない。
+二つの predecessor が共有する `G-q` budget、straight cost transport、
+entrance-depth Hensel residue を lossless に保持し、次段の純算術排除定理へ渡す。
+-/
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostArithmetic
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostTransfer
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedEntranceDepthHensel
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostCheckpoint
+
+
+
 
 /-!
 # CSTMicro MultiCorner
