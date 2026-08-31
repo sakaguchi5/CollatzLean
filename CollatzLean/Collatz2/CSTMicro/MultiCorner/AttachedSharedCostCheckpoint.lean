@@ -122,6 +122,19 @@ theorem entranceDepth_hensel_congruence
         (2 : ℤ) ^ C.hensel.entranceDepth * C.hensel.phi := by
   exact C.hensel.threePow_dvd_entranceResidue
 
+def AttachedSharedCostArithmeticObligation
+    (C : AttachedSharedCostCheckpoint) : Prop :=
+  (((C.pair.deltaSum ≤ C.pair.representativeThreshold ∧
+        C.pair.costSum < C.pair.sharedBudget) ∨
+      (C.pair.representativeThreshold < C.pair.deltaSum ∧
+        C.pair.sharedBudget < C.pair.costSum)) ∧
+    (C.pair.gap ∣
+      (3 : ℤ) ^ C.transfer.width * C.pair.cost1 -
+        (2 : ℤ) ^ (C.transfer.width + C.transfer.rho) * C.pair.cost0) ∧
+    ((3 : ℤ) ^ C.hensel.width ∣
+      (2 : ℤ) ^ C.hensel.width +
+        (2 : ℤ) ^ C.hensel.entranceDepth * C.hensel.phi))
+
 /--
 現在の attached 数学 checkpoint の三本柱を一度に取り出す。
 
@@ -130,16 +143,7 @@ theorem entranceDepth_hensel_congruence
 -/
 theorem arithmetic_obligation
     (C : AttachedSharedCostCheckpoint) :
-    (((C.pair.deltaSum ≤ C.pair.representativeThreshold ∧
-          C.pair.costSum < C.pair.sharedBudget) ∨
-        (C.pair.representativeThreshold < C.pair.deltaSum ∧
-          C.pair.sharedBudget < C.pair.costSum)) ∧
-      (C.pair.gap ∣
-        (3 : ℤ) ^ C.transfer.width * C.pair.cost1 -
-          (2 : ℤ) ^ (C.transfer.width + C.transfer.rho) * C.pair.cost0) ∧
-      ((3 : ℤ) ^ C.hensel.width ∣
-        (2 : ℤ) ^ C.hensel.width +
-          (2 : ℤ) ^ C.hensel.entranceDepth * C.hensel.phi)) := by
+    AttachedSharedCostArithmeticObligation C := by
   exact ⟨C.sharedBudget_dichotomy,
     C.straight_cost_congruence,
     C.entranceDepth_hensel_congruence⟩

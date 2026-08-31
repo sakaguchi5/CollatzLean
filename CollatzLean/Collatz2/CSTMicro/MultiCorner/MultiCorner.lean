@@ -50,7 +50,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostArithmetic
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostTransfer
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedEntranceDepthHensel
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostCheckpoint
-
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedSharedCostRhoDepthCompatibility
 
 
 
