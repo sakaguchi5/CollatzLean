@@ -58,7 +58,23 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedIntervalFerrersDefectBr
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedIntervalFerrersHenselBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.AttachedLocalizedThreeClearance
 
+/-
+# criticalization boundary digit 集約
 
+arithmetic criticalization の最左境界 `s = criticalizationStart` について、
+
+1. `s-1` から critical shadow を延長する residue が成立しないこと、
+2. global profile numerator の exact 3 進 quotient `criticalizationUnit` を
+   開始 state `Z_s` で展開すること、
+3. `criticalizationUnit` の最初の mod 3 digit が、その one-step extension failure と
+   一致すること、
+
+この層では actual exponent word が `s` から critical になるとは仮定しない。
+扱うのは integral critical shadow と profile numerator の exact 3 進境界だけである。
+-/
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationPredResidue
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationUnitStartState
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationUnitModThree
 
 
 
