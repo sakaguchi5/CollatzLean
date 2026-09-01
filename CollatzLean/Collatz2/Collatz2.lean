@@ -471,6 +471,15 @@ import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersZeroStartSanity
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.RecordFerrersGenericStartCoarsening
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.IntervalFerrersDeficitCostBridge
 import CollatzLean.Collatz2.CSTMicro.CarryGeometry.ColumnLayerScaledExactIntervalRealization
+/-
+# Pure B exposed predecessor weight bridge
+1. exposed predecessor `deltaB` と Pure-B corner monomial の exact 同定
+2. normalized cut term = `3 * deltaB`
+3. terminal-gap 上で `3^(m-1) * universalCutWeight = deltaB`
+-/
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBExposedPredecessorDeltaB
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBExposedPredecessorNormalizedCutTerm
+import CollatzLean.Collatz2.CSTMicro.ExternalArithmetic.PureBExposedPredecessorUniversalCutWeight
 
 
 
