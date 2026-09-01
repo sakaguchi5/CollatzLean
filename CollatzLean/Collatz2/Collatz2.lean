@@ -50,6 +50,21 @@ import CollatzLean.Collatz2.Geometry.PrimitiveReducedChristoffelBridge
 -/
 import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicCore
 import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicSmallMultiplier
+/-
+# Collatz2 Geometry: 臨界 Ferrers 3進復元・次段階
+
+1. actual word 上の有限区間 strict 増加と A/B wrapper
+2. `3^s | start` から `3^(r+s)` anchor
+3. valid 下端 / critical roof 上端 / width
+4. width < `4*3^(r+s)` による一般復元
+5. `s=0, r<=20` と `s=1, r<=53` の有限 corollary
+-/
+
+import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicActualWord
+import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicAnchor
+import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicRange
+import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicReconstruction
+
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
