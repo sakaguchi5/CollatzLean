@@ -75,6 +75,21 @@ arithmetic criticalization の最左境界 `s = criticalizationStart` につい�
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationPredResidue
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationUnitStartState
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationUnitModThree
+/-
+# Criticalization boundary digit bridge
+
+criticalization boundary の arithmetic を次の順で集約する。
+
+1. actual minimal-B packet から boundary arithmetic を取得する;
+2. canonical unit の最初の 3 進 digit を `ZMod 3` の `1 / 2` に有限化する;
+3. criticalization より左の任意 cut の residual へ exact に transport する;
+4. Left Case II の exposed provenance と同じ packet に束ねる。
+
+-/
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualCriticalizationBoundaryDigit
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationBoundaryDigitZMod3
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftExposedCriticalizationDigitBridge
+
 
 
 
