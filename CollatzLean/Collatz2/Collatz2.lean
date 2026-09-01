@@ -38,6 +38,18 @@ import CollatzLean.Collatz2.Geometry.RankUnitGeometricInverse
 import CollatzLean.Collatz2.Geometry.ResidueIndexedFerrersCellSum
 import CollatzLean.Collatz2.Geometry.ValidRecordRealization
 import CollatzLean.Collatz2.Geometry.PrimitiveReducedChristoffelBridge
+/-
+# Collatz2 Geometry: 臨界 Ferrers 3進分離 A/B
+
+臨界 Ferrers の 3進符号について、
+
+* 補題A: 最初の相違列が符号差の exact 2進深さを決める。
+* 補題B: `D = q * 3^r` のとき、その exact 2進深さが multiplier `q` へ移る。
+* critical corridor: 最初の相違列 `j` と低い高さ `a` は `j <= a < criticalHeight j`。
+* `|q| < 8` の場合: `q = ±4`, `a = 2`, `j = 2`, 高さは `(2,3)` または `(3,2)`。
+-/
+import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicCore
+import CollatzLean.Collatz2.Geometry.CriticalFerrersThreeAdicSmallMultiplier
 
 import CollatzLean.Collatz2.Canonical.ResidueClass
 import CollatzLean.Collatz2.Canonical.Representative
