@@ -89,8 +89,7 @@ criticalization boundary の arithmetic を次の順で集約する。
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualCriticalizationBoundaryDigit
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationBoundaryDigitZMod3
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftExposedCriticalizationDigitBridge
-
-
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftRecordFerrersResidualIncompatibility
 
 
 /-!
