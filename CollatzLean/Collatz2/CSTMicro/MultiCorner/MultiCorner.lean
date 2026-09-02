@@ -90,7 +90,9 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualCriticalizationBoundaryDi
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.CriticalizationBoundaryDigitZMod3
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftExposedCriticalizationDigitBridge
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftRecordFerrersResidualIncompatibility
+--
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RecordFerrersExposedProvenanceNumericalization
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.PreviousExposedRecordEmbedding
 
 /-!
 # CSTMicro MultiCorner
