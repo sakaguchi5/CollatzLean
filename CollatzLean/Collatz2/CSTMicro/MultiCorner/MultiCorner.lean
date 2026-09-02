@@ -93,6 +93,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftRecordFerrersResidualIncomp
 --
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RecordFerrersExposedProvenanceNumericalization
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.PreviousExposedRecordEmbedding
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftExposedCriticalizationNormalizedTail
 
 /-!
 # CSTMicro MultiCorner
