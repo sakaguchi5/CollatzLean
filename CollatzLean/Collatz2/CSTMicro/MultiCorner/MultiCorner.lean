@@ -94,6 +94,45 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftRecordFerrersResidualIncomp
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RecordFerrersExposedProvenanceNumericalization
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.PreviousExposedRecordEmbedding
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.LeftExposedCriticalizationNormalizedTail
+/-
+# MultiCorner: hard Case II shifted-criticalization
+
+ hard Case II
+
+  previous < b ≤ criticalizationStart < terminalCriticalStart
+
+で使う新しい bridge
+
+`RestartedTerminalGeometryPacket`
+: Case I 固有条件 `criticalizationStart ≤ previous` を geometry から除去する。
+  restarted support の positivity、`h(b)=1`、interior run-gap `=1`、
+  checkpoint の slope-one line を Case II でも利用可能にする。
+
+`ShiftedCriticalizationHenselPacket`
+: arithmetic criticalization start `s` から terminal start `c` まで Hensel chain を shift し、
+  次の exact bridge を与える。
+
+  * `(2)` `U = N_s + 2^p_s qH_s`
+  * `(3)` criticalization unit の start-state 展開
+  * `(4)` `2^p_s qH_s` の affine/shadow 差表示
+  * `(5)` `qH_s = X_s - 2^h(s) Z_s`
+  * `(6)` `X_s > 2^h(s) Z_s`
+  * `(8)` critical shadow の `s-1` への integral extension failure
+
+`ActualShiftedCriticalizationHenselPacket`
+: pure witness `y-q` を actual minimal-B の upper representative に戻し、
+  shifted affine state の actual endpoint coordinate を露出する。
+
+## 残る数学
+
+前段で式 `(7)` と呼んだ actual difference recurrence を完全に閉じるには、
+`affineStateAtCriticalization` と actual step-by-step prefix trace state の同定が必要である。
+その未証明 bridge を仮定せず、`ShiftedActualLeftStepObligation` として明示する。
+-/
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedTerminalGeometryPacket
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.ShiftedCriticalizationHenselPacket
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.ActualShiftedCriticalizationHenselPacket
+
 
 /-!
 # CSTMicro MultiCorner
