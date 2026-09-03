@@ -48,18 +48,115 @@ theorem exists_terminalCriticalSuffix
   intro k hmk hkm
   omega
 
-/-- 最長 terminal critical suffix の canonical start。 -/
-noncomputable def terminalCriticalStart
-    (P : PureBProfileObstruction) : ℕ := by
-  classical
-  exact Nat.find P.exists_terminalCriticalSuffix
+/--
+`[a,m)` の中で critical roof から外れている index の有限集合。
+
+この集合が空であることは、
+`a` が terminal critical suffix の start であることと
+`a ≤ m` の下で同値になる。
+-/
+def terminalCriticalBadIndices
+    (P : PureBProfileObstruction)
+    (a : ℕ) : Finset ℕ :=
+  (Finset.Ico a P.m).filter
+    (fun k => P.h k ≠ 0)
+
+/--
+terminal critical suffix なら、
+その区間には critical roof から外れた index は存在しない。
+-/
+theorem terminalCriticalBadIndices_eq_empty_of_suffix
+    (P : PureBProfileObstruction)
+    {a : ℕ}
+    (S : IsTerminalCriticalSuffix P a) :
+    P.terminalCriticalBadIndices a = ∅ := by
+  apply Finset.eq_empty_iff_forall_notMem.mpr
+  intro k hk
+  rw [terminalCriticalBadIndices, Finset.mem_filter] at hk
+  have hkIco : a ≤ k ∧ k < P.m :=
+    Finset.mem_Ico.mp hk.1
+  exact hk.2 (S.2 k hkIco.1 hkIco.2)
+
+/--
+`a ≤ m` かつ `[a,m)` に bad index がなければ、
+`a` は terminal critical suffix の start。
+-/
+theorem isTerminalCriticalSuffix_of_badIndices_eq_empty
+    (P : PureBProfileObstruction)
+    {a : ℕ}
+    (ha : a ≤ P.m)
+    (hBad : P.terminalCriticalBadIndices a = ∅) :
+    IsTerminalCriticalSuffix P a := by
+  refine ⟨ha, ?_⟩
+  intro k hak hkm
+  by_contra hk0
+  have hkBad :
+      k ∈ P.terminalCriticalBadIndices a := by
+    rw [terminalCriticalBadIndices, Finset.mem_filter]
+    exact
+      ⟨Finset.mem_Ico.mpr ⟨hak, hkm⟩, hk0⟩
+  rw [hBad] at hkBad
+  simp at hkBad
+
+/--
+terminal critical suffix の start 候補を有限集合として列挙する。
+
+候補は `0, ..., P.m` だけであり、
+各候補について `[a,m)` 内の bad index の有無を有限計算する。
+-/
+def terminalCriticalSuffixStarts
+    (P : PureBProfileObstruction) : Finset ℕ :=
+  (Finset.range (P.m + 1)).filter
+    (fun a => P.terminalCriticalBadIndices a = ∅)
+
+/-- terminal critical suffix の start 候補集合は空でない。 -/
+theorem terminalCriticalSuffixStarts_nonempty
+    (P : PureBProfileObstruction) :
+    P.terminalCriticalSuffixStarts.Nonempty := by
+  refine ⟨P.m, ?_⟩
+  rw [terminalCriticalSuffixStarts, Finset.mem_filter]
+  constructor
+  · exact Finset.mem_range.mpr (Nat.lt_succ_self P.m)
+  · apply Finset.eq_empty_iff_forall_notMem.mpr
+    intro k hk
+    rw [terminalCriticalBadIndices, Finset.mem_filter] at hk
+    have hkIco := Finset.mem_Ico.mp hk.1
+    omega
+
+/--
+最長 terminal critical suffix の canonical start。
+
+有限集合から最小要素を取るので完全に計算可能。
+-/
+def terminalCriticalStart
+    (P : PureBProfileObstruction) : ℕ :=
+  P.terminalCriticalSuffixStarts.min'
+    P.terminalCriticalSuffixStarts_nonempty
 
 /-- canonical start は実際に terminal critical suffix を与える。 -/
 theorem terminalCriticalStart_spec
     (P : PureBProfileObstruction) :
     IsTerminalCriticalSuffix P P.terminalCriticalStart := by
-  classical
-  exact Nat.find_spec P.exists_terminalCriticalSuffix
+  have hMem :
+      P.terminalCriticalStart ∈
+        P.terminalCriticalSuffixStarts := by
+    unfold terminalCriticalStart
+    exact
+      Finset.min'_mem
+        P.terminalCriticalSuffixStarts
+        P.terminalCriticalSuffixStarts_nonempty
+  have hData :=
+    Finset.mem_filter.mp hMem
+  have hStartLe :
+      P.terminalCriticalStart ≤ P.m := by
+    have hStartLt :
+        P.terminalCriticalStart < P.m + 1 :=
+      Finset.mem_range.mp hData.1
+    omega
+  exact
+    P.isTerminalCriticalSuffix_of_badIndices_eq_empty
+      hStartLe
+      hData.2
 
 /-- canonical start より前から terminal critical suffix を始めることはできない。 -/
 theorem terminalCriticalStart_minimal
@@ -67,11 +164,25 @@ theorem terminalCriticalStart_minimal
     {a : ℕ}
     (ha : IsTerminalCriticalSuffix P a) :
     P.terminalCriticalStart ≤ a := by
-  classical
-  exact Nat.find_min' P.exists_terminalCriticalSuffix ha
+  have hBad :
+      P.terminalCriticalBadIndices a = ∅ :=
+    P.terminalCriticalBadIndices_eq_empty_of_suffix ha
+  have haMem :
+      a ∈ P.terminalCriticalSuffixStarts := by
+    rw [terminalCriticalSuffixStarts, Finset.mem_filter]
+    exact
+      ⟨Finset.mem_range.mpr
+          (Nat.lt_succ_of_le ha.1),
+        hBad⟩
+  unfold terminalCriticalStart
+  exact
+    Finset.min'_le
+      P.terminalCriticalSuffixStarts
+      a
+      haMem
 
 /-- canonical terminal critical suffix length `t`。 -/
-noncomputable def terminalCriticalLength
+def terminalCriticalLength
     (P : PureBProfileObstruction) : ℕ :=
   P.m - terminalCriticalStart P
 
@@ -435,14 +546,17 @@ theorem terminalRawTail_dvd_of_inside
   simpa [terminalRawTail] using P.terminalRawTail_dvd Ss
 
 /-- divisibility の canonical integer quotient。 -/
-noncomputable def terminalTailStateInt
+def terminalTailStateInt
     (P : PureBProfileObstruction)
     {a : ℕ}
     (S : IsTerminalCriticalSuffix P a)
     (s : ℕ)
     (has : a ≤ s)
     (hsm : s ≤ P.m) : ℤ :=
-  Classical.choose (P.terminalRawTail_dvd_of_inside S has hsm)
+  Int.divExact
+    (P.terminalRawTail s)
+    ((3 : ℤ) ^ (P.m - s))
+    (P.terminalRawTail_dvd_of_inside S has hsm)
 
 /-- tail state の exact specification。 -/
 theorem terminalTailStateInt_spec
@@ -455,7 +569,11 @@ theorem terminalTailStateInt_spec
     P.terminalRawTail s =
       (3 : ℤ) ^ (P.m - s) *
         P.terminalTailStateInt S s has hsm := by
-  exact Classical.choose_spec (P.terminalRawTail_dvd_of_inside S has hsm)
+  unfold terminalTailStateInt
+  rw [Int.divExact_eq_ediv]
+  exact
+    (Int.mul_ediv_cancel'
+      (P.terminalRawTail_dvd_of_inside S has hsm)).symm
 
 /-- tail state quotient は一意。 -/
 theorem terminalTailStateInt_unique
@@ -725,7 +843,7 @@ theorem terminalTailStateInt_le_four_y
   nlinarith
 
 /-- nonnegative tail state の Nat version。 -/
-noncomputable def terminalTailStateNat
+def terminalTailStateNat
     (P : PureBProfileObstruction)
     {a : ℕ}
     (S : IsTerminalCriticalSuffix P a)

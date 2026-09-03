@@ -66,13 +66,14 @@ def terminalHenselBoundarySurvives
   terminalBoundaryLiftSurvives P hStart (henselThreeLiftDigit a)
 
 /-- Hensel 3-lift の boundary survivor 条件は判定可能。 -/
-noncomputable instance terminalHenselBoundarySurvives_decidable
+instance terminalHenselBoundarySurvives_decidable
     (P : PureBProfileObstruction)
     (hStart : 0 < P.criticalizationStart) :
     DecidablePred (terminalHenselBoundarySurvives P hStart) := by
-  classical
   intro a
-  unfold terminalHenselBoundarySurvives
+  change Decidable
+    (henselThreeLiftDigit a =
+      MultiCorner.criticalizationBoundaryDigit P hStart)
   infer_instance
 
 /--
