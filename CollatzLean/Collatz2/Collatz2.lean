@@ -488,6 +488,8 @@ import CollatzLean.Collatz2.RecordFerrers.All
 
 
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.MultiCorner
+--RecordFerrers / Ostrowski-Christoffel 二重分解: 集約
+import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition
 
 
 
