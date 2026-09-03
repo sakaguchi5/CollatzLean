@@ -142,6 +142,7 @@ import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedActualProfileWeightBri
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedActualDoublePredecessorSafety
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedCaseIIEndpointReduction
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedCaseIIActualEndpointReduction
+import CollatzLean.Collatz2.CSTMicro.MultiCorner.RestartedCaseIIEndpointClosureReduction
 
 /-!
 # CSTMicro MultiCorner
