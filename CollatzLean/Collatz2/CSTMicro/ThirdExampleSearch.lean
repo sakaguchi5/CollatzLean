@@ -39,6 +39,16 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ActualOstrowskiStandardB
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.TerminalHenselBoundaryDigitAdapter
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.CanonicalOstrowskiTransferFold
 
+/-
+# 第3例探索: 計算可能性の追加修正
+
+1. canonical Ostrowski decomposition を最小 rank で実行する高速版
+2. `Fin 3` Hensel digit label を実際の三つの integer lift 値へ接続する adapter
+-/
+
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.FastCanonicalOstrowskiRank
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ArithmeticHenselLiftValueAdapter
+
 namespace Collatz2
 namespace CSTMicro
 namespace ThirdExampleSearch
