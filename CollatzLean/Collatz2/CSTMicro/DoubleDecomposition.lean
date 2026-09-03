@@ -3,6 +3,8 @@ import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.CriticalDefectProfile
 import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.RecordFerrersRowBandPhi
 import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.RecordCarryCorrectionPhi
 import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.GapOneParadoxical
+import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.CriticalGapOneFerrersCertificate
+import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.ActualRecordFerrersDeficit
 
 /-!
 # RecordFerrers / Ostrowski-Christoffel 二重分解: 集約
