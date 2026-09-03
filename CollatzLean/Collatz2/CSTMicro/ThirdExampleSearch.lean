@@ -31,8 +31,13 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordFerrersProvenanceA
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordJumpHenselDictionary
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.TerminalBoundaryLiftSurvival
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ActualOstrowskiStandardBlockTransfer
-
-
+/-
+# 第3例探索 次段 1-2
+1. 実 Hensel 3-lift と criticalization boundary digit の exact adapter
+2. canonical Ostrowski block list 全体の StandardBlockTransfer fold
+-/
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.TerminalHenselBoundaryDigitAdapter
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.CanonicalOstrowskiTransferFold
 
 namespace Collatz2
 namespace CSTMicro
