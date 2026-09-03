@@ -490,6 +490,8 @@ import CollatzLean.Collatz2.RecordFerrers.All
 import CollatzLean.Collatz2.CSTMicro.MultiCorner.MultiCorner
 --RecordFerrers / Ostrowski-Christoffel 二重分解: 集約
 import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition
+--ThirdExampleSearch 7,91の次を探す
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch
 
 
 
