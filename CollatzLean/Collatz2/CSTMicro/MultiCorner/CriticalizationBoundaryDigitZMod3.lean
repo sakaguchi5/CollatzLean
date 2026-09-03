@@ -26,13 +26,13 @@ namespace MultiCorner
 open ExternalArithmetic
 
 /-- canonical criticalization unit の最初の 3 進 digit。 -/
-noncomputable def criticalizationBoundaryDigit
+def criticalizationBoundaryDigit
     (P : PureBProfileObstruction)
     (hStart : 0 < P.criticalizationStart) : ZMod 3 :=
   (criticalizationUnit P hStart : ZMod 3)
 
 /-- 直前 cut の extension failure を `ZMod 3` へ写した digit。 -/
-noncomputable def criticalizationPredFailureDigit
+def criticalizationPredFailureDigit
     (P : PureBProfileObstruction) : ZMod 3 :=
   (((2 : ℤ) ^ beattyIndex (P.criticalizationStart - 1) *
       (1 -

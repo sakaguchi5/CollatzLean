@@ -52,11 +52,13 @@ terminal raw tail から、critical suffix が強制する 3-power を除いた 
 定義は divisibility witness の `Classical.choose` だが、次の定理でこの quotient が
 既存の `criticalizationLeftResidual` と一意に一致することを示す。
 -/
-noncomputable def criticalizationNormalizedTerminalTail
+def criticalizationNormalizedTerminalTail
     (P : PureBProfileObstruction)
     (a : ℕ)
     (ha : a ≤ P.criticalizationStart) : ℤ :=
-  Classical.choose
+  Int.divExact
+    (P.terminalRawTail a)
+    ((3 : ℤ) ^ (P.m - P.criticalizationStart))
     (P.threePow_criticalizationSuffix_dvd_terminalRawTail a ha)
 
 /-- normalized terminal tail の defining factorization。 -/
@@ -67,8 +69,11 @@ theorem criticalizationNormalizedTerminalTail_spec
     P.terminalRawTail a =
       (3 : ℤ) ^ (P.m - P.criticalizationStart) *
         P.criticalizationNormalizedTerminalTail a ha := by
-  exact Classical.choose_spec
-    (P.threePow_criticalizationSuffix_dvd_terminalRawTail a ha)
+  unfold criticalizationNormalizedTerminalTail
+  rw [Int.divExact_eq_ediv]
+  exact
+    (Int.mul_ediv_cancel'
+      (P.threePow_criticalizationSuffix_dvd_terminalRawTail a ha)).symm
 
 /--
 中心補題。

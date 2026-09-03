@@ -108,7 +108,7 @@ theorem terminalHenselBoundarySurvives_iff_normalizedTerminalTail
       P hStart hcut (henselThreeLiftDigit a)
 
 /-- boundary digit が指定する canonical Hensel 3-lift 候補。 -/
-noncomputable def terminalHenselBoundaryCandidate
+def terminalHenselBoundaryCandidate
     (P : PureBProfileObstruction)
     (hStart : 0 < P.criticalizationStart) : Fin 3 :=
   henselThreeLiftIndexOfDigit

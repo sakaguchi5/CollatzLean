@@ -31,21 +31,26 @@ namespace MultiCorner
 
 open ExternalArithmetic
 
-/-- exact divisibility witness から quotient を canonical choice として取り出す。 -/
-noncomputable def threeAdicExactQuotient
+/--
+exact divisibility witness から quotient を
+計算可能な exact division として取り出す。
+-/
+def threeAdicExactQuotient
     (z : ℤ)
     (r : ℕ)
     (hDvd : (3 : ℤ) ^ r ∣ z) : ℤ :=
-  Classical.choose hDvd
+  Int.divExact z ((3 : ℤ) ^ r) hDvd
 
-/-- canonical quotient の defining equation。 -/
 theorem threeAdicExactQuotient_spec
     (z : ℤ)
     (r : ℕ)
     (hDvd : (3 : ℤ) ^ r ∣ z) :
-    z = (3 : ℤ) ^ r * threeAdicExactQuotient z r hDvd := by
+    z =
+      (3 : ℤ) ^ r *
+        threeAdicExactQuotient z r hDvd := by
   unfold threeAdicExactQuotient
-  exact Classical.choose_spec hDvd
+  rw [Int.divExact_eq_ediv]
+  exact (Int.mul_ediv_cancel' hDvd).symm
 
 /-- exact order なら canonical quotient は 3-adic unit。 -/
 theorem not_three_dvd_threeAdicExactQuotient_of_exactOrder
@@ -71,7 +76,7 @@ theorem not_three_dvd_threeAdicExactQuotient_of_exactOrder
 criticalization start で global numerator を exact に割った canonical unit。
 将来の split-state `U_s = C_s + R_s` と同定する候補。
 -/
-noncomputable def criticalizationUnit
+def criticalizationUnit
     (P : PureBProfileObstruction)
     (hStart : 0 < P.criticalizationStart) : ℤ :=
   let hExact :=

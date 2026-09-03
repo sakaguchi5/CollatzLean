@@ -25,7 +25,7 @@ namespace PureBProfileObstruction
 
 依存引数を後段から隠し、境界 residue を通常の整数式として扱うための wrapper。
 -/
-noncomputable def criticalizationStartStateInt
+def criticalizationStartStateInt
     (P : PureBProfileObstruction) : ℤ :=
   P.integralCriticalTailStateInt
     P.criticalizationStart_spec

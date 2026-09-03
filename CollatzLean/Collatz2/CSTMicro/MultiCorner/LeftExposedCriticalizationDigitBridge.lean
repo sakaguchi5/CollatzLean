@@ -43,7 +43,7 @@ namespace PureBProfileObstruction
 criticalization start state を任意の左 cut `a` まで critical recurrence で戻した raw residual。
 整数可解性は仮定せず、整数式そのものとして定義する。
 -/
-noncomputable def criticalizationLeftResidual
+def criticalizationLeftResidual
     (P : PureBProfileObstruction)
     (a : ℕ) : ℤ :=
   (2 : ℤ) ^

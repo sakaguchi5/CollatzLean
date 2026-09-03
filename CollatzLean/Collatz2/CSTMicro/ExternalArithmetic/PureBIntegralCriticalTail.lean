@@ -32,6 +32,14 @@ def IsIntegralCriticalTail
   a ≤ P.m ∧
     (3 : ℤ) ^ (P.m - a) ∣ P.terminalRawTail a
 
+/-- critical tail が整数化可能かどうかは判定可能。 -/
+instance instDecidableIsIntegralCriticalTail
+    (P : PureBProfileObstruction) :
+    DecidablePred (IsIntegralCriticalTail P) := by
+  intro a
+  unfold IsIntegralCriticalTail
+  infer_instance
+
 namespace IsIntegralCriticalTail
 
 /-- terminal 自身は常に integral critical tail の start。 -/
@@ -145,15 +153,18 @@ theorem integralCriticalTail_of_le
         P.integralCriticalTail_succ hIH hPrev
       simpa [Nat.add_assoc] using hStep
 
-/-- integral tail の canonical integer state。 -/
-noncomputable def integralCriticalTailStateInt
+/-- integral critical tail の canonical integer state。 -/
+def integralCriticalTailStateInt
     (P : PureBProfileObstruction)
     {a : ℕ}
     (A : IsIntegralCriticalTail P a)
     (s : ℕ)
     (has : a ≤ s)
     (hsm : s ≤ P.m) : ℤ :=
-  Classical.choose (P.integralCriticalTail_of_le A has hsm).2
+  Int.divExact
+    (P.terminalRawTail s)
+    ((3 : ℤ) ^ (P.m - s))
+    (P.integralCriticalTail_of_le A has hsm).2
 
 /-- canonical state の exact specification。 -/
 theorem integralCriticalTailStateInt_spec
@@ -165,7 +176,11 @@ theorem integralCriticalTailStateInt_spec
     P.terminalRawTail s =
       (3 : ℤ) ^ (P.m - s) *
         P.integralCriticalTailStateInt A s has hsm := by
-  exact Classical.choose_spec (P.integralCriticalTail_of_le A has hsm).2
+  unfold integralCriticalTailStateInt
+  rw [Int.divExact_eq_ediv]
+  exact
+    (Int.mul_ediv_cancel'
+      (P.integralCriticalTail_of_le A has hsm).2).symm
 
 /-- state quotient の一意性。 -/
 theorem integralCriticalTailStateInt_unique
@@ -516,18 +531,44 @@ theorem exists_integralCriticalTailStart
     ∃ a : ℕ, IsIntegralCriticalTail P a := by
   exact ⟨P.m, IsIntegralCriticalTail.terminal P⟩
 
+/--
+`P` の integral critical tail start を有限集合として列挙する。
+候補は `0, ..., P.m` だけなので完全に計算可能。
+-/
+def integralCriticalTailStarts
+    (P : PureBProfileObstruction) : Finset ℕ :=
+  (Finset.range (P.m + 1)).filter
+    (fun a => IsIntegralCriticalTail P a)
+
+/-- integral critical tail start の有限集合は空でない。 -/
+theorem integralCriticalTailStarts_nonempty
+    (P : PureBProfileObstruction) :
+    P.integralCriticalTailStarts.Nonempty := by
+  refine ⟨P.m, ?_⟩
+  rw [integralCriticalTailStarts, Finset.mem_filter]
+  exact
+    ⟨Finset.mem_range.mpr (Nat.lt_succ_self P.m),
+      IsIntegralCriticalTail.terminal P⟩
+
 /-- 最左の integral critical tail start。 -/
-noncomputable def criticalizationStart
-    (P : PureBProfileObstruction) : ℕ := by
-  classical
-  exact Nat.find P.exists_integralCriticalTailStart
+def criticalizationStart
+    (P : PureBProfileObstruction) : ℕ :=
+  P.integralCriticalTailStarts.min'
+    P.integralCriticalTailStarts_nonempty
 
 /-- canonical start は integral critical tail。 -/
 theorem criticalizationStart_spec
     (P : PureBProfileObstruction) :
     IsIntegralCriticalTail P P.criticalizationStart := by
-  classical
-  exact Nat.find_spec P.exists_integralCriticalTailStart
+  have hMem :
+      P.criticalizationStart ∈
+        P.integralCriticalTailStarts := by
+    unfold criticalizationStart
+    exact
+      Finset.min'_mem
+        P.integralCriticalTailStarts
+        P.integralCriticalTailStarts_nonempty
+  exact (Finset.mem_filter.mp hMem).2
 
 /-- canonical start より左には full-depth start はない。 -/
 theorem criticalizationStart_minimal
@@ -535,8 +576,17 @@ theorem criticalizationStart_minimal
     {a : ℕ}
     (A : IsIntegralCriticalTail P a) :
     P.criticalizationStart ≤ a := by
-  classical
-  exact Nat.find_min' P.exists_integralCriticalTailStart A
+  have haMem :
+      a ∈ P.integralCriticalTailStarts := by
+    rw [integralCriticalTailStarts, Finset.mem_filter]
+    exact
+      ⟨Finset.mem_range.mpr (Nat.lt_succ_of_le A.1), A⟩
+  unfold criticalizationStart
+  exact
+    Finset.min'_le
+      P.integralCriticalTailStarts
+      a
+      haMem
 
 /-- arithmetic criticalization は geometric terminal critical suffix より左か同じ。 -/
 theorem criticalizationStart_le_terminalCriticalStart
