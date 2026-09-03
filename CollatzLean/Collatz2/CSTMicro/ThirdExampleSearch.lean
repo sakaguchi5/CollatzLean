@@ -1,13 +1,4 @@
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.AffinePrefixModTwo
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.StartValuePrefix68
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.AffineSuffixModThree
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordPlateauQOneMacro
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordJumpHenselBoundary
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.TerminalHenselThreeLift
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.StandardBlockTransfer
-import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.FirstCrossingSpecialReturn
-
-/-!
+/-
 # 第3例 fixed-window 探索核 集約
 
 このファイルは、第3例探索の 1〜8 をまとめて import する。
@@ -24,6 +15,24 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.FirstCrossingSpecialRetu
 巨大整数 `G` や全軌道を hot loop で生成せず、左右 collar と中央の圧縮 transfer を
 分離するための最小核である。
 -/
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.AffinePrefixModTwo
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.StartValuePrefix68
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.AffineSuffixModThree
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordPlateauQOneMacro
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordJumpHenselBoundary
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.TerminalHenselThreeLift
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.StandardBlockTransfer
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.FirstCrossingSpecialReturn
+--
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordPlateauLocalMacro
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.PlateauPhiClosedForm
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordPlateauOneParameter
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordFerrersProvenanceAdapter
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.RecordJumpHenselDictionary
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.TerminalBoundaryLiftSurvival
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ActualOstrowskiStandardBlockTransfer
+
+
 
 namespace Collatz2
 namespace CSTMicro
