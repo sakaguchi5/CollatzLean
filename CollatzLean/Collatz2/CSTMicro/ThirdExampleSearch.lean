@@ -68,6 +68,9 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleOneBlockModu
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCanonical42ModularFold
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCanonical42FullPrefixBridge
 
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueSearchState
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleHensel42ResidueCompleteness
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueD2Aggregate
 
 
 namespace Collatz2
