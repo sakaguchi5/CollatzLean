@@ -103,6 +103,11 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleDeficitThree
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleDirectEndpointResidue
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleIndependentResidualFilter
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFinalNativeKernel
+--
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueSearchState
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCleanDirectEndpointResidue
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCleanActualFerrersDeficitBridge
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleD3CleanAggregate
 
 
 namespace Collatz2
