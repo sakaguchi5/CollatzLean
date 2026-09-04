@@ -89,7 +89,12 @@ residue を作り、full-defect residue との affine compatibility から endpo
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLast41TailPruning
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLongWidthPhaseCheckpoint
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLongWidthBranchPruning
-
+--
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFiniteDeficitBranch
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleGapOneAffineCompatibility
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFiniteDeficitEvaluator
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFiniteDeficitSoundness
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleNativeDeficitVerifier
 
 
 
