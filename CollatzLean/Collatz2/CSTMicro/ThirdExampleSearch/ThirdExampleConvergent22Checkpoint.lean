@@ -1,4 +1,5 @@
-import Mathlib.Tactic
+import Mathlib.Data.Nat.Factorization.Defs
+import Mathlib.Tactic.NormNum
 
 /-!
 # 第3例探索: convergent 22 の軽量 checkpoint

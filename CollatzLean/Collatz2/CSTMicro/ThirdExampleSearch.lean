@@ -54,6 +54,19 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleConvergent22
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ModularStandardBlockTransfer
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ModularContinuedFractionStandardBlock
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleOddScaleModularTransfers
+/-
+A. corrected CF packet + proof-only actual certification interface
+B. certified one-block modular transfer correctness
+C. canonical 42-block modular fold correctness
+
+探索 hot path は literal P/Q と ZMod recurrence のみを使い、
+巨大 `criticalPowerP/Q` / `criticalIntervalPhiZ` を評価しない。
+actual power-Farey との一致証明は `ThirdExampleCFPacketCertification` に隔離される。
+-/
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCFPacketCertification
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleOneBlockModularCorrectness
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCanonical42ModularFold
+
 
 
 
