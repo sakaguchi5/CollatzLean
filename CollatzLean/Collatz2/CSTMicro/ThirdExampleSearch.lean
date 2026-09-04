@@ -71,6 +71,10 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCanonical42F
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueSearchState
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleHensel42ResidueCompleteness
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueD2Aggregate
+--
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleForcedHensel42
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueD2Aggregate
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleD3ComputableHenselAggregate
 
 
 namespace Collatz2
