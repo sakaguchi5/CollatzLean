@@ -75,6 +75,11 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueD2Agg
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleForcedHensel42
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleResidueD2Aggregate
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleD3ComputableHenselAggregate
+--
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleComputableBackwardPredecessor
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleComputableBackwardPredecessorActualSoundness
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleBackwardHensel42
+
 
 
 namespace Collatz2
