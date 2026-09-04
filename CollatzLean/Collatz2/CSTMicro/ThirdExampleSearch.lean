@@ -66,7 +66,7 @@ actual power-Farey との一致証明は `ThirdExampleCFPacketCertification` に
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCFPacketCertification
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleOneBlockModularCorrectness
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCanonical42ModularFold
-
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleCanonical42FullPrefixBridge
 
 
 
