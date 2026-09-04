@@ -272,7 +272,7 @@ def straightHenselStart
   A.normalForm.previous + 1
 
 /-- previous corner の直後から terminal critical start までの幅。 -/
-noncomputable def straightHenselWidth
+def straightHenselWidth
     {P : PureBProfileObstruction}
     (A : AttachedTwoCornerPacket P) : ℕ :=
   P.terminalCriticalStart - A.straightHenselStart
