@@ -79,6 +79,18 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleD3Computable
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleComputableBackwardPredecessor
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleComputableBackwardPredecessorActualSoundness
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleBackwardHensel42
+/-
+# 第3例探索: last-41 / long-width pruning umbrella
+
+次段の仕事は、この有限 `(r,d,w)` domain ごとに最後41列以下の Ferrers deficit
+residue を作り、full-defect residue との affine compatibility から endpoint residue を
+復元すること。
+-/
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLast41TailPruning
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLongWidthPhaseCheckpoint
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLongWidthBranchPruning
+
+
 
 
 
