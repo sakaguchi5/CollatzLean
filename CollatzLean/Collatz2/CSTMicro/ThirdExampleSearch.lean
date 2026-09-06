@@ -119,6 +119,55 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleDecoderIndep
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleRightCompressedDeficitMerge
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleValuationSearchAggregate
 
+/-
+# 第三例探索・Lean形式化の途中成果（2026-09-06）
+
+## 確認済み
+
+* ThirdExampleBranchArithmetic: Newton反復によるgap逆元、11枝の剰余合同・候補数、a=67の空枝。
+* ThirdExampleAffineCertificate: familyの完全分割、分割の非重複、odd-step等式、検査器の健全性。
+* ThirdExampleFiniteFamilyVerifier: 証明木を保持しない深さ優先検査と健全性、odd-run長の上界。
+* ThirdExampleHighBranchChecks: 通常版a=65,62,59,56,54,51,48,46,43,40のnative_decideがすべて完了。
+* ThirdExampleHighBranchDispatch: 認証済み10枝をまとめる補題もコンパイル確認済み。
+* ThirdExampleRunBridge: 範囲内候補とindexの対応・非重複、既存Runsへの変換、first crossingとの矛盾。
+* ThirdExampleSearchBridge: 既存exact deficit式から各branch剰余への接続。
+* ThirdExampleFastFamilyVerifier: 高速化済みfamilyCheckへの互換API。fastFamilyCheckはfamilyCheckと定義的に同一。
+
+通常版は全ての範囲内候補をfamilyとして認証する。
+a=40について、外部探索の高さ条件排除数を仮定していない。
+再帰fuelは1000。証明されたodd-step数の保守的上限も1000で、targetの数十億stepを回さない。
+候補の巨大Listや2400万個の個別theoremは生成しない。
+native_decideの計算認証はLean標準のnative_decideの信頼機構を使用する。
+
+## 完成した追加箇所
+
+* ThirdExampleFirstDefectIndex24: Fin.val接続の2箇所を証明し、sorryを除去。
+  `j≤24` と `ν₂(deficit)≤37` の導出に未証明穴は残っていない。
+* ThirdExampleFastHighBranchChecks: `fastFamilyCheck = familyCheck` を用い、
+  native計算を二重実行せず通常版10枝の認証定理を再利用する互換層へ変更。
+
+既存のR: ThirdExampleRangeCertificateとCertLの前提をそのまま保持する。
+新しい探索結果をaxiom宣言や未証明の探索証明書として追加していない。
+このZIP内のLeanコードに `sorry` は残していない。
+
+## ファイルの利用
+
+各ファイルは同じソースルートに置く独立moduleである。
+既存CollatzLeanとMathlibが使用できる環境で、import順にコンパイルする。
+通常版の計算には時間がかかるため、HighBranchChecksは他の修正ファイルと分離した。
+集約入口はThirdExampleFirstDefectIndex24。
+このZIPにはLeanファイルだけを収録し、実験コード・実行環境・oleanは含めない。
+-/
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleAffineCertificate
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleBranchArithmetic
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFiniteFamilyVerifier
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFastFamilyVerifier
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleHighBranchChecks
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleHighBranchDispatch
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFastHighBranchChecks
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleRunBridge
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleSearchBridge
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFirstDefectIndex24
 
 namespace Collatz2
 namespace CSTMicro
