@@ -40,3 +40,7 @@ C. independent defect profile と exact-terminal minimal FirstCrossing word の�
 独立 Ferrers profile -> maximal horizontal bands -> shifted Phi evaluation -> gap-one certificate
 という探索経路を使えるようにする。
 -/
+import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.ActualFerrersSuffixDecomposition
+import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.ActualFerrersSuffixThreeAdicCorridor
+import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.ActualFerrersTerminalParity
+import CollatzLean.Collatz2.CSTMicro.DoubleDecomposition.ActualFerrersCanonicalHenselSuffix
