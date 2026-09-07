@@ -169,6 +169,33 @@ import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleRunBridge
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleSearchBridge
 import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleFirstDefectIndex24
 
+/-
+# 第3例低枝探索 集約 import
+
+証明順序:
+
+1. `ThirdExampleLow14FirstDefect`
+   first defect を `(j,a)` の低14状態へ有限化する。
+
+2. `ThirdExampleBranchResidueBelow68`
+   `candidate_branch_residue` を全 `a < 68` へ一般化する。
+
+3. `ThirdExampleDeficitThreeAdicNonvanishing`
+   exact certificate から直接 `3^42 ∤ deficit` を得る。
+
+4. `ThirdExampleLowBranchCollarBridge`
+   同じ exact candidate 上で左2進 collar と右42桁 Hensel 情報を同期する。
+   decoder completeness はここでは仮定しない。
+
+5. `ThirdExampleLowBranchFamilyFallback`
+   collar で残った branch にだけ既存 `familyCheck` を使えるようにする。
+-/
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLow14FirstDefect
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleBranchResidueBelow68
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleDeficitThreeAdicNonvanishing
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLowBranchCollarBridge
+import CollatzLean.Collatz2.CSTMicro.ThirdExampleSearch.ThirdExampleLowBranchFamilyFallback
+
 namespace Collatz2
 namespace CSTMicro
 namespace ThirdExampleSearch
