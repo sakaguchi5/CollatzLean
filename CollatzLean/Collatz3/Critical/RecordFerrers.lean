@@ -1,22 +1,22 @@
-import CollatzLean.Collatz3.Critical.RecordLocalGeometry
+import CollatzLean.Collatz3.Critical.RecordCarryExact
 
 /-!
 # 互換 import: RecordFerrers の定義は一時的に未確定
 
 この filename は直前版との import 互換のため残す。
 
-現在ここでは `RecordFerrers` structure を定義しない。
-直前版の structure は
+現在ここでは `RecordFerrers` structure をまだ定義しない。
+ただし local geometry に必要な exact 条件は `Critical.RecordCarryExact` で確定した。
 
-* `CriticalRecordSkeleton`,
-* `IsBestUpperWidth`,
-* `TerminalMinimalFrom`
+* local prefix failure
+  `<->` premature roof return + Beatty carry `1`,
+* terminal minimality
+  `<->` terminal Beatty carry `0`,
+* `RecordCarryCompatibleFrom`
+  `<->` `LocalCriticalBlocksFrom`。
 
-を束ねていたが、`IsBestUpperWidth` は genuine local critical geometry の必要条件ではなく、
-構成を一括保証する十分条件であることが分かった。
-
-そのため真の `RecordFerrers` は、record-level tie と local carry の exact 条件を
-確定するまで再導入しない。
-局所幾何の定義・派生定理・best-upper による十分条件は
-`Critical.RecordLocalGeometry` に置く。
+従って次に真の `RecordFerrers` を再導入するときは、
+`CriticalRecordSkeleton` と exact carry compatibility だけを独立条件として残し、
+`IsPrimitiveWidth` / `IsBestUpperWidth` / local `CriticalWord` は
+十分条件または派生 theorem として扱える。
 -/

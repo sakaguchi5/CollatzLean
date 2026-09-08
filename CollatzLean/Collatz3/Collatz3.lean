@@ -50,6 +50,7 @@ import CollatzLean.Collatz3.Critical.RecordSkeleton
 import CollatzLean.Collatz3.Critical.RecordRankArithmetic
 import CollatzLean.Collatz3.Critical.RecordLocalGeometry
 import CollatzLean.Collatz3.Critical.RecordTerminal
+import CollatzLean.Collatz3.Critical.RecordCarryExact
 
 import CollatzLean.Collatz3.Ferrers.RecordView
 import CollatzLean.Collatz3.Ferrers.RecordCanonical
@@ -92,15 +93,18 @@ Record/Ferrers 層で現在確定しているのは次の三段である。
    interior endpoint が critical roof に戻ることだけを持つ pure skeleton。
    local first-passage 性はここには保存しない。
 
-3. `Ferrers.RecordCanonical` / `Critical.RecordLocalGeometry` / `Critical.RecordTerminal`
+3. `Ferrers.RecordCanonical` / `Critical.RecordLocalGeometry` /
+   `Critical.RecordTerminal` / `Critical.RecordCarryExact`
    weak record から canonical skeleton への bridge と、その skeleton から local critical geometry を
    導くための定義・補題群。`NoRecordLevelTie` が exact な record-level tie 排除条件であり、
    `IsPrimitiveWidth` はそれを保証する十分条件として使う。
-   `IsBestUpperWidth` も local criticality の必要条件とはせず、`m > 2` では
-   proper-prefix bound と terminal minimality を一括保証する十分条件として使う。
+   local geometry 側では、premature carry-1 roof return の禁止と terminal carry `0` が
+   exact 条件であり、`RecordCarryCompatibleFrom` と `LocalCriticalBlocksFrom` は同値。
+   `IsBestUpperWidth` は必要条件とはせず、`m > 2` で exact carry 条件を一括保証する
+   十分条件として使う。
 
 真の `RecordFerrers` structure は現段階ではまだ定義しない。
-今回確定した canonical skeleton と local 条件を基礎に、必要最小限の exact 条件だけで再導入する。
+canonical skeleton と exact local carry 条件が確定したので、次段で必要最小限の条件だけで再導入する。
 
 critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置かない。
 `criticalTwoDepth m` が width `m` だけで決まることを使い、
