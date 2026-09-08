@@ -9,6 +9,7 @@ exact equivalence は
 
 までである。
 
-`CriticalRecordSkeleton` と full `RecordFerrers` は追加条件を持つため、
-Profile との `Equiv` は主張しない。旧 filename は import 互換のためだけに残す。
+`CriticalRecordSkeleton` は追加条件を持つため Profile との `Equiv` は主張しない。
+真の `RecordFerrers` は record-level tie と local carry の exact 条件を確定するまで
+まだ定義しない。旧 filename は import 互換のためだけに残す。
 -/

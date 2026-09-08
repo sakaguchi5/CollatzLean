@@ -47,10 +47,9 @@ import CollatzLean.Collatz3.Critical.WordFerrers
 import CollatzLean.Collatz3.Critical.WordProfileEquiv
 import CollatzLean.Collatz3.Critical.RoofAnchor
 import CollatzLean.Collatz3.Critical.RecordSkeleton
-import CollatzLean.Collatz3.Critical.RecordFerrers
+import CollatzLean.Collatz3.Critical.RecordLocalGeometry
 
 import CollatzLean.Collatz3.Ferrers.RecordView
-import CollatzLean.Collatz3.Ferrers.RecordFerrers
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
 
@@ -79,7 +78,7 @@ Nat-valued excess は valid word 上の互換 view とする。
 
 actual semantics、pure critical shape、Ferrers/record 幾何を混ぜない。
 
-Record/Ferrers 層は次の三段に分離する。
+Record/Ferrers 層で現在確定しているのは次の三段である。
 
 1. `Ferrers.RecordView`
    任意の admissible profile に deterministic な strict record-low cut list を付ける弱い view。
@@ -90,9 +89,13 @@ Record/Ferrers 層は次の三段に分離する。
    interior endpoint が critical roof に戻ることだけを持つ pure skeleton。
    local first-passage 性はここには保存しない。
 
-3. `Critical.RecordFerrers`
-   width-only best-upper arithmetic と terminal minimal input を加え、
-   各 skeleton block の local critical geometry を theorem として導く full 層。
+3. `Critical.RecordLocalGeometry`
+   skeleton から local critical block geometry を導くための定義・補題群。
+   `IsBestUpperWidth` は local criticality の必要条件とはせず、
+   proper-prefix Beatty bound を一括保証する十分条件として使う。
+
+真の `RecordFerrers` structure は現段階ではまだ定義しない。
+record-level tie と local carry の exact 条件を確定した後に、必要最小限の条件だけで再導入する。
 
 critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置かない。
 `criticalTwoDepth m` が width `m` だけで決まることを使い、
@@ -105,8 +108,8 @@ critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置か
 を一変数 width 理論として扱う。旧 `StripReduced` は
 `IsBestUpperWidth` と同値な compatibility view に降格する。
 
-primitive 性は weak RecordView から strict skeleton へ上げる際の rank-tie 排除に使う語彙で、
-full RecordFerrers の定義には埋め込まない。
+primitive 性は weak RecordView から strict skeleton へ上げる際の
+record-level tie 排除を保証する十分条件候補として扱い、structure には埋め込まない。
 
 `0` を record anchor にすると start/terminal rank がともに 0 となるため、
 critical record skeleton では positive roof anchor を採用する。

@@ -1,6 +1,5 @@
 import CollatzLean.Collatz3.Critical.WordProfileEquiv
 import CollatzLean.Collatz3.Critical.RecordSkeleton
-import CollatzLean.Collatz3.Critical.RecordFerrers
 import CollatzLean.Collatz3.Ferrers.RecordView
 import CollatzLean.Collatz3.Bridge.FirstPassageProfile
 
@@ -13,9 +12,12 @@ exact `Equiv` と、一方向の追加幾何 bridge を分離する。
 
 は exact。
 
-一方、`CriticalRecordSkeleton` は strict rank/roof geometry を追加し、
-full `RecordFerrers` はさらに local critical block geometry を追加する。
-したがって後二者を arbitrary profile と `Equiv` にはしない。
+`CriticalRecordSkeleton` は strict rank/roof geometry を追加するため、
+arbitrary profile と `Equiv` とは主張しない。
+
+真の `RecordFerrers` は現段階ではまだ定義しない。
+local critical block geometry については `Critical.RecordLocalGeometry` に
+十分条件と派生定理だけを置く。
 -/
 
 namespace Collatz3
@@ -67,23 +69,6 @@ theorem toCriticalWord_startsWithOne
     R.toCriticalWord.2 R.one_lt_width
 
 end CriticalRecordSkeleton
-
-namespace RecordFerrers
-
-/-- full Record--Ferrers から whole critical word shape への忘却。 -/
-def toCriticalWord
-    {m : ℕ}
-    (R : RecordFerrers m) : CriticalWord m :=
-  R.record.toCriticalWord
-
-/-- full Record--Ferrers の whole word も `[1]` から始まる。 -/
-theorem toCriticalWord_startsWithOne
-    {m : ℕ}
-    (R : RecordFerrers m) :
-    ∃ tail : Word, R.toCriticalWord.1 = 1 :: tail := by
-  exact R.record.toCriticalWord_startsWithOne
-
-end RecordFerrers
 end Critical
 
 namespace ActualFirstPassage
