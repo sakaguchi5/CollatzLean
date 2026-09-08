@@ -25,6 +25,8 @@ import CollatzLean.Collatz3.Semantics.OrbitReturn
 import CollatzLean.Collatz3.Semantics.PeriodicOrbit
 
 import CollatzLean.Collatz3.Combinatorics.WordRepetition
+import CollatzLean.Collatz3.Combinatorics.YoungFerrers
+import CollatzLean.Collatz3.Combinatorics.Record
 
 import CollatzLean.Collatz3.FixedFiber.UniversalExcess
 import CollatzLean.Collatz3.FixedFiber.PrependExcess
@@ -35,6 +37,8 @@ import CollatzLean.Collatz3.Critical.Profile
 import CollatzLean.Collatz3.Critical.ProfileAffine
 import CollatzLean.Collatz3.Critical.ProfileCanonical
 import CollatzLean.Collatz3.Critical.ProfileExtraction
+import CollatzLean.Collatz3.Critical.Ferrers
+import CollatzLean.Collatz3.Critical.RecordFerrers
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
 
@@ -45,6 +49,7 @@ import CollatzLean.Collatz3.Bridge.PeriodicOrbitConsequences
 import CollatzLean.Collatz3.Bridge.ProfileWordCanonical
 import CollatzLean.Collatz3.Bridge.FirstPassageProfile
 import CollatzLean.Collatz3.Bridge.PredecessorExcess
+import CollatzLean.Collatz3.Bridge.FerrersRealization
 
 set_option linter.style.header false
 /-!
@@ -63,4 +68,12 @@ pure fixed-fiber arithmetic は actual predecessor semantics を import せず�
 
 さらに actual critical first-passage から有限 profile を抽出し、
 checkpoint / affine numerator / canonical `R,Y,Q` まで lossless に接続する。
+
+Ferrers / Record 層も同じ原則に従う。
+
+1. `Combinatorics.YoungFerrers` は一般の ordered finite diagram と古典 Ferrers 条件だけ。
+2. `Critical.Ferrers` は Profile を diagram として読む derived view。
+3. `Combinatorics.Record` は任意 rank に対する generic record 語彙。
+4. `Critical.RecordFerrers` は profile rank を generic record に渡す薄い接着。
+5. actual Collatz run との一致は `Bridge.FerrersRealization` だけに置く。
 -/

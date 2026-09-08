@@ -1,0 +1,193 @@
+import Mathlib.Data.Nat.Basic
+import Mathlib.Data.Int.Basic
+
+/-!
+# Collatz3: generic record decomposition vocabulary
+
+このファイルにも Collatz 固有の量を入れない。
+
+`record` は「Ferrers」という名前に埋め込まず、任意の整数値 rank 関数に対する
+新しい strict minimum と、その間の excursion として定義する。
+
+後段の `Critical.RecordFerrers` は、この generic record 語彙へ
+critical profile から導いた rank を渡すだけにする。
+-/
+
+namespace Collatz3
+namespace Combinatorics
+
+/-- `k` がそれ以前の全 index より strict に低い record index。 -/
+def IsRecordLow
+    (rank : ℕ → ℤ)
+    (k : ℕ) : Prop :=
+  ∀ j : ℕ, j < k → rank k < rank j
+
+/-- index `0` は空の前歴に対して常に record。 -/
+theorem isRecordLow_zero
+    (rank : ℕ → ℤ) :
+    IsRecordLow rank 0 := by
+  intro j hj
+  omega
+
+/--
+start `a` から長さ `r` の一つの record excursion。
+
+* `r > 0`
+* interior は start rank より strict に上
+* endpoint で start rank より strict に下
+
+だけを持つ。minimality や Collatz actuality は定義に入れない。
+-/
+def IsRecordBlock
+    (rank : ℕ → ℤ)
+    (a r : ℕ) : Prop :=
+  0 < r ∧
+    (∀ j : ℕ, 0 < j → j < r → rank a < rank (a + j)) ∧
+    rank (a + r) < rank a
+
+namespace IsRecordBlock
+
+/-- record block の長さは正。 -/
+theorem length_pos
+    {rank : ℕ → ℤ}
+    {a r : ℕ}
+    (B : IsRecordBlock rank a r) :
+    0 < r :=
+  B.1
+
+/-- record block interior は start rank より上。 -/
+theorem interior
+    {rank : ℕ → ℤ}
+    {a r : ℕ}
+    (B : IsRecordBlock rank a r)
+    {j : ℕ}
+    (hjPos : 0 < j)
+    (hjLt : j < r) :
+    rank a < rank (a + j) :=
+  B.2.1 j hjPos hjLt
+
+/-- record block endpoint は start rank より下。 -/
+theorem end_drop
+    {rank : ℕ → ℤ}
+    {a r : ℕ}
+    (B : IsRecordBlock rank a r) :
+    rank (a + r) < rank a :=
+  B.2.2
+
+/--
+start が global record なら、record block の endpoint も新しい global record。
+これは record の一般論であり、Ferrers や Collatz を使わない。
+-/
+theorem end_recordLow
+    {rank : ℕ → ℤ}
+    {a r : ℕ}
+    (B : IsRecordBlock rank a r)
+    (ha : IsRecordLow rank a) :
+    IsRecordLow rank (a + r) := by
+  intro j hj
+  have hEnd :
+      rank (a + r) < rank a :=
+    end_drop B
+  by_cases hja : j < a
+  · have hPrev :
+        rank a < rank j :=
+      ha j hja
+    omega
+  by_cases hEq : j = a
+  · subst j
+    exact hEnd
+  have haj : a < j := by
+    omega
+  let t : ℕ := j - a
+  have htPos : 0 < t := by
+    dsimp [t]
+    omega
+  have htLt : t < r := by
+    dsimp [t]
+    omega
+  have hInt :
+      rank a < rank (a + t) :=
+    interior B htPos htLt
+  have hAj : a + t = j := by
+    dsimp [t]
+    omega
+  rw [hAj] at hInt
+  omega
+
+end IsRecordBlock
+
+/--
+record block の長さだけを保持する骨格。
+ここには rank も Ferrers decoration も保存しない。
+-/
+structure RecordSkeleton where
+  lengths : List ℕ
+  positive : ∀ r ∈ lengths, 0 < r
+
+namespace RecordSkeleton
+
+/-- skeleton が覆う総横幅。 -/
+def totalLength
+    (S : RecordSkeleton) : ℕ :=
+  S.lengths.sum
+
+/--
+長さ列が rank 上で start `a` から順に record blocks を実現する、という純粋な再帰 predicate。
+-/
+def realizesLengthsFrom
+    (rank : ℕ → ℤ) : ℕ → List ℕ → Prop
+  | _a, [] => True
+  | a, r :: rs =>
+      IsRecordBlock rank a r ∧
+        realizesLengthsFrom rank (a + r) rs
+
+/-- skeleton が rank 上で start `a` から record 分解を実現する。 -/
+def RealizesFrom
+    (S : RecordSkeleton)
+    (rank : ℕ → ℤ)
+    (a : ℕ) : Prop :=
+  realizesLengthsFrom rank a S.lengths
+
+/-- rank が pointwise に等しければ record realization は変わらない。 -/
+theorem realizesLengthsFrom_congr
+    {rank rank' : ℕ → ℤ}
+    (hEq : ∀ k : ℕ, rank k = rank' k) :
+    ∀ a rs,
+      realizesLengthsFrom rank a rs ↔
+        realizesLengthsFrom rank' a rs := by
+  intro a rs
+  induction rs generalizing a with
+  | nil =>
+      simp [realizesLengthsFrom]
+  | cons r rs ih =>
+      constructor
+      · intro h
+        rcases h with ⟨hBlock, hTail⟩
+        refine ⟨?_, (ih (a + r)).1 hTail⟩
+        rcases hBlock with ⟨hrPos, hInterior, hEnd⟩
+        refine ⟨hrPos, ?_, ?_⟩
+        · intro j hjPos hjLt
+          simpa [hEq a, hEq (a + j)] using hInterior j hjPos hjLt
+        · simpa [hEq (a + r), hEq a] using hEnd
+      · intro h
+        rcases h with ⟨hBlock, hTail⟩
+        refine ⟨?_, (ih (a + r)).2 hTail⟩
+        rcases hBlock with ⟨hrPos, hInterior, hEnd⟩
+        refine ⟨hrPos, ?_, ?_⟩
+        · intro j hjPos hjLt
+          simpa [hEq a, hEq (a + j)] using hInterior j hjPos hjLt
+        · simpa [hEq (a + r), hEq a] using hEnd
+
+/-- pointwise equal な rank では skeleton realization も同値。 -/
+theorem realizesFrom_congr
+    (S : RecordSkeleton)
+    {rank rank' : ℕ → ℤ}
+    {a : ℕ}
+    (hEq : ∀ k : ℕ, rank k = rank' k) :
+    S.RealizesFrom rank a ↔ S.RealizesFrom rank' a := by
+  exact realizesLengthsFrom_congr hEq a S.lengths
+
+end RecordSkeleton
+
+end Combinatorics
+end Collatz3
