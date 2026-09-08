@@ -19,15 +19,23 @@ import CollatzLean.Collatz3.Semantics.PeriodicOrbit
 
 import CollatzLean.Collatz3.Combinatorics.WordRepetition
 
+import CollatzLean.Collatz3.FixedFiber.UniversalExcess
+
+import CollatzLean.Collatz3.Critical.Beatty
+import CollatzLean.Collatz3.Critical.Profile
+import CollatzLean.Collatz3.Critical.ProfileAffine
+import CollatzLean.Collatz3.Critical.ProfileCanonical
+
 import CollatzLean.Collatz3.Bridge.RunsToCanonical
 import CollatzLean.Collatz3.Bridge.ReachOneConsequences
 import CollatzLean.Collatz3.Bridge.PeriodicOrbitConsequences
+import CollatzLean.Collatz3.Bridge.ProfileWordCanonical
 
 set_option linter.style.header false
 /-!
 # Collatz3: thin definitions + derived theorems kernel
 
 旧体系を import しない。
-基礎 affine/canonical kernel に、1 到達・actual 周期・文字列反復の薄い語彙と
-それらの derived consequences を一方向に追加する。
+affine/canonical/actual semantics に加えて fixed-fiber excess、Beatty critical roof、
+thin profile、profile canonical coordinates までを一方向依存で公開する。
 -/

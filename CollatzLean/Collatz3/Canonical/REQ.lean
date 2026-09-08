@@ -11,21 +11,20 @@ import Mathlib.Tactic.Linarith
 namespace Collatz3
 namespace Word
 
-/-- canonical start `R`: odd-start class の最小非負代表。 -/
-def canonicalStart (w : Word) : ℕ :=
-  (oddStartClass w).val
-
 /-- `R` は odd-endpoint modulus 未満。 -/
 theorem canonicalStart_lt_modulus (w : Word) :
     canonicalStart w < oddEndpointModulus w := by
+  rw [canonicalStart_eq_oddStartClass_val]
   have : NeZero (oddEndpointModulus w) :=
     ⟨Nat.ne_of_gt (oddEndpointModulus_pos w)⟩
   exact ZMod.val_lt (oddStartClass w)
 
 /-- canonical start を ZMod に戻すと元の class。 -/
 theorem canonicalStart_cast (w : Word) :
-    ((canonicalStart w : ℕ) : ZMod (oddEndpointModulus w)) =
+    ((canonicalStart w : ℕ) :
+        ZMod (oddEndpointModulus w)) =
       oddStartClass w := by
+  rw [canonicalStart_eq_oddStartClass_val]
   have : NeZero (oddEndpointModulus w) :=
     ⟨Nat.ne_of_gt (oddEndpointModulus_pos w)⟩
   exact ZMod.natCast_zmod_val (oddStartClass w)
@@ -38,7 +37,8 @@ theorem EndpointEquation.start_mod_eq_canonicalStart
     x % oddEndpointModulus w = canonicalStart w := by
   have hc := h.start_has_oddStartClass hy
   have hv := congrArg ZMod.val hc
-  simpa [canonicalStart, ZMod.val_natCast] using hv
+  rw [canonicalStart_eq_oddStartClass_val]
+  simpa only [ZMod.val_natCast] using hv
 
 /-- `R` は同じ odd-endpoint affine class の最小自然数 start。 -/
 theorem EndpointEquation.canonicalStart_le_start
