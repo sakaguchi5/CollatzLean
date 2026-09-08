@@ -44,6 +44,7 @@ import CollatzLean.Collatz3.Bridge.ReachOneConsequences
 import CollatzLean.Collatz3.Bridge.PeriodicOrbitConsequences
 import CollatzLean.Collatz3.Bridge.ProfileWordCanonical
 import CollatzLean.Collatz3.Bridge.FirstPassageProfile
+import CollatzLean.Collatz3.Bridge.PredecessorExcess
 
 set_option linter.style.header false
 /-!
@@ -53,7 +54,12 @@ set_option linter.style.header false
 
 canonical arithmetic の正本を affine data `(p,H,B)` に一本化し、
 Word / Profile はその薄い wrapper とする。
-fixed-fiber `E_RF` は signed view を正本として持つ。
+
+fixed-fiber では signed baseline / signed `E_RF` / signed prepend coordinate を正本とし、
+Nat-valued excess は valid word 上の互換 view とする。
+
+pure fixed-fiber arithmetic は actual predecessor semantics を import せず、
+逆コラッツ木との接続は Bridge 層だけに置く。
 
 さらに actual critical first-passage から有限 profile を抽出し、
 checkpoint / affine numerator / canonical `R,Y,Q` まで lossless に接続する。

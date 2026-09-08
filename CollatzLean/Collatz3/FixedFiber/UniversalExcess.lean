@@ -11,16 +11,64 @@ import CollatzLean.Collatz3.Core.WordTransfer
 ここでは RecordFerrers を定義・仮定しない。
 将来、RecordFerrers を導入した後に幾何的な面積座標として解釈できる形を保つ。
 
-符号を失わない `signedUniversalExcess : ℤ` を数学的な正本とする。
-従来の `universalExcess : ℕ` は valid word 上で使う互換用 Nat view として残す。
+符号を失わない `signedFixedFiberBaseline : ℕ → ℤ` と
+`signedUniversalExcess : Word → ℤ` を数学的な正本とする。
+
+従来の `fixedFiberBaseline : ℕ → ℕ` と `universalExcess : Word → ℕ` は、
+valid word 上で使う互換用 Nat view として残す。
 -/
 
 namespace Collatz3
 namespace Word
 
-/-- fixed odd-step count `p` に対する基準 translation。 -/
+/-- fixed odd-step count `p` に対する Nat-valued 基準 translation。 -/
 def fixedFiberBaseline (p : ℕ) : ℕ :=
   3 ^ p - 2 ^ p
+
+/--
+符号を失わない fixed-fiber baseline。
+
+`3^p - 2^p` を最初から整数差として持つ。
+-/
+def signedFixedFiberBaseline (p : ℕ) : ℤ :=
+  (3 : ℤ) ^ p - (2 : ℤ) ^ p
+
+/-- signed baseline は Nat baseline の exact cast。 -/
+theorem signedFixedFiberBaseline_eq_natCast
+    (p : ℕ) :
+    signedFixedFiberBaseline p =
+      (fixedFiberBaseline p : ℤ) := by
+  have hPow : 2 ^ p ≤ 3 ^ p := by
+    exact Nat.pow_le_pow_left (by decide : 2 ≤ (3 : ℕ)) _
+  unfold signedFixedFiberBaseline fixedFiberBaseline
+  rw [Nat.cast_sub hPow]
+  simp
+
+/--
+Nat baseline の 1 段再帰。
+
+`D_(q+1) = 3^q + 2*D_q`
+-/
+theorem fixedFiberBaseline_succ (q : ℕ) :
+    fixedFiberBaseline (q + 1) =
+      3 ^ q + 2 * fixedFiberBaseline q := by
+  have hPow : 2 ^ q ≤ 3 ^ q := by
+    exact Nat.pow_le_pow_left (by decide : 2 ≤ (3 : ℕ)) _
+  unfold fixedFiberBaseline
+  rw [pow_succ, pow_succ]
+  omega
+
+/--
+signed baseline の 1 段再帰。
+
+`D_(q+1) = 3^q + 2*D_q`
+-/
+theorem signedFixedFiberBaseline_succ (q : ℕ) :
+    signedFixedFiberBaseline (q + 1) =
+      (3 : ℤ) ^ q + 2 * signedFixedFiberBaseline q := by
+  unfold signedFixedFiberBaseline
+  rw [pow_succ, pow_succ]
+  ring
 
 /--
 符号を失わない fixed-fiber excess `E_RF`。
@@ -29,7 +77,7 @@ RecordFerrers に依存しない算術的な正本として定義する。
 -/
 def signedUniversalExcess (w : Word) : ℤ :=
   (affineConst w : ℤ) -
-    (fixedFiberBaseline (oddSteps w) : ℤ)
+    signedFixedFiberBaseline (oddSteps w)
 
 /--
 従来互換の Nat-valued excess。
@@ -86,6 +134,7 @@ theorem signedUniversalExcess_nonneg
   have hBase :=
     fixedFiberBaseline_le_affineConst hValid
   unfold signedUniversalExcess
+  rw [signedFixedFiberBaseline_eq_natCast]
   omega
 
 /-- valid word では Nat view は signed `E_RF` の exact cast。 -/
@@ -97,6 +146,7 @@ theorem signedUniversalExcess_eq_natCast
   have hBase :=
     fixedFiberBaseline_le_affineConst hValid
   unfold signedUniversalExcess universalExcess
+  rw [signedFixedFiberBaseline_eq_natCast]
   rw [Nat.cast_sub hBase]
 
 /-- valid word では `B = baseline + E_RF` が exact に復元される。 -/
@@ -116,7 +166,9 @@ theorem affineConst_int_eq_fixedFiberBaseline_add_signedUniversalExcess
     (affineConst w : ℤ) =
       (fixedFiberBaseline (oddSteps w) : ℤ) +
         signedUniversalExcess w := by
-  simp [signedUniversalExcess]
+  unfold signedUniversalExcess
+  rw [signedFixedFiberBaseline_eq_natCast]
+  ring
 
 /-- fixed `p` では Nat `E_RF` が affine translation を識別する。 -/
 theorem affineConst_eq_of_same_oddSteps_and_universalExcess

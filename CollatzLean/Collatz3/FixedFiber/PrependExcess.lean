@@ -1,60 +1,146 @@
 import CollatzLean.Collatz3.FixedFiber.UniversalExcess
-import CollatzLean.Collatz3.Semantics.Predecessor
 
 /-!
 # Collatz3: 先頭指数を付けたときの fixed-fiber excess
 
-`UniversalExcess` の `E_RF` に対して、指数 `e` を word の先頭へ付ける操作を調べる。
-ここでは RecordFerrers を導入しない。
+ここは pure fixed-fiber arithmetic のみを扱う。
+actual `Runs` / `BackwardStep` / predecessor semantics は import しない。
 
-核心は、tail の odd-step 数を `q` としたとき
+signed `E_RF` を正本として、先頭指数 `e` を付けたときの中心化座標を
 
-`E_RF (e :: w) + 2 * (3^q - 2^q) = 2^e * affineConst w`
+`C_Z(e,w) = E_RF^Z(e::w) + 2 D_q`
 
-となることである。
-したがって同じ tail に入る逆向き枝で指数を `e` から `e+2` へ増やすと、
-左辺の中心化座標は exact に 4 倍される。
+で定義する。ただし `q = oddSteps w`, `D_q = 3^q - 2^q`。
 
-実際の逆向き枝では `BackwardStep.add_two` により前駆点も
-`x ↦ 4*x+1` と移るので、逆コラッツ木の同一分岐族と `E_RF` の 4 倍相似が一致する。
+核心は raw Word 全体で
+
+`C_Z(e,w) = 2^e * affineConst w`
+
+であり、したがって
+
+`C_Z(e+2,w) = 4 * C_Z(e,w)`
+
+が仮定なしに成立する。
+
+Nat-valued `prependExcessCoordinate` は valid word 用の互換 view として残す。
+actual 逆コラッツ木との接続は `Bridge.PredecessorExcess` で行う。
 -/
 
 namespace Collatz3
 namespace Word
 
 /--
-fixed-fiber baseline `D_q = 3^q - 2^q` の 1 段再帰。
+signed `E_RF` による先頭付加中心化座標。
 
-`D_(q+1) = 3^q + 2*D_q`
-
-という形は、先頭指数を付けた affine translation
-`3^q + 2^e * B` と比較するときに使う。
+raw Word に対しても符号情報を失わない正本。
 -/
-theorem fixedFiberBaseline_succ (q : ℕ) :
-    fixedFiberBaseline (q + 1) =
-      3 ^ q + 2 * fixedFiberBaseline q := by
-  have hPow : 2 ^ q ≤ 3 ^ q := by
-    exact Nat.pow_le_pow_left (by decide : 2 ≤ (3 : ℕ)) _
-  unfold fixedFiberBaseline
-  rw [pow_succ, pow_succ]
-  omega
+def signedPrependExcessCoordinate
+    (e : ℕ)
+    (w : Word) : ℤ :=
+  signedUniversalExcess (e :: w) +
+    2 * signedFixedFiberBaseline (oddSteps w)
 
 /--
-先頭指数 `e` と tail `w` に対する中心化 `E_RF` 座標。
+signed 中心化座標の exact 基本式。
 
-`E_RF (e :: w)` そのものではなく、tail の fixed-fiber baseline `D_q` を
-`2*D_q` だけ足した量を使う。この平行移動によって逆向き枝の伸縮が純粋な
-`2^e` 倍として見える。
+`C_Z(e,w) = 2^e * affineConst w`
+
+validity や `e>0` を必要としない。
+-/
+theorem signedPrependExcessCoordinate_eq_twoPow_mul_affineConst
+    (e : ℕ)
+    (w : Word) :
+    signedPrependExcessCoordinate e w =
+      (2 : ℤ) ^ e * (affineConst w : ℤ) := by
+  unfold signedPrependExcessCoordinate signedUniversalExcess
+  rw [oddSteps_cons, affineConst_cons, signedFixedFiberBaseline_succ]
+  simp only [
+    Nat.cast_add,
+    Nat.cast_mul,
+    Nat.cast_pow,
+    Nat.cast_ofNat
+  ]
+  ring
+
+/--
+signed `E_RF` 自身の先頭付加更新則。
+
+`q = oddSteps w` とすると
+
+`E_RF^Z(e::w)
+ = 2^e E_RF^Z(w) + (2^e - 2) D_q`。
+-/
+theorem signedUniversalExcess_cons
+    (e : ℕ)
+    (w : Word) :
+    signedUniversalExcess (e :: w) =
+      (2 : ℤ) ^ e * signedUniversalExcess w +
+        ((2 : ℤ) ^ e - 2) *
+          signedFixedFiberBaseline (oddSteps w) := by
+  unfold signedUniversalExcess
+  rw [oddSteps_cons, affineConst_cons, signedFixedFiberBaseline_succ]
+  simp only [
+    Nat.cast_add,
+    Nat.cast_mul,
+    Nat.cast_pow,
+    Nat.cast_ofNat
+  ]
+  ring
+
+/--
+指数を `e` から `e+2` へ増やすと、
+signed 中心化座標は raw Word 全体で exact に 4 倍。
+-/
+theorem signedPrependExcessCoordinate_add_two
+    (e : ℕ)
+    (w : Word) :
+    signedPrependExcessCoordinate (e + 2) w =
+      4 * signedPrependExcessCoordinate e w := by
+  rw [
+    signedPrependExcessCoordinate_eq_twoPow_mul_affineConst,
+    signedPrependExcessCoordinate_eq_twoPow_mul_affineConst
+  ]
+  rw [pow_add]
+  norm_num
+  ring
+
+/--
+従来互換の Nat-valued 中心化座標。
+
+valid tail と正指数の範囲では signed 正本の Nat view と一致する。
 -/
 def prependExcessCoordinate (e : ℕ) (w : Word) : ℕ :=
   universalExcess (e :: w) +
     2 * fixedFiberBaseline (oddSteps w)
 
 /--
-valid tail `w` の先頭に正指数 `e` を付けると、中心化 `E_RF` 座標は
-`2^e * affineConst w` に exact に一致する。
+valid tail と正指数では signed 中心化座標は Nat view の exact cast。
+-/
+theorem signedPrependExcessCoordinate_eq_natCast
+    {e : ℕ}
+    {w : Word}
+    (he : 0 < e)
+    (hValid : Valid w) :
+    signedPrependExcessCoordinate e w =
+      (prependExcessCoordinate e w : ℤ) := by
+  have hConsValid : Valid (e :: w) := by
+    intro a ha
+    simp only [List.mem_cons] at ha
+    rcases ha with rfl | ha
+    · exact he
+    · exact hValid a ha
+  unfold signedPrependExcessCoordinate prependExcessCoordinate
+  rw [signedUniversalExcess_eq_natCast hConsValid]
+  rw [signedFixedFiberBaseline_eq_natCast]
+  simp only [
+    Nat.cast_add,
+    Nat.cast_mul,
+    Nat.cast_ofNat
+  ]
 
-これは `E_RF` の枝分かれ座標としての基本式である。
+/--
+valid tail `w` の先頭に正指数 `e` を付けると、
+Nat 中心化座標は `2^e * affineConst w` に exact に一致する。
 -/
 theorem prependExcessCoordinate_eq_twoPow_mul_affineConst
     {e : ℕ}
@@ -78,14 +164,10 @@ theorem prependExcessCoordinate_eq_twoPow_mul_affineConst
   omega
 
 /--
-中心化 `E_RF` 座標を tail の `E_RF` だけで書いた形。
+Nat 中心化座標を tail の `E_RF` だけで書いた形。
 
-`q = oddSteps w`, `D_q = 3^q - 2^q` とすれば
-
-`E_RF (e :: w) + 2*D_q = 2^e * (E_RF(w) + D_q)`。
-
-この形は `affineConst` を消しているため、将来 RecordFerrers の面積座標へ
-接続するときの直接 bridge として使える。
+`E_RF(e::w) + 2 D_q
+ = 2^e (E_RF(w) + D_q)`。
 -/
 theorem prependExcessCoordinate_eq_twoPow_mul_excess_add_baseline
     {e : ℕ}
@@ -101,13 +183,10 @@ theorem prependExcessCoordinate_eq_twoPow_mul_excess_add_baseline
   ring
 
 /--
-先頭指数を付けたときの `E_RF` 更新則。
+Nat `E_RF` の先頭付加更新則。
 
-`q = oddSteps w`, `D_q = 3^q - 2^q` と書けば
-
-`E_RF (e :: w) = 2^e * E_RF(w) + (2^e - 2) * D_q`。
-
-指数 `e=1` では補正項が消え、単に `E_RF` が 2 倍される。
+`E_RF(e::w)
+ = 2^e E_RF(w) + (2^e - 2) D_q`。
 -/
 theorem universalExcess_cons
     {e : ℕ}
@@ -134,7 +213,8 @@ theorem universalExcess_cons
             rw [Nat.sub_add_cancel hTwo]
       _ =
           (2 ^ e - 2) * fixedFiberBaseline (oddSteps w) +
-            2 * fixedFiberBaseline (oddSteps w) := by ring
+            2 * fixedFiberBaseline (oddSteps w) := by
+              ring
   have hEq :
       universalExcess (e :: w) +
           2 * fixedFiberBaseline (oddSteps w) =
@@ -146,9 +226,7 @@ theorem universalExcess_cons
     ring
   exact Nat.add_right_cancel hEq
 
-/--
-指数 `1` を先頭へ付ける場合、`E_RF` は補正項なしに exact に 2 倍される。
--/
+/-- 指数 `1` を先頭へ付けると Nat `E_RF` は exact に 2 倍。 -/
 theorem universalExcess_one_cons
     {w : Word}
     (hValid : Valid w) :
@@ -158,10 +236,9 @@ theorem universalExcess_one_cons
     (universalExcess_cons (e := 1) (w := w) (by decide) hValid)
 
 /--
-同じ tail `w` に対して先頭指数を `e` から `e+2` に増やすと、
-中心化 `E_RF` 座標は exact に 4 倍される。
+valid tail では Nat 中心化座標も `e ↦ e+2` で exact に 4 倍。
 
-これは fixed-fiber 側だけで見た逆枝の 4 倍相似である。
+数学的正本は `signedPrependExcessCoordinate_add_two`。
 -/
 theorem prependExcessCoordinate_add_two
     {e : ℕ}
@@ -177,39 +254,6 @@ theorem prependExcessCoordinate_add_two
   rw [pow_add]
   norm_num
   ring
-
-/--
-実際の逆向き 1 step と同じ tail run を固定した 4 倍相似。
-
-`x --e--> y` を逆向きに読んでいるとき、指数を `e+2` にした次の枝は
-`4*x+1` から同じ `y` へ入る。さらに tail `w` をそのまま続ければ同じ終点 `z` に到達し、
-その二つの word の中心化 `E_RF` 座標は exact に 4 倍の関係にある。
-
-したがって
-
-`x ↦ 4*x+1`
-
-という逆コラッツ木の同一分岐族と
-
-`centered E_RF ↦ 4 * centered E_RF`
-
-という fixed-fiber 相似が同じ `e ↦ e+2` 操作から同時に導かれる。
--/
-theorem backwardBranch_add_two_four_similarity
-    {e x y z : ℕ}
-    {w : Word}
-    (hStep : BackwardStep e y x)
-    (hTail : Runs w y z) :
-    BackwardStep (e + 2) y (4 * x + 1) ∧
-      Runs ((e + 2) :: w) (4 * x + 1) z ∧
-      prependExcessCoordinate (e + 2) w =
-        4 * prependExcessCoordinate e w := by
-  have hValid : Valid w := Runs.valid hTail
-  have he : 0 < e := BackwardStep.exponent_pos hStep
-  have hNext : BackwardStep (e + 2) y (4 * x + 1) :=
-    BackwardStep.add_two hStep
-  refine ⟨hNext, Runs.cons hNext hTail, ?_⟩
-  exact prependExcessCoordinate_add_two he hValid
 
 end Word
 end Collatz3
