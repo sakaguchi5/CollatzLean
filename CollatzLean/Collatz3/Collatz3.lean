@@ -55,6 +55,7 @@ import CollatzLean.Collatz3.Critical.RecordCarryExact
 import CollatzLean.Collatz3.Ferrers.RecordView
 import CollatzLean.Collatz3.Ferrers.RecordCanonical
 import CollatzLean.Collatz3.Ferrers.RecordCarryCanonical
+import CollatzLean.Collatz3.Ferrers.RecordCarryBridge
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
 
@@ -95,7 +96,8 @@ Record/Ferrers 層で現在確定しているのは次の三段である。
    local first-passage 性はここには保存しない。
 
 3. `Ferrers.RecordCanonical` / `Ferrers.RecordCarryCanonical` /
-   `Critical.RecordLocalGeometry` / `Critical.RecordTerminal` / `Critical.RecordCarryExact`
+   `Ferrers.RecordCarryBridge` / `Critical.RecordLocalGeometry` /
+   `Critical.RecordTerminal` / `Critical.RecordCarryExact`
    weak record から canonical skeleton への bridge と、その skeleton から local critical geometry を
    導くための定義・補題群。`NoRecordLevelTie` が exact な record-level tie 排除条件であり、
    `IsPrimitiveWidth` はそれを保証する十分条件として使う。
@@ -103,6 +105,7 @@ Record/Ferrers 層で現在確定しているのは次の三段である。
    exact 条件であり、`RecordCarryCompatibleFrom` と `LocalCriticalBlocksFrom` は同値。
    さらに deterministic `initialRecordCuts` から block lengths を有限計算し、
    canonical carry law が weak record excursion を strict excursion へ昇格させる。
+   cuts 表現と block-lengths 表現も strict realization / exact carry law の双方で exact に一致する。
    `IsBestUpperWidth` は必要条件とはせず、`m > 2` で exact carry 条件を一括保証する
    十分条件として使う。
 
