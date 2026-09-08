@@ -7,6 +7,8 @@ import CollatzLean.Collatz3.Core.AffineTransfer
 import CollatzLean.Collatz3.Core.WordTransfer
 import CollatzLean.Collatz3.Core.EndpointEquation
 
+import CollatzLean.Collatz3.Canonical.AffineDataResidue
+import CollatzLean.Collatz3.Canonical.AffineDataREQ
 import CollatzLean.Collatz3.Canonical.OddEndpointResidue
 import CollatzLean.Collatz3.Canonical.REQ
 import CollatzLean.Collatz3.Canonical.LiftClassification
@@ -36,6 +38,9 @@ set_option linter.style.header false
 # Collatz3: thin definitions + derived theorems kernel
 
 旧体系を import しない。
-affine/canonical/actual semantics に加えて fixed-fiber excess、Beatty critical roof、
-thin profile、profile canonical coordinates までを一方向依存で公開する。
+
+canonical arithmetic の正本を affine data `(p,H,B)` に一本化し、
+Word / Profile はその薄い wrapper とする。
+fixed-fiber `E_RF` は signed view を正本として持ち、
+actual semantics / critical profile / bridge は一方向依存で積み上げる。
 -/

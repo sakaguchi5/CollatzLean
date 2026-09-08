@@ -3,12 +3,14 @@ import CollatzLean.Collatz3.Core.WordTransfer
 /-!
 # Collatz3: fixed-fiber universal excess
 
-固定 `(p,H)` の中で affine translation `B` を
+固定 `p` の基準 translation
 
-  B = (3^p - 2^p) + E_RF
+`3^p - 2^p`
 
-と分解するための薄い view。
-`E_RF` は新しい primitive data ではなく `affineConst` から導く。
+からの差を RecordFerrers / fixed-fiber excess `E_RF` として扱う。
+
+符号を失わない `signedUniversalExcess : ℤ` を数学的な正本とする。
+従来の `universalExcess : ℕ` は valid word 上で使う互換用 Nat view として残す。
 -/
 
 namespace Collatz3
@@ -18,7 +20,18 @@ namespace Word
 def fixedFiberBaseline (p : ℕ) : ℕ :=
   3 ^ p - 2 ^ p
 
-/-- RecordFerrers / fixed-fiber の universal excess `E_RF`。 -/
+/--
+符号を失わない RecordFerrers / fixed-fiber excess `E_RF`。
+raw Word に対しても情報を潰さない。
+-/
+def signedUniversalExcess (w : Word) : ℤ :=
+  (affineConst w : ℤ) -
+    (fixedFiberBaseline (oddSteps w) : ℤ)
+
+/--
+従来互換の Nat-valued excess。
+valid word では baseline 以下に落ちないので signed 版と一致する。
+-/
 def universalExcess (w : Word) : ℕ :=
   affineConst w - fixedFiberBaseline (oddSteps w)
 
@@ -27,7 +40,8 @@ theorem two_le_twoPow_of_pos
     {e : ℕ}
     (he : 0 < e) :
     2 ≤ 2 ^ e := by
-  obtain ⟨d, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt he)
+  obtain ⟨d, rfl⟩ :=
+    Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt he)
   rw [pow_succ]
   have hp : 0 < 2 ^ d := Nat.pow_pos (by decide)
   omega
@@ -56,8 +70,31 @@ theorem fixedFiberBaseline_le_affineConst
       unfold fixedFiberBaseline at hMul ⊢
       rw [oddSteps_cons, affineConst_cons, pow_succ, pow_succ]
       have h3pow : 2 ^ oddSteps tail ≤ 3 ^ oddSteps tail := by
-        exact Nat.pow_le_pow_left (by decide : 2 ≤ (3 : ℕ)) _
+        exact
+          Nat.pow_le_pow_left
+            (by decide : 2 ≤ (3 : ℕ)) _
       omega
+
+/-- valid word では signed `E_RF` は非負。 -/
+theorem signedUniversalExcess_nonneg
+    {w : Word}
+    (hValid : Valid w) :
+    0 ≤ signedUniversalExcess w := by
+  have hBase :=
+    fixedFiberBaseline_le_affineConst hValid
+  unfold signedUniversalExcess
+  omega
+
+/-- valid word では Nat view は signed `E_RF` の exact cast。 -/
+theorem signedUniversalExcess_eq_natCast
+    {w : Word}
+    (hValid : Valid w) :
+    signedUniversalExcess w =
+      (universalExcess w : ℤ) := by
+  have hBase :=
+    fixedFiberBaseline_le_affineConst hValid
+  unfold signedUniversalExcess universalExcess
+  rw [Nat.cast_sub hBase]
 
 /-- valid word では `B = baseline + E_RF` が exact に復元される。 -/
 theorem affineConst_eq_fixedFiberBaseline_add_universalExcess
@@ -67,9 +104,18 @@ theorem affineConst_eq_fixedFiberBaseline_add_universalExcess
       fixedFiberBaseline (oddSteps w) + universalExcess w := by
   unfold universalExcess
   simpa [Nat.add_comm] using
-    (Nat.sub_add_cancel (fixedFiberBaseline_le_affineConst hValid)).symm
+    (Nat.sub_add_cancel
+      (fixedFiberBaseline_le_affineConst hValid)).symm
 
-/-- fixed `p` では `E_RF` が affine translation を識別する。 -/
+/-- signed `E_RF` からも `B` を exact に復元できる。 -/
+theorem affineConst_int_eq_fixedFiberBaseline_add_signedUniversalExcess
+    {w : Word} :
+    (affineConst w : ℤ) =
+      (fixedFiberBaseline (oddSteps w) : ℤ) +
+        signedUniversalExcess w := by
+  simp [signedUniversalExcess]
+
+/-- fixed `p` では Nat `E_RF` が affine translation を識別する。 -/
 theorem affineConst_eq_of_same_oddSteps_and_universalExcess
     {u v : Word}
     (hu : Valid u)
@@ -80,6 +126,16 @@ theorem affineConst_eq_of_same_oddSteps_and_universalExcess
   rw [affineConst_eq_fixedFiberBaseline_add_universalExcess hu]
   rw [affineConst_eq_fixedFiberBaseline_add_universalExcess hv]
   rw [hp, hE]
+
+/-- fixed `p` では signed `E_RF` も affine translation を識別する。 -/
+theorem affineConst_eq_of_same_oddSteps_and_signedUniversalExcess
+    {u v : Word}
+    (hp : oddSteps u = oddSteps v)
+    (hE : signedUniversalExcess u = signedUniversalExcess v) :
+    affineConst u = affineConst v := by
+  unfold signedUniversalExcess at hE
+  rw [hp] at hE
+  omega
 
 end Word
 end Collatz3

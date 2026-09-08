@@ -75,7 +75,13 @@ theorem canonicalCoordinates
   have hEnd : Word.canonicalEnd w = 1 := by
     simpa using hy.symm
   refine ⟨hStart, hEnd, ?_⟩
-  simp [Word.canonicalGap, hStart, hEnd]
+  have hGap :
+      Word.canonicalGap w =
+        (Word.canonicalEnd w : ℤ) -
+          (Word.canonicalStart w : ℤ) := by
+    rfl
+  rw [hGap, hStart, hEnd]
+  simp only [Nat.cast_one]
 
 /-- first hit は特に上の canonical 座標固定を満たす。 -/
 theorem firstHit_canonicalCoordinates

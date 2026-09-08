@@ -1,39 +1,24 @@
 import CollatzLean.Collatz3.Critical.ProfileAffine
-import CollatzLean.Collatz3.Canonical.OddEndpointResidue
-
-import Mathlib.Tactic.Ring
+import CollatzLean.Collatz3.Canonical.AffineDataREQ
 
 /-!
 # Collatz3: profile canonical coordinates
 
-profile が決める affine data
+Profile が決める affine data
 
 `(p,H,B) = (m, criticalTwoDepth m, profileAffineNumerator h)`
 
-から odd-endpoint residue と canonical coordinates
+を共有 `AffineDataResidue / AffineDataREQ` 核へ渡すだけの薄い wrapper。
 
-`R(h), Y(h), Q(h)`
-
-を直接導く。
-
-これらは profile packet field ではない。
-
-odd-start class と canonical start の構成そのものは
-`Canonical.OddEndpointResidue` の affine-data 共有核を使い、
-Profile 側では affine data の選択だけを行う。
+`R(h), Y(h), Q(h)` は profile packet field ではなく、すべて affine data から導く。
 -/
 
 namespace Collatz3
-
 namespace Critical
-
-/-!
-## profile affine data の odd-endpoint residue
--/
 
 /-- profile odd-endpoint residue の法 `2^(H+1)`。 -/
 def profileOddEndpointModulus (m : ℕ) : ℕ :=
-  Arithmetic.twoPowModulus (criticalTwoDepth m + 1)
+  oddEndpointModulusOfAffineData (criticalTwoDepth m)
 
 @[simp] theorem profileOddEndpointModulus_eq (m : ℕ) :
     profileOddEndpointModulus m =
@@ -42,17 +27,11 @@ def profileOddEndpointModulus (m : ℕ) : ℕ :=
 
 @[simp] theorem profileOddEndpointModulus_pos (m : ℕ) :
     0 < profileOddEndpointModulus m := by
-  simp [profileOddEndpointModulus, Arithmetic.twoPowModulus]
+  exact
+    oddEndpointModulusOfAffineData_pos
+      (criticalTwoDepth m)
 
-/--
-profile affine data が決める odd-start residue class。
-
-これは affine data
-
-`(m, criticalTwoDepth m, profileAffineNumerator h)`
-
-に対する共有 odd-start class の薄い wrapper。
--/
+/-- profile affine data が決める odd-start residue class。 -/
 def profileOddStartClass
     {m : ℕ}
     (h : Profile m) :
@@ -62,9 +41,6 @@ def profileOddStartClass
     (criticalTwoDepth m)
     (profileAffineNumerator h)
 
-/--
-profile odd-start class は共有 affine-data class そのもの。
--/
 @[simp] theorem profileOddStartClass_eq_affineData
     {m : ℕ}
     (h : Profile m) :
@@ -75,13 +51,7 @@ profile odd-start class は共有 affine-data class そのもの。
         (profileAffineNumerator h) := by
   rfl
 
-/--
-profile odd-start class は defining congruence
-
-`3^m * R + A(h) = 2^H (mod 2^(H+1))`
-
-を満たす。
--/
+/-- profile odd-start class は defining congruence を満たす。 -/
 theorem profileOddStartClass_spec
     {m : ℕ}
     (h : Profile m) :
@@ -92,39 +62,13 @@ theorem profileOddStartClass_spec
           ZMod (profileOddEndpointModulus m)) =
       ((2 ^ criticalTwoDepth m : ℕ) :
         ZMod (profileOddEndpointModulus m)) := by
-  change
-    (((3 ^ m : ℕ) :
-        ZMod
-          (Arithmetic.twoPowModulus
-            (criticalTwoDepth m + 1))) *
-      oddStartClassOfAffineData
-        m
-        (criticalTwoDepth m)
-        (profileAffineNumerator h)) +
-      ((profileAffineNumerator h : ℕ) :
-        ZMod
-          (Arithmetic.twoPowModulus
-            (criticalTwoDepth m + 1))) =
-    ((2 ^ criticalTwoDepth m : ℕ) :
-      ZMod
-        (Arithmetic.twoPowModulus
-          (criticalTwoDepth m + 1)))
   exact
     oddStartClassOfAffineData_spec
       m
       (criticalTwoDepth m)
       (profileAffineNumerator h)
 
-/-!
-## profile canonical start
--/
-
-/--
-profile canonical start `R(h)`。
-
-primitive data として保存せず、
-profile の affine data `(p,H,B)` から導く。
--/
+/-- profile canonical start `R(h)`。 -/
 def profileCanonicalStart
     {m : ℕ}
     (h : Profile m) : ℕ :=
@@ -133,10 +77,6 @@ def profileCanonicalStart
     (criticalTwoDepth m)
     (profileAffineNumerator h)
 
-/--
-profile canonical start は
-profile odd-start class の最小非負代表。
--/
 theorem profileCanonicalStart_eq_oddStartClass_val
     {m : ℕ}
     (h : Profile m) :
@@ -150,13 +90,6 @@ theorem profileCanonicalStart_lt_modulus
     (h : Profile m) :
     profileCanonicalStart h <
       profileOddEndpointModulus m := by
-  change
-    canonicalStartOfAffineData
-        m
-        (criticalTwoDepth m)
-        (profileAffineNumerator h) <
-      Arithmetic.twoPowModulus
-        (criticalTwoDepth m + 1)
   exact
     canonicalStartOfAffineData_lt_modulus
       m
@@ -170,101 +103,33 @@ theorem profileCanonicalStart_cast
     ((profileCanonicalStart h : ℕ) :
         ZMod (profileOddEndpointModulus m)) =
       profileOddStartClass h := by
-  change
-    ((canonicalStartOfAffineData
-        m
-        (criticalTwoDepth m)
-        (profileAffineNumerator h) : ℕ) :
-      ZMod
-        (Arithmetic.twoPowModulus
-          (criticalTwoDepth m + 1))) =
-    oddStartClassOfAffineData
-      m
-      (criticalTwoDepth m)
-      (profileAffineNumerator h)
   exact
     canonicalStartOfAffineData_cast
       m
       (criticalTwoDepth m)
       (profileAffineNumerator h)
 
-/-!
-## canonical numerator
--/
-
-/-- profile canonical start を affine equation に代入した分子。 -/
+/-- profile canonical numerator。 -/
 def profileCanonicalNumerator
     {m : ℕ}
     (h : Profile m) : ℕ :=
-  3 ^ m * profileCanonicalStart h +
-    profileAffineNumerator h
+  canonicalNumeratorOfAffineData
+    m
+    (criticalTwoDepth m)
+    (profileAffineNumerator h)
 
-/--
-canonical numerator の `2^(H+1)` 剰余は exactly `2^H`。
--/
+/-- canonical numerator の `2^(H+1)` 剰余は exactly `2^H`。 -/
 theorem profileCanonicalNumerator_mod_modulus
     {m : ℕ}
     (h : Profile m) :
     profileCanonicalNumerator h %
         profileOddEndpointModulus m =
       2 ^ criticalTwoDepth m := by
-  have : NeZero (profileOddEndpointModulus m) :=
-    ⟨Nat.ne_of_gt (profileOddEndpointModulus_pos m)⟩
-  have hcast :
-      ((profileCanonicalNumerator h : ℕ) :
-          ZMod (profileOddEndpointModulus m)) =
-        ((2 ^ criticalTwoDepth m : ℕ) :
-          ZMod (profileOddEndpointModulus m)) := by
-    calc
-      ((profileCanonicalNumerator h : ℕ) :
-          ZMod (profileOddEndpointModulus m))
-          =
-          (((3 ^ m : ℕ) :
-              ZMod (profileOddEndpointModulus m)) *
-            ((profileCanonicalStart h : ℕ) :
-              ZMod (profileOddEndpointModulus m))) +
-          ((profileAffineNumerator h : ℕ) :
-            ZMod (profileOddEndpointModulus m)) := by
-              simp [profileCanonicalNumerator]
-      _ =
-          (((3 ^ m : ℕ) :
-              ZMod (profileOddEndpointModulus m)) *
-            profileOddStartClass h) +
-          ((profileAffineNumerator h : ℕ) :
-            ZMod (profileOddEndpointModulus m)) := by
-              rw [profileCanonicalStart_cast]
-      _ =
-          ((2 ^ criticalTwoDepth m : ℕ) :
-            ZMod (profileOddEndpointModulus m)) :=
-        profileOddStartClass_spec h
-  have hval := congrArg ZMod.val hcast
-  have hpowlt :
-      2 ^ criticalTwoDepth m <
-        profileOddEndpointModulus m := by
-    unfold profileOddEndpointModulus
-      Arithmetic.twoPowModulus
-    exact
-      Nat.pow_lt_pow_right
-        (by omega)
-        (Nat.lt_succ_self _)
-  calc
-    profileCanonicalNumerator h %
-        profileOddEndpointModulus m
-        =
-        (((profileCanonicalNumerator h : ℕ) :
-          ZMod (profileOddEndpointModulus m))).val := by
-            simp only [ZMod.val_natCast]
-    _ =
-        (((2 ^ criticalTwoDepth m : ℕ) :
-          ZMod (profileOddEndpointModulus m))).val :=
-      hval
-    _ =
-        (2 ^ criticalTwoDepth m) %
-          profileOddEndpointModulus m := by
-            simp only [ZMod.val_natCast]
-    _ =
-        2 ^ criticalTwoDepth m :=
-      Nat.mod_eq_of_lt hpowlt
+  exact
+    canonicalNumeratorOfAffineData_mod_modulus
+      m
+      (criticalTwoDepth m)
+      (profileAffineNumerator h)
 
 /-- profile canonical numerator は `2^H * odd`。 -/
 theorem profileCanonicalNumerator_eq_twoPow_mul_odd
@@ -273,96 +138,67 @@ theorem profileCanonicalNumerator_eq_twoPow_mul_odd
     ∃ k : ℕ,
       profileCanonicalNumerator h =
         2 ^ criticalTwoDepth m * (2 * k + 1) := by
-  have hdecomp :=
-    Nat.mod_add_div
-      (profileCanonicalNumerator h)
-      (profileOddEndpointModulus m)
-  rw [profileCanonicalNumerator_mod_modulus h] at hdecomp
-  refine
-    ⟨profileCanonicalNumerator h /
-        profileOddEndpointModulus m, ?_⟩
-  calc
-    profileCanonicalNumerator h
-        =
-        2 ^ criticalTwoDepth m +
-          profileOddEndpointModulus m *
-            (profileCanonicalNumerator h /
-              profileOddEndpointModulus m) := by
-                exact hdecomp.symm
-    _ =
-        2 ^ criticalTwoDepth m *
-          (2 *
-              (profileCanonicalNumerator h /
-                profileOddEndpointModulus m) +
-            1) := by
-              unfold profileOddEndpointModulus
-                Arithmetic.twoPowModulus
-              rw [pow_succ]
-              ring
-
-/-!
-## profile canonical endpoint
--/
+  exact
+    canonicalNumeratorOfAffineData_eq_twoPow_mul_odd
+      m
+      (criticalTwoDepth m)
+      (profileAffineNumerator h)
 
 /-- profile canonical endpoint `Y(h)`。 -/
 def profileCanonicalEnd
     {m : ℕ}
     (h : Profile m) : ℕ :=
-  profileCanonicalNumerator h /
-    2 ^ criticalTwoDepth m
+  canonicalEndOfAffineData
+    m
+    (criticalTwoDepth m)
+    (profileAffineNumerator h)
 
-/--
-profile canonical endpoint は numerator を exact に割り切る。
--/
+/-- profile canonical endpoint は numerator を exact に割り切る。 -/
 theorem twoPow_mul_profileCanonicalEnd
     {m : ℕ}
     (h : Profile m) :
-    2 ^ criticalTwoDepth m *
-        profileCanonicalEnd h =
+    2 ^ criticalTwoDepth m * profileCanonicalEnd h =
       profileCanonicalNumerator h := by
-  rcases
-      profileCanonicalNumerator_eq_twoPow_mul_odd h
-      with ⟨k, hk⟩
-  simp [profileCanonicalEnd, hk]
+  exact
+    twoPow_mul_canonicalEndOfAffineData
+      m
+      (criticalTwoDepth m)
+      (profileAffineNumerator h)
 
-/-- profile canonical endpoint は奇数。 -/
+/-- profile canonical endpoint `Y(h)` は奇数。 -/
 theorem profileCanonicalEnd_odd
     {m : ℕ}
     (h : Profile m) :
     Odd (profileCanonicalEnd h) := by
-  rcases
-      profileCanonicalNumerator_eq_twoPow_mul_odd h
-      with ⟨k, hk⟩
-  have hEnd :
-      profileCanonicalEnd h = 2 * k + 1 := by
-    simp [profileCanonicalEnd, hk]
-  exact ⟨k, hEnd⟩
+  exact
+    canonicalEndOfAffineData_odd
+      m
+      (criticalTwoDepth m)
+      (profileAffineNumerator h)
 
-/-!
-## profile canonical drift
--/
-
-/-- profile canonical drift `Q(h) = Y(h) - R(h)`。 -/
+/-- profile canonical drift `Q(h) = Y(h)-R(h)`。 -/
 def profileCanonicalGap
     {m : ℕ}
     (h : Profile m) : ℤ :=
-  (profileCanonicalEnd h : ℤ) -
-    (profileCanonicalStart h : ℤ)
+  canonicalGapOfAffineData
+    m
+    (criticalTwoDepth m)
+    (profileAffineNumerator h)
 
 /-- profile 版 REQ 基本等式。 -/
 theorem profile_req_equation
     {m : ℕ}
     (h : Profile m) :
-    2 ^ criticalTwoDepth m *
-        profileCanonicalEnd h =
+    2 ^ criticalTwoDepth m * profileCanonicalEnd h =
       3 ^ m * profileCanonicalStart h +
         profileAffineNumerator h := by
-  rw [twoPow_mul_profileCanonicalEnd]
-  rfl
+  exact
+    reqEquationOfAffineData
+      m
+      (criticalTwoDepth m)
+      (profileAffineNumerator h)
 
-/--
-`A(h) = (2^H - 3^m) R(h) + 2^H Q(h)`。
--/
+/-- `A(h) = (2^H-3^m)R(h) + 2^H Q(h)`。 -/
 theorem profileAffineNumerator_eq_gap_start_add_twoPow_gap
     {m : ℕ}
     (h : Profile m) :
@@ -372,28 +208,11 @@ theorem profileAffineNumerator_eq_gap_start_add_twoPow_gap
         (profileCanonicalStart h : ℤ) +
       (2 : ℤ) ^ criticalTwoDepth m *
         profileCanonicalGap h := by
-  have hEq :=
-    congrArg
-      (fun n : ℕ => (n : ℤ))
-      (profile_req_equation h)
-  push_cast at hEq
-  calc
-    (profileAffineNumerator h : ℤ)
-        =
-        (2 : ℤ) ^ criticalTwoDepth m *
-            (profileCanonicalEnd h : ℤ) -
-          (3 : ℤ) ^ m *
-            (profileCanonicalStart h : ℤ) := by
-              linarith
-    _ =
-        ((2 : ℤ) ^ criticalTwoDepth m -
-            (3 : ℤ) ^ m) *
-          (profileCanonicalStart h : ℤ) +
-        (2 : ℤ) ^ criticalTwoDepth m *
-          profileCanonicalGap h := by
-            simp [profileCanonicalGap]
-            ring
+  exact
+    affineTranslation_eq_scaleGap_start_add_twoPow_gap
+      m
+      (criticalTwoDepth m)
+      (profileAffineNumerator h)
 
 end Critical
-
 end Collatz3
