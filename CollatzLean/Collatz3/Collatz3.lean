@@ -23,6 +23,9 @@ import CollatzLean.Collatz3.Semantics.Sufficiency
 import CollatzLean.Collatz3.Semantics.ReachOne
 import CollatzLean.Collatz3.Semantics.OrbitReturn
 import CollatzLean.Collatz3.Semantics.PeriodicOrbit
+import CollatzLean.Collatz3.Semantics.OddOrbit
+import CollatzLean.Collatz3.Semantics.FutureMinimum
+import CollatzLean.Collatz3.Semantics.StandardFutureMinimum
 
 import CollatzLean.Collatz3.Combinatorics.WordRepetition
 import CollatzLean.Collatz3.Combinatorics.YoungFerrers
@@ -39,9 +42,11 @@ import CollatzLean.Collatz3.Critical.ProfileCanonical
 import CollatzLean.Collatz3.Critical.ProfileExtraction
 import CollatzLean.Collatz3.Critical.Ferrers
 import CollatzLean.Collatz3.Critical.WordFerrers
-import CollatzLean.Collatz3.Critical.RecordFerrers
 import CollatzLean.Collatz3.Critical.WordProfileEquiv
+import CollatzLean.Collatz3.Critical.RoofAnchor
+import CollatzLean.Collatz3.Critical.RecordFerrers
 
+import CollatzLean.Collatz3.Ferrers.RecordView
 import CollatzLean.Collatz3.Ferrers.RecordFerrers
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
@@ -54,6 +59,7 @@ import CollatzLean.Collatz3.Bridge.ProfileWordCanonical
 import CollatzLean.Collatz3.Bridge.FirstPassageProfile
 import CollatzLean.Collatz3.Bridge.PredecessorExcess
 import CollatzLean.Collatz3.Bridge.FerrersRealization
+import CollatzLean.Collatz3.Bridge.CriticalRecord
 import CollatzLean.Collatz3.Bridge.CriticalRecordEquiv
 
 set_option linter.style.header false
@@ -68,18 +74,22 @@ Word / Profile はその薄い wrapper とする。
 fixed-fiber では signed baseline / signed `E_RF` / signed prepend coordinate を正本とし、
 Nat-valued excess は valid word 上の互換 view とする。
 
-pure fixed-fiber arithmetic は actual predecessor semantics を import せず、
-逆コラッツ木との接続は Bridge 層だけに置く。
+actual semantics、pure critical shape、Ferrers/record 幾何を混ぜない。
 
-さらに actual critical first-passage から有限 profile を抽出し、
-checkpoint / affine numerator / canonical `R,Y,Q` まで lossless に接続する。
+Record 層では特に次の二種類を明確に分離する。
 
-Ferrers / Record 層も同じ原則に従う。
+1. `Ferrers.RecordView`
+   任意の admissible profile に deterministic な record-low cut list を付ける弱い view。
+   Profile と exact `Equiv` だが、local block geometry は主張しない。
 
-1. `Combinatorics.YoungFerrers` は一般の ordered finite diagram と古典 Ferrers 条件だけ。
-2. `Critical.Ferrers` は Profile を diagram として読む derived view。
-3. `Critical.WordFerrers` は Word の pure Ferrers/rank view だけを持つ。
-4. `Combinatorics.Record` は任意 rank に対する generic record block と terminal tail を分離する。
-5. `Critical.RecordFerrers` は proper record blocks + closing terminal tail として profile を分解する。
-6. actual Collatz run との rank 一致は `Bridge.FerrersRealization` だけに置く。
+2. `Critical.RecordFerrers`
+   canonical positive roof anchor `[1]` から terminal まで strict record blocks を連結する
+   強い幾何 packet。任意 profile との `Equiv` は主張しない。
+
+`0` を record anchor にすると start/terminal rank がともに 0 となるため、
+strong Record--Ferrers では positive roof anchor を明示的に採用する。
+actual future-minimum はこの pure anchor と別概念であり、必要な接続は Bridge 層だけに置く。
+
+無限 actual semantics も `OddOrbit` / `FutureMinimum` / `StandardFutureMinimum` に分割し、
+標準 tail-minimum 選択の強さを一点の future-minimum 性へ混ぜない。
 -/
