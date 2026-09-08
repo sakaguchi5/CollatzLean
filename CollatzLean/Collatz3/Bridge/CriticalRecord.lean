@@ -14,6 +14,8 @@ exact `Equiv` と、一方向の強い幾何 bridge を分離する。
 
 一方、strong `Critical.RecordFerrers m` は profile に追加の strict block geometry を持つため、
 任意 profile と同値とは主張しない。underlying profile を経由して CriticalWord へ忘却できるだけである。
+
+weak `RecordView` の cut 抽出は有限計算なので、ここにある `Equiv` もすべて computable。
 -/
 
 namespace Collatz3
@@ -26,14 +28,14 @@ def criticalWordProfileEquiv
     Critical.CriticalWord m ≃ Critical.AdmissibleProfile m :=
   Critical.criticalWordEquivAdmissibleProfile m hm
 
-/-- finite profile と弱い canonical record view の exact equivalence。 -/
-noncomputable def profileRecordViewEquiv
+/-- finite profile と弱い canonical record view の computable exact equivalence。 -/
+def profileRecordViewEquiv
     (m : ℕ) :
     Critical.AdmissibleProfile m ≃ Ferrers.RecordView m :=
   Ferrers.admissibleProfileEquivRecordView m
 
-/-- positive width では CriticalWord と弱い RecordView も exact `Equiv`。 -/
-noncomputable def criticalWordRecordViewEquiv
+/-- positive width では CriticalWord と弱い RecordView も computable exact `Equiv`。 -/
+def criticalWordRecordViewEquiv
     (m : ℕ)
     (hm : 0 < m) :
     Critical.CriticalWord m ≃ Ferrers.RecordView m :=

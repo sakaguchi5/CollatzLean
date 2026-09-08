@@ -11,8 +11,10 @@ import CollatzLean.Collatz3.Critical.Ferrers
 local minimal block や roof-return geometry を含む強い Record--Ferrers ではない。
 
 また record 判定は canonical anchor `1` より後だけで行い、比較集合には anchor 自身を
-含める。したがって旧 `properRecordCuts` のように `k=1` が vacuous に record と判定される
-ことはない。
+含める。したがって `k=1` が比較対象なしで record と判定されることはない。
+
+今回の重要な実装上の整理として、record 判定そのものを有限型 `Fin k` 上で書く。
+そのため cut list の抽出は classical choice を必要とせず、通常の計算として実行できる。
 -/
 
 namespace Collatz3
@@ -22,6 +24,13 @@ open Critical
 
 /--
 anchor より後の cut `k` が、anchor から `k-1` までの全 rank より strict に低い。
+
+比較対象を `Fin k` に限定しているので、この predicate は有限に判定できる。
+数学的内容は
+
+`anchor ≤ j < k  ->  rank(k) < rank(j)`
+
+そのものである。
 -/
 def IsRecordCutAfter
     {m : ℕ}
@@ -29,16 +38,52 @@ def IsRecordCutAfter
     (anchor k : ℕ) : Prop :=
   anchor < k ∧
     k < m ∧
-    ∀ j : ℕ, anchor ≤ j → j < k →
-      profileChordRank h k < profileChordRank h j
+    ∀ j : Fin k,
+      anchor ≤ j.1 →
+        profileChordRank h k < profileChordRank h j.1
 
-/-- 指定 anchor より後の deterministic record cut list。 -/
-noncomputable def recordCutsAfter
+/-- `IsRecordCutAfter` は有限比較だけなので computable に判定できる。 -/
+instance instDecidableIsRecordCutAfter
     {m : ℕ}
     (h : Profile m)
-    (anchor : ℕ) : List ℕ := by
-  classical
-  exact (List.range m).filter (fun k => IsRecordCutAfter h anchor k)
+    (anchor k : ℕ) :
+    Decidable (IsRecordCutAfter h anchor k) := by
+  unfold IsRecordCutAfter
+  infer_instance
+
+/--
+`Fin k` 版の有限定義を、通常の自然数区間で読むための仕様定理。
+-/
+theorem isRecordCutAfter_iff
+    {m : ℕ}
+    {h : Profile m}
+    {anchor k : ℕ} :
+    IsRecordCutAfter h anchor k ↔
+      anchor < k ∧
+      k < m ∧
+      ∀ j : ℕ,
+        anchor ≤ j →
+        j < k →
+          profileChordRank h k < profileChordRank h j := by
+  constructor
+  · intro H
+    refine ⟨H.1, H.2.1, ?_⟩
+    intro j haj hjk
+    exact H.2.2 ⟨j, hjk⟩ haj
+  · intro H
+    refine ⟨H.1, H.2.1, ?_⟩
+    intro j haj
+    exact H.2.2 j.1 haj j.2
+
+/--
+指定 anchor より後の deterministic record cut list。
+有限範囲 `0, ..., m-1` を走査するだけなので computable。
+-/
+def recordCutsAfter
+    {m : ℕ}
+    (h : Profile m)
+    (anchor : ℕ) : List ℕ :=
+  (List.range m).filter (fun k => IsRecordCutAfter h anchor k)
 
 /-- record cut list の membership specification。 -/
 theorem mem_recordCutsAfter_iff
@@ -47,11 +92,10 @@ theorem mem_recordCutsAfter_iff
     {anchor k : ℕ} :
     k ∈ recordCutsAfter h anchor ↔
       k < m ∧ IsRecordCutAfter h anchor k := by
-  classical
   simp [recordCutsAfter]
 
 /-- canonical positive anchor `1` より後だけを見る record cut list。 -/
-noncomputable def initialRecordCuts
+def initialRecordCuts
     {m : ℕ}
     (h : Profile m) : List ℕ :=
   recordCutsAfter h initialRoofAnchor
@@ -84,8 +128,8 @@ def forget
     (R : RecordView m) : AdmissibleProfile m :=
   R.profile
 
-/-- profile に deterministic cut decoration を付ける。 -/
-noncomputable def ofProfile
+/-- profile に computable な deterministic cut decoration を付ける。 -/
+def ofProfile
     {m : ℕ}
     (H : AdmissibleProfile m) : RecordView m where
   profile := H
@@ -102,9 +146,10 @@ end RecordView
 
 /--
 finite admissible profile と weak canonical `RecordView` は exact `Equiv`。
+cut 抽出が有限計算になったため、この `Equiv` 自体も computable である。
 この theorem は強い `Critical.RecordFerrers` との同値を主張しない。
 -/
-noncomputable def admissibleProfileEquivRecordView
+def admissibleProfileEquivRecordView
     (m : ℕ) :
     AdmissibleProfile m ≃ RecordView m where
   toFun H := RecordView.ofProfile H

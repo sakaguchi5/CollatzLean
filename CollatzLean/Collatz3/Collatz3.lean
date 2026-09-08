@@ -80,7 +80,7 @@ Record 層では特に次の二種類を明確に分離する。
 
 1. `Ferrers.RecordView`
    任意の admissible profile に deterministic な record-low cut list を付ける弱い view。
-   Profile と exact `Equiv` だが、local block geometry は主張しない。
+   Profile と exact `Equiv` であり、cut 抽出を含めすべて finite computable。
 
 2. `Critical.RecordFerrers`
    canonical positive roof anchor `[1]` から terminal まで strict record blocks を連結する
@@ -90,6 +90,8 @@ Record 層では特に次の二種類を明確に分離する。
 strong Record--Ferrers では positive roof anchor を明示的に採用する。
 actual future-minimum はこの pure anchor と別概念であり、必要な接続は Bridge 層だけに置く。
 
-無限 actual semantics も `OddOrbit` / `FutureMinimum` / `StandardFutureMinimum` に分割し、
-標準 tail-minimum 選択の強さを一点の future-minimum 性へ混ぜない。
+無限 actual semantics は `OddOrbit` / `FutureMinimum` / `StandardFutureMinimum` に分割する。
+stable root が公開するのは future-minimum 性と `FutureMinima.IsStandard` までであり、
+無限 tail から canonical witness を classical に選ぶ実装は
+`Semantics.StandardFutureMinimumChoice` に隔離して root から import しない。
 -/

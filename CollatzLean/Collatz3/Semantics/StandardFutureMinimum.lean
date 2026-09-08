@@ -1,128 +1,31 @@
 import CollatzLean.Collatz3.Semantics.FutureMinimum
-import Mathlib.Data.Finset.Basic
 
 /-!
-# Collatz3: standard future-minimum selection
+# Collatz3: standard future-minimum property
 
 単なる future-minimum 部分列と、各 current の直後の tail 全体から最小値を選ぶ
 **標準列**を分離する。
 
-Adjacent-return の suffix geometry に本当に必要なのは、この標準隣接性である。
-Record--Ferrers の positive roof anchor とは別層の actual semantics として維持する。
+stable core では「どの標準列を classical に選ぶか」を定義しない。
+後段の定理が本当に使う `IsStandard` という性質だけを公開し、
+標準列そのものは証明付き入力として受け取る。
+
+無限 tail の最小値を `Nat.find` / `Classical.choose` で一つ選ぶ従来の canonical constructor は
+`StandardFutureMinimumChoice.lean` に隔離する。この choice ファイルは stable root から import しない。
+
+Adjacent-return の suffix geometry に必要なのはこちらの `IsStandard` であり、
+Record--Ferrers の positive roof anchor とは別層の actual semantics である。
 -/
 
 namespace Collatz3
 namespace OddOrbit
-
-/-- 閾値 `N` 以後に現れる値は少なくとも一つ存在する。 -/
-theorem exists_tail_value
-    (O : OddOrbit)
-    (N : ℕ) :
-    ∃ v : ℕ, ∃ n : ℕ, N ≤ n ∧ O.value n = v :=
-  ⟨O.value N, N, le_rfl, rfl⟩
-
-/-- 閾値 `N` 以後に現れる最小値。 -/
-noncomputable def tailMinValue
-    (O : OddOrbit)
-    (N : ℕ) : ℕ := by
-  classical
-  exact Nat.find (O.exists_tail_value N)
-
-/-- tail minimum value は実際の軌道位置で実現される。 -/
-theorem tailMinValue_spec
-    (O : OddOrbit)
-    (N : ℕ) :
-    ∃ n : ℕ, N ≤ n ∧ O.value n = O.tailMinValue N := by
-  classical
-  unfold tailMinValue
-  exact Nat.find_spec (O.exists_tail_value N)
-
-/-- tail minimum value を実現する位置を一つ選ぶ。 -/
-noncomputable def tailMinIndex
-    (O : OddOrbit)
-    (N : ℕ) : ℕ :=
-  Classical.choose (O.tailMinValue_spec N)
-
-@[simp] theorem tailMinIndex_ge
-    (O : OddOrbit)
-    (N : ℕ) :
-    N ≤ O.tailMinIndex N :=
-  (Classical.choose_spec (O.tailMinValue_spec N)).1
-
-@[simp] theorem value_tailMinIndex
-    (O : OddOrbit)
-    (N : ℕ) :
-    O.value (O.tailMinIndex N) = O.tailMinValue N :=
-  (Classical.choose_spec (O.tailMinValue_spec N)).2
-
-/-- tail minimum value は閾値以後の任意の軌道値以下。 -/
-theorem tailMinValue_le
-    (O : OddOrbit)
-    (N m : ℕ)
-    (hm : N ≤ m) :
-    O.tailMinValue N ≤ O.value m := by
-  classical
-  unfold tailMinValue
-  exact Nat.find_min' (O.exists_tail_value N) ⟨m, hm, rfl⟩
-
-/-- 選択した tail minimum 位置は future minimum。 -/
-theorem futureMinimumAt_tailMinIndex
-    (O : OddOrbit)
-    (N : ℕ) :
-    O.FutureMinimumAt (O.tailMinIndex N) := by
-  intro m hm
-  rw [O.value_tailMinIndex]
-  exact O.tailMinValue_le N m
-    (le_trans (O.tailMinIndex_ge N) hm)
-
-/-- tail minimum を current+1 以後から再帰的に選ぶ canonical index 列。 -/
-noncomputable def standardFutureMinIndex
-    (O : OddOrbit) : ℕ → ℕ
-  | 0 => O.tailMinIndex 0
-  | j + 1 => O.tailMinIndex (O.standardFutureMinIndex j + 1)
-
-/-- canonical index は一段ごとに strict に進む。 -/
-theorem standardFutureMinIndex_lt_succ
-    (O : OddOrbit)
-    (j : ℕ) :
-    O.standardFutureMinIndex j <
-      O.standardFutureMinIndex (j + 1) := by
-  rw [standardFutureMinIndex]
-  have h := O.tailMinIndex_ge (O.standardFutureMinIndex j + 1)
-  omega
-
-/-- canonical index 列は strict monotone。 -/
-theorem standardFutureMinIndex_strict
-    (O : OddOrbit) :
-    StrictMono O.standardFutureMinIndex :=
-  strictMono_nat_of_lt_succ O.standardFutureMinIndex_lt_succ
-
-/-- canonical に選んだ各 index は future minimum。 -/
-theorem futureMinimumAt_standardFutureMinIndex
-    (O : OddOrbit)
-    (j : ℕ) :
-    O.FutureMinimumAt (O.standardFutureMinIndex j) := by
-  cases j with
-  | zero =>
-      simpa [standardFutureMinIndex] using
-        O.futureMinimumAt_tailMinIndex 0
-  | succ j =>
-      simpa [standardFutureMinIndex] using
-        O.futureMinimumAt_tailMinIndex (O.standardFutureMinIndex j + 1)
-
-/-- canonical tail-minimum index 列を `FutureMinima` packet にまとめる。 -/
-noncomputable def standardFutureMinima
-    (O : OddOrbit) : O.FutureMinima where
-  index := O.standardFutureMinIndex
-  index_strict := O.standardFutureMinIndex_strict
-  minimum := O.futureMinimumAt_standardFutureMinIndex
-
 namespace FutureMinima
 
 /--
 次項が current より後の任意の軌道値以下、という標準隣接性。
 
-実装上どの `tailMinIndex` witness を選んだかではなく、後段が本当に使う数学的性質だけを公開する。
+どの witness を使って標準列を構成したかには依存せず、
+後段の幾何が本当に必要とする性質だけを表す。
 -/
 def IsStandard
     {O : OddOrbit}
@@ -131,22 +34,15 @@ def IsStandard
     S.index j < t →
       O.value (S.index (j + 1)) ≤ O.value t
 
-/-- canonical tail-minimum 列は標準隣接性を満たす。 -/
-theorem standardFutureMinima_isStandard
-    (O : OddOrbit) :
-    (O.standardFutureMinima).IsStandard := by
-  intro j t hjt
-  change O.standardFutureMinIndex j < t at hjt
-  change
-    O.value (O.standardFutureMinIndex (j + 1)) ≤
-      O.value t
-  rw [standardFutureMinIndex, O.value_tailMinIndex]
-  exact
-    O.tailMinValue_le
-      (O.standardFutureMinIndex j + 1)
-      t
-      (by
-        exact Nat.succ_le_of_lt hjt)
+/-- 標準列の次項は current より後の各位置の値以下。 -/
+theorem next_value_le_of_standard
+    {O : OddOrbit}
+    {S : O.FutureMinima}
+    (hStandard : S.IsStandard)
+    {j t : ℕ}
+    (hjt : S.index j < t) :
+    O.value (S.index (j + 1)) ≤ O.value t :=
+  hStandard j t hjt
 
 end FutureMinima
 end OddOrbit
