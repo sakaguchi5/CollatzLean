@@ -47,9 +47,12 @@ import CollatzLean.Collatz3.Critical.WordFerrers
 import CollatzLean.Collatz3.Critical.WordProfileEquiv
 import CollatzLean.Collatz3.Critical.RoofAnchor
 import CollatzLean.Collatz3.Critical.RecordSkeleton
+import CollatzLean.Collatz3.Critical.RecordRankArithmetic
 import CollatzLean.Collatz3.Critical.RecordLocalGeometry
+import CollatzLean.Collatz3.Critical.RecordTerminal
 
 import CollatzLean.Collatz3.Ferrers.RecordView
+import CollatzLean.Collatz3.Ferrers.RecordCanonical
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
 
@@ -89,13 +92,15 @@ Record/Ferrers 層で現在確定しているのは次の三段である。
    interior endpoint が critical roof に戻ることだけを持つ pure skeleton。
    local first-passage 性はここには保存しない。
 
-3. `Critical.RecordLocalGeometry`
-   skeleton から local critical block geometry を導くための定義・補題群。
-   `IsBestUpperWidth` は local criticality の必要条件とはせず、
-   proper-prefix Beatty bound を一括保証する十分条件として使う。
+3. `Ferrers.RecordCanonical` / `Critical.RecordLocalGeometry` / `Critical.RecordTerminal`
+   weak record から canonical skeleton への bridge と、その skeleton から local critical geometry を
+   導くための定義・補題群。`NoRecordLevelTie` が exact な record-level tie 排除条件であり、
+   `IsPrimitiveWidth` はそれを保証する十分条件として使う。
+   `IsBestUpperWidth` も local criticality の必要条件とはせず、`m > 2` では
+   proper-prefix bound と terminal minimality を一括保証する十分条件として使う。
 
 真の `RecordFerrers` structure は現段階ではまだ定義しない。
-record-level tie と local carry の exact 条件を確定した後に、必要最小限の条件だけで再導入する。
+今回確定した canonical skeleton と local 条件を基礎に、必要最小限の exact 条件だけで再導入する。
 
 critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置かない。
 `criticalTwoDepth m` が width `m` だけで決まることを使い、
@@ -109,7 +114,7 @@ critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置か
 `IsBestUpperWidth` と同値な compatibility view に降格する。
 
 primitive 性は weak RecordView から strict skeleton へ上げる際の
-record-level tie 排除を保証する十分条件候補として扱い、structure には埋め込まない。
+record-level tie 排除を保証する十分条件として扱い、structure には埋め込まない。
 
 `0` を record anchor にすると start/terminal rank がともに 0 となるため、
 critical record skeleton では positive roof anchor を採用する。
