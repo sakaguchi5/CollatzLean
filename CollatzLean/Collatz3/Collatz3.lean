@@ -24,6 +24,8 @@ import CollatzLean.Collatz3.Semantics.ReachOne
 import CollatzLean.Collatz3.Semantics.OrbitReturn
 import CollatzLean.Collatz3.Semantics.PeriodicOrbit
 import CollatzLean.Collatz3.Semantics.OddOrbit
+import CollatzLean.Collatz3.Semantics.OrbitFate
+import CollatzLean.Collatz3.Semantics.FiniteOrbitFate
 import CollatzLean.Collatz3.Semantics.FutureMinimum
 import CollatzLean.Collatz3.Semantics.StandardFutureMinimum
 
@@ -84,6 +86,16 @@ Nat-valued excess は valid word 上の互換 view とする。
 
 actual semantics、pure critical shape、Ferrers/record 幾何を混ぜない。
 
+actual semantics の最終挙動も同じ原則で分離する。
+
+* `ReachesOne x` は指数語を忘れた「1 への有限到達」だけを表す。
+* `EndsAtOne w x` はその到達を実現する有限 run 証明書であり、`FirstHitsOne` はその正規形。
+* `OddOrbit.HitsOne` / `HasNontrivialRepeat` / `DivergesToInfinity` は無限軌道の3つの薄い最終挙動述語。
+* `FiniteOrbitFate` では有限深度の三分法を構成的に閉じる。
+* 無限軌道の完全三分法は `Semantics.OrbitFateClassical` に隔離し、stable root から import しない。
+
+これにより「終点 1」は pure shape の追加条件ではなく、第1の軌道終局型を有限に証明する意味論的条件として扱う。
+
 Record/Ferrers 層で現在確定しているのは次の三段である。
 
 1. `Ferrers.RecordView`
@@ -130,8 +142,9 @@ record-level tie 排除を保証する十分条件として扱い、structure �
 critical record skeleton では positive roof anchor を採用する。
 actual future-minimum は pure anchor と別概念であり、必要な接続は Bridge 層だけに置く。
 
-無限 actual semantics は `OddOrbit` / `FutureMinimum` / `StandardFutureMinimum` に分割する。
-stable root が公開するのは future-minimum 性と `FutureMinima.IsStandard` までであり、
+無限 actual semantics は `OddOrbit` / `OrbitFate` / `FutureMinimum` / `StandardFutureMinimum` に分割する。
+stable root が公開するのは構成的な有限深度三分法と future-minimum 性、`FutureMinima.IsStandard` までであり、
+無限軌道の完全三分法は `Semantics.OrbitFateClassical`、
 無限 tail から canonical witness を classical に選ぶ実装は
 `Semantics.StandardFutureMinimumChoice` に隔離して root から import しない。
 -/
