@@ -10,38 +10,6 @@ actual orbit や critical geometry に依存しない純粋な word 関数とし
 namespace Collatz3
 namespace Word
 
-/-- 先頭 `k` odd steps までの累積 2 除算指数。 -/
-def prefixTwoDepth : Word → ℕ → ℕ
-  | [], _ => 0
-  | _ :: _, 0 => 0
-  | e :: tail, k + 1 => e + prefixTwoDepth tail k
-
-@[simp] theorem prefixTwoDepth_nil (k : ℕ) :
-    prefixTwoDepth ([] : Word) k = 0 := by
-  cases k <;> rfl
-
-@[simp] theorem prefixTwoDepth_zero (w : Word) :
-    prefixTwoDepth w 0 = 0 := by
-  cases w <;> rfl
-
-@[simp] theorem prefixTwoDepth_cons_succ
-    (e : ℕ) (tail : Word) (k : ℕ) :
-    prefixTwoDepth (e :: tail) (k + 1) =
-      e + prefixTwoDepth tail k := by
-  rfl
-
-/-- word 全長までの prefix depth は `twoSteps` そのもの。 -/
-@[simp] theorem prefixTwoDepth_oddSteps (w : Word) :
-    prefixTwoDepth w (oddSteps w) = twoSteps w := by
-  induction w with
-  | nil =>
-      rfl
-  | cons e tail ih =>
-      change
-        e + prefixTwoDepth tail (oddSteps tail) =
-          e + twoSteps tail
-      rw [ih]
-
 /-- valid word では prefix two-depth は一 step ごとに strict に増える。 -/
 theorem prefixTwoDepth_strict_succ_of_valid
     {w : Word}

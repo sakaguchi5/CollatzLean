@@ -40,6 +40,9 @@ import CollatzLean.Collatz3.Critical.ProfileExtraction
 import CollatzLean.Collatz3.Critical.Ferrers
 import CollatzLean.Collatz3.Critical.WordFerrers
 import CollatzLean.Collatz3.Critical.RecordFerrers
+import CollatzLean.Collatz3.Critical.WordProfileEquiv
+
+import CollatzLean.Collatz3.Ferrers.RecordFerrers
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
 
@@ -51,6 +54,7 @@ import CollatzLean.Collatz3.Bridge.ProfileWordCanonical
 import CollatzLean.Collatz3.Bridge.FirstPassageProfile
 import CollatzLean.Collatz3.Bridge.PredecessorExcess
 import CollatzLean.Collatz3.Bridge.FerrersRealization
+import CollatzLean.Collatz3.Bridge.CriticalRecordEquiv
 
 set_option linter.style.header false
 /-!
