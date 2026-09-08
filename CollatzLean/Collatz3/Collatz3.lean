@@ -18,6 +18,7 @@ import CollatzLean.Collatz3.Canonical.LiftClassification
 import CollatzLean.Collatz3.Semantics.OddStep
 import CollatzLean.Collatz3.Semantics.Runs
 import CollatzLean.Collatz3.Semantics.Reachability
+import CollatzLean.Collatz3.Semantics.Predecessor
 import CollatzLean.Collatz3.Semantics.Sufficiency
 import CollatzLean.Collatz3.Semantics.ReachOne
 import CollatzLean.Collatz3.Semantics.OrbitReturn
@@ -26,6 +27,7 @@ import CollatzLean.Collatz3.Semantics.PeriodicOrbit
 import CollatzLean.Collatz3.Combinatorics.WordRepetition
 
 import CollatzLean.Collatz3.FixedFiber.UniversalExcess
+import CollatzLean.Collatz3.FixedFiber.PrependExcess
 
 import CollatzLean.Collatz3.Critical.Beatty
 import CollatzLean.Collatz3.Critical.FirstPassage

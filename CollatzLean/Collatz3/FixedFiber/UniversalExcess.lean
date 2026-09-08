@@ -7,7 +7,9 @@ import CollatzLean.Collatz3.Core.WordTransfer
 
 `3^p - 2^p`
 
-からの差を RecordFerrers / fixed-fiber excess `E_RF` として扱う。
+からの差を fixed-fiber excess `E_RF` として扱う。
+ここでは RecordFerrers を定義・仮定しない。
+将来、RecordFerrers を導入した後に幾何的な面積座標として解釈できる形を保つ。
 
 符号を失わない `signedUniversalExcess : ℤ` を数学的な正本とする。
 従来の `universalExcess : ℕ` は valid word 上で使う互換用 Nat view として残す。
@@ -21,8 +23,9 @@ def fixedFiberBaseline (p : ℕ) : ℕ :=
   3 ^ p - 2 ^ p
 
 /--
-符号を失わない RecordFerrers / fixed-fiber excess `E_RF`。
+符号を失わない fixed-fiber excess `E_RF`。
 raw Word に対しても情報を潰さない。
+RecordFerrers に依存しない算術的な正本として定義する。
 -/
 def signedUniversalExcess (w : Word) : ℤ :=
   (affineConst w : ℤ) -
