@@ -17,6 +17,8 @@ import CollatzLean.Collatz3.Canonical.LiftClassification
 
 import CollatzLean.Collatz3.Semantics.OddStep
 import CollatzLean.Collatz3.Semantics.Runs
+import CollatzLean.Collatz3.Semantics.Reachability
+import CollatzLean.Collatz3.Semantics.Sufficiency
 import CollatzLean.Collatz3.Semantics.ReachOne
 import CollatzLean.Collatz3.Semantics.OrbitReturn
 import CollatzLean.Collatz3.Semantics.PeriodicOrbit
@@ -34,6 +36,7 @@ import CollatzLean.Collatz3.Critical.ProfileExtraction
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
 
+import CollatzLean.Collatz3.Bridge.SufficiencyConsequences
 import CollatzLean.Collatz3.Bridge.RunsToCanonical
 import CollatzLean.Collatz3.Bridge.ReachOneConsequences
 import CollatzLean.Collatz3.Bridge.PeriodicOrbitConsequences
