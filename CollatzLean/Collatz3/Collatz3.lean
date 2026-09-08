@@ -145,6 +145,4 @@ actual future-minimum は pure anchor と別概念であり、必要な接続は
 無限 actual semantics は `OddOrbit` / `OrbitFate` / `FutureMinimum` / `StandardFutureMinimum` に分割する。
 stable root が公開するのは構成的な有限深度三分法と future-minimum 性、`FutureMinima.IsStandard` までであり、
 無限軌道の完全三分法は `Semantics.OrbitFateClassical`、
-無限 tail から canonical witness を classical に選ぶ実装は
-`Semantics.StandardFutureMinimumChoice` に隔離して root から import しない。
 -/

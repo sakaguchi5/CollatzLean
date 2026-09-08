@@ -10,8 +10,6 @@ stable core では「どの標準列を classical に選ぶか」を定義しな
 後段の定理が本当に使う `IsStandard` という性質だけを公開し、
 標準列そのものは証明付き入力として受け取る。
 
-無限 tail の最小値を `Nat.find` / `Classical.choose` で一つ選ぶ従来の canonical constructor は
-`StandardFutureMinimumChoice.lean` に隔離する。この choice ファイルは stable root から import しない。
 
 Adjacent-return の suffix geometry に必要なのはこちらの `IsStandard` であり、
 Record--Ferrers の positive roof anchor とは別層の actual semantics である。

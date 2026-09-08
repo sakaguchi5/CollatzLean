@@ -1,4 +1,4 @@
-import CollatzLean.Collatz3.Ferrers.RecordView
+import CollatzLean.Collatz3.Ferrers.RecordPartition
 import CollatzLean.Collatz3.Critical.RecordSkeleton
 import CollatzLean.Collatz3.Critical.BestUpperWidth
 import CollatzLean.Collatz3.Critical.RecordRankArithmetic
@@ -10,22 +10,25 @@ import Mathlib.Tactic.Ring
 /-!
 # Collatz3: RecordView から canonical critical record skeleton へ
 
-このファイルは weak `RecordView` と `CriticalRecordSkeleton` の間の前半 bridge を扱う。
+このファイルは weak `RecordView` と `CriticalRecordSkeleton` の間の bridge を扱う。
 
 設計上の要点は次の通り。
 
+* `initialRecordCuts` と `canonicalRecordLengths` は `RecordPartition` で有限計算する。
 * exact な障害は「全 rank が相異なること」ではなく、weak running minimum が
   同じ level に戻る `record-level tie` である。
-* `IsPrimitiveWidth` はその exact 条件ではなく、record-level tie を排除する
+* `NoRecordLevelTie` は block length を選ぶためには使わない。
+  profile から既に計算された canonical partition が genuine strict skeleton であることを
+  証明するためだけに使う。
+* `IsPrimitiveWidth` は exact 条件ではなく、record-level tie を排除する
   算術的な十分条件として使う。
-* strict record cut が critical roof に乗ること自体には primitive 性を使わない。
 * `CriticalRecordSkeleton` が同じ profile 上に二つ存在すれば、その block length 列は一意。
 
+従来の theorem-level choice による data constructor は置かない。
 真の `RecordFerrers` はここではまだ定義しない。
 -/
 
 namespace Collatz3
-
 namespace Ferrers
 
 open Critical
@@ -263,8 +266,6 @@ relative record start `a` の後で、
 * `a < t < k` の内部では start rank 以上
 
 なら、`k` は元の anchor から見た weak record cut である。
-
-`buildBlocksFrom` 内の weak-record 証明を共通化する補題。
 -/
 private theorem weakRecordCutAfter_of_relativeStart
     {m : ℕ}
@@ -288,9 +289,7 @@ private theorem weakRecordCutAfter_of_relativeStart
   · have hPrev :
         profileChordRank h a < profileChordRank h t :=
       haRecord.2.2 t hat hta
-    exact
-      le_of_lt
-        (lt_of_le_of_lt hEndLe hPrev)
+    exact le_of_lt (lt_of_le_of_lt hEndLe hPrev)
   · have hatLe : a ≤ t :=
       Nat.le_of_not_gt hta
     by_cases htaEq : t = a
@@ -311,9 +310,6 @@ relative record start `a` より後の `j` について、
 
 が成り立つなら、record-level tie が無い限り
 実際には `rank a < rank j` である。
-
-等号なら `j` が weak record cut になり、
-`NoRecordLevelTie` により strict record cut となって矛盾する。
 -/
 private theorem strictRankAbove_of_noRecordLevelTie
     {m : ℕ}
@@ -336,9 +332,7 @@ private theorem strictRankAbove_of_noRecordLevelTie
   have hWeakJ :
       IsWeakRecordCutAfter h anchor j :=
     weakRecordCutAfter_of_relativeStart
-      haRecord
-      haj
-      hjm
+      haRecord haj hjm
       (le_of_eq hEq.symm)
       hInteriorLe
   have hRecordJ :
@@ -352,290 +346,545 @@ private theorem strictRankAbove_of_noRecordLevelTie
     hRJ.2.2 a haRecord.1 haj
   exact (ne_of_lt hDrop) hEq.symm
 
-private noncomputable def buildBlocksFrom
+
+/-! ## deterministic canonical cuts の weak geometry -/
+
+/--
+record block の weak 版。
+
+* 長さは正、
+* interior は start rank 以上、
+* endpoint では start rank より strict に下がる。
+
+record-level tie をまだ禁止しない。
+-/
+def IsWeakRecordBlock
+    {m : ℕ}
+    (h : Profile m)
+    (a r : ℕ) : Prop :=
+  0 < r ∧
+    (∀ j : ℕ,
+      0 < j →
+      j < r →
+        profileChordRank h a ≤ profileChordRank h (a + j)) ∧
+    profileChordRank h (a + r) < profileChordRank h a
+
+namespace IsWeakRecordBlock
+
+theorem length_pos
+    {m : ℕ}
+    {h : Profile m}
+    {a r : ℕ}
+    (B : IsWeakRecordBlock h a r) :
+    0 < r :=
+  B.1
+
+theorem interior
+    {m : ℕ}
+    {h : Profile m}
+    {a r j : ℕ}
+    (B : IsWeakRecordBlock h a r)
+    (hjPos : 0 < j)
+    (hjLt : j < r) :
+    profileChordRank h a ≤ profileChordRank h (a + j) :=
+  B.2.1 j hjPos hjLt
+
+theorem end_drop
+    {m : ℕ}
+    {h : Profile m}
+    {a r : ℕ}
+    (B : IsWeakRecordBlock h a r) :
+    profileChordRank h (a + r) < profileChordRank h a :=
+  B.2.2
+
+end IsWeakRecordBlock
+
+/--
+strict cut list が切り出す各区間を weak record block として読む canonical view。
+最後の区間は terminal `m` まで。
+-/
+def CanonicalWeakBlocksFrom
+    {m : ℕ}
+    (h : Profile m) : ℕ → List ℕ → Prop
+  | a, [] =>
+      IsWeakRecordBlock h a (m - a)
+  | a, k :: ks =>
+      IsWeakRecordBlock h a (k - a) ∧
+        IsRoofCut h k ∧
+        CanonicalWeakBlocksFrom h k ks
+
+/--
+relative strict record start `a` より後で最初に start rank を strict に下回る cut は、
+元 anchor から見ても strict record cut になる。
+-/
+private theorem firstLower_isRecordCutAfter
+    {m : ℕ}
+    {h : Profile m}
+    {anchor a k : ℕ}
+    (haRecord : IsRelativeRecordStart h anchor a)
+    (hak : a < k)
+    (hkm : k < m)
+    (hLower :
+      profileChordRank h k < profileChordRank h a)
+    (hFirst :
+      ∀ j : ℕ,
+        a < j →
+        j < k →
+          profileChordRank h a ≤ profileChordRank h j) :
+    IsRecordCutAfter h anchor k := by
+  apply (isRecordCutAfter_iff).2
+  refine ⟨lt_of_le_of_lt haRecord.1 hak, hkm, ?_⟩
+  intro j haj hjk
+  by_cases hja : j < a
+  · have hPrev := haRecord.2.2 j haj hja
+    exact lt_trans hLower hPrev
+  by_cases hEq : j = a
+  · subst j
+    exact hLower
+  · have hajStrict : a < j := by omega
+    exact lt_of_lt_of_le hLower (hFirst j hajStrict hjk)
+
+/--
+current start `a` より前に未列挙の strict lower cut が無いなら、
+次の canonical cut までの rank は start rank 以上。
+
+ここでの `Nat.find` は theorem 内の有限存在証明にだけ現れ、
+計算データを構成する定義には現れない。
+-/
+private theorem rank_le_before_next_recordCut
+    {m : ℕ}
+    {h : Profile m}
+    {anchor a endIndex : ℕ}
+    {cuts : List ℕ}
+    (haRecord : IsRelativeRecordStart h anchor a)
+    (hComplete :
+      ∀ q : ℕ,
+        IsRecordCutAfter h anchor q →
+        a < q →
+        q ∈ cuts)
+    (hNoCutBefore :
+      ∀ q ∈ cuts,
+        ¬ (a < q ∧ q < endIndex))
+    {j : ℕ}
+    (haj : a < j)
+    (hjEnd : j < endIndex)
+    (hEndLeM : endIndex ≤ m) :
+    profileChordRank h a ≤ profileChordRank h j := by
+  by_contra hNot
+  have hjLower :
+      profileChordRank h j < profileChordRank h a :=
+    lt_of_not_ge hNot
+  have hExists :
+      ∃ q : ℕ,
+        a < q ∧
+        q < endIndex ∧
+        profileChordRank h q < profileChordRank h a :=
+    ⟨j, haj, hjEnd, hjLower⟩
+  let q : ℕ := Nat.find hExists
+  have hq := Nat.find_spec hExists
+  have hqFirst :
+      ∀ t : ℕ,
+        a < t →
+        t < q →
+          profileChordRank h a ≤ profileChordRank h t := by
+    intro t hat htq
+    by_contra hNotLe
+    have htLower :
+        profileChordRank h t < profileChordRank h a :=
+      lt_of_not_ge hNotLe
+    have htCandidate :
+        a < t ∧
+        t < endIndex ∧
+        profileChordRank h t < profileChordRank h a :=
+      ⟨hat, lt_trans htq hq.2.1, htLower⟩
+    have hqLe : q ≤ t := by
+      dsimp [q]
+      exact Nat.find_min' hExists htCandidate
+    omega
+  have hqm : q < m :=
+    lt_of_lt_of_le hq.2.1 hEndLeM
+  have hRecordQ : IsRecordCutAfter h anchor q :=
+    firstLower_isRecordCutAfter
+      haRecord hq.1 hqm hq.2.2 hqFirst
+  have hMem := hComplete q hRecordQ hq.1
+  exact hNoCutBefore q hMem ⟨hq.1, hq.2.1⟩
+
+private theorem canonicalWeakBlocksFrom_of_cuts
+    {m : ℕ}
+    {h : Profile m}
+    {anchor : ℕ}
+    (recordCut_isRoof :
+      ∀ {k : ℕ},
+        IsRecordCutAfter h anchor k →
+        IsRoofCut h k) :
+    ∀ (a : ℕ) (cuts : List ℕ),
+      IsRoofCut h a →
+      IsRelativeRecordStart h anchor a →
+      StrictCutChainFrom m a cuts →
+      (∀ k ∈ cuts, IsRecordCutAfter h anchor k) →
+      (∀ k : ℕ,
+        IsRecordCutAfter h anchor k →
+        a < k →
+        k ∈ cuts) →
+      CanonicalWeakBlocksFrom h a cuts
+  | a, [], hRoof, hRelative, hChain, _hRecords, hComplete => by
+      simp only [StrictCutChainFrom] at hChain
+      simp only [CanonicalWeakBlocksFrom]
+      refine ⟨Nat.sub_pos_of_lt hChain, ?_, ?_⟩
+      · intro j hjPos hjLt
+        have haj : a < a + j := by omega
+        have hjm : a + j < m := by omega
+        exact rank_le_before_next_recordCut
+          hRelative
+          hComplete
+          (by simp)
+          haj
+          hjm
+          (Nat.le_refl m)
+      · have hIndex :
+            a + (m - a) = m :=
+          Nat.add_sub_of_le
+            (Nat.le_of_lt hChain)
+        rw [hIndex, profileChordRank_terminal_eq_zero]
+        exact profileChordRank_pos_of_roofCut hRoof
+  | a, k :: ks, hRoof, hRelative, hChain,
+      hRecords, hComplete => by
+      simp only [StrictCutChainFrom] at hChain
+      have hak : a < k := hChain.1
+      have hkm : k < m := hChain.2.1
+      have hTailChain := hChain.2.2
+      have hRecordK :
+          IsRecordCutAfter h anchor k :=
+        hRecords k (by simp)
+      have hNoCutBefore :
+          ∀ q ∈ k :: ks,
+            ¬ (a < q ∧ q < k) := by
+        intro q hq hBetween
+        simp only [List.mem_cons] at hq
+        rcases hq with hEq | hTail
+        · subst q
+          omega
+        · have hkq :=
+            lt_of_mem_of_strictCutChainFrom
+              hTailChain hTail
+          omega
+      have hWeakInterior :
+          ∀ j : ℕ,
+            0 < j →
+            j < k - a →
+              profileChordRank h a ≤
+                profileChordRank h (a + j) := by
+        intro j hjPos hjLt
+        have haj : a < a + j := by omega
+        have hjk : a + j < k := by omega
+        exact rank_le_before_next_recordCut
+          hRelative
+          hComplete
+          hNoCutBefore
+          haj
+          hjk
+          (Nat.le_of_lt hkm)
+      have hRK :=
+        (isRecordCutAfter_iff).1 hRecordK
+      have hEndDrop :
+          profileChordRank h k <
+            profileChordRank h a :=
+        hRK.2.2 a hRelative.1 hak
+      have hIndex :
+          a + (k - a) = k :=
+        Nat.add_sub_of_le
+          (Nat.le_of_lt hak)
+      have hWeakBlock :
+          IsWeakRecordBlock h a (k - a) := by
+        refine
+          ⟨Nat.sub_pos_of_lt hak,
+            hWeakInterior,
+            ?_⟩
+        simpa [hIndex] using hEndDrop
+      have hRoofK : IsRoofCut h k :=
+        recordCut_isRoof hRecordK
+      have hRelativeK :
+          IsRelativeRecordStart h anchor k :=
+        isRelativeRecordStart_of_recordCut hRecordK
+      have hTailRecords :
+          ∀ q ∈ ks,
+            IsRecordCutAfter h anchor q := by
+        intro q hq
+        exact hRecords q (by simp [hq])
+      have hTailComplete :
+          ∀ q : ℕ,
+            IsRecordCutAfter h anchor q →
+            k < q →
+            q ∈ ks := by
+        intro q hqRecord hkq
+        have hMem :=
+          hComplete q hqRecord
+            (lt_trans hak hkq)
+        simp only [List.mem_cons] at hMem
+        rcases hMem with hEq | hTail
+        · subst q
+          omega
+        · exact hTail
+      refine ⟨hWeakBlock, hRoofK, ?_⟩
+      exact canonicalWeakBlocksFrom_of_cuts
+        recordCut_isRoof
+        k ks
+        hRoofK
+        hRelativeK
+        hTailChain
+        hTailRecords
+        hTailComplete
+
+/--
+任意の admissible profile について、deterministic strict record cuts が切り出す区間は
+自動的に weak record excursions になる。
+`NoRecordLevelTie` は仮定しない。
+-/
+theorem canonicalWeakBlocksFrom_initialRecordCuts
     {m : ℕ}
     {h : Profile m}
     (A : Admissible h)
-    (T : NoRecordLevelTie h initialRoofAnchor)
-    (a : ℕ)
-    (haRoof : IsRoofCut h a)
-    (haRecord :
-      IsRelativeRecordStart h initialRoofAnchor a) :
-    {rs : List ℕ //
-      RoofRecordSkeleton.RealizesBlocksFrom h a rs} := by
-  classical
-  have haLt : a < m :=
-    haRecord.2.1
-  by_cases hLower :
-      ∃ k : ℕ,
-        a < k ∧
-        k < m ∧
-        profileChordRank h k <
-          profileChordRank h a
-  · /-
-    次の strict lower cut を最小添字で選ぶ。
-    -/
-    let k : ℕ :=
-      Nat.find hLower
-    have hk :
-        a < k ∧
-        k < m ∧
-        profileChordRank h k <
-          profileChordRank h a := by
-      dsimp [k]
-      exact Nat.find_spec hLower
-    /-
-    k が最初の lower cut なので、
-    a < j < k では rank a ≤ rank j。
-    -/
-    have hkMin :
-        ∀ j : ℕ,
-          a < j →
-          j < k →
-          profileChordRank h a ≤
-            profileChordRank h j := by
-      intro j haj hjk
-      by_contra hNotLe
-      have hjLower :
-          profileChordRank h j <
-            profileChordRank h a :=
-        lt_of_not_ge hNotLe
-      have hjPred :
-          a < j ∧
-          j < m ∧
-          profileChordRank h j <
-            profileChordRank h a :=
-        ⟨haj,
-          lt_trans hjk hk.2.1,
-          hjLower⟩
-      have hkLe : k ≤ j := by
-        dsimp [k]
-        exact Nat.find_min' hLower hjPred
-      exact (Nat.not_lt_of_ge hkLe) hjk
-    /-
-    record-level tie が無いので、
-    first lower cut より前の内部は weak ではなく strict に上。
-    -/
-    have hStrictInterior :
-        ∀ j : ℕ,
-          a < j →
-          j < k →
-          profileChordRank h a <
-            profileChordRank h j := by
-      intro j haj hjk
-      have hLe :
-          profileChordRank h a ≤
-            profileChordRank h j :=
-        hkMin j haj hjk
-      have hjm : j < m :=
-        lt_trans hjk hk.2.1
-      have hInteriorLe :
-          ∀ t : ℕ,
-            a < t →
-            t < j →
-            profileChordRank h a ≤
-              profileChordRank h t := by
-        intro t hat htj
-        exact
-          hkMin
-            t
-            hat
-            (lt_trans htj hjk)
-      exact
-        strictRankAbove_of_noRecordLevelTie
-          T
-          haRecord
-          haj
-          hjm
-          hLe
-          hInteriorLe
-    /-
-    first lower cut k 自体は weak record。
-    tie-free 性により strict record になる。
-    -/
-    have hWeakK :
-        IsWeakRecordCutAfter
-          h initialRoofAnchor k :=
-      weakRecordCutAfter_of_relativeStart
-        haRecord
-        hk.1
-        hk.2.1
-        (le_of_lt hk.2.2)
-        hkMin
-    have hRecordK :
-        IsRecordCutAfter
-          h initialRoofAnchor k :=
-      T k hWeakK
-    have hRoofK :
-        IsRoofCut h k :=
-      isRoofCut_of_isRecordCutAfter
-        A hRecordK
-    have hRelK :
-        IsRelativeRecordStart
-          h initialRoofAnchor k :=
-      isRelativeRecordStart_of_recordCut
-        hRecordK
-    /-
-    a から k までは一つの strict record block。
-    -/
-    have hBlock :
-        Combinatorics.IsRecordBlock
-          (profileChordRank h)
-          a
-          (k - a) := by
-      refine
-        ⟨Nat.sub_pos_of_lt hk.1,
-          ?_,
-          ?_⟩
-      · intro j hjPos hjLt
-        have haj :
-            a < a + j := by
-          omega
-        have hjk :
-            a + j < k := by
-          omega
-        exact
-          hStrictInterior
-            (a + j)
-            haj
-            hjk
-      · have hEqIndex :
-            a + (k - a) = k :=
-          Nat.add_sub_of_le
-            (Nat.le_of_lt hk.1)
-        rw [hEqIndex]
-        exact hk.2.2
-    /-
-    k から terminal までは同じ構成を再帰する。
-    -/
-    let tail :=
-      buildBlocksFrom
-        A T
-        k
-        hRoofK
-        hRelK
-    rcases tail with ⟨rs, hrs⟩
-    cases rs with
-    | nil =>
-        have hFalse : False := by
-          simp
-            [RoofRecordSkeleton.RealizesBlocksFrom]
-            at hrs
-        exact False.elim hFalse
-    | cons s ss =>
-        refine
-          ⟨(k - a) :: s :: ss, ?_⟩
-        simp only
-          [RoofRecordSkeleton.RealizesBlocksFrom]
-        have hEqIndex :
-            a + (k - a) = k :=
-          Nat.add_sub_of_le
-            (Nat.le_of_lt hk.1)
-        refine ⟨hBlock, ?_, ?_⟩
-        · rw [hEqIndex]
-          exact hRoofK
-        · rw [hEqIndex]
-          exact hrs
-  · /-
-    terminal まで strict lower cut が存在しない場合。
-    -/
-    have hNoLower :
-        ∀ j : ℕ,
-          a < j →
-          j < m →
-          profileChordRank h a ≤
-            profileChordRank h j := by
-      intro j haj hjm
-      by_contra hNotLe
-      have hjLower :
-          profileChordRank h j <
-            profileChordRank h a :=
-        lt_of_not_ge hNotLe
-      exact
-        hLower
-          ⟨j, haj, hjm, hjLower⟩
-    /-
-    tie-free 性により terminal 前の内部は strict に上。
-    -/
-    have hStrictInterior :
-        ∀ j : ℕ,
-          a < j →
-          j < m →
-          profileChordRank h a <
-            profileChordRank h j := by
-      intro j haj hjm
-      have hLe :
-          profileChordRank h a ≤
-            profileChordRank h j :=
-        hNoLower j haj hjm
-      have hInteriorLe :
-          ∀ t : ℕ,
-            a < t →
-            t < j →
-            profileChordRank h a ≤
-              profileChordRank h t := by
-        intro t hat htj
-        exact
-          hNoLower
-            t
-            hat
-            (lt_trans htj hjm)
-      exact
-        strictRankAbove_of_noRecordLevelTie
-          T
-          haRecord
-          haj
-          hjm
-          hLe
-          hInteriorLe
-    /-
-    roof cut の rank は正で、terminal rank は 0。
-    従って最後の区間も strict record block になる。
-    -/
-    have hStartPos :
-        0 < profileChordRank h a :=
-      profileChordRank_pos_of_roofCut
-        haRoof
-    have hBlock :
-        Combinatorics.IsRecordBlock
-          (profileChordRank h)
-          a
-          (m - a) := by
-      refine
-        ⟨Nat.sub_pos_of_lt haLt,
-          ?_,
-          ?_⟩
-      · intro j hjPos hjLt
-        have haj :
-            a < a + j := by
-          omega
-        have hjm :
-            a + j < m := by
-          omega
-        exact
-          hStrictInterior
-            (a + j)
-            haj
-            hjm
-      · have hEqIndex :
-            a + (m - a) = m :=
-          Nat.add_sub_of_le
-            (Nat.le_of_lt haLt)
-        rw [
-          hEqIndex,
-          profileChordRank_terminal_eq_zero
-        ]
-        exact hStartPos
-    refine ⟨[m - a], ?_⟩
-    simp only
-      [RoofRecordSkeleton.RealizesBlocksFrom]
-    refine ⟨hBlock, ?_⟩
+    (hm : 1 < m) :
+    CanonicalWeakBlocksFrom h initialRoofAnchor (initialRecordCuts h) := by
+  have hRoof := initialRoofAnchor_isRoofCut A hm
+  have hRelative :
+      IsRelativeRecordStart h initialRoofAnchor initialRoofAnchor :=
+    isRelativeRecordStart_anchor hRoof.lt_width
+  have hChain :=
+    initialRecordCuts_strictCutChain (h := h) hm
+  have hRecords :
+      ∀ k ∈ initialRecordCuts h,
+        IsRecordCutAfter h initialRoofAnchor k := by
+    intro k hk
+    change k ∈ recordCutsAfter h initialRoofAnchor at hk
+    have hSpec := (mem_recordCutsAfter_iff).1 hk
+    exact hSpec.2
+  have hComplete :
+      ∀ k : ℕ,
+        IsRecordCutAfter h initialRoofAnchor k →
+        initialRoofAnchor < k →
+        k ∈ initialRecordCuts h := by
+    intro k hRecord _hkAfter
+    change k ∈ recordCutsAfter h initialRoofAnchor
     exact
-      Nat.add_sub_of_le
-        (Nat.le_of_lt haLt)
-termination_by m - a
-decreasing_by
-  omega
+      (mem_recordCutsAfter_iff).2
+        ⟨hRecord.2.1, hRecord⟩
+  exact canonicalWeakBlocksFrom_of_cuts
+    (isRoofCut_of_isRecordCutAfter A)
+    initialRoofAnchor
+    (initialRecordCuts h)
+    hRoof hRelative hChain hRecords hComplete
+
+/-! ## tie-free canonical strict geometry -/
+
+/-- canonical partition の各区間を genuine strict record block として読む。 -/
+def CanonicalStrictBlocksFrom
+    {m : ℕ}
+    (h : Profile m) : ℕ → List ℕ → Prop
+  | a, [] =>
+      Combinatorics.IsRecordBlock
+        (profileChordRank h) a (m - a)
+  | a, k :: ks =>
+      Combinatorics.IsRecordBlock
+          (profileChordRank h) a (k - a) ∧
+        IsRoofCut h k ∧
+        CanonicalStrictBlocksFrom h k ks
+
+/--
+weak block の内部で等号が起きれば、その位置は weak record cut になる。
+`NoRecordLevelTie` はそれを strict record cut に昇格させるため、
+次の canonical cut より前には等号が残れない。
+-/
+private theorem isRecordBlock_of_weak_of_noRecordLevelTie
+    {m : ℕ}
+    {h : Profile m}
+    {anchor a r : ℕ}
+    (T : NoRecordLevelTie h anchor)
+    (haRecord : IsRelativeRecordStart h anchor a)
+    (hEnd : a + r ≤ m)
+    (W : IsWeakRecordBlock h a r) :
+    Combinatorics.IsRecordBlock (profileChordRank h) a r := by
+  refine ⟨W.length_pos, ?_, W.end_drop⟩
+  intro j hjPos hjLt
+  have haj : a < a + j := by omega
+  have hjm : a + j < m := by omega
+  have hLe :
+      profileChordRank h a ≤
+        profileChordRank h (a + j) :=
+    W.interior hjPos hjLt
+  have hInteriorLe :
+      ∀ t : ℕ,
+        a < t →
+        t < a + j →
+          profileChordRank h a ≤ profileChordRank h t := by
+    intro t hat htj
+    have htPos : 0 < t - a := by omega
+    have htLt : t - a < r := by omega
+    have hInt :=
+      W.interior (j := t - a) htPos htLt
+    have hIndex : a + (t - a) = t := by omega
+    rw [hIndex] at hInt
+    exact hInt
+  exact strictRankAbove_of_noRecordLevelTie
+    T haRecord haj hjm hLe hInteriorLe
+
+private theorem canonicalStrictBlocksFrom_of_weak_of_noRecordLevelTie
+    {m : ℕ}
+    {h : Profile m}
+    {anchor : ℕ}
+    (T : NoRecordLevelTie h anchor) :
+    ∀ (a : ℕ) (cuts : List ℕ),
+      IsRelativeRecordStart h anchor a →
+      StrictCutChainFrom m a cuts →
+      (∀ k ∈ cuts, IsRecordCutAfter h anchor k) →
+      CanonicalWeakBlocksFrom h a cuts →
+      CanonicalStrictBlocksFrom h a cuts
+  | a, [], hRelative, hChain, _hRecords, hWeak => by
+      simp only [StrictCutChainFrom] at hChain
+      simp only [CanonicalWeakBlocksFrom] at hWeak
+      simp only [CanonicalStrictBlocksFrom]
+      have hEnd : a + (m - a) ≤ m := by omega
+      exact
+        isRecordBlock_of_weak_of_noRecordLevelTie
+          T hRelative hEnd hWeak
+  | a, k :: ks, hRelative, hChain, hRecords, hWeak => by
+      simp only [StrictCutChainFrom] at hChain
+      simp only [CanonicalWeakBlocksFrom] at hWeak
+      simp only [CanonicalStrictBlocksFrom]
+      have hRecordK :
+          IsRecordCutAfter h anchor k :=
+        hRecords k (by simp)
+      have hEnd : a + (k - a) ≤ m := by omega
+      have hStrict :
+          Combinatorics.IsRecordBlock
+            (profileChordRank h) a (k - a) :=
+        isRecordBlock_of_weak_of_noRecordLevelTie
+          T hRelative hEnd hWeak.1
+      have hRelativeK :
+          IsRelativeRecordStart h anchor k :=
+        isRelativeRecordStart_of_recordCut hRecordK
+      have hTailRecords :
+          ∀ q ∈ ks,
+            IsRecordCutAfter h anchor q := by
+        intro q hq
+        exact hRecords q (by simp [hq])
+      refine ⟨hStrict, hWeak.2.1, ?_⟩
+      exact canonicalStrictBlocksFrom_of_weak_of_noRecordLevelTie
+        T k ks
+        hRelativeK
+        hChain.2.2
+        hTailRecords
+        hWeak.2.2
+
+/--
+`NoRecordLevelTie` があれば、profile から有限計算した deterministic partition が
+そのまま genuine strict canonical blocks になる。
+-/
+theorem canonicalStrictBlocksFrom_of_noRecordLevelTie
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    (hm : 1 < m)
+    (T : NoRecordLevelTie h initialRoofAnchor) :
+    CanonicalStrictBlocksFrom
+      h initialRoofAnchor (initialRecordCuts h) := by
+  have hRelative :
+      IsRelativeRecordStart h initialRoofAnchor initialRoofAnchor :=
+    isRelativeRecordStart_anchor
+      (by simpa [initialRoofAnchor] using hm)
+  have hChain :=
+    initialRecordCuts_strictCutChain (h := h) hm
+  have hRecords :
+      ∀ k ∈ initialRecordCuts h,
+        IsRecordCutAfter h initialRoofAnchor k := by
+    intro k hk
+    change k ∈ recordCutsAfter h initialRoofAnchor at hk
+    exact ((mem_recordCutsAfter_iff).1 hk).2
+  exact
+    canonicalStrictBlocksFrom_of_weak_of_noRecordLevelTie
+      T initialRoofAnchor (initialRecordCuts h)
+      hRelative
+      hChain
+      hRecords
+      (canonicalWeakBlocksFrom_initialRecordCuts A hm)
+
+/--
+strict cut chain を隣接差へ変換すると、
+`CanonicalStrictBlocksFrom` は既存の roof-record length realization を与える。
+
+ここでは一方向だけを使う。exact な逆向き bridge は後段の `RecordCarryBridge` に残す。
+-/
+theorem realizesBlocksFrom_blockLengths_of_canonicalStrictBlocks
+    {m : ℕ}
+    {h : Profile m} :
+    ∀ (a : ℕ) (cuts : List ℕ),
+      StrictCutChainFrom m a cuts →
+      CanonicalStrictBlocksFrom h a cuts →
+      RoofRecordSkeleton.RealizesBlocksFrom
+        h a (blockLengthsFromCuts m a cuts)
+  | a, [], hChain, hStrict => by
+      simp only [StrictCutChainFrom] at hChain
+      simp only [CanonicalStrictBlocksFrom] at hStrict
+      simp only [
+        blockLengthsFromCuts,
+        RoofRecordSkeleton.RealizesBlocksFrom
+      ]
+      exact
+        ⟨hStrict,
+          Nat.add_sub_of_le (Nat.le_of_lt hChain)⟩
+  | a, k :: ks, hChain, hStrict => by
+      simp only [StrictCutChainFrom] at hChain
+      simp only [CanonicalStrictBlocksFrom] at hStrict
+      have hak : a < k := hChain.1
+      have hIndex :
+          a + (k - a) = k :=
+        Nat.add_sub_of_le (Nat.le_of_lt hak)
+      let tailLengths : List ℕ :=
+        blockLengthsFromCuts m k ks
+      have hTailNe : tailLengths ≠ [] := by
+        dsimp [tailLengths]
+        exact blockLengthsFromCuts_ne_nil m k ks
+      have hTail :=
+        realizesBlocksFrom_blockLengths_of_canonicalStrictBlocks
+          k ks hChain.2.2 hStrict.2.2
+      change
+        RoofRecordSkeleton.RealizesBlocksFrom
+          h k tailLengths
+        at hTail
+      cases hTailEq : tailLengths with
+      | nil =>
+          exact False.elim (hTailNe hTailEq)
+      | cons s ss =>
+          rw [hTailEq] at hTail
+          simp only [blockLengthsFromCuts]
+          change
+            RoofRecordSkeleton.RealizesBlocksFrom
+              h a ((k - a) :: tailLengths)
+          rw [hTailEq]
+          simp only [RoofRecordSkeleton.RealizesBlocksFrom]
+          rw [hIndex]
+          exact ⟨hStrict.1, hStrict.2.1, hTail⟩
+
+/--
+tie-free admissible profile では、有限計算された `canonicalRecordLengths` が
+roof-record realization を実現する。
+-/
+theorem realizesCanonicalRecordLengths_of_noRecordLevelTie
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    (hm : 1 < m)
+    (T : NoRecordLevelTie h initialRoofAnchor) :
+    RoofRecordSkeleton.RealizesBlocksFrom
+      h initialRoofAnchor (canonicalRecordLengths h) := by
+  unfold canonicalRecordLengths
+  exact
+    realizesBlocksFrom_blockLengths_of_canonicalStrictBlocks
+      initialRoofAnchor
+      (initialRecordCuts h)
+      (initialRecordCuts_strictCutChain (h := h) hm)
+      (canonicalStrictBlocksFrom_of_noRecordLevelTie A hm T)
+
 
 /-- roof-compatible realization の全 block length は正。 -/
 theorem realizesBlocksFrom_lengths_pos
@@ -666,34 +915,39 @@ theorem realizesBlocksFrom_lengths_pos
 
 /--
 `NoRecordLevelTie` を満たす admissible profile から canonical critical record skeleton を作る。
-構成自体は theorem-level choice を使うが、後の一意性定理により結果は profile だけで決まる。
+
+保存する block length は profile から有限計算された `canonicalRecordLengths` そのもの。
+`T` は data selection には使わず、その deterministic partition が genuine strict
+roof-record skeleton を実現することの証明にだけ使う。
 -/
-noncomputable def criticalRecordSkeletonOfProfile
+def criticalRecordSkeletonOfProfile
     {m : ℕ}
     (H : AdmissibleProfile m)
     (hm : 1 < m)
     (T : NoRecordLevelTie H.1 initialRoofAnchor) :
     CriticalRecordSkeleton m := by
-  let hRoof := initialRoofAnchor_isRoofCut H.2 hm
-  let hRel : IsRelativeRecordStart H.1 initialRoofAnchor initialRoofAnchor :=
-    isRelativeRecordStart_anchor (by
-      simpa [initialRoofAnchor] using hm)
-  let B := buildBlocksFrom H.2 T initialRoofAnchor hRoof hRel
+  let hRoof :=
+    initialRoofAnchor_isRoofCut H.2 hm
+  let hRealizes :
+      RoofRecordSkeleton.RealizesBlocksFrom
+        H.1 initialRoofAnchor (canonicalRecordLengths H.1) :=
+    realizesCanonicalRecordLengths_of_noRecordLevelTie
+      H.2 hm T
   let S : Combinatorics.RecordSkeleton :=
-    { lengths := B.1
+    { lengths := canonicalRecordLengths H.1
       positive :=
-        realizesBlocksFrom_lengths_pos
-          initialRoofAnchor B.1 B.2 }
+        canonicalRecordLengths_pos
+          (h := H.1) hm }
   exact {
     profile := H
     skeleton := S
-    realizes := ⟨hRoof, B.2⟩
+    realizes := ⟨hRoof, hRealizes⟩
   }
 
 namespace RecordView
 
 /-- weak RecordView を、tie-free 仮定の下で critical record skeleton へ持ち上げる。 -/
-noncomputable def toCriticalRecordSkeleton
+def toCriticalRecordSkeleton
     {m : ℕ}
     (R : RecordView m)
     (hm : 1 < m)
@@ -702,7 +956,7 @@ noncomputable def toCriticalRecordSkeleton
   criticalRecordSkeletonOfProfile R.profile hm T
 
 /-- primitive width は canonical skeleton を構成する十分条件。 -/
-noncomputable def toCriticalRecordSkeletonOfPrimitive
+def toCriticalRecordSkeletonOfPrimitive
     {m : ℕ}
     (R : RecordView m)
     (hm : 1 < m)
@@ -736,7 +990,6 @@ theorem recordBlock_length_eq_of_same_start
     have hEnd := S.end_drop
     omega
   omega
-
 
 /-- block length 列から terminal を除いた proper endpoint 列を読む。 -/
 def properEndpointsFrom : ℕ → List ℕ → List ℕ
@@ -908,7 +1161,6 @@ theorem mem_criticalRecordSkeletonEndpoints_iff
     exact recordCut_mem_properEndpointsFrom
       initialRoofAnchor R.skeleton.lengths k
       hAnchorRel R.realizes.2 hRecord hAfter
-
 
 /--
 roof record realization が存在する区間では、current start より後の weak record は strict record になる。
