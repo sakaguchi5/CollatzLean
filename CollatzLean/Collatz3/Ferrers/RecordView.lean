@@ -4,17 +4,20 @@ import CollatzLean.Collatz3.Critical.Ferrers
 /-!
 # Collatz3: weak canonical record view
 
-これは強い `Critical.RecordFerrers` とは別物である。
-
 任意の admissible profile に deterministic な record-low cut list を付けるだけの
-**弱い view** をここに置く。profile と完全同値にできるのはこちらであり、
-local minimal block や roof-return geometry を含む強い Record--Ferrers ではない。
+**弱い view** をここに置く。profile と完全同値にできるのはこちらである。
 
-また record 判定は canonical anchor `1` より後だけで行い、比較集合には anchor 自身を
-含める。したがって `k=1` が比較対象なしで record と判定されることはない。
+これは `Critical.CriticalRecordSkeleton` とも full `Critical.RecordFerrers` とも別物である。
 
-今回の重要な実装上の整理として、record 判定そのものを有限型 `Fin k` 上で書く。
-そのため cut list の抽出は classical choice を必要とせず、通常の計算として実行できる。
+* `RecordView`: deterministic strict record-low cuts の decoration。
+* `CriticalRecordSkeleton`: roof-return を含む genuine strict excursion skeleton。
+* `RecordFerrers`: skeleton の各 block が local critical geometry を持つ層。
+
+record 判定は canonical anchor `1` より後だけで行い、比較集合には anchor 自身を含める。
+そのため `k=1` が比較対象なしで record と判定されることはない。
+
+record 判定自体を有限型 `Fin k` 上で書くので、cut list 抽出は classical choice を必要とせず
+通常の計算として実行できる。
 -/
 
 namespace Collatz3
@@ -24,13 +27,6 @@ open Critical
 
 /--
 anchor より後の cut `k` が、anchor から `k-1` までの全 rank より strict に低い。
-
-比較対象を `Fin k` に限定しているので、この predicate は有限に判定できる。
-数学的内容は
-
-`anchor ≤ j < k  ->  rank(k) < rank(j)`
-
-そのものである。
 -/
 def IsRecordCutAfter
     {m : ℕ}
@@ -51,9 +47,7 @@ instance instDecidableIsRecordCutAfter
   unfold IsRecordCutAfter
   infer_instance
 
-/--
-`Fin k` 版の有限定義を、通常の自然数区間で読むための仕様定理。
--/
+/-- `Fin k` 版の有限定義を通常の自然数区間で読む仕様定理。 -/
 theorem isRecordCutAfter_iff
     {m : ℕ}
     {h : Profile m}
@@ -75,10 +69,7 @@ theorem isRecordCutAfter_iff
     intro j haj
     exact H.2.2 j.1 haj j.2
 
-/--
-指定 anchor より後の deterministic record cut list。
-有限範囲 `0, ..., m-1` を走査するだけなので computable。
--/
+/-- 指定 anchor より後の deterministic record cut list。 -/
 def recordCutsAfter
     {m : ℕ}
     (h : Profile m)
@@ -146,8 +137,9 @@ end RecordView
 
 /--
 finite admissible profile と weak canonical `RecordView` は exact `Equiv`。
-cut 抽出が有限計算になったため、この `Equiv` 自体も computable である。
-この theorem は強い `Critical.RecordFerrers` との同値を主張しない。
+cut 抽出が有限計算なので、この `Equiv` 自体も computable。
+
+この theorem は `CriticalRecordSkeleton` や full `RecordFerrers` との同値を主張しない。
 -/
 def admissibleProfileEquivRecordView
     (m : ℕ) :

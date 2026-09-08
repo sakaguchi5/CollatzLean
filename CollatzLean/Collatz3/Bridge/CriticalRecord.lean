@@ -1,21 +1,21 @@
 import CollatzLean.Collatz3.Critical.WordProfileEquiv
+import CollatzLean.Collatz3.Critical.RecordSkeleton
 import CollatzLean.Collatz3.Critical.RecordFerrers
 import CollatzLean.Collatz3.Ferrers.RecordView
 import CollatzLean.Collatz3.Bridge.FirstPassageProfile
 
 /-!
-# Collatz3: critical Word / Profile / Record 層の正しい接続
+# Collatz3: critical Word / Profile / Record 層の接続
 
-exact `Equiv` と、一方向の強い幾何 bridge を分離する。
+exact `Equiv` と、一方向の追加幾何 bridge を分離する。
 
-  CriticalWord m <-> AdmissibleProfile m <-> RecordView m
+`CriticalWord m <-> AdmissibleProfile m <-> RecordView m`
 
 は exact。
 
-一方、strong `Critical.RecordFerrers m` は profile に追加の strict block geometry を持つため、
-任意 profile と同値とは主張しない。underlying profile を経由して CriticalWord へ忘却できるだけである。
-
-weak `RecordView` の cut 抽出は有限計算なので、ここにある `Equiv` もすべて computable。
+一方、`CriticalRecordSkeleton` は strict rank/roof geometry を追加し、
+full `RecordFerrers` はさらに local critical block geometry を追加する。
+したがって後二者を arbitrary profile と `Equiv` にはしない。
 -/
 
 namespace Collatz3
@@ -45,26 +45,43 @@ def criticalWordRecordViewEquiv
 end Bridge
 
 namespace Critical
-namespace RecordFerrers
+namespace CriticalRecordSkeleton
 
 /--
-strong Record--Ferrers から underlying profile を通して critical word shape を復元する。
-これは forgetful map であり、Record--Ferrers との `Equiv` ではない。
+critical record skeleton から underlying profile を通して critical word shape を復元する。
+これは forgetful map であり、skeleton との `Equiv` ではない。
 -/
 def toCriticalWord
     {m : ℕ}
-    (R : RecordFerrers m) : CriticalWord m :=
+    (R : CriticalRecordSkeleton m) : CriticalWord m :=
   (criticalWordEquivAdmissibleProfile m (by
     have hm := R.one_lt_width
     omega)).symm R.profile
 
-/-- strong Record--Ferrers から得る word は exact に `[1]` から始まる。 -/
+/-- critical record skeleton から得る word は exact に `[1]` から始まる。 -/
+theorem toCriticalWord_startsWithOne
+    {m : ℕ}
+    (R : CriticalRecordSkeleton m) :
+    ∃ tail : Word, R.toCriticalWord.1 = 1 :: tail := by
+  exact IsCriticalWord.exists_tail_eq_one_cons
+    R.toCriticalWord.2 R.one_lt_width
+
+end CriticalRecordSkeleton
+
+namespace RecordFerrers
+
+/-- full Record--Ferrers から whole critical word shape への忘却。 -/
+def toCriticalWord
+    {m : ℕ}
+    (R : RecordFerrers m) : CriticalWord m :=
+  R.record.toCriticalWord
+
+/-- full Record--Ferrers の whole word も `[1]` から始まる。 -/
 theorem toCriticalWord_startsWithOne
     {m : ℕ}
     (R : RecordFerrers m) :
     ∃ tail : Word, R.toCriticalWord.1 = 1 :: tail := by
-  exact IsCriticalWord.exists_tail_eq_one_cons
-    R.toCriticalWord.2 R.one_lt_width
+  exact R.record.toCriticalWord_startsWithOne
 
 end RecordFerrers
 end Critical

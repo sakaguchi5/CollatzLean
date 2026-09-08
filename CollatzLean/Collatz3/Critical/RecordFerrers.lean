@@ -1,268 +1,405 @@
-import CollatzLean.Collatz3.Critical.Ferrers
-import CollatzLean.Collatz3.Critical.RoofAnchor
-import CollatzLean.Collatz3.Combinatorics.Record
+import CollatzLean.Collatz3.Critical.RecordSkeleton
+import CollatzLean.Collatz3.Critical.BestUpperWidth
+import CollatzLean.Collatz3.Critical.WordProfileEquiv
 
 /-!
-# Collatz3: roof-anchored Record--Ferrers
+# Collatz3: full Record--Ferrers local critical geometry
 
-このファイルの `RecordFerrers` は、単に profile に deterministic な cut list を付けた
-view object ではない。
+`CriticalRecordSkeleton` は global chord rank と roof-return だけを持つ。
+このファイルで初めて、その各 block が local critical first-passage shape になる層を作る。
 
-旧設計で本当に使っていた幾何を薄く再構成する。
+thin definition として保存するのは次だけである。
 
-* 開始点は `0` ではなく positive critical-roof anchor。
-* 各 record block は global chord rank に対する strict excursion。
-* interior block の終点は次の roof cut に戻る。
-* 最後の block は terminal `m` で strict に落ちる。
+1. critical record skeleton,
+2. width-only best-upper 性,
+3. 最後の terminal block の local minimal depth。
 
-したがって terminal tail を人工的に追加する必要はない。
-一方で、この強い構造が任意の admissible profile に自動的に存在するとは定義しない。
-その存在・一意性は後段の theorem の仕事である。
+interior block の minimal depthと、全 block の proper-prefix Beatty bound は theorem として導く。
+primitive 性はここには保存しない。primitive は weak RecordView から strict skeleton を作る
+前半の橋で使う語彙である。
 -/
 
 namespace Collatz3
 namespace Critical
 
-namespace RoofRecord
+/-- cut `a` から `j` 進んだ局所 two-depth。 -/
+def localDepth
+    {m : ℕ}
+    (h : Profile m)
+    (a j : ℕ) : ℕ :=
+  profileHeight h (a + j) - profileHeight h a
+
+@[simp] theorem localDepth_zero
+    {m : ℕ}
+    (h : Profile m)
+    (a : ℕ) :
+    localDepth h a 0 = 0 := by
+  simp [localDepth]
+
+/-- admissible profile の height path は `a` から `a+j` まで weak monotone。 -/
+theorem profileHeight_le_add
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    (a j : ℕ)
+    (hEnd : a + j ≤ m) :
+    profileHeight h a ≤ profileHeight h (a + j) := by
+  revert hEnd
+  induction j with
+  | zero =>
+      intro hEnd
+      simp
+  | succ j ih =>
+      intro hEnd
+      have hPrev : a + j ≤ m := by omega
+      have hStepIndex : a + j < m := by omega
+      have hIH := ih hPrev
+      have hStep := profileHeight_lt_succ A hStepIndex
+      have hStep' :
+          profileHeight h (a + j) <
+            profileHeight h (a + Nat.succ j) := by
+        simpa [Nat.succ_eq_add_one, Nat.add_assoc] using hStep
+      exact le_trans hIH (Nat.le_of_lt hStep')
+
+/-- local depth を start height と足すと global height に戻る。 -/
+theorem profileHeight_add_localDepth
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    {a j : ℕ}
+    (hEnd : a + j ≤ m) :
+    profileHeight h a + localDepth h a j =
+      profileHeight h (a + j) := by
+  have hMono :
+      profileHeight h a ≤ profileHeight h (a + j) :=
+    profileHeight_le_add A a j hEnd
+  have hSub := Nat.sub_add_cancel hMono
+  simpa [localDepth, Nat.add_comm] using hSub
 
 /--
-roof anchor から record block 長さ列を terminal まで連結する pure predicate。
+chord rank の cut shift は local depth だけで書ける。
 
-`[]` は record decomposition として許さない。
-最後の block だけは endpoint が terminal `m` に一致し、roof へ戻ることを要求しない。
-interior block の endpoint は次の `IsRoofCut` でなければならない。
+`rank(a+j)-rank(a) = H_m*j - m*localDepth(a,j)`。
 -/
-def RealizesBlocksFrom
+theorem profileChordRank_add_sub
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    {a j : ℕ}
+    (hEnd : a + j ≤ m) :
+    profileChordRank h (a + j) - profileChordRank h a =
+      (criticalTwoDepth m : ℤ) * (j : ℤ) -
+        (m : ℤ) * (localDepth h a j : ℤ) := by
+  have hDepth :=
+    profileHeight_add_localDepth A hEnd
+  have hCutStart :
+      cutDepth h a = profileHeight h a := by
+    rfl
+  have hCutEnd :
+      cutDepth h (a + j) =
+        profileHeight h (a + j) := by
+    rfl
+  have hDepthZ :
+      (profileHeight h a : ℤ) +
+          (localDepth h a j : ℤ) =
+        (profileHeight h (a + j) : ℤ) := by
+    exact_mod_cast hDepth
+  unfold profileChordRank
+  rw [hCutStart, hCutEnd]
+  rw [← hDepthZ]
+  push_cast
+  ring
+
+/-- record block interior では local depth が whole chord より strict に下。 -/
+theorem localDepth_below_chord_of_recordInterior
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    {a r j : ℕ}
+    (B : Combinatorics.IsRecordBlock (profileChordRank h) a r)
+    (hEnd : a + r ≤ m)
+    (hjPos : 0 < j)
+    (hjLt : j < r) :
+    m * localDepth h a j < criticalTwoDepth m * j := by
+  have hWithin : a + j ≤ m := by omega
+  have hDiff := profileChordRank_add_sub A hWithin
+  have hRank := B.interior hjPos hjLt
+  have hPos :
+      0 < profileChordRank h (a + j) - profileChordRank h a :=
+    sub_pos.mpr hRank
+  rw [hDiff] at hPos
+  have hPos' :
+      (m : ℤ) * (localDepth h a j : ℤ) <
+        (criticalTwoDepth m : ℤ) * (j : ℤ) := by
+    linarith
+  exact_mod_cast hPos'
+
+/-- record block endpoint では local depth が whole chord より strict に上。 -/
+theorem chord_below_localDepth_of_recordEnd
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    {a r : ℕ}
+    (B : Combinatorics.IsRecordBlock (profileChordRank h) a r)
+    (hEnd : a + r ≤ m) :
+    criticalTwoDepth m * r < m * localDepth h a r := by
+  have hDiff := profileChordRank_add_sub A hEnd
+  have hRank := B.end_drop
+  have hNeg :
+      profileChordRank h (a + r) - profileChordRank h a < 0 :=
+    sub_neg.mpr hRank
+  rw [hDiff] at hNeg
+  have hNeg' :
+      (criticalTwoDepth m : ℤ) * (r : ℤ) <
+        (m : ℤ) * (localDepth h a r : ℤ) := by
+    linarith
+  exact_mod_cast hNeg'
+
+/--
+best-upper width の record block interior は local Beatty roof 以下。
+これが global strict excursion から local first-passage を導く中心 bridge。
+-/
+theorem localDepth_le_beatty_of_bestUpper
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    (Best : IsBestUpperWidth m)
+    {a r j : ℕ}
+    (B : Combinatorics.IsRecordBlock (profileChordRank h) a r)
+    (hEnd : a + r ≤ m)
+    (hjPos : 0 < j)
+    (hjLt : j < r) :
+    localDepth h a j ≤ beattyIndex j := by
+  have hm : 0 < m := by
+    have hr := B.length_pos
+    omega
+  have hjM : j < m := by omega
+  have hBelow :=
+    localDepth_below_chord_of_recordInterior A B hEnd hjPos hjLt
+  exact Best.depth_le_beatty_of_strict_below hm hjPos hjM hBelow
+
+/--
+interior block が roof から roof へ strict record drop するなら、
+その local terminal depth は自動的に minimal critical depth `H_r` になる。
+
+従って interior carry `1` は structure field ではなく derived theorem である。
+-/
+theorem interior_localDepth_eq_criticalTwoDepth
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    {a r : ℕ}
+    (B : Combinatorics.IsRecordBlock (profileChordRank h) a r)
+    (hStartRoof : IsRoofCut h a)
+    (hEndRoof : IsRoofCut h (a + r)) :
+    localDepth h a r = criticalTwoDepth r := by
+  have hEndLe : a + r ≤ m := Nat.le_of_lt hEndRoof.lt_width
+  have hDepthAdd := profileHeight_add_localDepth A hEndLe
+  have hStartHeight := hStartRoof.height_eq
+  have hEndHeight := hEndRoof.height_eq
+  have hLocalBeatty :
+      beattyIndex a + localDepth h a r = beattyIndex (a + r) := by
+    simpa [hStartHeight, hEndHeight] using hDepthAdd
+  have hCarry := beattyIndex_add_eq a r
+  have hCarryCases := beattyCarry_eq_zero_or_one a r
+  have hAbove := chord_below_localDepth_of_recordEnd A B hEndLe
+  have hm : 0 < m :=
+    lt_trans hStartRoof.1 hStartRoof.2.1
+  have hLower := beattyIndex_below_criticalChord hm B.length_pos
+  rcases hCarryCases with hZero | hOne
+  · have hDepthEq : localDepth h a r = beattyIndex r := by
+      rw [hZero, Nat.add_zero] at hCarry
+      omega
+    rw [hDepthEq] at hAbove
+    omega
+  · have hDepthEq : localDepth h a r = beattyIndex r + 1 := by
+      rw [hOne] at hCarry
+      omega
+    simpa [criticalTwoDepth] using hDepthEq
+
+/-- 一つの local block が critical first-passage profile geometry を満たす。 -/
+def IsLocalCriticalBlock
+    {m : ℕ}
+    (h : Profile m)
+    (a r : ℕ) : Prop :=
+  0 < r ∧
+    a + r ≤ m ∧
+    localDepth h a r = criticalTwoDepth r ∧
+    ∀ j : ℕ,
+      0 < j →
+      j < r →
+      localDepth h a j ≤ beattyIndex j
+
+/-- 最後の block だけに必要な minimal-depth input。 -/
+def TerminalMinimalFrom
     {m : ℕ}
     (h : Profile m) : ℕ → List ℕ → Prop
   | _a, [] => False
-  | a, [r] =>
-      Combinatorics.IsRecordBlock (profileChordRank h) a r ∧
-        a + r = m
-  | a, r :: s :: rs =>
-      Combinatorics.IsRecordBlock (profileChordRank h) a r ∧
-        IsRoofCut h (a + r) ∧
-        RealizesBlocksFrom h (a + r) (s :: rs)
+  | a, [r] => localDepth h a r = criticalTwoDepth r
+  | a, r :: s :: rs => TerminalMinimalFrom h (a + r) (s :: rs)
 
-/-- roof-compatible block chain を generic record realization へ忘却する。 -/
-theorem realizesBlocksFrom_record
+/-- 全 block が local critical geometry を満たすという派生 predicate。 -/
+def LocalCriticalBlocksFrom
     {m : ℕ}
-    {h : Profile m} :
+    (h : Profile m) : ℕ → List ℕ → Prop
+  | _a, [] => True
+  | a, r :: rs =>
+      IsLocalCriticalBlock h a r ∧
+        LocalCriticalBlocksFrom h (a + r) rs
+
+/--
+record skeleton + best-upper + 最終 minimal depth から、全 block の local criticality を導く。
+interior minimal depth は `interior_localDepth_eq_criticalTwoDepth` から自動で出る。
+-/
+theorem localCriticalBlocksFrom_of_record
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    (Best : IsBestUpperWidth m) :
     ∀ (a : ℕ) (rs : List ℕ),
-      RealizesBlocksFrom h a rs →
-        Combinatorics.RecordSkeleton.realizesLengthsFrom
-          (profileChordRank h) a rs
-  | _a, [], hFalse => False.elim hFalse
-  | a, [r], hOne => by
-      refine ⟨hOne.1, ?_⟩
-      trivial
-  | a, r :: s :: rs, hMany => by
-      refine ⟨hMany.1, ?_⟩
-      exact realizesBlocksFrom_record
-        (a + r) (s :: rs) hMany.2.2
-
-/-- roof-compatible block chain は開始点から terminal まで exact に覆う。 -/
-theorem realizesBlocksFrom_end
-    {m : ℕ}
-    {h : Profile m} :
-    ∀ (a : ℕ) (rs : List ℕ),
-      RealizesBlocksFrom h a rs →
-        a + rs.sum = m
-  | _a, [], hFalse => False.elim hFalse
-  | a, [r], hOne => by
-      simpa using hOne.2
-  | a, r :: s :: rs, hMany => by
-      have hTail := realizesBlocksFrom_end
-        (a + r) (s :: rs) hMany.2.2
-      simpa [Nat.add_assoc] using hTail
-
-/--
-指定した positive roof anchor から skeleton が genuine record excursion chain を実現する。
-actual Collatz run や local minimal-crossing decoration はまだ入れない。
--/
-def AnchoredRealizes
-    {m : ℕ}
-    (h : Profile m)
-    (anchor : ℕ)
-    (S : Combinatorics.RecordSkeleton) : Prop :=
-  IsRoofCut h anchor ∧
-    RealizesBlocksFrom h anchor S.lengths
-
-namespace AnchoredRealizes
-
-/-- realization の開始点は roof cut。 -/
-theorem anchor_roof
-    {m : ℕ}
-    {h : Profile m}
-    {anchor : ℕ}
-    {S : Combinatorics.RecordSkeleton}
-    (R : AnchoredRealizes h anchor S) :
-    IsRoofCut h anchor :=
-  R.1
-
-/-- realization の block 列は必ず非空。 -/
-theorem lengths_nonempty
-    {m : ℕ}
-    {h : Profile m}
-    {anchor : ℕ}
-    {S : Combinatorics.RecordSkeleton}
-    (R : AnchoredRealizes h anchor S) :
-    S.lengths ≠ [] := by
-  intro hNil
-  have hBlocks := R.2
-  rw [hNil] at hBlocks
-  simp [RealizesBlocksFrom] at hBlocks
+      IsRoofCut h a →
+      RoofRecordSkeleton.RealizesBlocksFrom h a rs →
+      TerminalMinimalFrom h a rs →
+      LocalCriticalBlocksFrom h a rs
+  | _a, [], _hRoof, hFalse, _hTerminal => False.elim hFalse
+  | a, [r], hRoof, hOne, hTerminal => by
+      have hEnd : a + r ≤ m := Nat.le_of_eq hOne.2
+      refine ⟨?_, by trivial⟩
+      refine ⟨hOne.1.length_pos, hEnd, hTerminal, ?_⟩
+      intro j hjPos hjLt
+      exact localDepth_le_beatty_of_bestUpper
+        A Best hOne.1 hEnd hjPos hjLt
+  | a, r :: s :: rs, hRoof, hMany, hTerminal => by
+      have hEndRoof : IsRoofCut h (a + r) := hMany.2.1
+      have hEnd : a + r ≤ m := Nat.le_of_lt hEndRoof.lt_width
+      have hMinimal : localDepth h a r = criticalTwoDepth r :=
+        interior_localDepth_eq_criticalTwoDepth A hMany.1 hRoof hEndRoof
+      refine ⟨?_, ?_⟩
+      · refine ⟨hMany.1.length_pos, hEnd, hMinimal, ?_⟩
+        intro j hjPos hjLt
+        exact localDepth_le_beatty_of_bestUpper
+          A Best hMany.1 hEnd hjPos hjLt
+      · exact localCriticalBlocksFrom_of_record
+          A Best
+          (a + r) (s :: rs)
+          hEndRoof hMany.2.2 hTerminal
 
 /--
-roof-compatible realization は generic `RecordSkeleton.RealizesFrom` を忘却像として持つ。
--/
-theorem record_realization
-    {m : ℕ}
-    {h : Profile m}
-    {anchor : ℕ}
-    {S : Combinatorics.RecordSkeleton}
-    (R : AnchoredRealizes h anchor S) :
-    S.RealizesFrom (profileChordRank h) anchor := by
-  unfold Combinatorics.RecordSkeleton.RealizesFrom
-  exact realizesBlocksFrom_record anchor S.lengths R.2
+full Record--Ferrers packet。
 
-/-- roof-compatible realization は anchor から terminal まで exact に覆う。 -/
-theorem anchor_add_totalLength_eq_terminal
-    {m : ℕ}
-    {h : Profile m}
-    {anchor : ℕ}
-    {S : Combinatorics.RecordSkeleton}
-    (R : AnchoredRealizes h anchor S) :
-    anchor + S.totalLength = m := by
-  unfold Combinatorics.RecordSkeleton.totalLength
-  exact realizesBlocksFrom_end anchor S.lengths R.2
-
-end AnchoredRealizes
-end RoofRecord
-
-/--
-任意の positive roof anchor を明示した強い Record--Ferrers packet。
-profile と skeleton はデータ、record/roof 条件は `realizes` という Prop に隔離する。
--/
-structure AnchoredRecordFerrers (m : ℕ) where
-  profile : AdmissibleProfile m
-  anchor : ℕ
-  skeleton : Combinatorics.RecordSkeleton
-  realizes : RoofRecord.AnchoredRealizes profile.1 anchor skeleton
-
-namespace AnchoredRecordFerrers
-
-/-- underlying admissible profile を忘却する。 -/
-def forget
-    {m : ℕ}
-    (R : AnchoredRecordFerrers m) : AdmissibleProfile m :=
-  R.profile
-
-/-- anchor は正。 -/
-theorem anchor_pos
-    {m : ℕ}
-    (R : AnchoredRecordFerrers m) :
-    0 < R.anchor :=
-  R.realizes.anchor_roof.pos
-
-/-- anchor は terminal より手前。 -/
-theorem anchor_lt_terminal
-    {m : ℕ}
-    (R : AnchoredRecordFerrers m) :
-    R.anchor < m :=
-  R.realizes.anchor_roof.lt_width
-
-/-- skeleton は anchor から terminal まで exact に覆う。 -/
-theorem anchor_add_totalLength_eq_terminal
-    {m : ℕ}
-    (R : AnchoredRecordFerrers m) :
-    R.anchor + R.skeleton.totalLength = m :=
-  R.realizes.anchor_add_totalLength_eq_terminal
-
-/-- 最終 record endpoint の rank は anchor rank より strict に低い。 -/
-theorem terminal_rank_lt_anchor_rank
-    {m : ℕ}
-    (R : AnchoredRecordFerrers m) :
-    profileChordRank R.profile.1 m <
-      profileChordRank R.profile.1 R.anchor := by
-  have hDrop := R.skeleton.end_drop_of_realizesFrom
-    R.realizes.record_realization
-    R.realizes.lengths_nonempty
-  rw [R.anchor_add_totalLength_eq_terminal] at hDrop
-  exact hDrop
-
-end AnchoredRecordFerrers
-
-/--
-current critical geometry の canonical anchor `1` を使う Record--Ferrers packet。
-`1` を cut list の先頭要素として保存せず、開始基準点として型に固定する。
+local block 列そのものを data として重複保存せず、critical record skeleton と
+width arithmetic から local critical geometry を導く。
+terminal block の minimal depth だけは現段階では独立 input とする。
 -/
 structure RecordFerrers (m : ℕ) where
-  profile : AdmissibleProfile m
-  skeleton : Combinatorics.RecordSkeleton
-  realizes : RoofRecord.AnchoredRealizes
-    profile.1 initialRoofAnchor skeleton
+  record : CriticalRecordSkeleton m
+  bestUpper : IsBestUpperWidth m
+  terminalMinimal : TerminalMinimalFrom
+    record.profile.1 initialRoofAnchor record.skeleton.lengths
 
 namespace RecordFerrers
 
-/-- underlying admissible profile を忘却する。 -/
-def forget
+/-- underlying critical record skeleton を忘却する。 -/
+def forgetRecordSkeleton
+    {m : ℕ}
+    (R : RecordFerrers m) : CriticalRecordSkeleton m :=
+  R.record
+
+/-- underlying admissible profile。 -/
+def profile
     {m : ℕ}
     (R : RecordFerrers m) : AdmissibleProfile m :=
-  R.profile
+  R.record.profile
 
-/-- canonical anchor `1` は terminal より手前。従って Record--Ferrers 幅は 2 以上。 -/
+/-- full Record--Ferrers 幅は 2 以上。 -/
 theorem one_lt_width
     {m : ℕ}
     (R : RecordFerrers m) :
-    1 < m := by
-  simpa [initialRoofAnchor] using R.realizes.anchor_roof.lt_width
+    1 < m :=
+  R.record.one_lt_width
 
-/-- canonical anchor は admissible profile の critical roof 上。 -/
-theorem initial_anchor_roof
+/-- 全 skeleton block は local critical geometry を満たす。 -/
+theorem localCriticalBlocks
     {m : ℕ}
     (R : RecordFerrers m) :
-    IsRoofCut R.profile.1 initialRoofAnchor :=
-  R.realizes.anchor_roof
-
-/-- skeleton は anchor `1` から terminal まで exact に覆う。 -/
-theorem one_add_totalLength_eq_terminal
-    {m : ℕ}
-    (R : RecordFerrers m) :
-    1 + R.skeleton.totalLength = m := by
-  simpa [initialRoofAnchor] using
-    R.realizes.anchor_add_totalLength_eq_terminal
-
-/-- terminal rank は canonical anchor rank より strict に低い。 -/
-theorem terminal_rank_lt_anchor_rank
-    {m : ℕ}
-    (R : RecordFerrers m) :
-    profileChordRank R.profile.1 m <
-      profileChordRank R.profile.1 initialRoofAnchor := by
-  have hDrop := R.skeleton.end_drop_of_realizesFrom
-    R.realizes.record_realization
-    R.realizes.lengths_nonempty
-  rw [R.realizes.anchor_add_totalLength_eq_terminal] at hDrop
-  exact hDrop
-
-/-- terminal rank が 0 なので、canonical positive anchor の rank は strict に正。 -/
-theorem anchor_rank_pos
-    {m : ℕ}
-    (R : RecordFerrers m) :
-    0 < profileChordRank R.profile.1 initialRoofAnchor := by
-  have h := R.terminal_rank_lt_anchor_rank
-  simpa using h
-
-/-- general anchored packet への忘却。 -/
-def toAnchored
-    {m : ℕ}
-    (R : RecordFerrers m) : AnchoredRecordFerrers m where
-  profile := R.profile
-  anchor := initialRoofAnchor
-  skeleton := R.skeleton
-  realizes := R.realizes
+    LocalCriticalBlocksFrom
+      R.record.profile.1 initialRoofAnchor R.record.skeleton.lengths := by
+  exact localCriticalBlocksFrom_of_record
+    R.record.profile.2 R.bestUpper
+    initialRoofAnchor R.record.skeleton.lengths
+    R.record.realizes.anchor_roof
+    R.record.realizes.2
+    R.terminalMinimal
 
 end RecordFerrers
 
+/-- local profile geometry から読む exponent word。 -/
+def localWord
+    {m : ℕ}
+    (h : Profile m)
+    (a r : ℕ) : Word :=
+  wordFromHeight (fun j => localDepth h a j) r
+
+/-- admissible profile の local depth path は block 範囲内で strict に増加する。 -/
+theorem localDepth_lt_succ
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    {a r j : ℕ}
+    (hEnd : a + r ≤ m)
+    (hj : j < r) :
+    localDepth h a j < localDepth h a (j + 1) := by
+  have hBaseJ :
+      profileHeight h a ≤ profileHeight h (a + j) :=
+    profileHeight_le_add A a j (by omega)
+  have hBaseNext :
+      profileHeight h a ≤ profileHeight h (a + (j + 1)) :=
+    profileHeight_le_add A a (j + 1) (by omega)
+  have hStepIndex : a + j < m := by omega
+  have hStep := profileHeight_lt_succ A hStepIndex
+  have hStep' :
+      profileHeight h (a + j) < profileHeight h (a + (j + 1)) := by
+    simpa [Nat.add_assoc] using hStep
+  have hJ := Nat.sub_add_cancel hBaseJ
+  have hNext := Nat.sub_add_cancel hBaseNext
+  unfold localDepth
+  omega
+
+/-- local critical geometry は genuine `IsCriticalWord` を生成する。 -/
+theorem isCriticalWord_localWord
+    {m : ℕ}
+    {h : Profile m}
+    (A : Admissible h)
+    {a r : ℕ}
+    (B : IsLocalCriticalBlock h a r) :
+    IsCriticalWord r (localWord h a r) := by
+  have hStep :
+      ∀ j : ℕ, j < r →
+        localDepth h a j < localDepth h a (j + 1) := by
+    intro j hj
+    exact localDepth_lt_succ A B.2.1 hj
+  refine ⟨?_, oddSteps_wordFromHeight _ _, ?_, ?_⟩
+  · exact valid_wordFromHeight (fun j => localDepth h a j) r hStep
+  · calc
+      Word.twoSteps (localWord h a r)
+          = localDepth h a r := by
+              exact twoSteps_wordFromHeight
+                (fun j => localDepth h a j) r
+                (localDepth_zero h a) hStep
+      _ = criticalTwoDepth r := B.2.2.1
+  · intro k hk
+    have hPrefix := prefixTwoDepth_wordFromHeight
+      (fun j => localDepth h a j) r
+      (localDepth_zero h a) hStep
+      (Nat.le_of_lt hk)
+    change
+      Word.prefixTwoDepth
+          (wordFromHeight (fun j => localDepth h a j) r) k
+        ≤ beattyIndex k
+    rw [hPrefix]
+    by_cases hk0 : k = 0
+    · subst k
+      simp [localDepth]
+    · exact B.2.2.2 k (Nat.pos_of_ne_zero hk0) hk
 end Critical
 end Collatz3
