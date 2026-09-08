@@ -9,6 +9,9 @@ import Mathlib.Data.Int.Basic
 `record` は「Ferrers」という名前に埋め込まず、任意の整数値 rank 関数に対する
 新しい strict minimum と、その間の excursion として定義する。
 
+完全な有限分解では、strict record blocks の後に terminal tail を分離する。
+terminal endpoint 自体を新しい strict record と要求しないことが重要である。
+
 後段の `Critical.RecordFerrers` は、この generic record 語彙へ
 critical profile から導いた rank を渡すだけにする。
 -/
@@ -117,6 +120,61 @@ theorem end_recordLow
 end IsRecordBlock
 
 /--
+最後の strict record cut `a` から terminal index までの closing tail。
+
+terminal 自身を新しい record low とは要求しない。
+interior に start rank より低い点がないことだけを要求する。
+`a = terminalIndex` の退化 tail も generic 語彙としては許す。
+-/
+def IsTerminalTail
+    (rank : ℕ → ℤ)
+    (a terminalIndex : ℕ) : Prop :=
+  a ≤ terminalIndex ∧
+    ∀ j : ℕ,
+      a < j →
+      j < terminalIndex →
+      rank a ≤ rank j
+
+namespace IsTerminalTail
+
+/-- terminal tail の start は terminal を越えない。 -/
+theorem start_le_terminal
+    {rank : ℕ → ℤ}
+    {a terminalIndex : ℕ}
+    (T : IsTerminalTail rank a terminalIndex) :
+    a ≤ terminalIndex :=
+  T.1
+
+/-- terminal tail interior には start rank より低い点がない。 -/
+theorem interior_not_below
+    {rank : ℕ → ℤ}
+    {a terminalIndex j : ℕ}
+    (T : IsTerminalTail rank a terminalIndex)
+    (haj : a < j)
+    (hjt : j < terminalIndex) :
+    rank a ≤ rank j :=
+  T.2 j haj hjt
+
+/-- pointwise equal な rank では terminal tail 条件も変わらない。 -/
+theorem congr
+    {rank rank' : ℕ → ℤ}
+    {a terminalIndex : ℕ}
+    (hEq : ∀ k : ℕ, rank k = rank' k) :
+    IsTerminalTail rank a terminalIndex ↔
+      IsTerminalTail rank' a terminalIndex := by
+  constructor
+  · intro T
+    refine ⟨T.1, ?_⟩
+    intro j haj hjt
+    simpa [hEq a, hEq j] using T.2 j haj hjt
+  · intro T
+    refine ⟨T.1, ?_⟩
+    intro j haj hjt
+    simpa [hEq a, hEq j] using T.2 j haj hjt
+
+end IsTerminalTail
+
+/--
 record block の長さだけを保持する骨格。
 ここには rank も Ferrers decoration も保存しない。
 -/
@@ -147,6 +205,53 @@ def RealizesFrom
     (rank : ℕ → ℤ)
     (a : ℕ) : Prop :=
   realizesLengthsFrom rank a S.lengths
+
+/--
+非空の record block 列を実現すると、最後の cut rank は開始 rank より strict に低い。
+terminal tail を record block 列から分離すべき理由を generic に表す補題でもある。
+-/
+theorem realizesLengthsFrom_end_drop
+    {rank : ℕ → ℤ}
+    {a : ℕ}
+    {rs : List ℕ}
+    (h : realizesLengthsFrom rank a rs)
+    (hne : rs ≠ []) :
+    rank (a + rs.sum) < rank a := by
+  induction rs generalizing a with
+  | nil =>
+      exact False.elim (hne rfl)
+  | cons r rs ih =>
+      change
+        IsRecordBlock rank a r ∧
+          realizesLengthsFrom rank (a + r) rs
+        at h
+      rcases h with ⟨hBlock, hTail⟩
+      by_cases hEmpty : rs = []
+      · subst rs
+        simpa using hBlock.end_drop
+      · have hTailDrop := ih (a := a + r) hTail hEmpty
+        have hFirstDrop := hBlock.end_drop
+        have hIndex :
+            a + (r :: rs).sum = (a + r) + rs.sum := by
+          simp [Nat.add_assoc]
+        calc
+          rank (a + (r :: rs).sum)
+              = rank ((a + r) + rs.sum) := by
+                  rw [hIndex]
+          _ < rank (a + r) := hTailDrop
+          _ < rank a := hFirstDrop
+
+/-- skeleton 版の終端 strict drop。 -/
+theorem end_drop_of_realizesFrom
+    (S : RecordSkeleton)
+    {rank : ℕ → ℤ}
+    {a : ℕ}
+    (h : S.RealizesFrom rank a)
+    (hne : S.lengths ≠ []) :
+    rank (a + S.totalLength) < rank a := by
+  unfold RealizesFrom at h
+  unfold totalLength
+  exact realizesLengthsFrom_end_drop h hne
 
 /-- rank が pointwise に等しければ record realization は変わらない。 -/
 theorem realizesLengthsFrom_congr

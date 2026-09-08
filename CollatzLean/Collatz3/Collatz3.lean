@@ -38,6 +38,7 @@ import CollatzLean.Collatz3.Critical.ProfileAffine
 import CollatzLean.Collatz3.Critical.ProfileCanonical
 import CollatzLean.Collatz3.Critical.ProfileExtraction
 import CollatzLean.Collatz3.Critical.Ferrers
+import CollatzLean.Collatz3.Critical.WordFerrers
 import CollatzLean.Collatz3.Critical.RecordFerrers
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
@@ -73,7 +74,8 @@ Ferrers / Record 層も同じ原則に従う。
 
 1. `Combinatorics.YoungFerrers` は一般の ordered finite diagram と古典 Ferrers 条件だけ。
 2. `Critical.Ferrers` は Profile を diagram として読む derived view。
-3. `Combinatorics.Record` は任意 rank に対する generic record 語彙。
-4. `Critical.RecordFerrers` は profile rank を generic record に渡す薄い接着。
-5. actual Collatz run との一致は `Bridge.FerrersRealization` だけに置く。
+3. `Critical.WordFerrers` は Word の pure Ferrers/rank view だけを持つ。
+4. `Combinatorics.Record` は任意 rank に対する generic record block と terminal tail を分離する。
+5. `Critical.RecordFerrers` は proper record blocks + closing terminal tail として profile を分解する。
+6. actual Collatz run との rank 一致は `Bridge.FerrersRealization` だけに置く。
 -/
