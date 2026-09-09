@@ -88,6 +88,9 @@ import CollatzLean.Collatz3.Bridge.CriticalRecordEquiv
 
 --独立実験層
 import CollatzLean.Collatz3.Experimental2
+--独立実験層との橋
+import CollatzLean.Collatz3.Bridge.Experimental2Realization
+
 
 set_option linter.style.header false
 /-!
