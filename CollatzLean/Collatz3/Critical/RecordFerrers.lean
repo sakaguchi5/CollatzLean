@@ -1,22 +1,22 @@
-import CollatzLean.Collatz3.Critical.RecordCarryExact
+import CollatzLean.Collatz3.Ferrers.RecordFerrers
 
 /-!
-# 互換 import: RecordFerrers の定義は一時的に未確定
+# 互換 import: 真の RecordFerrers の正本
 
-この filename は直前版との import 互換のため残す。
+`RecordFerrers` の完成定義は `Collatz3.Ferrers.RecordFerrers` に置く。
+この filename は旧 import との互換のためだけに残す。
 
-現在ここでは `RecordFerrers` structure をまだ定義しない。
-ただし local geometry に必要な exact 条件は `Critical.RecordCarryExact` で確定した。
+現在の正本は
 
-* local prefix failure
-  `<->` premature roof return + Beatty carry `1`,
-* terminal minimality
-  `<->` terminal Beatty carry `0`,
-* `RecordCarryCompatibleFrom`
-  `<->` `LocalCriticalBlocksFrom`。
+`AdmissibleProfile + (1 < width) + canonical exact carry law`
 
-従って次に真の `RecordFerrers` を再導入するときは、
-`CriticalRecordSkeleton` と exact carry compatibility だけを独立条件として残し、
-`IsPrimitiveWidth` / `IsBestUpperWidth` / local `CriticalWord` は
-十分条件または派生 theorem として扱える。
+という最小 subtype である。
+
+* deterministic cuts / lengths、
+* `CriticalRecordSkeleton`、
+* `NoRecordLevelTie`、
+* local critical geometry、
+* primitive / best-upper
+
+は field に保存せず、すべて派生 theorem または十分条件として扱う。
 -/

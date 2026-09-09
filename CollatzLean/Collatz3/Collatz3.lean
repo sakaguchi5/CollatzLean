@@ -67,6 +67,9 @@ import CollatzLean.Collatz3.Ferrers.RecordCanonical
 import CollatzLean.Collatz3.Ferrers.RecordCarryCanonical
 import CollatzLean.Collatz3.Ferrers.RecordCarryBridge
 import CollatzLean.Collatz3.Ferrers.RecordExactConsequences
+import CollatzLean.Collatz3.Ferrers.RecordFerrers
+import CollatzLean.Collatz3.Ferrers.RecordWordFactorization
+import CollatzLean.Collatz3.Ferrers.RecordArithmeticFactorization
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
 
@@ -122,12 +125,14 @@ Record/Ferrers 層では deterministic partition を data の正本とする。
   `NoRecordLevelTie ∧ LocalCriticalBlocksFrom canonicalRecordLengths` と exact に同値。
 * 任意の `CriticalRecordSkeleton` の length 列は underlying profile の
   `canonicalRecordLengths` と一致する。
-* 従って skeleton length、record-level tie、local critical geometry を
-  真の `RecordFerrers` に重複保存する必要はない。
 * interior / terminal 一 block の local criticality は exact carry 条件へ局所分解される。
-
-真の `RecordFerrers` structure は現段階ではまだ定義しない。
-上記 exact characterization を基礎に、次段で必要最小限の条件だけで一度だけ導入する。
+* 真の `RecordFerrers` は
+  `AdmissibleProfile + 1 < width + canonical exact carry law`
+  だけを保存する最小 subtype とし、skeleton / tie / local criticality は重複保存しない。
+* canonical local words は `[1]` の後ろの word を lossless に分解し、各 local word は
+  対応する block width の genuine `CriticalWord` になる。
+* width / total two-depth / Beatty index / affine translation `B` はこの canonical block 列へ
+  exact に factorize される。
 
 critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置かない。
 `criticalTwoDepth m` が width `m` だけで決まることを使い、
@@ -140,8 +145,9 @@ critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置か
 を一変数 width 理論として扱う。旧 `StripReduced` は
 `IsBestUpperWidth` と同値な compatibility view に降格する。
 
-primitive 性は weak RecordView から strict skeleton へ上げる際の
-record-level tie 排除を保証する十分条件として扱い、structure には埋め込まない。
+primitive 性と best-upper は RecordFerrers の field ではない。
+前者は record-level tie 排除、後者は local criticality を一括保証する十分条件であり、
+`RecordFerrers.ofPrimitiveBestUpper` で構成用 certificate としてだけ使う。
 
 `0` を record anchor にすると start/terminal rank がともに 0 となるため、
 critical record skeleton では positive roof anchor を採用する。
