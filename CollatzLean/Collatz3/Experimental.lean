@@ -10,7 +10,8 @@ import CollatzLean.Collatz3.Experimental.HomogenizedSlopeExistence
 import CollatzLean.Collatz3.Experimental.HomogenizedSlopeUniqueness
 import CollatzLean.Collatz3.Experimental.IrrationalSlopeBridge
 import CollatzLean.Collatz3.Experimental.RationalScaledSlopeBridge
-
+import CollatzLean.Collatz3.Experimental.NonnegativeRationalSlopeExtraction
+import CollatzLean.Collatz3.Experimental.UnitCarryCompleteClassification
 set_option linter.style.header false
 /-!
 # Collatz3 mathematical experiments
