@@ -2,6 +2,11 @@ import CollatzLean.Collatz3.Experimental.UnitCarryRoof
 import CollatzLean.Collatz3.Experimental.RoofPathExact
 import CollatzLean.Collatz3.Experimental.CarryCocycle
 import CollatzLean.Collatz3.Experimental.RecordCarryBudget
+import CollatzLean.Collatz3.Experimental.CarryDefectRefinement
+import CollatzLean.Collatz3.Experimental.CarryWordBalance
+import CollatzLean.Collatz3.Experimental.UnitCarryClassification
+import CollatzLean.Collatz3.Experimental.RotationPhase
+
 
 set_option linter.style.header false
 /-!
