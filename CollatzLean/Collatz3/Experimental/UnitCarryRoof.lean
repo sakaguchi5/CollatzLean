@@ -131,7 +131,6 @@ theorem below_criticalChord
     {β : ℕ → ℕ}
     (U : HasUnitCarry β)
     {m r : ℕ}
-    (_hm : 0 < m)
     (hr : 0 < r) :
     m * β r < criticalDepth β m * r := by
   cases r with

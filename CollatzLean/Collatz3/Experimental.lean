@@ -1,5 +1,7 @@
 import CollatzLean.Collatz3.Experimental.UnitCarryRoof
 import CollatzLean.Collatz3.Experimental.RoofPathExact
+import CollatzLean.Collatz3.Experimental.CarryCocycle
+import CollatzLean.Collatz3.Experimental.RecordCarryBudget
 
 set_option linter.style.header false
 /-!

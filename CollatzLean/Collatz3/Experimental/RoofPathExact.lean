@@ -106,7 +106,6 @@ theorem localFailure_iff_roofReturn_and_carryOne
     (A : IsAdmissibleRoofPath β m height)
     {a j : ℕ}
     (hStartRoof : IsRoofCut β m height a)
-    (hjPos : 0 < j)
     (hEndLt : a + j < m) :
     β j < localDepth height a j ↔
       IsRoofCut β m height (a + j) ∧
@@ -114,6 +113,7 @@ theorem localFailure_iff_roofReturn_and_carryOne
   have hDepthAdd :=
     IsAdmissibleRoofPath.height_add_localDepth A (Nat.le_of_lt hEndLt)
   have hStart := hStartRoof.2.2
+  have haPos : 0 < a := hStartRoof.1
   have hEndLe : height (a + j) ≤ β (a + j) :=
     A.1 (a + j) hEndLt
   have hCarry := HasUnitCarry.add_eq U a j
