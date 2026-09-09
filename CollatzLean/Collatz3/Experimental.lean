@@ -6,7 +6,7 @@ import CollatzLean.Collatz3.Experimental.CarryDefectRefinement
 import CollatzLean.Collatz3.Experimental.CarryWordBalance
 import CollatzLean.Collatz3.Experimental.UnitCarryClassification
 import CollatzLean.Collatz3.Experimental.RotationPhase
-
+import CollatzLean.Collatz3.Experimental.HomogenizedSlopeExistence
 
 set_option linter.style.header false
 /-!
