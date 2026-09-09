@@ -7,6 +7,9 @@ import CollatzLean.Collatz3.Experimental.CarryWordBalance
 import CollatzLean.Collatz3.Experimental.UnitCarryClassification
 import CollatzLean.Collatz3.Experimental.RotationPhase
 import CollatzLean.Collatz3.Experimental.HomogenizedSlopeExistence
+import CollatzLean.Collatz3.Experimental.HomogenizedSlopeUniqueness
+import CollatzLean.Collatz3.Experimental.IrrationalSlopeBridge
+import CollatzLean.Collatz3.Experimental.RationalScaledSlopeBridge
 
 set_option linter.style.header false
 /-!
