@@ -86,6 +86,9 @@ import CollatzLean.Collatz3.Bridge.FerrersRealization
 import CollatzLean.Collatz3.Bridge.CriticalRecord
 import CollatzLean.Collatz3.Bridge.CriticalRecordEquiv
 
+--独立実験層
+import CollatzLean.Collatz3.Experimental
+
 set_option linter.style.header false
 /-!
 # Collatz3: thin definitions + derived theorems kernel
