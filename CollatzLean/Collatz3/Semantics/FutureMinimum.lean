@@ -15,6 +15,9 @@ current より後の tail から一つだけ最小点を取る `NextFutureMinimu
 next minimum の存在を構成的に導く。三つの終局型からその証明書を作る橋は
 `OrbitFateFutureMinimum.lean` に分離する。
 
+repeat が与えられた場合の tail 有限化は `HasNontrivialRepeat` を使わず、
+生の `i<j`, `value i = value j` だけからこの層で導く。
+
 選択済み future-minimum 列は compatibility view として残し、
 標準隣接性は `StandardFutureMinimum.lean` に分離する。
 -/
@@ -98,6 +101,17 @@ theorem futureMinimumAt
     O.FutureMinimumAt j := by
   intro t hjt
   exact h.2 t (lt_of_lt_of_le h.1 hjt)
+
+/-- 同じ current に対する二つの next minimum は値として一致する。 -/
+theorem value_eq
+    {O : OddOrbit}
+    {i j k : ℕ}
+    (hj : O.NextFutureMinimum i j)
+    (hk : O.NextFutureMinimum i k) :
+    O.value j = O.value k := by
+  apply Nat.le_antisymm
+  · exact hj.2 k hk.1
+  · exact hk.2 j hj.1
 
 end NextFutureMinimum
 
@@ -186,6 +200,67 @@ theorem exists_nextFutureMinimum_of_eventually_ge_candidate
         · exact le_rfl
         · omega
       exact le_trans hMinCandidate hCandidate
+
+/--
+値の repeat `i<j`, `O_i=O_j` だけで、任意の current の後に
+`NextFutureMinimum` が構成的に存在する。
+
+`O_i ≠ 1` はこの有限化には不要であり、transient 部分と一周期幅だけを有限探索する。
+-/
+theorem exists_nextFutureMinimum_of_repeat
+    (O : OddOrbit)
+    {i j0 : ℕ}
+    (hij : i < j0)
+    (heq : O.value i = O.value j0)
+    (current : ℕ) :
+    ∃ j : ℕ, O.NextFutureMinimum current j := by
+  let d : ℕ := j0 - i
+  have hd : 0 < d := by
+    dsimp [d]
+    exact Nat.sub_pos_of_lt hij
+  let base : ℕ := max (current + 1) i
+  have hBaseI : i ≤ base := Nat.le_max_right _ _
+  have hCurrentBase : current + 1 ≤ base := Nat.le_max_left _ _
+  let terminal : ℕ := base + (d - 1)
+  have hCurrentTerminal : current + 1 ≤ terminal := by
+    dsimp [terminal]
+    omega
+  let q : ℕ := terminal - (current + 1)
+  have hEnd : (current + 1) + q = terminal := by
+    dsimp [q]
+    exact Nat.add_sub_of_le hCurrentTerminal
+  rcases O.exists_intervalMinimum (current + 1) q with
+    ⟨m, hmStart, hmEnd, hMin⟩
+  refine ⟨m, by omega, ?_⟩
+  intro t hCurrentT
+  by_cases htTerminal : t ≤ terminal
+  · apply hMin t
+    · omega
+    · rw [hEnd]
+      exact htTerminal
+  · have hTerminalT : terminal < t := Nat.lt_of_not_ge htTerminal
+    have hBaseT : base ≤ t := by
+      dsimp [terminal] at hTerminalT
+      omega
+    let qt : ℕ := t - base
+    have hTIndex : base + qt = t := by
+      dsimp [qt]
+      exact Nat.add_sub_of_le hBaseT
+    rcases O.exists_periodRepresentativeFrom_repeat
+        hij heq hBaseI qt with
+      ⟨r, hrBase, hrPeriod, hRep⟩
+    have hrStart : current + 1 ≤ r :=
+      le_trans hCurrentBase hrBase
+    have hrTerminal : r ≤ terminal := by
+      dsimp [terminal, d] at hrPeriod ⊢
+      omega
+    have hMinR : O.value m ≤ O.value r := by
+      apply hMin r hrStart
+      rw [hEnd]
+      exact hrTerminal
+    rw [hTIndex] at hRep
+    rw [hRep]
+    exact hMinR
 
 /--
 選択済み future-minimum 列。

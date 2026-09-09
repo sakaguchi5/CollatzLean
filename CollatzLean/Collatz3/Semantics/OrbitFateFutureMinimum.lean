@@ -9,7 +9,8 @@ import CollatzLean.Collatz3.Semantics.FutureMinimum
 このファイルで最終挙動の証明書と接続する。
 
 * `HitsOne` では、到達した `1`（またはその後の `1`）が next minimum になる。
-* `HasNontrivialRepeat` では、transient 部分と一周期分だけを有限探索すればよい。
+* `HasNontrivialRepeat` では、生の repeat に対する `FutureMinimum.exists_nextFutureMinimum_of_repeat`
+  を使う。`value ≠ 1` はこの有限化には不要。
 * `DivergesToInfinity` では、current+1 の値を境界に使うと、十分後ろはそれより大きい。
   従って next minimum は有限区間だけを探索すれば構成的に得られる。
 * 発散枝ではさらに、任意に遠い future minimum の値を `>1` にでき、指数は exact に `1`。
@@ -57,61 +58,15 @@ theorem exists_nextFutureMinimum_of_hitsOne
 
 /--
 第2枝でも任意の current の後に next future minimum が構成的に存在する。
-repeat 開始以後は有限周期幅へ値を代表できるため、transient 部分と一周期分だけを有限探索する。
+本当に必要なのは `i<j` と repeated value だけであり、`value i ≠ 1` は使わない。
 -/
 theorem exists_nextFutureMinimum_of_nontrivialRepeat
     (O : OddOrbit)
     (hRepeat : O.HasNontrivialRepeat)
     (current : ℕ) :
     ∃ j : ℕ, O.NextFutureMinimum current j := by
-  rcases hRepeat with ⟨i, j0, hij, heq, _hiOne⟩
-  let d : ℕ := j0 - i
-  have hd : 0 < d := by
-    dsimp [d]
-    exact Nat.sub_pos_of_lt hij
-  let base : ℕ := max (current + 1) i
-  have hBaseI : i ≤ base := Nat.le_max_right _ _
-  have hCurrentBase : current + 1 ≤ base := Nat.le_max_left _ _
-  let terminal : ℕ := base + (d - 1)
-  have hCurrentTerminal : current + 1 ≤ terminal := by
-    dsimp [terminal]
-    omega
-  let q : ℕ := terminal - (current + 1)
-  have hEnd : (current + 1) + q = terminal := by
-    dsimp [q]
-    exact Nat.add_sub_of_le hCurrentTerminal
-  rcases O.exists_intervalMinimum (current + 1) q with
-    ⟨m, hmStart, hmEnd, hMin⟩
-  refine ⟨m, by omega, ?_⟩
-  intro t hCurrentT
-  by_cases htTerminal : t ≤ terminal
-  · apply hMin t
-    · omega
-    · rw [hEnd]
-      exact htTerminal
-  · have hTerminalT : terminal < t := Nat.lt_of_not_ge htTerminal
-    have hBaseT : base ≤ t := by
-      dsimp [terminal] at hTerminalT
-      omega
-    let qt : ℕ := t - base
-    have hTIndex : base + qt = t := by
-      dsimp [qt]
-      exact Nat.add_sub_of_le hBaseT
-    rcases O.exists_periodRepresentativeFrom_repeat
-        hij heq hBaseI qt with
-      ⟨r, hrBase, hrPeriod, hRep⟩
-    have hrStart : current + 1 ≤ r :=
-      le_trans hCurrentBase hrBase
-    have hrTerminal : r ≤ terminal := by
-      dsimp [terminal, d] at hrPeriod ⊢
-      omega
-    have hMinR : O.value m ≤ O.value r := by
-      apply hMin r hrStart
-      rw [hEnd]
-      exact hrTerminal
-    rw [hTIndex] at hRep
-    rw [hRep]
-    exact hMinR
+  rcases hRepeat with ⟨i, j, hij, heq, _hiOne⟩
+  exact O.exists_nextFutureMinimum_of_repeat hij heq current
 
 /--
 第3枝では任意の current の後に next future minimum が構成的に存在する。
