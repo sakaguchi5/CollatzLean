@@ -16,6 +16,8 @@ import CollatzLean.Collatz3.Experimental.ReducedRationalSlope
 import CollatzLean.Collatz3.Experimental.RationalMechanicalClosedForm
 import CollatzLean.Collatz3.Experimental.CarryWordMechanicalFormula
 import CollatzLean.Collatz3.Experimental.UnitCarryMechanicalCharacterization
+import CollatzLean.Collatz3.Experimental.PromotedLocalLemmas
+import CollatzLean.Collatz3.Experimental.PromotedLocalApplications
 
 set_option linter.style.header false
 
@@ -36,11 +38,18 @@ Collatz3 全面書き換え前に、Collatz 固有の実装から一般数学を
 8. rational lower / upper 型の全幅 closed form、
 9. carry word の exact mechanical formula、
 10. lower / upper mechanical roof から `HasUnitCarry` を復元する converse、
-11. `HasUnitCarry ↔ mechanical roof` の特徴付け。
+11. `HasUnitCarry ↔ mechanical roof` の特徴付け、
+12. 長い証明に埋もれていた局所保存式・有限算術の名前付き theorem への昇格、
+13. 昇格 theorem を使った既存主要結果の短い再構成。
 
 重要なのは、slope `ρ`、rational witness `p,q`、lower / upper 型、carry pattern を
 primitive field として保存しないこと。
 これらは薄い unit-carry 条件から theorem として導く。
+
+また、`Experimental2` へ移る前の最終整理として、
+residual の unit-carry 保存、roof-slack 保存式、一般 factorization budget、
+refinement の leaf/internal-count 関係、slope の有限距離評価、scaled-cell 除算などを
+独立 theorem として公開した。
 
 この層は現行 `Critical` / `Ferrers` / `Semantics` を import せず、
 全面書き換え時にどこまでを一般数学 kernel として再利用できるかを調べるための独立実験層である。
