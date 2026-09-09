@@ -6,12 +6,11 @@ import CollatzLean.Collatz3.Semantics.FutureMinimum
 単なる future-minimum 部分列と、各 current の直後の tail 全体から最小値を選ぶ
 **標準列**を分離する。
 
-stable core では「どの標準列を classical に選ぶか」を定義しない。
-後段の定理が本当に使う `IsStandard` という性質だけを公開し、
-標準列そのものは証明付き入力として受け取る。
+stable core では無限 selector を classical に構成しない。
+局所正本は `NextFutureMinimum` とし、既存の `FutureMinima.IsStandard` は
+隣接 pair がすべてその局所条件を満たす compatibility view として扱う。
 
-
-Adjacent-return の suffix geometry に必要なのはこちらの `IsStandard` であり、
+Adjacent-return の suffix geometry に必要なのはこちらの局所最小性であり、
 Record--Ferrers の positive roof anchor とは別層の actual semantics である。
 -/
 
@@ -41,6 +40,24 @@ theorem next_value_le_of_standard
     (hjt : S.index j < t) :
     O.value (S.index (j + 1)) ≤ O.value t :=
   hStandard j t hjt
+
+/--
+`IsStandard` は、各隣接 pair が局所正本 `NextFutureMinimum` であることと同値。
+無限列に固有の追加情報はない。
+-/
+theorem isStandard_iff_nextFutureMinimum
+    {O : OddOrbit}
+    (S : O.FutureMinima) :
+    S.IsStandard ↔
+      ∀ j : ℕ,
+        O.NextFutureMinimum (S.index j) (S.index (j + 1)) := by
+  constructor
+  · intro h j
+    refine ⟨S.index_strict (Nat.lt_succ_self j), ?_⟩
+    intro t hjt
+    exact h j t hjt
+  · intro h j t hjt
+    exact (h j).2 t hjt
 
 end FutureMinima
 end OddOrbit

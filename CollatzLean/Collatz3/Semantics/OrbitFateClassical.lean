@@ -3,17 +3,18 @@ import Mathlib.Data.Finset.Preimage
 import Mathlib.Data.Finset.Max
 
 /-!
-# Collatz3: 無限軌道三分法の classical closure
+# Collatz3: 無限軌道三分法の classical coverage
 
-基礎語彙と有限深度三分法は `OrbitFate` / `FiniteOrbitFate` に置き、
-このファイルだけで無限軌道の完全三分法を閉じる。
+基礎語彙、有限深度三分法、三枝の相互排他性は stable / constructive 側に置く。
+このファイルが担当するのは、無限軌道について三枝の**どれかが必ず成立する**という
+網羅性だけである。
 
 `HitsOne` も非自明な再訪もないなら、軌道値列は単射である。
 単射な自然数列では各有限集合の逆像も有限なので、各境界以下を訪れる時刻には最後がある。
 したがって軌道は `+∞` へ発散する。
 
 有限集合の全逆像を一つの `Finset` として選ぶ箇所が noncomputable なので、
-この無限 closure のみ classical に隔離する。stable root からは import しない。
+この無限 coverage のみ classical に隔離する。stable root からは import しない。
 -/
 
 namespace Collatz3
@@ -85,13 +86,14 @@ theorem divergesToInfinity_of_no_hit_no_repeat
     (value_injective_of_no_hit_no_repeat O hHit hRepeat)
 
 /--
-無限 odd-only 軌道の完全三分法。
+無限 odd-only 軌道の三分法の網羅性。
 
 1. 有限時間で `1` に到達する。
-2. `1` 以外の同じ値を二度通り、非自明周期の有限証明書を持つ。
+2. `1` 以外の同じ値を二度通る。
 3. `+∞` へ発散する。
 
-完全性のための古典的場合分けはこの theorem とこのファイルだけに隔離する。
+三枝の相互排他性は `OrbitFate.lean` で構成的に証明済み。
+この theorem は「少なくとも一つが成立する」という classical coverage だけを閉じる。
 -/
 theorem fate_trichotomy
     (O : OddOrbit) :

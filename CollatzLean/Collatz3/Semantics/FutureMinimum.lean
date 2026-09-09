@@ -1,15 +1,22 @@
 import CollatzLean.Collatz3.Semantics.OddOrbit
 import Mathlib.Tactic.NormNum
 
+
 /-!
 # Collatz3: future minimum の thin semantics
 
 future minimum は **actual orbit の値** に関する意味論であり、
 critical roof anchor や Record--Ferrers の cut とは別概念である。
 
-ここでは一点の性質と、任意に選択された future-minimum 列だけを定義する。
-「次項が current+1 以後の tail minimum そのもの」という標準隣接性は
-`StandardFutureMinimum.lean` に分離する。
+無限の selector を最初から要求せず、まず一点の future minimum と、
+current より後の tail から一つだけ最小点を取る `NextFutureMinimum` を薄い局所語彙として置く。
+一つの next minimum を無条件に無限 tail から選ぶことはここでは行わない。
+有限区間に最小値があることと、「十分後ろでは既知の候補以上」という有限化証明書から
+next minimum の存在を構成的に導く。三つの終局型からその証明書を作る橋は
+`OrbitFateFutureMinimum.lean` に分離する。
+
+選択済み future-minimum 列は compatibility view として残し、
+標準隣接性は `StandardFutureMinimum.lean` に分離する。
 -/
 
 namespace Collatz3
@@ -70,6 +77,115 @@ theorem exponent_eq_one_of_one_lt
   omega
 
 end FutureMinimumAt
+
+/--
+`j` が current index `i` より後の tail 全体の最小値を実現する。
+無限 selector を保存せず、一つの局所 witness だけを表す。
+-/
+def NextFutureMinimum
+    (O : OddOrbit)
+    (i j : ℕ) : Prop :=
+  i < j ∧
+    ∀ t : ℕ, i < t → O.value j ≤ O.value t
+
+namespace NextFutureMinimum
+
+/-- next minimum は特にその位置自身から先の future minimum。 -/
+theorem futureMinimumAt
+    {O : OddOrbit}
+    {i j : ℕ}
+    (h : O.NextFutureMinimum i j) :
+    O.FutureMinimumAt j := by
+  intro t hjt
+  exact h.2 t (lt_of_lt_of_le h.1 hjt)
+
+end NextFutureMinimum
+
+/--
+有限区間 `[a, a+q]` には actual orbit value の最小点が存在する。
+有限長に対する帰納法と自然数比較だけを使う構成的補題。
+-/
+theorem exists_intervalMinimum
+    (O : OddOrbit)
+    (a q : ℕ) :
+    ∃ j : ℕ,
+      a ≤ j ∧
+      j ≤ a + q ∧
+      ∀ t : ℕ,
+        a ≤ t →
+        t ≤ a + q →
+        O.value j ≤ O.value t := by
+  induction q with
+  | zero =>
+      refine ⟨a, le_rfl, by simp, ?_⟩
+      intro t hat hta
+      have ht : t = a := by omega
+      subst t
+      exact le_rfl
+  | succ q ih =>
+      rcases ih with ⟨j, haj, hjEnd, hMin⟩
+      let b : ℕ := a + (q + 1)
+      by_cases hle : O.value j ≤ O.value b
+      · refine ⟨j, haj, ?_, ?_⟩
+        · omega
+        · intro t hat htEnd
+          by_cases htb : t = b
+          · subst t
+            exact hle
+          · apply hMin t hat
+            dsimp [b] at htEnd htb
+            omega
+      · have hbj : O.value b < O.value j :=
+          lt_of_not_ge hle
+        refine ⟨b, ?_, le_rfl, ?_⟩
+        · dsimp [b]
+          omega
+        · intro t hat htEnd
+          by_cases htb : t = b
+          · subst t
+            exact le_rfl
+          · have htOld : t ≤ a + q := by
+              dsimp [b] at htEnd htb
+              omega
+            exact le_trans (Nat.le_of_lt hbj) (hMin t hat htOld)
+
+/--
+current `i` の直後の値が、ある有限境界 `M` より後の tail 全体以下であるなら、
+`i` の次の tail minimum は有限区間 `[i+1,M]` の探索だけで得られる。
+
+これは無限 tail から witness を選ばずに済むための構成的な一般 bridge。
+-/
+theorem exists_nextFutureMinimum_of_eventually_ge_candidate
+    (O : OddOrbit)
+    (i M : ℕ)
+    (hM : i + 1 ≤ M)
+    (hTail :
+      ∀ t : ℕ,
+        M < t →
+        O.value (i + 1) ≤ O.value t) :
+    ∃ j : ℕ, O.NextFutureMinimum i j := by
+  let q : ℕ := M - (i + 1)
+  have hEnd : (i + 1) + q = M := by
+    dsimp [q]
+    exact Nat.add_sub_of_le hM
+  rcases O.exists_intervalMinimum (i + 1) q with
+    ⟨j, hjStart, hjEnd, hMin⟩
+  refine ⟨j, ?_, ?_⟩
+  · omega
+  · intro t hit
+    by_cases htM : t ≤ M
+    · apply hMin t
+      · omega
+      · rw [hEnd]
+        exact htM
+    · have hMt : M < t := Nat.lt_of_not_ge htM
+      have hCandidate : O.value (i + 1) ≤ O.value t :=
+        hTail t hMt
+      have hMinCandidate : O.value j ≤ O.value (i + 1) := by
+        apply hMin (i + 1)
+        · exact le_rfl
+        · omega
+      exact le_trans hMinCandidate hCandidate
 
 /--
 選択済み future-minimum 列。

@@ -28,6 +28,7 @@ import CollatzLean.Collatz3.Semantics.OrbitFate
 import CollatzLean.Collatz3.Semantics.FiniteOrbitFate
 import CollatzLean.Collatz3.Semantics.FutureMinimum
 import CollatzLean.Collatz3.Semantics.StandardFutureMinimum
+import CollatzLean.Collatz3.Semantics.OrbitFateFutureMinimum
 
 import CollatzLean.Collatz3.Combinatorics.WordRepetition
 import CollatzLean.Collatz3.Combinatorics.YoungFerrers
@@ -65,6 +66,7 @@ import CollatzLean.Collatz3.Bridge.SufficiencyConsequences
 import CollatzLean.Collatz3.Bridge.RunsToCanonical
 import CollatzLean.Collatz3.Bridge.ReachOneConsequences
 import CollatzLean.Collatz3.Bridge.PeriodicOrbitConsequences
+import CollatzLean.Collatz3.Bridge.OrbitFateConsequences
 import CollatzLean.Collatz3.Bridge.ProfileWordCanonical
 import CollatzLean.Collatz3.Bridge.FirstPassageProfile
 import CollatzLean.Collatz3.Bridge.PredecessorExcess
@@ -91,10 +93,14 @@ actual semantics の最終挙動も同じ原則で分離する。
 * `ReachesOne x` は指数語を忘れた「1 への有限到達」だけを表す。
 * `EndsAtOne w x` はその到達を実現する有限 run 証明書であり、`FirstHitsOne` はその正規形。
 * `OddOrbit.HitsOne` / `HasNontrivialRepeat` / `DivergesToInfinity` は無限軌道の3つの薄い最終挙動述語。
+* 第1枝は唯一の first-hit word、第2枝は primitive return、第3枝は任意に遠い exponent-1 future minimum
+   へ derived theorem で正規化する。
+* 三枝の相互排他性は stable 層で構成的に証明する。
 * `FiniteOrbitFate` では有限深度の三分法を構成的に閉じる。
-* 無限軌道の完全三分法は `Semantics.OrbitFateClassical` に隔離し、stable root から import しない。
+* 無限軌道の完全三分法の網羅性だけを `Semantics.OrbitFateClassical` に隔離し、stable root から import しない。
 
 これにより「終点 1」は pure shape の追加条件ではなく、第1の軌道終局型を有限に証明する意味論的条件として扱う。
+三分類から finite affine / canonical arithmetic への接続は `Bridge.OrbitFateConsequences` にだけ置く。
 
 Record/Ferrers 層で現在確定しているのは次の三段である。
 
@@ -143,6 +149,8 @@ critical record skeleton では positive roof anchor を採用する。
 actual future-minimum は pure anchor と別概念であり、必要な接続は Bridge 層だけに置く。
 
 無限 actual semantics は `OddOrbit` / `OrbitFate` / `FutureMinimum` / `StandardFutureMinimum` に分割する。
-stable root が公開するのは構成的な有限深度三分法と future-minimum 性、`FutureMinima.IsStandard` までであり、
-無限軌道の完全三分法は `Semantics.OrbitFateClassical`、
+future minimum の局所正本は `NextFutureMinimum` とし、無限 selector の
+ `IsStandard` はその隣接 compatibility view とする。
+stable root が公開するのは構成的な有限深度三分法、三枝の相互排他性、局所 future-minimum 性までであり、
+無限軌道の完全三分法の網羅性は `Semantics.OrbitFateClassical` に隔離する。
 -/

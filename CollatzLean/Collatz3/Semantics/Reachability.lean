@@ -1,4 +1,3 @@
-import CollatzLean.Collatz3.Arithmetic.Pow23
 import CollatzLean.Collatz3.Semantics.Runs
 
 /-!
@@ -8,86 +7,11 @@ import CollatzLean.Collatz3.Semantics.Runs
 このファイルでは、指数語を忘れた有限到達 `Reaches` と、
 二つの始点が共通の後続点を持つことを表す `Merges` だけを薄い語彙として導入する。
 
-`Merges` の推移性は定義に埋め込まない。
-odd-only Collatz の 1 step が決定的であることと、`Runs` の連結から theorem として導く。
+1 step の決定性は `OddStep.deterministic`、finite run の prefix 決定性は `Runs` 層に置く。
+`Merges` の推移性は定義に埋め込まず、決定性と `Runs` の連結から theorem として導く。
 -/
 
 namespace Collatz3
-
-namespace OddStep
-
-/--
-同じ始点からの exact odd-only step は、2 除算指数も終点も一意。
-
-証明では `2^e * y = 2^f * z` を比較する。
-仮に `e < f` なら、奇数 `y` が正の 2 の冪で割り切れることになり矛盾する。
-`f < e` も対称である。
--/
-theorem deterministic
-    {e f x y z : ℕ}
-    (hy : OddStep e x y)
-    (hz : OddStep f x z) :
-    e = f ∧ y = z := by
-  have hEq : 2 ^ e * y = 2 ^ f * z := by
-    calc
-      2 ^ e * y = 3 * x + 1 := hy.equation
-      _ = 2 ^ f * z := hz.equation.symm
-  have hef : e = f := by
-    by_contra hne
-    rcases lt_or_gt_of_ne hne with hef | hfe
-    · have hle : e ≤ f := Nat.le_of_lt hef
-      have hPow : 2 ^ f = 2 ^ e * 2 ^ (f - e) := by
-        calc
-          2 ^ f = 2 ^ (e + (f - e)) := by
-            rw [Nat.add_sub_of_le hle]
-          _ = 2 ^ e * 2 ^ (f - e) := by
-            rw [pow_add]
-      have hEq' :
-          2 ^ e * y = 2 ^ e * (2 ^ (f - e) * z) := by
-        calc
-          2 ^ e * y = 2 ^ f * z := hEq
-          _ = (2 ^ e * 2 ^ (f - e)) * z := by rw [hPow]
-          _ = 2 ^ e * (2 ^ (f - e) * z) := by ring
-      have hyFactor : y = 2 ^ (f - e) * z :=
-        Nat.mul_left_cancel (Arithmetic.twoPow_pos e) hEq'
-      have hdPos : 0 < f - e := Nat.sub_pos_of_lt hef
-      obtain ⟨d, hd⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hdPos)
-      have hyEven : ∃ q : ℕ, y = 2 * q := by
-        refine ⟨2 ^ d * z, ?_⟩
-        rw [hyFactor, hd, pow_succ]
-        ring
-      rcases hy.end_odd with ⟨k, hk⟩
-      rcases hyEven with ⟨q, hq⟩
-      omega
-    · have hle : f ≤ e := Nat.le_of_lt hfe
-      have hPow : 2 ^ e = 2 ^ f * 2 ^ (e - f) := by
-        calc
-          2 ^ e = 2 ^ (f + (e - f)) := by
-            rw [Nat.add_sub_of_le hle]
-          _ = 2 ^ f * 2 ^ (e - f) := by
-            rw [pow_add]
-      have hEq' :
-          2 ^ f * z = 2 ^ f * (2 ^ (e - f) * y) := by
-        calc
-          2 ^ f * z = 2 ^ e * y := hEq.symm
-          _ = (2 ^ f * 2 ^ (e - f)) * y := by rw [hPow]
-          _ = 2 ^ f * (2 ^ (e - f) * y) := by ring
-      have hzFactor : z = 2 ^ (e - f) * y :=
-        Nat.mul_left_cancel (Arithmetic.twoPow_pos f) hEq'
-      have hdPos : 0 < e - f := Nat.sub_pos_of_lt hfe
-      obtain ⟨d, hd⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hdPos)
-      have hzEven : ∃ q : ℕ, z = 2 * q := by
-        refine ⟨2 ^ d * y, ?_⟩
-        rw [hzFactor, hd, pow_succ]
-        ring
-      rcases hz.end_odd with ⟨k, hk⟩
-      rcases hzEven with ⟨q, hq⟩
-      omega
-  subst f
-  refine ⟨rfl, ?_⟩
-  exact Nat.mul_left_cancel (Arithmetic.twoPow_pos e) hEq
-
-end OddStep
 
 /--
 指数語の情報を忘れた finite odd-only 到達。
@@ -123,7 +47,7 @@ theorem of_oddStep
 
 /--
 同じ始点から二つの finite run を進めた終点は、どちらかが他方の後続点になる。
-これは odd-only step の決定性から従う。
+これは `Runs.prefixComparable_of_common_start` の word 情報を忘れた像。
 -/
 theorem comparable_of_common_start
     {x y z : ℕ}
@@ -132,17 +56,10 @@ theorem comparable_of_common_start
     Reaches y z ∨ Reaches z y := by
   rcases hxy with ⟨u, hu⟩
   rcases hxz with ⟨v, hv⟩
-  induction hu generalizing v z with
-  | nil x =>
-      exact Or.inl ⟨v, hv⟩
-  | @cons e u x m y hstep htail ih =>
-      cases hv with
-      | nil x =>
-          exact Or.inr ⟨e :: u, Runs.cons hstep htail⟩
-      | @cons f v x n z hstep' htail' =>
-          have hmn : m = n := (OddStep.deterministic hstep hstep').2
-          subst n
-          exact ih (v := v) (z := z) htail'
+  rcases Runs.prefixComparable_of_common_start hu hv with
+      ⟨t, _hEq, hRun⟩ | ⟨t, _hEq, hRun⟩
+  · exact Or.inl ⟨t, hRun⟩
+  · exact Or.inr ⟨t, hRun⟩
 
 end Reaches
 

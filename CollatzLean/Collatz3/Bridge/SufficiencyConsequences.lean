@@ -7,9 +7,6 @@ import CollatzLean.Collatz3.Semantics.ReachOne
 `OddSufficient S` は「任意の正の奇数が、`S` のある元と有限時間後に合流する」
 ことだけを表す薄い語彙である。
 
-このファイルでは、さらに `S` の各元が `1` に到達すると仮定すれば、
-任意の正の奇数も `1` に到達することを導く。
-
 重要なのは、`Merges x a` だけから直ちに `Reaches x 1` としていないことである。
 まず odd-only Collatz では `1` から始まる有限 run の終点が常に `1` であることを
 決定性から証明し、その後で「合流は 1 到達性を輸送する」ことを theorem として導く。
@@ -19,15 +16,6 @@ Monks 型の arithmetic progression の十分性はここでは仮定しない�
 -/
 
 namespace Collatz3
-
-namespace OddStep
-
-/-- accelerated odd-only Collatz では `1` は指数 `2` で自分自身へ移る。 -/
-theorem one_self : OddStep 2 1 1 := by
-  refine ⟨by decide, by decide, ?_⟩
-  exact ⟨0, rfl⟩
-
-end OddStep
 
 namespace Runs
 

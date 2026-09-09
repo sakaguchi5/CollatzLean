@@ -1,5 +1,6 @@
 import CollatzLean.Collatz3.Semantics.Reachability
 
+
 /-!
 # Collatz3: 1 への有限到達
 
@@ -59,6 +60,22 @@ theorem exists_endsAtOne
   change Reaches x 1 at h
   exact h
 
+/--
+開始点が `1` でないなら、与えられた finite run を左から有限に調べ、
+`1` へ初めて到達する prefix を取り出す。
+
+`Runs.exists_firstHitPrefix` を使うため、classical choice や無限探索は不要。
+-/
+theorem exists_firstHitsOne_of_ne_one
+    {x : ℕ}
+    (hx : x ≠ 1)
+    (h : ReachesOne x) :
+    ∃ w : Word, FirstHitsOne w x := by
+  rcases h.exists_endsAtOne with ⟨w, hw⟩
+  rcases Runs.exists_firstHitPrefix hw hx with
+    ⟨v, _tail, _hSplit, hvRun, _hvNonempty, hvFirst⟩
+  exact ⟨v, hvRun, hx, hvFirst⟩
+
 end ReachesOne
 
 /-- `ReachesOne` は `EndsAtOne` 証明書が存在することと正確に同値。 -/
@@ -69,6 +86,24 @@ theorem reachesOne_iff_exists_endsAtOne
   · exact ReachesOne.exists_endsAtOne
   · rintro ⟨w, hw⟩
     exact EndsAtOne.reachesOne hw
+
+/--
+第1分類の正規化。
+`x = 1` なら空 run で既に終局点にあり、そうでなければ `FirstHitsOne` 証明書を持つ。
+-/
+theorem reachesOne_iff_eq_one_or_exists_firstHitsOne
+    (x : ℕ) :
+    ReachesOne x ↔
+      x = 1 ∨ ∃ w : Word, FirstHitsOne w x := by
+  constructor
+  · intro h
+    by_cases hx : x = 1
+    · exact Or.inl hx
+    · exact Or.inr (ReachesOne.exists_firstHitsOne_of_ne_one hx h)
+  · intro h
+    rcases h with rfl | ⟨w, hw⟩
+    · exact Reaches.refl 1
+    · exact EndsAtOne.reachesOne hw.1
 
 namespace FirstHitsOne
 
@@ -104,5 +139,43 @@ theorem word_nonempty
   cases hRun
   exact h.start_ne_one rfl
 
+/--
+同じ開始値から `1` に初めて到達する word は一意。
+finite run の prefix 決定性により、片方が他方の真の prefix なら長い方の first-hit 性に反する。
+-/
+theorem word_unique
+    {u v : Word}
+    {x : ℕ}
+    (hu : FirstHitsOne u x)
+    (hv : FirstHitsOne v x) :
+    u = v := by
+  rcases Runs.prefixComparable_of_common_start
+      hu.endsAtOne hv.endsAtOne with
+      ⟨t, hEq, hRun⟩ | ⟨t, hEq, hRun⟩
+  · by_cases ht : t = []
+    · subst t
+      simpa using hEq.symm
+    · exact False.elim
+        (hv.2.2 u t hEq ht hu.endsAtOne)
+  · by_cases ht : t = []
+    · subst t
+      simpa using hEq
+    · exact False.elim
+        (hu.2.2 v t hEq ht hv.endsAtOne)
+
 end FirstHitsOne
+
+/--
+`x ≠ 1` かつ `ReachesOne x` なら first-hit word は存在し、しかも一意。
+-/
+theorem existsUnique_firstHitsOne
+    {x : ℕ}
+    (hx : x ≠ 1)
+    (h : ReachesOne x) :
+    ∃! w : Word, FirstHitsOne w x := by
+  rcases ReachesOne.exists_firstHitsOne_of_ne_one hx h with ⟨w, hw⟩
+  refine ⟨w, hw, ?_⟩
+  intro v hv
+  exact FirstHitsOne.word_unique hv hw
+
 end Collatz3
