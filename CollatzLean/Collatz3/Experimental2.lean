@@ -26,6 +26,7 @@ import CollatzLean.Collatz3.Experimental2.RotationPhaseDerived
 import CollatzLean.Collatz3.Experimental2.MechanicalConvergentCorridor
 import CollatzLean.Collatz3.Experimental2.MechanicalInverse
 import CollatzLean.Collatz3.Experimental2.MechanicalInverseCorridor
+import CollatzLean.Collatz3.Experimental2.MechanicalInverseCorridorEndpoint
 import CollatzLean.Collatz3.Experimental2.RecordCarryLaw
 
 set_option linter.style.header false
