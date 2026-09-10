@@ -28,8 +28,12 @@ import CollatzLean.Collatz3.Experimental2.MechanicalInverse
 import CollatzLean.Collatz3.Experimental2.MechanicalInverseCorridor
 import CollatzLean.Collatz3.Experimental2.MechanicalInverseCorridorEndpoint
 import CollatzLean.Collatz3.Experimental2.MechanicalConvergentCorridorSharp
+import CollatzLean.Collatz3.Experimental2.MechanicalConvergentCorridorSharpEndpoint
 import CollatzLean.Collatz3.Experimental2.FiniteInverseCorridorComposition
 import CollatzLean.Collatz3.Experimental2.OstrowskiCorridorArithmetic
+import CollatzLean.Collatz3.Experimental2.OstrowskiCanonicalArithmetic
+import CollatzLean.Collatz3.Experimental2.OstrowskiCanonicalGreedy
+import CollatzLean.Collatz3.Experimental2.OstrowskiCanonicalCorridor
 import CollatzLean.Collatz3.Experimental2.RecordCarryLaw
 
 set_option linter.style.header false
@@ -37,40 +41,18 @@ set_option linter.style.header false
 /-!
 # Collatz3 Experimental2
 
-`Experimental` を凍結した後、その成果を
+`Experimental` を凍結した後、その成果を `thin definitions + derived theorems` の原則で
+数学的依存順に再構成した第二実験層。
 
-`thin definitions + derived theorems`
+今回追加した canonical Ostrowski 層では、continued fraction の実数実装をこの層へ
+持ち込まず、部分商と convergent weight が満たす自然数再帰だけを generic kernel とする。
 
-の原則で数学的依存順に再構成した第二実験層。
+* sharp Farey corridor の lower endpoint から不要な `P < Pn` を除く。
+* bounded Ostrowski digit だけから sharp residual range を導く。
+* canonical adjacency は exactness ではなく normal form / uniqueness にだけ使う。
+* Euclidean greedy により任意の自然数へ canonical finite-support digits を与える。
+* bounded digits から `ExactInverseCorridorChain` を自動生成し、外部 chain certificate を消す。
 
-方針:
-
-1. `HasUnitCarry` を下側超加法性と上側一単位誤差へ分解する。
-2. carry は屋根から計算する derived quantity とする。
-3. 正規化は carry を保存する冪等射影として扱う。
-4. bit-list / finite composition / refinement を roof path や slope から分離する。
-5. slope は residual ではなく屋根 `β` 自身に対して直接定義する。
-6. exact Real slope は `noncomputable def` として保存せず、
-   `∃! σ, IsRoofSlope β σ` を主 theorem とする。
-7. 実行可能な slope 近似は `ℚ` で別に持つ。
-8. mechanical roof は linear part や residual を field に保存せず、
-   `β(n)` 自身の lower / upper cell 条件だけで定義する。
-9. rational generic theory では `p ≤ q` を仮定しない。
-10. `Experimental/*` は一切 import せず、旧層を regression oracle として固定する。
-
-第二段では primitive definition を増やさず、旧 Experimental にあった便利な derived API を
-新設計に沿って再建した。
-
-* direct slope と normalized slope の exact shift bridge
-* computable rational approximation と exact slope の certificate
-* global roof defect / permutation / split / normalization invariance
-* normalized Record 型 factorization の carry-budget corollary
-* lower floor / upper ceil concrete mechanical formula
-* carry word / balancedness / normalized discrete derivative
-* rotation phase の一歩更新と threshold coding
-
-旧 Experimental との definition-level regression は別入口
-`CollatzLean.Collatz3.Experimental2Compatibility` に隔離し、stable root からは import しない。
-
-この層も `Critical` / `Ferrers` / `Semantics` には依存しない。
+この層は引き続き `Critical` / `Ferrers` / `Semantics` には依存しない。
+旧 `Experimental/*` も一切 import しない。
 -/

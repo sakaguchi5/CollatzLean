@@ -86,87 +86,25 @@ import CollatzLean.Collatz3.Bridge.FerrersRealization
 import CollatzLean.Collatz3.Bridge.CriticalRecord
 import CollatzLean.Collatz3.Bridge.CriticalRecordEquiv
 
---独立実験層
+-- 独立実験層
 import CollatzLean.Collatz3.Experimental2
---独立実験層との橋
+-- 独立実験層との橋
 import CollatzLean.Collatz3.Bridge.Experimental2Realization
---
 import CollatzLean.Collatz3.Bridge.Experimental2BeattyInverse
 import CollatzLean.Collatz3.Bridge.Experimental2SturmianBoundary
 import CollatzLean.Collatz3.Bridge.Experimental2ConvergentSturmian
 import CollatzLean.Collatz3.Bridge.Experimental2ConvergentSturmianCompletion
 import CollatzLean.Collatz3.Bridge.Experimental2OstrowskiSturmianRecord
+import CollatzLean.Collatz3.Bridge.Experimental2CanonicalOstrowski
 
 set_option linter.style.header false
+
 /-!
 # Collatz3: thin definitions + derived theorems kernel
 
-旧体系を import しない。
+stable arithmetic / semantics / Ferrers と独立 `Experimental2` を、Bridge 層だけで接続する。
+今回の canonical Ostrowski bridge では、regular-convergent certificate から canonical greedy digits、
+sharp inverse corridor、Sturmian ceiling、admissible record cut / `initialRecordCuts` の exact 座標公式を導く。
 
-canonical arithmetic の正本を affine data `(p,H,B)` に一本化し、
-Word / Profile はその薄い wrapper とする。
-
-fixed-fiber では signed baseline / signed `E_RF` / signed prepend coordinate を正本とし、
-Nat-valued excess は valid word 上の互換 view とする。
-
-actual semantics、pure critical shape、Ferrers/record 幾何を混ぜない。
-
-actual semantics の最終挙動も同じ原則で分離する。
-
-* `ReachesOne x` は指数語を忘れた「1 への有限到達」だけを表す。
-* `EndsAtOne w x` はその到達を実現する有限 run 証明書であり、`FirstHitsOne` はその正規形。
-* `Merges` 上で `ReachesOne` は不変であり、sufficiency 側はこの semantic theorem を利用する。
-* `OddOrbit.HitsOne` / `HasNontrivialRepeat` / `DivergesToInfinity` は無限軌道の3つの薄い最終挙動述語。
-* 第1枝は唯一の first-hit word、第2枝は primitive return、第3枝は任意に遠い exponent-1 future minimum
-  へ derived theorem で正規化する。
-* repeated state から値列だけでなく exponent / finite segment word の周期性も theorem として導く。
-* 三枝の相互排他性は stable 層で構成的に証明する。
-* `FiniteOrbitFate` では有限深度の三分法を構成的に閉じる。
-* 無限軌道の完全三分法の網羅性だけを `Semantics.OrbitFateClassical` に隔離し、stable root から import しない。
-
-これにより「終点 1」は pure shape の追加条件ではなく、第1の軌道終局型を有限に証明する意味論的条件として扱う。
-三分類から finite affine / canonical arithmetic への接続は Bridge 層だけに置く。
-
-Record/Ferrers 層では deterministic partition を data の正本とする。
-
-* `initialRecordCuts` と `canonicalRecordLengths` は有限計算。
-* cuts と lengths は純データとして相互 inverse。
-* canonical exact carry は `NoRecordLevelTie` を派生させる。
-* canonical exact carry は
-  `NoRecordLevelTie ∧ LocalCriticalBlocksFrom canonicalRecordLengths` と exact に同値。
-* 任意の `CriticalRecordSkeleton` の length 列は underlying profile の
-  `canonicalRecordLengths` と一致する。
-* interior / terminal 一 block の local criticality は exact carry 条件へ局所分解される。
-* 真の `RecordFerrers` は
-  `AdmissibleProfile + 1 < width + canonical exact carry law`
-  だけを保存する最小 subtype とし、skeleton / tie / local criticality は重複保存しない。
-* canonical local words は `[1]` の後ろの word を lossless に分解し、各 local word は
-  対応する block width の genuine `CriticalWord` になる。
-* width / total two-depth / Beatty index / affine translation `B` はこの canonical block 列へ
-  exact に factorize される。
-
-critical slope arithmetic では旧 `ContractingExponentPair` を基礎に置かない。
-`criticalTwoDepth m` が width `m` だけで決まることを使い、
-
-* `IsBestUpperWidth m`,
-* `criticalStripWidth m r`,
-* `IsPrimitiveWidth m`,
-* `primitiveWidth m`
-
-を一変数 width 理論として扱う。旧 `StripReduced` は
-`IsBestUpperWidth` と同値な compatibility view に降格する。
-
-primitive 性と best-upper は RecordFerrers の field ではない。
-前者は record-level tie 排除、後者は local criticality を一括保証する十分条件であり、
-`RecordFerrers.ofPrimitiveBestUpper` で構成用 certificate としてだけ使う。
-
-`0` を record anchor にすると start/terminal rank がともに 0 となるため、
-critical record skeleton では positive roof anchor を採用する。
-actual future-minimum は pure anchor と別概念であり、必要な接続は Bridge 層だけに置く。
-
-無限 actual semantics は `OddOrbit` / `OrbitFate` / `FutureMinimum` / `StandardFutureMinimum` に分割する。
-future minimum の局所正本は `NextFutureMinimum` とし、無限 selector の
-`IsStandard` はその隣接 compatibility view とする。
-stable root が公開するのは構成的な有限深度三分法、三枝の相互排他性、局所 future-minimum 性までであり、
-無限軌道の完全三分法の網羅性は `Semantics.OrbitFateClassical` に隔離する。
+旧 `Experimental` は import しない。
 -/
