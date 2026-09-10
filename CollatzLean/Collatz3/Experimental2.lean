@@ -22,7 +22,7 @@ import CollatzLean.Collatz3.Experimental2.MechanicalRoofDerived
 import CollatzLean.Collatz3.Experimental2.CarryWord
 import CollatzLean.Collatz3.Experimental2.RotationPhaseDerived
 
---
+-- 第三段: inverse / convergent corridor / Record chain law
 import CollatzLean.Collatz3.Experimental2.MechanicalConvergentCorridor
 import CollatzLean.Collatz3.Experimental2.MechanicalInverse
 import CollatzLean.Collatz3.Experimental2.RecordCarryLaw

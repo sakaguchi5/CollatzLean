@@ -91,12 +91,40 @@ def IsUpperMechanicalHeight
     («λ» : ℝ) : Prop :=
   ∀ k : ℕ, H k = ⌈(k : ℝ) * «λ»⌉₊
 
-/-- upper mechanical height の一歩差分。 -/
-noncomputable def upperMechanicalHeightBit
-    («λ» : ℝ)
+/--
+upper mechanical height の一歩差分。
+
+height 列 `H` を直接使い、
+時刻 `k` から `k+1` へ進んだときに height が何段増えたかを表す。
+
+後で `H` が slope `λ` の upper mechanical height であることを仮定すれば、
+この値は
+`ceil((k+1)λ) - ceil(kλ)`
+という解析的な ceiling 差分に一致する。
+
+定義自体には実数 slope を含めず、純粋に離散的な差分として保存する。
+-/
+def upperMechanicalHeightBit
+    (H : ℕ → ℕ)
     (k : ℕ) : ℕ :=
-  ⌈((k + 1 : ℕ) : ℝ) * «λ»⌉₊ -
-    ⌈(k : ℝ) * «λ»⌉₊
+  H (k + 1) - H k
+
+/--
+upper mechanical height の一歩差分は、
+対応する ceiling 列の一歩差分に一致する。
+-/
+theorem upperMechanicalHeightBit_eq_ceilDiff
+    {H : ℕ → ℕ}
+    {«λ» : ℝ}
+    (M : IsUpperMechanicalHeight H «λ»)
+    (k : ℕ) :
+    upperMechanicalHeightBit H k =
+      ⌈((k + 1 : ℕ) : ℝ) * «λ»⌉₊ -
+        ⌈(k : ℝ) * «λ»⌉₊ := by
+  unfold upperMechanicalHeightBit
+  rw [M (k + 1), M k]
+
+
 
 namespace IsLowerMechanicalRoof
 
@@ -246,21 +274,21 @@ theorem inverse_eq_natCeil_div
       exact ⟨hLeft, hRight⟩
     exact hCeil.symm
 
-/-- inverse-height slope。 -/
-noncomputable def inverseSlope (σ : ℝ) : ℝ :=
-  σ⁻¹
+/--
+division 形を inverse slope の multiplication 形へ書き換えた closed form。
 
-/-- division 形を slope multiplication 形へ書き換えた closed form。 -/
-theorem inverse_eq_natCeil_mul_inverseSlope
+新しい slope data は定義せず、`σ⁻¹` をそのまま使う。
+-/
+theorem inverse_eq_natCeil_mul_inv
     {β : ℕ → ℕ}
     {σ : ℝ}
     (M : IsLowerMechanicalRoof β σ)
     (hσ : (1 : ℝ) ≤ σ)
     (k : ℕ) :
     M.inverse hσ k =
-      ⌈(k : ℝ) * inverseSlope σ⌉₊ := by
+      ⌈(k : ℝ) * σ⁻¹⌉₊ := by
   rw [M.inverse_eq_natCeil_div hσ]
-  simp [inverseSlope, div_eq_mul_inv]
+  simp [div_eq_mul_inv]
 
 /-- 離散逆は一歩で下がらない。 -/
 theorem inverse_le_succ
@@ -333,7 +361,10 @@ theorem inverseStep_eq_zero_or_one
   omega
 
 /--
-離散逆の increment は slope `1/σ` の upper/ceil mechanical bit そのもの。
+離散逆の increment は、その離散逆 height 自身の
+upper mechanical height bit そのもの。
+
+これは解析的 slope を使わない、完全に離散的な等式。
 -/
 theorem inverseStep_eq_upperMechanicalHeightBit
     {β : ℕ → ℕ}
@@ -342,20 +373,43 @@ theorem inverseStep_eq_upperMechanicalHeightBit
     (hσ : (1 : ℝ) ≤ σ)
     (k : ℕ) :
     M.inverseStep hσ k =
-      upperMechanicalHeightBit (inverseSlope σ) k := by
-  unfold inverseStep upperMechanicalHeightBit
-  rw [M.inverse_eq_natCeil_mul_inverseSlope hσ (k + 1)]
-  rw [M.inverse_eq_natCeil_mul_inverseSlope hσ k]
+      upperMechanicalHeightBit (M.inverse hσ) k := by
+  rfl
 
-/-- canonical 離散逆全体が upper mechanical height になる。 -/
+/--
+canonical 離散逆全体は slope `σ⁻¹` の upper mechanical height になる。
+
+`σ⁻¹` は新しい data definition として保存せず、
+解析的 characterization の theorem にだけ現れる。
+-/
 theorem inverse_isUpperMechanicalHeight
     {β : ℕ → ℕ}
     {σ : ℝ}
     (M : IsLowerMechanicalRoof β σ)
     (hσ : (1 : ℝ) ≤ σ) :
-    IsUpperMechanicalHeight (M.inverse hσ) (inverseSlope σ) := by
+    IsUpperMechanicalHeight (M.inverse hσ) σ⁻¹ := by
   intro k
-  exact M.inverse_eq_natCeil_mul_inverseSlope hσ k
+  exact M.inverse_eq_natCeil_mul_inv hσ k
+
+/--
+inverse step の解析的表示。
+
+離散的に定義された inverse bit が、
+slope `σ⁻¹` の ceiling 差分に一致する。
+-/
+theorem inverseStep_eq_ceilDiff
+    {β : ℕ → ℕ}
+    {σ : ℝ}
+    (M : IsLowerMechanicalRoof β σ)
+    (hσ : (1 : ℝ) ≤ σ)
+    (k : ℕ) :
+    M.inverseStep hσ k =
+      ⌈((k + 1 : ℕ) : ℝ) * σ⁻¹⌉₊ -
+        ⌈(k : ℝ) * σ⁻¹⌉₊ := by
+  rw [M.inverseStep_eq_upperMechanicalHeightBit hσ k]
+  exact
+    upperMechanicalHeightBit_eq_ceilDiff
+      (M.inverse_isUpperMechanicalHeight hσ) k
 
 end IsLowerMechanicalRoof
 
