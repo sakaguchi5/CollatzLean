@@ -93,6 +93,7 @@ import CollatzLean.Collatz3.Bridge.Experimental2Realization
 --
 import CollatzLean.Collatz3.Bridge.Experimental2BeattyInverse
 import CollatzLean.Collatz3.Bridge.Experimental2SturmianBoundary
+import CollatzLean.Collatz3.Bridge.Experimental2ConvergentSturmian
 
 set_option linter.style.header false
 /-!
