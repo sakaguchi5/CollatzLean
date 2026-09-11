@@ -12,4 +12,7 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.FractionalGauge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.IrrationalRotationRoof
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RotationOstrowskiSystem
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.OstrowskiRecordFerrers
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordRankEnvelope
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordFerrersRankDrop
+
 set_option linter.style.header false
