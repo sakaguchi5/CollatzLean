@@ -97,6 +97,7 @@ import CollatzLean.Collatz3.Bridge.Experimental2ConvergentSturmianCompletion
 import CollatzLean.Collatz3.Bridge.Experimental2OstrowskiSturmianRecord
 import CollatzLean.Collatz3.Bridge.Experimental2CanonicalOstrowski
 import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiCoordinates
+import CollatzLean.Collatz3.Bridge.Experimental2HorizontalOstrowskiTwoAdic
 --
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
 import CollatzLean.Collatz3.Bridge.RecordPartitionNoninjective
@@ -110,6 +111,8 @@ set_option linter.style.header false
 stable arithmetic / semantics / Ferrers と独立 `Experimental2` を、Bridge 層だけで接続する。
 今回の canonical Ostrowski bridge では、regular-convergent certificate から canonical greedy digits、
 sharp inverse corridor、Sturmian ceiling、admissible record cut / `initialRecordCuts` の exact 座標公式を導く。
+さらに initial-value horizontal Ostrowski digits について、固定 `2^r` 法の有限状態走査から
+`2^r ∣ 3x+1` を exact に判定する scan-local law を導く。
 
 旧 `Experimental` は import しない。
 -/

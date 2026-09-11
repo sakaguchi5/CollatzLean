@@ -34,6 +34,7 @@ import CollatzLean.Collatz3.Experimental2.OstrowskiCorridorArithmetic
 import CollatzLean.Collatz3.Experimental2.OstrowskiCanonicalArithmetic
 import CollatzLean.Collatz3.Experimental2.OstrowskiCanonicalGreedy
 import CollatzLean.Collatz3.Experimental2.OstrowskiCanonicalCorridor
+import CollatzLean.Collatz3.Experimental2.OstrowskiResidueScan
 import CollatzLean.Collatz3.Experimental2.RecordCarryLaw
 
 set_option linter.style.header false
@@ -52,6 +53,7 @@ set_option linter.style.header false
 * canonical adjacency は exactness ではなく normal form / uniqueness にだけ使う。
 * Euclidean greedy により任意の自然数へ canonical finite-support digits を与える。
 * bounded digits から `ExactInverseCorridorChain` を自動生成し、外部 chain certificate を消す。
+* 固定法に対する weighted sum を weight pair と residue の有限状態走査で復元する。
 
 この層は引き続き `Critical` / `Ferrers` / `Semantics` には依存しない。
 旧 `Experimental/*` も一切 import しない。
