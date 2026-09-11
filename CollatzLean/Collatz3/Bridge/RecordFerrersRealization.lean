@@ -7,8 +7,14 @@ import CollatzLean.Collatz3.Ferrers.RecordFerrers
 # Collatz3 Bridge: RecordFerrers packet と初期値 residue
 
 このファイルでは `canonicalRecordLengths` から exponent word を逆復元する定義を置かない。
-現行の `canonicalRecordLengths` は profile から決まる deterministic partition の派生 view であり、
-length 列だけを full word の符号化として扱う根拠はまだないためである。
+`canonicalRecordLengths` は profile から決まる deterministic partition の派生 view だが、
+一般には full profile / exponent word を決定しない。
+
+実際、初期値 `95` と `175` から得る actual critical first-passage words は
+異なる critical profile を持つ一方、どちらも同じ `canonicalRecordLengths = [4]` を持つ。
+従って情報は `profile -> initialRecordCuts` の段階で失われる。
+`cuts <-> lengths` 自体の有限データ inverse とは両立する。
+この具体的な非単射性は `Bridge.RecordPartitionNoninjective` に regression theorem として固定する。
 
 代わりに、同じ finite Collatz packet を
 
