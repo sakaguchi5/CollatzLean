@@ -111,6 +111,8 @@ import CollatzLean.Collatz3.Bridge.CollatzOstrowskiRecordStability
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
 import CollatzLean.Collatz3.Bridge.RecordPartitionNoninjective
 import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiRealization
+--
+import CollatzLean.Collatz3.Bridge.GenericRecordFerrersBeatty
 
 set_option linter.style.header false
 
