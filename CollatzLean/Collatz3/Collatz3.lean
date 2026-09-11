@@ -102,6 +102,7 @@ import CollatzLean.Collatz3.Bridge.CollatzLogPhase
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseBounds
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseRun
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseProfile
+import CollatzLean.Collatz3.Bridge.CollatzLogPhaseLocalProfile
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseNearReturn
 --
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
@@ -125,6 +126,8 @@ finite actual run ではこの一歩則を telescope し、horizontal convergent
 `1/q_next + q/(3X ln 2)` で評価する。
 さらに critical first-passage の proper prefix では、actual `log₂` growth を
 `profile height + normalized Beatty phase + correction sum` に exact 分解する。
+二つの proper cut の間ではその差を取り、local actual growth を
+`profile difference + mechanical phase difference + local correction sum` に exact 分解する。
 
 旧 `Experimental` は import しない。
 -/

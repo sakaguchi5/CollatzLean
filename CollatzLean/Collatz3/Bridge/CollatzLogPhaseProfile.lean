@@ -221,17 +221,15 @@ theorem logGrowth_lt_profile_add_one_add_correctionSum
   linarith
 
 /--
-full run の全 step start が `X` 以上なら、`take k` で切った prefix も同じ下限を保つ。
+full word の全 step start が `X` 以上なら、`take k` で切った prefix も同じ下限を保つ。
 -/
 theorem AllStartsAtLeast.take
     {X : ℕ}
     {w : Word}
-    {x y z : ℕ}
-    {hFull : Runs w x y}
-    (hAbove : AllStartsAtLeast X hFull)
-    (k : ℕ)
-    (hPrefix : Runs (w.take k) x z) :
-    AllStartsAtLeast X hPrefix := by
+    {x : ℕ}
+    (hAbove : AllStartsAtLeast X w x)
+    (k : ℕ) :
+    AllStartsAtLeast X (w.take k) x := by
   intro u v e a hTake hu
   apply hAbove
       (u := u)
@@ -263,13 +261,11 @@ theorem logGrowth_lt_profile_add_one_add_uniformCorrection
     (h : Runs (w.take k.1) x z)
     (hFirst : Word.CriticalFirstPassage w)
     (hX : 0 < X)
-    (hAbove : AllStartsAtLeast X h) :
+    (hAbove : AllStartsAtLeast X (w.take k.1) x) :
     Real.logb 2 (z : ℝ) - Real.logb 2 (x : ℝ) <
       (Critical.profileFromWord w k : ℝ) + 1 +
         (k.1 : ℝ) /
           (((3 : ℝ) * (X : ℝ)) * Real.log 2) := by
-  have hkLe : k.1 ≤ Word.oddSteps w :=
-    Nat.le_of_lt k.2
   have hSteps :
       Word.oddSteps (w.take k.1) = k.1 := by
     have hkLen : k.1 ≤ w.length := by
@@ -278,7 +274,8 @@ theorem logGrowth_lt_profile_add_one_add_uniformCorrection
   have hGrowth :=
     h.logGrowth_lt_profile_add_one_add_correctionSum hFirst
   have hCorr :=
-    h.logCorrectionSum_le_steps_div_three_mul_log_two hX hAbove
+    h.logCorrectionSum_le_steps_div_three_mul_log_two
+      hX hAbove
   rw [hSteps] at hCorr
   linarith
 
@@ -308,8 +305,10 @@ theorem exists_prefix_logGrowth_decomposition
     hPrefix.logGrowth_eq_profile_add_roofPhase_add_correctionSum h.critical⟩
 
 /--
-full actual first-passage run が区間全体で `X>0` 以上なら、任意の proper cut に actual endpoint があり、
-その logarithmic growth は profile height から幅 `1 + k/(3X ln2)` の corridor に入る。
+full actual first-passage run が区間全体で `X>0` 以上なら、
+任意の proper cut に actual endpoint があり、
+その logarithmic growth は profile height から
+幅 `1 + k/(3X ln2)` の corridor に入る。
 -/
 theorem exists_prefix_logGrowth_profile_corridor
     {X : ℕ}
@@ -317,7 +316,7 @@ theorem exists_prefix_logGrowth_profile_corridor
     {x y : ℕ}
     (h : ActualFirstPassage w x y)
     (hX : 0 < X)
-    (hAbove : Runs.AllStartsAtLeast X h.run)
+    (hAbove : Runs.AllStartsAtLeast X w x)
     (k : Fin (Word.oddSteps w)) :
     ∃ z : ℕ, ∃ _hPrefix : Runs (w.take k.1) x z,
       (Critical.profileFromWord w k : ℝ) ≤
@@ -328,12 +327,14 @@ theorem exists_prefix_logGrowth_profile_corridor
               (((3 : ℝ) * (X : ℝ)) * Real.log 2) := by
   rcases h.run.exists_take_run k.1 with
     ⟨z, hPrefix, _hSuffix⟩
-  have hPrefixAbove : Runs.AllStartsAtLeast X hPrefix :=
-    hAbove.take k.1 hPrefix
-  exact ⟨z, hPrefix,
-    hPrefix.profile_le_logGrowth h.critical,
-    hPrefix.logGrowth_lt_profile_add_one_add_uniformCorrection
-      h.critical hX hPrefixAbove⟩
+  have hPrefixAbove :
+      Runs.AllStartsAtLeast X (w.take k.1) x :=
+    hAbove.take k.1
+  exact
+    ⟨z, hPrefix,
+      hPrefix.profile_le_logGrowth h.critical,
+      hPrefix.logGrowth_lt_profile_add_one_add_uniformCorrection
+        h.critical hX hPrefixAbove⟩
 
 end ActualFirstPassage
 

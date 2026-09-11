@@ -176,39 +176,34 @@ cons run の correction residual は
   ring
 
 /--
-run の全 step start が `X` 以上であるという derived predicate。
+word `w` に沿う actual prefix の各 step start が `X` 以上である。
 
-`Runs : Prop` の証明自体を pattern match せず、
-word の各 step より手前の actual prefix の終点を用いて特徴づける。
-
-`w = u ++ e :: v` なら、prefix `u` の終点がその step の始点なので、
-その値が常に `X` 以上であることを要求する。
+`w = u ++ e :: v` なら、prefix `u` の終点 `a` がその step の始点なので、
+`Runs u x a` を満たすすべての actual prefix endpoint に `X ≤ a` を要求する。
 -/
 def AllStartsAtLeast
     (X : ℕ)
-    {w : Word} {x y : ℕ}
-    (_h : Runs w x y) : Prop :=
+    (w : Word)
+    (x : ℕ) : Prop :=
   ∀ {u v : Word} {e a : ℕ},
     w = u ++ e :: v →
     Runs u x a →
     X ≤ a
 
-/-- 空 run には step start が存在しないので条件は自明。 -/
+/-- 空 word には step start が存在しないので条件は自明。 -/
 @[simp] theorem allStartsAtLeast_nil
     (X x : ℕ) :
-    AllStartsAtLeast X (Runs.nil x) := by
+    AllStartsAtLeast X [] x := by
   intro u v e a hw hu
   simp at hw
 
-/-- nonempty run の最初の始点も当然 `X` 以上。 -/
+/-- nonempty word の最初の始点も当然 `X` 以上。 -/
 theorem AllStartsAtLeast.head
     {X e : ℕ}
     {w : Word}
-    {x m z : ℕ}
-    {hstep : OddStep e x m}
-    {htail : Runs w m z}
+    {x : ℕ}
     (hAbove :
-      AllStartsAtLeast X (Runs.cons hstep htail)) :
+      AllStartsAtLeast X (e :: w) x) :
     X ≤ x := by
   apply hAbove
       (u := [])
@@ -219,17 +214,17 @@ theorem AllStartsAtLeast.head
   · exact Runs.nil x
 
 /--
-nonempty run 全体が `X` 以上なら、その tail の全 step start も `X` 以上。
+nonempty actual run 全体が `X` 以上なら、
+最初の一歩後の tail も全 step start が `X` 以上。
 -/
 theorem AllStartsAtLeast.tail
     {X e : ℕ}
     {w : Word}
-    {x m z : ℕ}
-    {hstep : OddStep e x m}
-    {htail : Runs w m z}
+    {x m : ℕ}
+    (hstep : OddStep e x m)
     (hAbove :
-      AllStartsAtLeast X (Runs.cons hstep htail)) :
-    AllStartsAtLeast X htail := by
+      AllStartsAtLeast X (e :: w) x) :
+    AllStartsAtLeast X w m := by
   intro u v f a hw hu
   apply hAbove
       (u := e :: u)
@@ -378,7 +373,7 @@ theorem logCorrectionSum_le_steps_mul_cap
     {x y : ℕ}
     (h : Runs w x y)
     (hX : 0 < X)
-    (hAbove : AllStartsAtLeast X h) :
+    (hAbove : AllStartsAtLeast X w x) :
     h.logCorrectionSum ≤
       (Word.oddSteps w : ℝ) *
         Bridge.collatzLogCorrectionCap X := by
@@ -387,15 +382,10 @@ theorem logCorrectionSum_le_steps_mul_cap
       simp
   | @cons e w x m z hstep htail ih =>
       have hx : X ≤ x :=
-        AllStartsAtLeast.head
-          (hstep := hstep)
-          (htail := htail)
-          hAbove
-      have htailAbove : AllStartsAtLeast X htail :=
-        AllStartsAtLeast.tail
-          (hstep := hstep)
-          (htail := htail)
-          hAbove
+        hAbove.head
+      have htailAbove :
+          AllStartsAtLeast X w m :=
+        hAbove.tail hstep
       have hδ :
           Bridge.collatzLogCorrection x ≤
             Bridge.collatzLogCorrectionCap X :=
@@ -429,7 +419,7 @@ theorem logCorrectionSum_le_steps_div_three_mul_log_two
     {x y : ℕ}
     (h : Runs w x y)
     (hX : 0 < X)
-    (hAbove : AllStartsAtLeast X h) :
+    (hAbove : AllStartsAtLeast X w x) :
     h.logCorrectionSum ≤
       (Word.oddSteps w : ℝ) /
         (((3 : ℝ) * (X : ℝ)) * Real.log 2) := by

@@ -204,23 +204,29 @@ theorem horizontalNearReturnShift_abs_lt
     (h : Runs w x y)
     (hSteps : Word.oddSteps w = (D.horizontalWeights).Q n)
     (hX : 0 < X)
-    (hAbove : AllStartsAtLeast X h) :
+    (hAbove : AllStartsAtLeast X w x) :
     |D.horizontalRotationReturnError n + h.logCorrectionSum| <
       1 / ((D.horizontalWeights).Q (n + 1) : ℝ) +
         ((D.horizontalWeights).Q n : ℝ) /
           (((3 : ℝ) * (X : ℝ)) * Real.log 2) := by
-  have hErr := D.abs_horizontalRotationReturnError_lt_inv_nextWeight n
-  have hSumNonneg := h.logCorrectionSum_nonneg
-  have hSum := h.logCorrectionSum_le_steps_div_three_mul_log_two hX hAbove
+  have hErr :=
+    D.abs_horizontalRotationReturnError_lt_inv_nextWeight n
+  have hSumNonneg :=
+    h.logCorrectionSum_nonneg
+  have hSum :=
+    h.logCorrectionSum_le_steps_div_three_mul_log_two hX hAbove
   rw [hSteps] at hSum
   have hTriangle :
       |D.horizontalRotationReturnError n + h.logCorrectionSum| ≤
-        |D.horizontalRotationReturnError n| + |h.logCorrectionSum| :=
+        |D.horizontalRotationReturnError n| +
+          |h.logCorrectionSum| :=
     abs_add_le _ _
   rw [abs_of_nonneg hSumNonneg] at hTriangle
   calc
     |D.horizontalRotationReturnError n + h.logCorrectionSum|
-        ≤ |D.horizontalRotationReturnError n| + h.logCorrectionSum := hTriangle
+        ≤ |D.horizontalRotationReturnError n| +
+            h.logCorrectionSum :=
+      hTriangle
     _ < 1 / ((D.horizontalWeights).Q (n + 1) : ℝ) +
           h.logCorrectionSum := by
       simpa [add_comm] using
@@ -244,7 +250,7 @@ theorem logPhase_horizontalNearReturn_with_bound
     (h : Runs w x y)
     (hSteps : Word.oddSteps w = (D.horizontalWeights).Q n)
     (hX : 0 < X)
-    (hAbove : AllStartsAtLeast X h) :
+    (hAbove : AllStartsAtLeast X w x) :
     Bridge.collatzLogPhase y =
         Int.fract
           (Bridge.collatzLogPhase x +
@@ -254,8 +260,10 @@ theorem logPhase_horizontalNearReturn_with_bound
         1 / ((D.horizontalWeights).Q (n + 1) : ℝ) +
           ((D.horizontalWeights).Q n : ℝ) /
             (((3 : ℝ) * (X : ℝ)) * Real.log 2) := by
-  exact ⟨h.logPhase_horizontalNearReturn D n hSteps,
-    h.horizontalNearReturnShift_abs_lt D n X hSteps hX hAbove⟩
+  exact
+    ⟨h.logPhase_horizontalNearReturn D n hSteps,
+      h.horizontalNearReturnShift_abs_lt
+        D n X hSteps hX hAbove⟩
 
 end Runs
 end Collatz3
