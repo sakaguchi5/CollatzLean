@@ -97,6 +97,9 @@ import CollatzLean.Collatz3.Bridge.Experimental2ConvergentSturmianCompletion
 import CollatzLean.Collatz3.Bridge.Experimental2OstrowskiSturmianRecord
 import CollatzLean.Collatz3.Bridge.Experimental2CanonicalOstrowski
 import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiCoordinates
+--
+import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
+import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiRealization
 
 set_option linter.style.header false
 
