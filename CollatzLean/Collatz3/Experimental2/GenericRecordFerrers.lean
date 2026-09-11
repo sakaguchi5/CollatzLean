@@ -10,4 +10,5 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.LinearGauge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.MechanicalPhase
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.FractionalGauge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.IrrationalRotationRoof
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RotationOstrowskiSystem
 set_option linter.style.header false
