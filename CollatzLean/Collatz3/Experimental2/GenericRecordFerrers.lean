@@ -1,5 +1,7 @@
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.ChordRank
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordPartition
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordPartitionInverse
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordRoofBridge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordTie
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.CanonicalRecordChain
 set_option linter.style.header false
