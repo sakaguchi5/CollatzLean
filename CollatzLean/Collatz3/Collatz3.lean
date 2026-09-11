@@ -100,6 +100,8 @@ import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiCoordinates
 import CollatzLean.Collatz3.Bridge.Experimental2HorizontalOstrowskiTwoAdic
 import CollatzLean.Collatz3.Bridge.CollatzLogPhase
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseBounds
+import CollatzLean.Collatz3.Bridge.CollatzLogPhaseRun
+import CollatzLean.Collatz3.Bridge.CollatzLogPhaseNearReturn
 --
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
 import CollatzLean.Collatz3.Bridge.RecordPartitionNoninjective
@@ -117,6 +119,9 @@ sharp inverse corridor、Sturmian ceiling、admissible record cut / `initialReco
 `2^r ∣ 3x+1` を exact に判定する scan-local law を導く。
 actual odd-only step については `log₂` fractional phase を導入し、一歩が
 `log₂(3/2)` 回転と正の小補正 `log₂(1+1/(3x))` に exact に分解されることを導く。
+finite actual run ではこの一歩則を telescope し、horizontal convergent denominator 長の区間を
+`log₂` 位相の near-return block として exact に表し、高い軌道上の return shift を
+`1/q_next + q/(3X ln 2)` で評価する。
 
 旧 `Experimental` は import しない。
 -/
