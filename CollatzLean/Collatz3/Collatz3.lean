@@ -106,6 +106,7 @@ import CollatzLean.Collatz3.Bridge.CollatzLogPhaseLocalProfile
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseNearReturn
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseMechanical
 import CollatzLean.Collatz3.Bridge.CollatzOstrowskiBlockStability
+import CollatzLean.Collatz3.Bridge.CollatzOstrowskiRecordStability
 --
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
 import CollatzLean.Collatz3.Bridge.RecordPartitionNoninjective
@@ -132,6 +133,8 @@ finite actual run ではこの一歩則を telescope し、horizontal convergent
 `profile difference + mechanical phase difference + local correction sum` に exact 分解する。
 さらに任意 block length の horizontal canonical Ostrowski 展開から basic near-return error を合成し、
 actual phase shift を `composite Ostrowski error + correction sum` として exact に記述する。
+さらに normalized mechanical phase と Ostrowski block error を同定し、Beatty carry threshold、
+canonical RecordFerrers carry law、actual Collatz correction-stability を四層で exact に接続する。
 
 旧 `Experimental` は import しない。
 -/
