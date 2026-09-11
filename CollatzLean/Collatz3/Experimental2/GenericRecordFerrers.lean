@@ -5,4 +5,6 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordRoofBridge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordTie
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.CanonicalRecordChain
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.CanonicalCarryExact
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordFerrers
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.LinearGauge
 set_option linter.style.header false
