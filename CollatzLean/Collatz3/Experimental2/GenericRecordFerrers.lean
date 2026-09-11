@@ -7,4 +7,5 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.CanonicalRecordCh
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.CanonicalCarryExact
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordFerrers
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.LinearGauge
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.MechanicalPhase
 set_option linter.style.header false
