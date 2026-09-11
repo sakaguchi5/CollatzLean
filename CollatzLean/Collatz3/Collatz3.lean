@@ -113,6 +113,7 @@ import CollatzLean.Collatz3.Bridge.RecordPartitionNoninjective
 import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiRealization
 --
 import CollatzLean.Collatz3.Bridge.GenericRecordFerrersBeatty
+import CollatzLean.Collatz3.Bridge.GenericRecordFerrersCollatzOstrowski
 
 set_option linter.style.header false
 
