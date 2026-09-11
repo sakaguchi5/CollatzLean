@@ -104,6 +104,7 @@ import CollatzLean.Collatz3.Bridge.CollatzLogPhaseRun
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseProfile
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseLocalProfile
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseNearReturn
+import CollatzLean.Collatz3.Bridge.CollatzLogPhaseMechanical
 import CollatzLean.Collatz3.Bridge.CollatzOstrowskiBlockStability
 --
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
