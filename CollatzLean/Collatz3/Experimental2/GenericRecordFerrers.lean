@@ -4,4 +4,5 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordPartitionIn
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordRoofBridge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordTie
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.CanonicalRecordChain
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.CanonicalCarryExact
 set_option linter.style.header false
