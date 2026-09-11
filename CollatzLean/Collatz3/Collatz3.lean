@@ -104,6 +104,7 @@ import CollatzLean.Collatz3.Bridge.CollatzLogPhaseRun
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseProfile
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseLocalProfile
 import CollatzLean.Collatz3.Bridge.CollatzLogPhaseNearReturn
+import CollatzLean.Collatz3.Bridge.CollatzOstrowskiBlockStability
 --
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
 import CollatzLean.Collatz3.Bridge.RecordPartitionNoninjective
@@ -128,6 +129,8 @@ finite actual run ではこの一歩則を telescope し、horizontal convergent
 `profile height + normalized Beatty phase + correction sum` に exact 分解する。
 二つの proper cut の間ではその差を取り、local actual growth を
 `profile difference + mechanical phase difference + local correction sum` に exact 分解する。
+さらに任意 block length の horizontal canonical Ostrowski 展開から basic near-return error を合成し、
+actual phase shift を `composite Ostrowski error + correction sum` として exact に記述する。
 
 旧 `Experimental` は import しない。
 -/
