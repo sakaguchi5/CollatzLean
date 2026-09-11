@@ -1,0 +1,3 @@
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.ChordRank
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordPartition
+set_option linter.style.header false
