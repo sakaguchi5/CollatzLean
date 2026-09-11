@@ -98,6 +98,8 @@ import CollatzLean.Collatz3.Bridge.Experimental2OstrowskiSturmianRecord
 import CollatzLean.Collatz3.Bridge.Experimental2CanonicalOstrowski
 import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiCoordinates
 import CollatzLean.Collatz3.Bridge.Experimental2HorizontalOstrowskiTwoAdic
+import CollatzLean.Collatz3.Bridge.CollatzLogPhase
+import CollatzLean.Collatz3.Bridge.CollatzLogPhaseBounds
 --
 import CollatzLean.Collatz3.Bridge.RecordFerrersRealization
 import CollatzLean.Collatz3.Bridge.RecordPartitionNoninjective
@@ -113,6 +115,8 @@ stable arithmetic / semantics / Ferrers と独立 `Experimental2` を、Bridge �
 sharp inverse corridor、Sturmian ceiling、admissible record cut / `initialRecordCuts` の exact 座標公式を導く。
 さらに initial-value horizontal Ostrowski digits について、固定 `2^r` 法の有限状態走査から
 `2^r ∣ 3x+1` を exact に判定する scan-local law を導く。
+actual odd-only step については `log₂` fractional phase を導入し、一歩が
+`log₂(3/2)` 回転と正の小補正 `log₂(1+1/(3x))` に exact に分解されることを導く。
 
 旧 `Experimental` は import しない。
 -/
