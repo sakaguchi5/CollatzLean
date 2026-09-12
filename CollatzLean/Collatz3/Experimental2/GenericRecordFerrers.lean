@@ -29,5 +29,6 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.LazyOstrowskiComp
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphPathCode
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphYoungPathBridge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphYoungCodeComparison
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphThresholdBridge
 
 set_option linter.style.header false
