@@ -18,5 +18,8 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordRankFerrers
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RotationOstrowskiExistence
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.OstrowskiRankFerrersBridge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.OstrowskiYoungCompleteCode
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraph
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphOstrowskiBridge
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphYoungBridge
 
 set_option linter.style.header false
