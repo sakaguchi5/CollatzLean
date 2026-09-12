@@ -16,5 +16,6 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordRankEnvelop
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordFerrersRankDrop
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RecordRankFerrersShape
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.RotationOstrowskiExistence
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.OstrowskiRankFerrersBridge
 
 set_option linter.style.header false
