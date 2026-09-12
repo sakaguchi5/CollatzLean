@@ -100,7 +100,10 @@ def jumpThenShort
   have tail := shortRunFrom W (h + 1) 1 (k - 1) hTailBound
   have p := SturmianPath.cons e tail
   rw [sturmianBlockStart_succ] at p
-  convert p using 1 <;> simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] <;> omega
+  have hkEq : k = 1 + (k - 1) := by
+    omega
+  rw [sturmianBlockStart_succ, hkEq]
+  simpa [Nat.add_assoc, Nat.add_mul] using p
 
 /--
 finite lazy prefix `d[0..t)` を初期状態 `0` からの graph path として実現する。
@@ -160,8 +163,7 @@ noncomputable def pathOfLazyPrefix
             (by simpa using hNewBound)
           have joined := prev'.append ext
           convert joined using 1 <;>
-            simp [ostrowskiPrefixSum_succ, Nat.add_assoc, Nat.add_comm,
-              Nat.add_left_comm]
+            simp [ostrowskiPrefixSum_succ, Nat.add_assoc, Nat.add_comm]
         · have hPrevLt : d t < W.a t := by omega
           have hLo : sturmianBlockStart W t ≤ sturmianBlockStart W t + d t := by omega
           have hHi : sturmianBlockStart W t + d t < sturmianBoundary W t := by
@@ -172,8 +174,7 @@ noncomputable def pathOfLazyPrefix
             hLo hHi hNewPos hNewBound
           have joined := prev.append ext
           convert joined using 1 <;>
-            simp [ostrowskiPrefixSum_succ, Nat.add_assoc, Nat.add_comm,
-              Nat.add_left_comm]
+            simp [ostrowskiPrefixSum_succ, Nat.add_assoc, Nat.add_comm]
 
 /-- canonical lazy representation が与える実 graph path。 -/
 noncomputable def pathOfLazyRepresentation
@@ -182,9 +183,23 @@ noncomputable def pathOfLazyRepresentation
     (R : LazyOstrowskiRepresentation W N) :
     InitialSturmianPathOfWeight W N := by
   let t := ostrowskiLazyLength W N
-  let p := pathOfLazyPrefix W R.digits t R.bounded R.lazy
-  refine ⟨_, ?_⟩
-  simpa [R.value] using p
+  let terminal :=
+    if t = 0 then
+      0
+    else
+      sturmianBlockStart W (t - 1) + R.digits (t - 1)
+  let p :
+      SturmianPath W 0 terminal
+        (ostrowskiPrefixSum W.Q R.digits t) :=
+    pathOfLazyPrefix W R.digits t R.bounded R.lazy
+  have hValue :
+      ostrowskiPrefixSum W.Q R.digits t = N := by
+    simpa [t] using R.value
+  refine
+    { terminal := terminal
+      path := ?_ }
+  rw [← hValue]
+  exact p
 
 end SturmianPath
 
@@ -272,8 +287,8 @@ theorem initialPaths_sameWeight_edgeCount_eq
     (Q : SturmianPath W 0 z₂ N) :
     P.edgeCount = Q.edgeCount := by
   funext h
-  rw [P.edgeCount_eq_canonicalLazyDigits h,
-    Q.edgeCount_eq_canonicalLazyDigits h]
+  rw [edgeCount_eq_canonicalLazyDigits P h,
+    edgeCount_eq_canonicalLazyDigits Q h]
 
 /--
 2012 Theorem 47：lazy Ostrowski digits と weight `N` の Sturmian graph path code は exact に一致する。
@@ -289,7 +304,7 @@ theorem theorem47_lazy_iff_sturmianPathCode
     (canonicalLazyOstrowskiRepresentation W N)
   intro h
   have hPath :=
-    (canonicalInitialSturmianPath W N).path.edgeCount_eq_canonicalLazyDigits h
+    edgeCount_eq_canonicalLazyDigits (canonicalInitialSturmianPath W N).path h
   rw [congrArg (fun S => S.digits h) hLazy]
   exact hPath.symm
 
@@ -306,7 +321,7 @@ theorem theorem42_47_countingCode
         Q.path.edgeCount = P.path.edgeCount) := by
   refine ⟨canonicalInitialSturmianPath W N, ?_, ?_⟩
   · intro h
-    exact (canonicalInitialSturmianPath W N).path.edgeCount_eq_canonicalLazyDigits h
+    exact edgeCount_eq_canonicalLazyDigits (canonicalInitialSturmianPath W N).path h
   · intro Q
     exact initialPaths_sameWeight_edgeCount_eq Q.path
       (canonicalInitialSturmianPath W N).path
@@ -360,7 +375,7 @@ theorem canonicalLazySturmianGraphPath_edgeCount
     (N h : ℕ) :
     (D.canonicalLazySturmianGraphPath N).path.edgeCount h =
       (canonicalLazyOstrowskiRepresentation D.horizontalWeights N).digits h := by
-  exact (D.canonicalLazySturmianGraphPath N).path.edgeCount_eq_canonicalLazyDigits h
+  exact edgeCount_eq_canonicalLazyDigits (D.canonicalLazySturmianGraphPath N).path h
 
 /--
 同じ horizontal weight `N` の任意 Sturmian graph path は canonical path と同じ lazy code を持つ。

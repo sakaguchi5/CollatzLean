@@ -88,6 +88,7 @@ import CollatzLean.Collatz3.Bridge.CriticalRecordEquiv
 
 -- 独立実験層
 import CollatzLean.Collatz3.Experimental2
+/-Experimental2の実験中は重たいのでコメントアウト
 -- 独立実験層との橋
 import CollatzLean.Collatz3.Bridge.Experimental2Realization
 import CollatzLean.Collatz3.Bridge.Experimental2BeattyInverse
@@ -114,7 +115,7 @@ import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiRealization
 --
 import CollatzLean.Collatz3.Bridge.GenericRecordFerrersBeatty
 import CollatzLean.Collatz3.Bridge.GenericRecordFerrersCollatzOstrowski
-
+-/
 set_option linter.style.header false
 
 /-!
