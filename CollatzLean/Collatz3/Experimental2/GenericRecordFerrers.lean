@@ -21,5 +21,8 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.OstrowskiYoungCom
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraph
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphOstrowskiBridge
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphYoungBridge
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphLocalStructure
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.LazyOstrowski
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphLazyBridge
 
 set_option linter.style.header false

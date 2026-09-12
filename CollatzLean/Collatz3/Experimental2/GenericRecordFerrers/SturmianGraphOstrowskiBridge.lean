@@ -36,7 +36,7 @@ namespace RotationOstrowskiSystem
 abbrev SturmianGraphArc
     {α : ℝ}
     (D : RotationOstrowskiSystem α)
-    (i j w : ℕ) : Prop :=
+    (i j w : ℕ) : Type :=
   IsSturmianArc D.horizontalWeights i j w
 
 /-- `D` に付随する Sturmian graph の finite weighted path。 -/

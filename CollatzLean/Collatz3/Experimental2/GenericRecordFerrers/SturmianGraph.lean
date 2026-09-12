@@ -132,12 +132,13 @@ theorem exists_sturmianBoundary_gt
   omega
 
 /--
-semi-normalized infinite Sturmian graph の weighted arc relation。
+semi-normalized infinite Sturmian graph の weighted arc。
 
 `h` block 内の状態 `i` から、論文 Definition 6 の二本の arc をそのまま生成する。
+後段で arc の種類と level をデータとして読むため、arc certificate は `Type` に置く。
 -/
 inductive IsSturmianArc
-    (W : UnitOstrowskiWeightSystem) : ℕ → ℕ → ℕ → Prop
+    (W : UnitOstrowskiWeightSystem) : ℕ → ℕ → ℕ → Type
   | short {h i : ℕ}
       (hLo : sturmianBlockStart W h ≤ i)
       (hHi : i < sturmianBoundary W h) :
