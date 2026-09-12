@@ -116,6 +116,9 @@ import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiRealization
 --
 import CollatzLean.Collatz3.Bridge.GenericRecordFerrersBeatty
 import CollatzLean.Collatz3.Bridge.GenericRecordFerrersCollatzOstrowski
+--Collatz3.CSTMicro
+import CollatzLean.Collatz3.CSTMicro
+
 
 set_option linter.style.header false
 
