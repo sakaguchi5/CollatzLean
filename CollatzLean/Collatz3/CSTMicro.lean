@@ -23,5 +23,9 @@ import CollatzLean.Collatz3.CSTMicro.CriticalGapBridge
 
 -- Stage 5: standard first-passage -> canonical critical word -> admissible profile
 import CollatzLean.Collatz3.CSTMicro.ProfileExtraction
+import CollatzLean.Collatz3.CSTMicro.ProfileReindex
+
+-- Stage 6: odd endpoint -> actual first-passage -> canonical R/Y/Q
+import CollatzLean.Collatz3.CSTMicro.OddEndpointCanonical
 
 set_option linter.style.header false

@@ -4,5 +4,8 @@ import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Conjugate
 import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Area
 import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Durfee
 import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Dominance
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.GenuineConjugate
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.GenuineDurfee
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.ClassicalDominance
 
 set_option linter.style.header false
