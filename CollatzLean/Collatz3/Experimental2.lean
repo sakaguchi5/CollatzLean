@@ -40,6 +40,9 @@ import CollatzLean.Collatz3.Experimental2.RecordCarryLaw
 --サブフォルダ　GenericRecordFerrers
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers
 
+--サブフォルダ　YoungFerrersRestricted
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted
+
 set_option linter.style.header false
 
 /-!

@@ -21,4 +21,7 @@ import CollatzLean.Collatz3.CSTMicro.RoofEnvelope
 -- Stage 4: pure 2--3 critical gap interface と single-lift bridge
 import CollatzLean.Collatz3.CSTMicro.CriticalGapBridge
 
+-- Stage 5: standard first-passage -> canonical critical word -> admissible profile
+import CollatzLean.Collatz3.CSTMicro.ProfileExtraction
+
 set_option linter.style.header false

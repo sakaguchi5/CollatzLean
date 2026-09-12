@@ -1,0 +1,8 @@
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.PlateauDecomposition
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.RecordFerrersPlateau
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Conjugate
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Area
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Durfee
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.Dominance
+
+set_option linter.style.header false
