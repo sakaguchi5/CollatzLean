@@ -15,4 +15,10 @@ import CollatzLean.Collatz3.CSTMicro.AffineExpansion
 import CollatzLean.Collatz3.CSTMicro.CriticalExpansion
 import CollatzLean.Collatz3.CSTMicro.Compression
 
+-- Stage 3: Beatty roof による affine numerator の deterministic sharp envelope
+import CollatzLean.Collatz3.CSTMicro.RoofEnvelope
+
+-- Stage 4: pure 2--3 critical gap interface と single-lift bridge
+import CollatzLean.Collatz3.CSTMicro.CriticalGapBridge
+
 set_option linter.style.header false
