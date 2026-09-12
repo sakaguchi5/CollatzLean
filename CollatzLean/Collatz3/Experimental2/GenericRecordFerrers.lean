@@ -28,5 +28,6 @@ import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphObse
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.LazyOstrowskiCompleteCode
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphPathCode
 import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphYoungPathBridge
+import CollatzLean.Collatz3.Experimental2.GenericRecordFerrers.SturmianGraphYoungCodeComparison
 
 set_option linter.style.header false
