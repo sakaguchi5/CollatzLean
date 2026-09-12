@@ -28,4 +28,9 @@ import CollatzLean.Collatz3.CSTMicro.ProfileReindex
 -- Stage 6: odd endpoint -> actual first-passage -> canonical R/Y/Q
 import CollatzLean.Collatz3.CSTMicro.OddEndpointCanonical
 
+-- Stage 7: RecordFerrers compatibility -> shape-sensitive B/R/Q corridor
+import CollatzLean.Collatz3.CSTMicro.RecordCompatibility
+import CollatzLean.Collatz3.CSTMicro.RecordShapeEnvelope
+import CollatzLean.Collatz3.CSTMicro.RecordSurvivor
+
 set_option linter.style.header false
