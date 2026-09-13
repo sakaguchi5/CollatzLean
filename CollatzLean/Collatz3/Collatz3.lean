@@ -119,7 +119,9 @@ import CollatzLean.Collatz3.Bridge.GenericRecordFerrersCollatzOstrowski
 
 -- F9--F13 の collision 算術を Collatz Beatty/log slope へ特殊化する橋
 import CollatzLean.Collatz3.Bridge.RecordFerrersCollisionArithmetic
-
+--
+import CollatzLean.Collatz3.Bridge.FullCriticalYoung
+import CollatzLean.Collatz3.Bridge.FullCriticalYoungPlateau
 --Collatz3.CSTMicro
 import CollatzLean.Collatz3.CSTMicro
 
