@@ -131,6 +131,13 @@ import CollatzLean.Collatz3.Bridge.CriticalWidthDisjoint
 import CollatzLean.Collatz3.Bridge.CriticalFixedWidthCounting
 import CollatzLean.Collatz3.Bridge.CriticalFixedWidthDensity
 import CollatzLean.Collatz3.Bridge.CriticalFiniteWidthDensityBound
+--
+import CollatzLean.Collatz3.Bridge.FullFirstCrossing
+import CollatzLean.Collatz3.Bridge.FullFirstCrossingPartition
+import CollatzLean.Collatz3.Bridge.FullFirstCrossingActual
+import CollatzLean.Collatz3.Bridge.FullFirstCrossingCoarseFiber
+import CollatzLean.Collatz3.Bridge.FullFirstCrossingDensity
+import CollatzLean.Collatz3.Bridge.FullFirstCrossingFiniteWidthBound
 
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
