@@ -122,6 +122,25 @@ import CollatzLean.Collatz3.Bridge.RecordFerrersCollisionArithmetic
 --
 import CollatzLean.Collatz3.Bridge.FullCriticalYoung
 import CollatzLean.Collatz3.Bridge.FullCriticalYoungPlateau
+--
+import CollatzLean.Collatz3.Bridge.FullCriticalRestrictedPartition
+import CollatzLean.Collatz3.Bridge.ValidEndpointRuns
+/-
+# Collatz3: critical-margin / multi-collision package 1--6
+1. critical margin と rank-drop determinant
+2. coefficient first-passage -> existing CriticalFirstPassage
+3. actual correction sum の necessary lower bound
+4. high-orbit correction budget upper bound
+5. multiple collision の additive / gcd-quadratic area penalty
+6. collision-free branch の internal tight recurrence
+-/
+import CollatzLean.Collatz3.Bridge.CriticalMargin
+import CollatzLean.Collatz3.Bridge.CoefficientFirstPassage
+import CollatzLean.Collatz3.Bridge.CriticalCorrectionLowerBound
+import CollatzLean.Collatz3.Bridge.CriticalCorrectionUpperBound
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.MultiCollisionPenalty
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.CollisionFreeRigidity
+
 --Collatz3.CSTMicro
 import CollatzLean.Collatz3.CSTMicro
 
