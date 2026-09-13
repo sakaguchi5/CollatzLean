@@ -29,4 +29,7 @@ import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.BasisParity
 -- F7: basis equality と no-simultaneous-diagonal-corner characterization
 import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.BasisCharacterization
 
+-- F8: Frobenius diagonal corner を canonical widths / rank-drop boundaries へ exact に戻す
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.RecordFerrersDiagonalBoundary
+
 set_option linter.style.header false
