@@ -148,7 +148,8 @@ import CollatzLean.Collatz3.Bridge.CriticalInfiniteDensityExact
 --
 import CollatzLean.Collatz3.Bridge.FiniteParityResidue
 import CollatzLean.Collatz3.Bridge.SurvivorActualResidue
-
+import CollatzLean.Collatz3.Bridge.CriticalUnionTail
+import CollatzLean.Collatz3.Bridge.CriticalUnionDensityExact
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
 1. critical margin と rank-drop determinant
