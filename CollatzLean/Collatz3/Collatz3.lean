@@ -138,6 +138,13 @@ import CollatzLean.Collatz3.Bridge.FullFirstCrossingActual
 import CollatzLean.Collatz3.Bridge.FullFirstCrossingCoarseFiber
 import CollatzLean.Collatz3.Bridge.FullFirstCrossingDensity
 import CollatzLean.Collatz3.Bridge.FullFirstCrossingFiniteWidthBound
+--
+import CollatzLean.Collatz3.Bridge.CriticalParityCode
+import CollatzLean.Collatz3.Bridge.CriticalAdmissibleParity
+import CollatzLean.Collatz3.Bridge.CriticalSurvivorParity
+import CollatzLean.Collatz3.Bridge.CriticalFirstCrossingKraft
+import CollatzLean.Collatz3.Bridge.CriticalSurvivorDecay
+import CollatzLean.Collatz3.Bridge.CriticalInfiniteDensityExact
 
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
