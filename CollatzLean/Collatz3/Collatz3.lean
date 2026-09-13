@@ -116,9 +116,12 @@ import CollatzLean.Collatz3.Bridge.Experimental2DualOstrowskiRealization
 --
 import CollatzLean.Collatz3.Bridge.GenericRecordFerrersBeatty
 import CollatzLean.Collatz3.Bridge.GenericRecordFerrersCollatzOstrowski
+
+-- F9--F13 の collision 算術を Collatz Beatty/log slope へ特殊化する橋
+import CollatzLean.Collatz3.Bridge.RecordFerrersCollisionArithmetic
+
 --Collatz3.CSTMicro
 import CollatzLean.Collatz3.CSTMicro
-
 
 set_option linter.style.header false
 

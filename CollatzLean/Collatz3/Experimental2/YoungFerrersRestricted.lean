@@ -32,4 +32,19 @@ import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.BasisCharacteri
 -- F8: Frobenius diagonal corner を canonical widths / rank-drop boundaries へ exact に戻す
 import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.RecordFerrersDiagonalBoundary
 
+-- F9: rank drop の算術正規形・normalization 不変性・gcd modulus
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.RankDropArithmetic
+
+-- F10: canonical collision の gcd obstruction と area gap >= 2
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.CollisionArithmetic
+
+-- F11: 任意無理回転の floor 公式（Collatz 特殊化は Bridge 層）
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.MechanicalCollisionSpecialization
+
+-- F12: actual-basis 面積差の exact weighted-slack 分解
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.BasisExcessDecomposition
+
+-- F13: diagonal boundary collision と slack の exact bridge、gap >= 2*t
+import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.DiagonalSlackCollision
+
 set_option linter.style.header false
