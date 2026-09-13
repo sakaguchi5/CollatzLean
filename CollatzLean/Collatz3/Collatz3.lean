@@ -127,6 +127,11 @@ import CollatzLean.Collatz3.Bridge.FullCriticalRestrictedPartition
 import CollatzLean.Collatz3.Bridge.ValidEndpointRuns
 import CollatzLean.Collatz3.Bridge.CriticalActualFiber
 import CollatzLean.Collatz3.Bridge.CriticalActualClassification
+import CollatzLean.Collatz3.Bridge.CriticalWidthDisjoint
+import CollatzLean.Collatz3.Bridge.CriticalFixedWidthCounting
+import CollatzLean.Collatz3.Bridge.CriticalFixedWidthDensity
+import CollatzLean.Collatz3.Bridge.CriticalFiniteWidthDensityBound
+
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
 1. critical margin と rank-drop determinant
