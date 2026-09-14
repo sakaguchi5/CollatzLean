@@ -170,6 +170,19 @@ import CollatzLean.Collatz3.Bridge.SurvivorRecordInteriorActual
 -/
 import CollatzLean.Collatz3.Bridge.SurvivorCompletionArithmetic
 import CollatzLean.Collatz3.Bridge.SurvivorCompletionLift
+/-
+* 隣接 completion lift cocycle と exact 2進 depth
+* `e=1` / defect-zero の有限 transition
+* completion canonical starts の通常大小での発散下界
+* positive defect tail での roof / Record cut 排除
+* Hensel residue による lift coefficient 一意性
+* defect `0,1` の lift finite classification
+* 任意に遠い future-minimum `e=1` anchor 上の exact cocycle
+新しい primitive orbit notion は導入しない。
+-/
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionCocycle
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionConsequences
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionFutureMinimum
 
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
