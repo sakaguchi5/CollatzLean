@@ -155,6 +155,9 @@ import CollatzLean.Collatz3.Bridge.InfiniteSurvivorDefect
 import CollatzLean.Collatz3.Bridge.SurvivorCriticalCompletion
 import CollatzLean.Collatz3.Bridge.SurvivorRecordWindows
 import CollatzLean.Collatz3.Bridge.NaturalSurvivorResidueStability
+import CollatzLean.Collatz3.Bridge.InfiniteSurvivorOrbitBridge
+import CollatzLean.Collatz3.Bridge.InfiniteSurvivorEscape
+import CollatzLean.Collatz3.Bridge.SurvivorRecordInteriorActual
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
 1. critical margin と rank-drop determinant
