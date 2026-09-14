@@ -192,6 +192,8 @@ import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumMinLength
 import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumSharpMinLength
 import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumRigidity
 import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumNoTripleRise
+import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumBarrier
+import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumCorrection
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
 1. critical margin と rank-drop determinant
