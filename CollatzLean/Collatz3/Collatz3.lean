@@ -1,6 +1,7 @@
 import CollatzLean.Collatz3.Arithmetic.Pow23
 import CollatzLean.Collatz3.Arithmetic.Signed
 import CollatzLean.Collatz3.Arithmetic.ModTwoPow
+import CollatzLean.Collatz3.Arithmetic.ResidueFiveCandidates
 
 import CollatzLean.Collatz3.Core.Word
 import CollatzLean.Collatz3.Core.PrefixDepth
@@ -183,6 +184,8 @@ import CollatzLean.Collatz3.Bridge.SurvivorCompletionLift
 import CollatzLean.Collatz3.Bridge.SurvivorCompletionCocycle
 import CollatzLean.Collatz3.Bridge.SurvivorCompletionConsequences
 import CollatzLean.Collatz3.Bridge.SurvivorCompletionFutureMinimum
+--
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionFiveBranch
 
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
