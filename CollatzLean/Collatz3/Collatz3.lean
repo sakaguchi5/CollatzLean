@@ -216,6 +216,9 @@ import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.CollisionFreeRi
 --Collatz3.CSTMicro
 import CollatzLean.Collatz3.CSTMicro
 
+-- CST を global assumption として置く条件付き package（unconditional 本体とは分離）
+import CollatzLean.Collatz3.CSTConditional
+
 set_option linter.style.header false
 
 /-!
