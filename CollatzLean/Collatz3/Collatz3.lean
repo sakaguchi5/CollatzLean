@@ -190,6 +190,7 @@ import CollatzLean.Collatz3.Bridge.SurvivorSegmentDefect
 import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimum
 import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumMinLength
 import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumSharpMinLength
+import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumRigidity
 import CollatzLean.Collatz3.Bridge.SurvivorAdjacentFutureMinimumNoTripleRise
 /-
 # Collatz3: critical-margin / multi-collision package 1--6
