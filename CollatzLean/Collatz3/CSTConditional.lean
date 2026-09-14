@@ -5,6 +5,7 @@ import CollatzLean.Collatz3.CSTConditional.FlatStructure
 import CollatzLean.Collatz3.CSTConditional.ACStructure
 import CollatzLean.Collatz3.CSTConditional.ACCounting
 import CollatzLean.Collatz3.CSTConditional.ACConservation
+import CollatzLean.Collatz3.CSTConditional.ALinearGrowth
 
 /-!
 # Collatz3: CSTConditional package
@@ -19,6 +20,7 @@ import CollatzLean.Collatz3.CSTConditional.ACConservation
 * `#A + #C = q`
 * `defectGrowth + #C = q`
 * defect / critical-margin exact conservation
+* linear defect lower bound から future-minimum 密度・平均 block 長・actual log growth
 
 として整理する。
 -/
