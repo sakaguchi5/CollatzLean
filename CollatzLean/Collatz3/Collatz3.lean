@@ -159,6 +159,19 @@ import CollatzLean.Collatz3.Bridge.InfiniteSurvivorOrbitBridge
 import CollatzLean.Collatz3.Bridge.InfiniteSurvivorEscape
 import CollatzLean.Collatz3.Bridge.SurvivorRecordInteriorActual
 /-
+* common affine translation
+* extra depth = defect + 1
+* roof cut ↔ defect zero
+* exact start residue depth
+* eventual positive odd natural lift
+* exact endpoint lift
+* Hensel residue
+* cross-width 2-adic ultrametric law
+-/
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionArithmetic
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionLift
+
+/-
 # Collatz3: critical-margin / multi-collision package 1--6
 1. critical margin と rank-drop determinant
 2. coefficient first-passage -> existing CriticalFirstPassage
