@@ -7,6 +7,8 @@ import CollatzLean.Collatz3.CSTConditional.ACCounting
 import CollatzLean.Collatz3.CSTConditional.ACConservation
 import CollatzLean.Collatz3.CSTConditional.ALinearGrowth
 import CollatzLean.Collatz3.CSTConditional.ANormalizedEscape
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumLocalRoof
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumLocalRoofAsymptotics
 
 -- normalized escape 以後の薄い derived bridge
 import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeShadow
@@ -51,6 +53,11 @@ import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
 * defect / critical-margin exact conservation
 * linear defect lower bound から future-minimum 密度・平均 block 長・actual log growth
 * linear defect survivor の normalized escape coordinate の有限正実数極限
+* future minimum から見た local roof defect `beattyIndex r - twoSteps(segment)`
+* local roof contribution `w_r / 2^d` と scaled normalized escape increment の exact 同一視
+* local roof contribution の shadow-gap `tsum` identity
+* local contribution の Cesàro 平均 `0` と weighted roof deficit の Lemma 41 平均
+* 任意の固定 local roof depth band の自然密度 `0`
 * escape limit から得られる negative real shadow の exact affine recurrence
 * next-future-minimum block 上の positive shadow-gap affine contraction
 * critical completion endpoint と normalized escape の finite exact identity
