@@ -16,6 +16,15 @@ import CollatzLean.Collatz3.CSTConditional.ANormalizedEscapeShadow
 import CollatzLean.Collatz3.CSTConditional.ACNormalizedEscapeShadow
 import CollatzLean.Collatz3.CSTConditional.ANormalizedCompletionAnchor
 
+-- completion residue / normalized lift の次段 thin-derived package
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionResidueDynamics
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionCenteredResidue
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionAllStepNormalizedLift
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionSharpNormalizedBranch
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionDyadicState
+import CollatzLean.Collatz3.Bridge.SurvivorDefectNormalizedActual
+import CollatzLean.Collatz3.CSTConditional.ADefectNormalizedActual
+
 /-!
 # Collatz3: CSTConditional package
 
@@ -36,9 +45,15 @@ import CollatzLean.Collatz3.CSTConditional.ANormalizedCompletionAnchor
 * critical completion endpoint と normalized escape の finite exact identity
 * completion lift cocycle の defect-normalized 5候補、および flat branch の3候補化
 * A 型 real shadow と normalized completion branch の任意に遠い共通 future-minimum anchor
+* canonical residue `rho` の flat/rise exact transition
+* midpoint-centered residue `sigma` と `-3^(-(m+1))` 型 congruence
+* exponent を消去した normalized completion lift の全-step recurrence
+* Sturmian step `0/1` に応じた branch の `3/5 -> 2/4` sharp 化
+* centered lift/residue をまとめる dyadic state `xi` と future-minimum skew-product
+* actual value の defect-normalized compact state `V_m`
 
 として整理する。
 
-最後の三項は、real escape limit と natural/2進 completion を同一視するものではない。
+real escape limit と natural/2進 completion を同一視しない。
 両側が同じ finite exponent itinerary 上で同時に満たす exact 制約だけを記録する。
 -/
