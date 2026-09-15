@@ -31,6 +31,7 @@ import CollatzLean.Collatz3.Bridge.SurvivorActualCompletionHensel
 import CollatzLean.Collatz3.Bridge.SurvivorActualCompletionGridSeparation
 import CollatzLean.Collatz3.Bridge.SurvivorDefectBeattyScale
 import CollatzLean.Collatz3.Bridge.SurvivorCriticalEscapeWeight
+import CollatzLean.Collatz3.Bridge.Research2021SafeFinite
 import CollatzLean.Collatz3.CSTConditional.AFutureMinimumDefectFloor
 import CollatzLean.Collatz3.CSTConditional.AActualResidueQuotient
 import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
@@ -70,6 +71,9 @@ import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
 * critical escape weight `w_m=2^beattyIndex(m)/3^(m+1)` と `1/6<w_m<=1/3`
 * actual normalized escape increment の exact factorization `a_m=w_m/2^delta_m`
 * critical weight の Sturmian one-step recurrence と `w_m=1/(3P_m)`
+* 2021 Lemma 41 の列と `criticalEscapeWeight` の exact floor/Cesàro reduction
+* Ferrers 1-cell move の exact affine weight と finite chain weighted telescope
+* normalized Ferrers cell weight と critical escape weight の exact row/defect factorization
 * Global CST future minimum を基点とする one-sided defect floor
 * A 型 ordinary quotient の一様有限化
 * 任意に遠い future minimum 上での real target + finite Hensel 共通 anchor
