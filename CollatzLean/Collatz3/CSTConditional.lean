@@ -12,6 +12,15 @@ import CollatzLean.Collatz3.CSTConditional.FutureMinimumLocalRoofAsymptotics
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumFerrersStrip
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumRoofCarryCocycle
 
+-- A 型 exact defect / cut geometry / A-C-Sturmian / margin / counting / compact state / residue dynamics
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumDefectExact
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumCutGeometry
+import CollatzLean.Collatz3.CSTConditional.ACSturmianRefinement
+import CollatzLean.Collatz3.CSTConditional.ACMarginFloor
+import CollatzLean.Collatz3.CSTConditional.ACStrongCounting
+import CollatzLean.Collatz3.CSTConditional.ADefectNormalizedActualCompact
+import CollatzLean.Collatz3.CSTConditional.ActualResidueDynamics
+
 -- normalized escape 以後の薄い derived bridge
 import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeShadow
 import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeCompletion
@@ -64,6 +73,17 @@ import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
 * weighted Ferrers strip area の Cesàro 極限 `1/(6 log 2)`
 * fixed-anchor local roof defect の Beatty carry cocycle
 * 標準 future-minimum endpoint depth と 0/1 Beatty carry 累積の exact 同一視
+* global defect / fixed-anchor local roof defect / absolute Beatty carry の exact identity
+* linear defect A 型では固定 anchor の bounded local roof depth が tail から完全消滅
+* next-future-minimum block の任意 internal cut で `tailExcess = localDepth + relativeCarry`
+* `A` transition の開始 absolute Sturmian step `=1`
+* 非自明 `A` tail の exact `(carry,excess)=(1,1)`
+* 非自明 `C` の `step=0/1` と tail `(1,1)/(0,1)` の exact 二分岐
+* 全 A/C block length の universal margin floor `log2(4/3)`
+* 強い A-count bound `#A < log2(3/2) q + 1`
+* 5 transitions ごとに `#A≤3`, `#C≥2`
+* A 型 defect-normalized actual state の late compact annulus `L/8 < V_m < L/2`
+* actual residue fraction `theta` の exact one-step recurrence と A の denominator-4 branch
 * escape limit から得られる negative real shadow の exact affine recurrence
 * next-future-minimum block 上の positive shadow-gap affine contraction
 * critical completion endpoint と normalized escape の finite exact identity
