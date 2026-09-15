@@ -12,7 +12,7 @@ import CollatzLean.Collatz3.CSTConditional.FutureMinimumLocalRoofAsymptotics
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumFerrersStrip
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumRoofCarryCocycle
 
--- A 型 exact defect / cut geometry / A-C-Sturmian / margin / counting / compact state / residue dynamics
+-- A 型 refinement 1〜7: exact defect / cut geometry / A-C-Sturmian / margin / counting / compact state / residue dynamics
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumDefectExact
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumCutGeometry
 import CollatzLean.Collatz3.CSTConditional.ACSturmianRefinement
@@ -20,6 +20,11 @@ import CollatzLean.Collatz3.CSTConditional.ACMarginFloor
 import CollatzLean.Collatz3.CSTConditional.ACStrongCounting
 import CollatzLean.Collatz3.CSTConditional.ADefectNormalizedActualCompact
 import CollatzLean.Collatz3.CSTConditional.ActualResidueDynamics
+
+-- A 型 refinement 8〜10: integral completion lattice / block Hensel transport / shifted-tail self-similarity
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumIntegralCompletionLattice
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumBlockHenselTransport
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumShiftSelfSimilarity
 
 -- normalized escape 以後の薄い derived bridge
 import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeShadow
@@ -84,6 +89,12 @@ import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
 * 5 transitions ごとに `#A≤3`, `#C≥2`
 * A 型 defect-normalized actual state の late compact annulus `L/8 < V_m < L/2`
 * actual residue fraction `theta` の exact one-step recurrence と A の denominator-4 branch
+* `theta + 2^(-(delta+2)) + 3^m xi in Z` という integral completion lattice
+* future minimum 上の `xi = Z/2^delta` defect-grid と centered Hensel congruence
+* next-future-minimum block の centered Hensel transport (`A`: factor 2, `C`: factor 1)
+* A/C block transport と absolute Sturmian `A/C0/C1` refinement の同時 package
+* future-minimum time shift と `shift defect = local roof defect` の exact identity
+* A 型 linear defect lower bound の shifted-tail `2K` self-similarity
 * escape limit から得られる negative real shadow の exact affine recurrence
 * next-future-minimum block 上の positive shadow-gap affine contraction
 * critical completion endpoint と normalized escape の finite exact identity
