@@ -25,6 +25,15 @@ import CollatzLean.Collatz3.Bridge.SurvivorCompletionDyadicState
 import CollatzLean.Collatz3.Bridge.SurvivorDefectNormalizedActual
 import CollatzLean.Collatz3.CSTConditional.ADefectNormalizedActual
 
+-- a4bf... 以後: actual finite residue / Hensel / Beatty target / defect floor
+import CollatzLean.Collatz3.Bridge.SurvivorDefectActualResidue
+import CollatzLean.Collatz3.Bridge.SurvivorActualCompletionHensel
+import CollatzLean.Collatz3.Bridge.SurvivorActualCompletionGridSeparation
+import CollatzLean.Collatz3.Bridge.SurvivorDefectBeattyScale
+import CollatzLean.Collatz3.CSTConditional.AFutureMinimumDefectFloor
+import CollatzLean.Collatz3.CSTConditional.AActualResidueQuotient
+import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
+
 /-!
 # Collatz3: CSTConditional package
 
@@ -51,6 +60,15 @@ import CollatzLean.Collatz3.CSTConditional.ADefectNormalizedActual
 * Sturmian step `0/1` に応じた branch の `3/5 -> 2/4` sharp 化
 * centered lift/residue をまとめる dyadic state `xi` と future-minimum skew-product
 * actual value の defect-normalized compact state `V_m`
+* actual `2^(δ+2)` residue の有限 future-word 決定
+* actual ordinary quotient と residue fraction による `V_m = k_m + theta_m` 分解
+* natural completion endpoint から得る finite Hensel congruence と bounded lift 一意性
+* `theta + (3^m/4) upsilon in Z` という finite real/dyadic compatibility
+* 同じ actual `theta` に対する spacing `2/1` completion branch の finite separation
+* Beatty scale `P_m in [1,2)` と `V_m=(R_m/4)P_m` の exact factorization
+* Global CST future minimum を基点とする one-sided defect floor
+* A 型 ordinary quotient の一様有限化
+* 任意に遠い future minimum 上での real target + finite Hensel 共通 anchor
 
 として整理する。
 
