@@ -56,7 +56,13 @@ import CollatzLean.Collatz3.Bridge.Research2021SafeFinite
 import CollatzLean.Collatz3.CSTConditional.AFutureMinimumDefectFloor
 import CollatzLean.Collatz3.CSTConditional.AActualResidueQuotient
 import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
+--
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumActualBranchUniqueness
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumActualBranchSelection
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumXiCorrectionUniqueness
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumEndpointPhase
 
+set_option linter.style.longLine false
 /-!
 # Collatz3: CSTConditional package
 
