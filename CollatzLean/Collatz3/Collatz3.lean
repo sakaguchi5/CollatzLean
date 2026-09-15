@@ -213,6 +213,8 @@ import CollatzLean.Collatz3.Bridge.CriticalCorrectionUpperBound
 import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.MultiCollisionPenalty
 import CollatzLean.Collatz3.Experimental2.YoungFerrersRestricted.CollisionFreeRigidity
 
+--Collatz から独立した無理回転の解析層
+import CollatzLean.Collatz3.Analysis.IrrationalRotation
 --Collatz3.CSTMicro
 import CollatzLean.Collatz3.CSTMicro
 
