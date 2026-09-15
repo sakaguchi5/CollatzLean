@@ -8,6 +8,14 @@ import CollatzLean.Collatz3.CSTConditional.ACConservation
 import CollatzLean.Collatz3.CSTConditional.ALinearGrowth
 import CollatzLean.Collatz3.CSTConditional.ANormalizedEscape
 
+-- normalized escape 以後の薄い derived bridge
+import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeShadow
+import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeCompletion
+import CollatzLean.Collatz3.Bridge.SurvivorCompletionNormalizedLift
+import CollatzLean.Collatz3.CSTConditional.ANormalizedEscapeShadow
+import CollatzLean.Collatz3.CSTConditional.ACNormalizedEscapeShadow
+import CollatzLean.Collatz3.CSTConditional.ANormalizedCompletionAnchor
+
 /-!
 # Collatz3: CSTConditional package
 
@@ -23,6 +31,14 @@ import CollatzLean.Collatz3.CSTConditional.ANormalizedEscape
 * defect / critical-margin exact conservation
 * linear defect lower bound から future-minimum 密度・平均 block 長・actual log growth
 * linear defect survivor の normalized escape coordinate の有限正実数極限
+* escape limit から得られる negative real shadow の exact affine recurrence
+* next-future-minimum block 上の positive shadow-gap affine contraction
+* critical completion endpoint と normalized escape の finite exact identity
+* completion lift cocycle の defect-normalized 5候補、および flat branch の3候補化
+* A 型 real shadow と normalized completion branch の任意に遠い共通 future-minimum anchor
 
 として整理する。
+
+最後の三項は、real escape limit と natural/2進 completion を同一視するものではない。
+両側が同じ finite exponent itinerary 上で同時に満たす exact 制約だけを記録する。
 -/
