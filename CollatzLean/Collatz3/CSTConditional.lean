@@ -26,6 +26,9 @@ import CollatzLean.Collatz3.CSTConditional.FutureMinimumIntegralCompletionLattic
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumBlockHenselTransport
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumShiftSelfSimilarity
 
+-- A 型 refinement 11: current defect-grid / block transport / actual-compatible branch separation
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumActualBranchSelection
+
 -- normalized escape 以後の薄い derived bridge
 import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeShadow
 import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeCompletion
@@ -95,6 +98,10 @@ import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
 * A/C block transport と absolute Sturmian `A/C0/C1` refinement の同時 package
 * future-minimum time shift と `shift defect = local roof defect` の exact identity
 * A 型 linear defect lower bound の shifted-tail `2K` self-similarity
+* normalized lift-step の spacing `4` を actual-compatible next centered lift の spacing `2/1` へ移す separation
+* `A`: step `1` による adjacent completion branch の actual-compatible pairwise exclusion
+* `C`: length-one step `0` および nontrivial `C0/C1` による branch separation cases
+* current future-minimum defect-grid + A block Hensel transport + next actual branch separation の共通 package
 * escape limit から得られる negative real shadow の exact affine recurrence
 * next-future-minimum block 上の positive shadow-gap affine contraction
 * critical completion endpoint と normalized escape の finite exact identity
