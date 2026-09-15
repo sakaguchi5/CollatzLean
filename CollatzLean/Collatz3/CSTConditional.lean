@@ -9,6 +9,8 @@ import CollatzLean.Collatz3.CSTConditional.ALinearGrowth
 import CollatzLean.Collatz3.CSTConditional.ANormalizedEscape
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumLocalRoof
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumLocalRoofAsymptotics
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumFerrersStrip
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumRoofCarryCocycle
 
 -- normalized escape 以後の薄い derived bridge
 import CollatzLean.Collatz3.Bridge.SurvivorNormalizedEscapeShadow
@@ -58,6 +60,10 @@ import CollatzLean.Collatz3.CSTConditional.AFiniteActualCompletionAnchor
 * local roof contribution の shadow-gap `tsum` identity
 * local contribution の Cesàro 平均 `0` と weighted roof deficit の Lemma 41 平均
 * 任意の固定 local roof depth band の自然密度 `0`
+* weighted roof deficit と縦 Ferrers cell strip の finite exact identity
+* weighted Ferrers strip area の Cesàro 極限 `1/(6 log 2)`
+* fixed-anchor local roof defect の Beatty carry cocycle
+* 標準 future-minimum endpoint depth と 0/1 Beatty carry 累積の exact 同一視
 * escape limit から得られる negative real shadow の exact affine recurrence
 * next-future-minimum block 上の positive shadow-gap affine contraction
 * critical completion endpoint と normalized escape の finite exact identity
