@@ -61,7 +61,11 @@ import CollatzLean.Collatz3.CSTConditional.FutureMinimumActualBranchUniqueness
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumActualBranchSelection
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumXiCorrectionUniqueness
 import CollatzLean.Collatz3.CSTConditional.FutureMinimumEndpointPhase
-
+--
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumCompletionBlockCocycle
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumCompletionBlockBranchUniqueness
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumDyadicGridBlockTransport
+import CollatzLean.Collatz3.CSTConditional.FutureMinimumBlockBranchGridIdentification
 set_option linter.style.longLine false
 /-!
 # Collatz3: CSTConditional package
