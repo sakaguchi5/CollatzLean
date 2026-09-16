@@ -13,6 +13,7 @@ import CollatzLean.Collatz3.CSTConditional.IntegerReduction.EventualPeriodicity
 import CollatzLean.Collatz3.CSTConditional.IntegerReduction.RightRecordCharacterization
 import CollatzLean.Collatz3.CSTConditional.IntegerReduction.AdmissibleDecompositionUniqueness
 import CollatzLean.Collatz3.CSTConditional.IntegerReduction.EscapeRecordReconstruction
+import CollatzLean.Collatz3.CSTConditional.IntegerReduction.EscapeLinearDefectRecovery
 import CollatzLean.Collatz3.CSTConditional.IntegerReduction.FromAType
 
 set_option linter.style.longLine false
@@ -26,7 +27,9 @@ GPT Work で得た独立整数問題への縮約を、`IntegerReduction` 以下�
 
 * pure integer 側では actual orbit / `GlobalCST` を使わない。
 * right-record による boundary の完全特徴付けと、許容 block 分解の一意性を含む。
-* Problem E 型の指数逃走から、有限 shift 後の許容 block 分解を再構成する逆向きも含む。
+* Problem E 型の指数逃走から、有限 shift 後の許容 block 分解を再構成する逆向きを含む。
+* さらに Problem E から sufficiently-late な exact linear stream / boundary defect lower bound を回収する。
+* exact linear stream defect lower bound から Problem E 型指数逃走へ戻る向きも含む。
 * `FromAType` だけが現行 CSTConditional の A 型仮定から pure integer package へ橋を架ける。
 * 主 `CSTConditional.lean` には import を追加せず、この `CSTConditional.Work` を明示的に
   import したときだけ研究縮約層を読み込む。
