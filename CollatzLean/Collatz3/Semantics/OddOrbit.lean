@@ -63,6 +63,17 @@ def segmentWord (O : OddOrbit) : ℕ → ℕ → Word
   | succ q ih =>
       simp [segmentWord, ih]
 
+/-- segment word の List 長は指定長そのもの。 -/
+@[simp] theorem segmentWord_length
+    (O : OddOrbit)
+    (i q : ℕ) :
+    (O.segmentWord i q).length = q := by
+  induction q generalizing i with
+  | zero =>
+      rfl
+  | succ q ih =>
+      simp [segmentWord, ih]
+
 /-- 無限軌道の有限 segment は既存の `Runs` relation を実現する。 -/
 theorem runsSegment
     (O : OddOrbit)
