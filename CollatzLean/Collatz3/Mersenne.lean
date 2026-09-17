@@ -8,6 +8,8 @@ import CollatzLean.Collatz3.Mersenne.OneZeroRegions
 import CollatzLean.Collatz3.Mersenne.OneZeroSparseComplement
 import CollatzLean.Collatz3.Mersenne.BoundedBlockSUnitReduction
 import CollatzLean.Collatz3.Mersenne.BoundedBlockDefectEscape
+import CollatzLean.Collatz3.Mersenne.SourceDefectBridge
+import CollatzLean.Collatz3.Mersenne.FixedDefectEscape
 
 /-!
 # Collatz3 Mersenne
@@ -15,7 +17,8 @@ import CollatzLean.Collatz3.Mersenne.BoundedBlockDefectEscape
 Mersenne block の純粋整数算術、one-zero family、fixed `(d,r)` affine lift、
 one-zero obstruction の三領域 reduction、および bounded defect からの sparse equation をまとめる。
 さらに、一般 `BlockData` について source coefficient / target の bounded defect を
-固定項数 `{2,3}`-unit obstruction へ送る generic route も含む。
+固定項数 `{2,3}`-unit obstruction へ送る generic route と、source 本体の defect を
+coefficient へ移して fixed-number-of-zeros 全体を扱う bridge も含む。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
