@@ -69,5 +69,68 @@ theorem exists_blockDepth_bound_of_sourceTargetDefect
         k < K := by
   exact boundedSourceTargetDefectEscape_of_twoThreeUnitBound hSUnit A B
 
+/--
+source defect が `m` 以下のまま十分深い block に入るなら、
+target defect も `m` 以下であることはできない。
+
+つまり、固定 defect `m` を保ったまま arbitrarily deep block を通ることはできない、
+という `BoundedSourceTargetDefectEscape` の直接の対偶形。
+-/
+theorem deepBlock_forces_targetDefect_above_bound
+    (hSUnit : NondegenerateTwoThreeUnitExponentBound)
+    (m : ℕ) :
+    ∃ K : ℕ,
+      ∀ k r u x y : ℕ,
+        BlockData k r u x y →
+        Binary.HasZeroDefectAtMost x m →
+        K ≤ k →
+        ¬ Binary.HasZeroDefectAtMost y m := by
+  rcases exists_blockDepth_bound_of_sourceTargetDefect hSUnit m m with
+    ⟨K, hK⟩
+  refine ⟨K, ?_⟩
+  intro k r u x y hBlock hSource hk hTarget
+  have hkLt : k < K :=
+    hK k r u x y hBlock hSource hTarget
+  omega
+
+/--
+source が exact に `m` 個の zero を持ち、
+target が exact に `targetDefect` 個の zero を持つとする。
+
+block depth が十分大きければ
+
+`m < targetDefect`
+
+が必ず成り立つ。
+
+したがって十分深い block は binary zero defect を厳密に増加させる。
+-/
+theorem deepBlock_forces_strict_zeroDefect_growth
+    (hSUnit : NondegenerateTwoThreeUnitExponentBound)
+    (m : ℕ) :
+    ∃ K : ℕ,
+      ∀ k r u x y sourceLength targetDefect targetLength : ℕ,
+        BlockData k r u x y →
+        Binary.HasZeroDefect x m sourceLength →
+        Binary.HasZeroDefect y targetDefect targetLength →
+        K ≤ k →
+        m < targetDefect := by
+  rcases deepBlock_forces_targetDefect_above_bound hSUnit m with
+    ⟨K, hK⟩
+  refine ⟨K, ?_⟩
+  intro k r u x y sourceLength targetDefect targetLength
+    hBlock hSourceExact hTargetExact hk
+  have hSourceAtMost : Binary.HasZeroDefectAtMost x m :=
+    Binary.HasZeroDefectAtMost.of_exact hSourceExact (by omega)
+  have hNotTargetAtMost :
+      ¬ Binary.HasZeroDefectAtMost y m :=
+    hK k r u x y hBlock hSourceAtMost hk
+  by_contra hNotGreater
+  have hTargetLe : targetDefect ≤ m := by
+    omega
+  have hTargetAtMost : Binary.HasZeroDefectAtMost y m :=
+    Binary.HasZeroDefectAtMost.of_exact hTargetExact hTargetLe
+  exact hNotTargetAtMost hTargetAtMost
+
 end Mersenne
 end Collatz3
