@@ -79,6 +79,9 @@ import CollatzLean.Collatz3.Binary
 import CollatzLean.Collatz3.Mersenne
 --
 import CollatzLean.Collatz3.Bridge.Mersenne
+--
+import CollatzLean.Collatz3.BinaryResidue
+import CollatzLean.Collatz3.OneZeroObstruction
 
 import CollatzLean.Collatz3.Bridge.SufficiencyConsequences
 import CollatzLean.Collatz3.Bridge.RunsToCanonical

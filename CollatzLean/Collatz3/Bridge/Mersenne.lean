@@ -1,11 +1,12 @@
 import CollatzLean.Collatz3.Mersenne
 import CollatzLean.Collatz3.Bridge.MersenneRuns
+import CollatzLean.Collatz3.Bridge.CycleResidue
 
 /-!
-# Collatz3 Bridge: Mersenne
+# Collatz3 Bridge: Mersenne / residue obstruction
 
-M2 の Mersenne block と actual odd-only `Runs` の接続をまとめる集約 import。
+Mersenne block と actual odd-only `Runs` の接続に加え、
+cycle residue の一歩必要条件をまとめる集約 import。
 
-低層の `Mersenne` package は semantics 非依存のまま保ち、
-actual Collatz realization はこの Bridge 入口から読む。
+低層 `Mersenne` package は semantics 非依存のまま保つ。
 -/

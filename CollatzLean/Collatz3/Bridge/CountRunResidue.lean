@@ -42,7 +42,7 @@ theorem endpointEquation_residueLift
     dsimp [M, Binary.residueDepthModulus]
     calc
       3 ^ m * 3 ^ (K + 1) = 3 ^ (m + (K + 1)) := by
-        rw [pow_add]
+        simp [pow_add]
       _ = 3 ^ (K + m + 1) := by
         congr 1
         omega
@@ -55,7 +55,6 @@ theorem endpointEquation_residueLift
   have hMain₂ := (Word.endpointEquation_iff w x₂ y₂).1 h₂
   have hTwo :
       2 ^ E * y₁ ≡ 2 ^ E * y₂ [MOD M] := by
-    dsimp [E, m] at hMain₁ hMain₂
     calc
       2 ^ E * y₁ = 3 ^ m * x₁ + Word.affineConst w := by
         simpa [E, m] using hMain₁
