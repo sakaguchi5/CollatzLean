@@ -110,7 +110,7 @@ theorem segmentWord_take
     omega
   rw [hq, O.segmentWord_add]
   have hLen : (O.segmentWord i k).length = k := by
-    simpa [Word.oddSteps] using O.segmentWord_oddSteps i k
+    simp only [segmentWord_length]
   rw [List.take_append_of_le_length]
   · simpa only [hLen] using
       (List.take_length (l := O.segmentWord i k))

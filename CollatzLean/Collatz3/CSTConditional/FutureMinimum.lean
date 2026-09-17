@@ -80,7 +80,7 @@ private theorem prefixTwoDepth_trimmedLast
   have htq : t ≤ p - 1 := by omega
   have hLen : (O.segmentWord i (p - 1)).length = p - 1 := by
     have h := O.segmentWord_oddSteps i (p - 1)
-    simpa [Word.oddSteps] using h
+    simp only [OddOrbit.segmentWord_length]
   unfold Word.prefixTwoDepth
   rw [List.take_append_of_le_length]
   · rw [segmentWord_take_of_le O i htq]
