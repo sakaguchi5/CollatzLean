@@ -18,11 +18,15 @@ import CollatzLean.Collatz3.Binary.ResidueSupportDerived
 -- bounded defect -> sparse complement
 import CollatzLean.Collatz3.Binary.SparseComplement
 
+-- conditional number theory と接続する binary complexity 語彙
+import CollatzLean.Collatz3.Binary.Complexity
+
 /-!
 # Collatz3 Binary
 
 binary vocabulary / dynamics / residue statistics の集約 import。
 O1 以降で使う bounded zero defect と、その sparse-complement 帰結も含む。
+さらに conditional closure 用の run / period-break complexity を薄く追加する。
 
 この入口は actual Collatz `OddStep / Runs` semantics を import しない。
 actual orbit との接続は Bridge 層に置く。
