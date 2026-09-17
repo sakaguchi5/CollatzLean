@@ -73,6 +73,12 @@ import CollatzLean.Collatz3.Ferrers.RecordWordFactorization
 import CollatzLean.Collatz3.Ferrers.RecordArithmeticFactorization
 
 import CollatzLean.Collatz3.Semantics.FirstPassage
+--
+import CollatzLean.Collatz3.Binary
+--
+import CollatzLean.Collatz3.Mersenne
+--
+import CollatzLean.Collatz3.Bridge.Mersenne
 
 import CollatzLean.Collatz3.Bridge.SufficiencyConsequences
 import CollatzLean.Collatz3.Bridge.RunsToCanonical
