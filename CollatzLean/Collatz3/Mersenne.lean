@@ -21,6 +21,7 @@ import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientDerived
 import CollatzLean.Collatz3.Mersenne.SmallHoleExitDepth
 import CollatzLean.Collatz3.Mersenne.TailLoopModular
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteTailLoopSieve
+import CollatzLean.Collatz3.Mersenne.OneHoleFiniteLift65536
 
 /-!
 # Collatz3 Mersenne
@@ -54,9 +55,10 @@ small-hole exit-depth 層では mod 4 / mod 8 だけで決まる non-resonant br
 exact に固定し、odd `k` の source hole `a=2` や even `k` の source-two holes `(1,2)`
 といった低位 resonance を後段の tail/loop sieve へ明示的に残す。
 
-one-hole finite sieve の第1段では `M₂=2^7*5*17*257` まで lift し、
-source resonance `a=2` と target low-source `n=1,2` の `k mod 256` を
-Lean の有限計算 certificate で少数の residue class に絞る。
+one-hole finite sieve の第1段では `M₂=2^7*5*17*257` で `k mod 256` を絞る。
+第2段では `M₃=2^8*5*17*257*65537` へ survivor class だけを lift し、
+source resonance `a=2` を14個、target low-source `n=1,2` を10個の
+`mod 65536` class に絞る。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
