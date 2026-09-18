@@ -22,6 +22,7 @@ import CollatzLean.Collatz3.Mersenne.SmallHoleExitDepth
 import CollatzLean.Collatz3.Mersenne.TailLoopModular
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteTailLoopSieve
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteLift65536
+import CollatzLean.Collatz3.Mersenne.OneHoleThreeTailLargeDepth
 
 /-!
 # Collatz3 Mersenne
@@ -59,6 +60,11 @@ one-hole finite sieve の第1段では `M₂=2^7*5*17*257` で `k mod 256` を�
 第2段では `M₃=2^8*5*17*257*65537` へ survivor class だけを lift し、
 source resonance `a=2` を14個、target low-source `n=1,2` を10個の
 `mod 65536` class に絞る。
+
+第3段では `3^6` を含む `M₄=3^6*7*19*73*163*487` を使い、`k≥6` を
+3-adic tail state として扱う。これにより source `a=2` と target `n=1,2` の
+large-depth branch を完全排除し、source-one の残りを even `k`, `a≥3`, `r=1`、
+target-one の残りを `n≥3` の parity-controlled exit-depth branch へ局所化する。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
