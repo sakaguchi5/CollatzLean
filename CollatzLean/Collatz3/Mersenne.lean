@@ -23,6 +23,7 @@ import CollatzLean.Collatz3.Mersenne.TailLoopModular
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteTailLoopSieve
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteLift65536
 import CollatzLean.Collatz3.Mersenne.OneHoleThreeTailLargeDepth
+import CollatzLean.Collatz3.Mersenne.OneHoleSourceResidualProof
 
 /-!
 # Collatz3 Mersenne
@@ -65,6 +66,11 @@ source resonance `a=2` を14個、target low-source `n=1,2` を10個の
 3-adic tail state として扱う。これにより source `a=2` と target `n=1,2` の
 large-depth branch を完全排除し、source-one の残りを even `k`, `a≥3`, `r=1`、
 target-one の残りを `n≥3` の parity-controlled exit-depth branch へ局所化する。
+
+source-one の最後の residual S では、low-bit congruence から `2^(a-2) ∣ k`、
+`3^k ∣ 2^(L+1)-1` から `2*3^(k-1) ∣ L+1` を導く。
+前者と元の等式から得る線形上界 `L+1 < 5k+3` と、後者の指数的下界を衝突させ、
+well-formed source-one について無条件に `k≤5` を得る。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
