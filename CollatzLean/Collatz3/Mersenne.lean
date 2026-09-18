@@ -17,6 +17,9 @@ import CollatzLean.Collatz3.Mersenne.SmallHoleModular
 import CollatzLean.Collatz3.Mersenne.NoHoleProof
 import CollatzLean.Collatz3.Mersenne.NoHoleSourceOneProof
 import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientProof
+import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientDerived
+import CollatzLean.Collatz3.Mersenne.SmallHoleExitDepth
+import CollatzLean.Collatz3.Mersenne.TailLoopModular
 
 /-!
 # Collatz3 Mersenne
@@ -37,14 +40,18 @@ coefficient へ移す bridge も含む。
 
 small-hole 層では exact equation の well-formedness を保持し、hole 0/1/2 を
 0,1,2 個の dyadic correction を持つ正規形へ exact に分解する。
-さらに `ZMod` 上の period certificate により exponent を有限 residue window へ落とす
-modular-lifting bridgeまでを用意する。
+さらに `ZMod` 上の period certificate に加えて tail/loop certificate を導入し、
+低い exponent を exact に保持した finite modular lifting を可能にする。
 
 no-hole 層では mod 3 / mod 8 の elementary constraints、`ord_(2^r)(3)`、
 Mersenne modulus 上の `2` の exact order、geometric-sum 分解、mod 9 を組み合わせ、
 二つの residual をともに排除する。
 したがって `NoHoleCompleteClassification` は無条件に閉じ、hole 0 の解は
 既知の四つだけとなる。
+
+small-hole exit-depth 層では mod 4 / mod 8 だけで決まる non-resonant branch の `r` を
+exact に固定し、odd `k` の source hole `a=2` や even `k` の source-two holes `(1,2)`
+といった低位 resonance を後段の tail/loop sieve へ明示的に残す。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
