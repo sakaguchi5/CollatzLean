@@ -1,80 +1,111 @@
 import CollatzLean.Collatz3.Arithmetic.TwoThreeUnit
 
 /-!
-# Collatz3 Arithmetic: `{2,3}`-unit exponent bound の定量版
+# Collatz3 Arithmetic: `{2,3}`-unit certificate の項数下界
 
-既存の `NondegenerateTwoThreeUnitExponentBound` は
+以前の定量化では、固定項数 `N` から exponent 上界を返す関数
 
-`∀ N, ∃ K, ... k < K`
+`F : ℕ → ℕ`
 
-という存在形だけを保持する。
+を classical choice で取り出していた。
 
-このファイルでは bound を関数 `F : ℕ → ℕ` として外へ出した薄い interface
-`NondegenerateTwoThreeUnitExponentBoundBy F` を追加する。
+しかし Collatz 側で本当に必要なのは逆向きである。
+深さ `k` を実現する nondegenerate certificate が、最低何項を必要とするかを直接測る。
 
-新しい数論仮定は導入しない。既存の存在形から classical choice で
-ある `F` を選べることも証明する。
+このファイルでは
+
+* fixed card なら `k` は一様有界、という qualitative escape
+* `G k ≤ card` という quantitative lower-bound interface
+
+だけを置く。
+`G(k)` の具体的な成長率はここでは仮定しない。
 -/
 
 namespace Collatz3
 namespace Arithmetic
 
 /--
-`N` 項以下の nondegenerate `{2,3}`-unit equation に `-3^k` が現れるなら、
-`k < F N` である、という定量版 interface。
--/
-def NondegenerateTwoThreeUnitExponentBoundBy
-    (F : ℕ → ℕ) : Prop :=
-  ∀ N : ℕ,
-    ∀ {ι : Type} [DecidableEq ι],
-      ∀ (term : ι → SignedTwoThreeUnit)
-        (s : Finset ι)
-        (k : ℕ),
-        s.card ≤ N →
-        NondegenerateSumOne
-          (fun i => (term i).value) s →
-        (∃ i ∈ s, term i = SignedTwoThreeUnit.negThree k) →
-        k < F N
+深さ `k` の nondegenerate `{2,3}`-unit certificate は、
+固定 cardinality `D` のまま arbitrarily deep にはできない。
 
-/-- 定量版から既存の存在版を忘却する。 -/
-theorem NondegenerateTwoThreeUnitExponentBoundBy.to_exists
-    {F : ℕ → ℕ}
-    (h : NondegenerateTwoThreeUnitExponentBoundBy F) :
-    NondegenerateTwoThreeUnitExponentBound := by
-  intro N
-  refine ⟨F N, ?_⟩
-  intro ι inst term s k hCard hNondegenerate hThree
-  exact h N term s k hCard hNondegenerate hThree
+これは既存の exponent-bound interface を、定量化に向いた逆向きに読み直したもの。
+-/
+def NondegenerateTwoThreeUnitCardEscape : Prop :=
+  ∀ D : ℕ,
+    ∃ K : ℕ,
+      ∀ {ι : Type} [DecidableEq ι],
+        ∀ (term : ι → SignedTwoThreeUnit)
+          (s : Finset ι)
+          (k : ℕ),
+          K ≤ k →
+          NondegenerateSumOne
+            (fun i => (term i).value) s →
+          (∃ i ∈ s, term i = SignedTwoThreeUnit.negThree k) →
+          D < s.card
 
 /--
-既存の存在版 bound から classical choice で一つの bound function を選ぶ。
-
-この関数に growth rate の情報は一切入っていない。
+既存の `NondegenerateTwoThreeUnitExponentBound` から、
+cardinality 版の qualitative escape が従う。
 -/
-noncomputable def chosenTwoThreeUnitExponentBound
-    (h : NondegenerateTwoThreeUnitExponentBound)
-    (N : ℕ) : ℕ :=
-  Classical.choose (h N)
-
-/-- chosen bound function は定量版 interface を満たす。 -/
-theorem chosenTwoThreeUnitExponentBound_spec
+theorem nondegenerateTwoThreeUnitCardEscape_of_exponentBound
     (h : NondegenerateTwoThreeUnitExponentBound) :
-    NondegenerateTwoThreeUnitExponentBoundBy
-      (chosenTwoThreeUnitExponentBound h) := by
-  intro N
-  exact Classical.choose_spec (h N)
+    NondegenerateTwoThreeUnitCardEscape := by
+  intro D
+  rcases h D with ⟨K, hK⟩
+  refine ⟨K, ?_⟩
+  intro ι inst term s k hk hNondegenerate hThree
+  by_contra hNot
+  have hCard : s.card ≤ D := by
+    omega
+  have hkLt : k < K :=
+    hK term s k hCard hNondegenerate hThree
+  omega
 
 /--
-存在版 exponent bound があれば、それを実現する何らかの bound function `F` が存在する。
+自然数値 complexity lower bound `G` が無限へ発散する、という最小 interface。
 
-これは growth rate を主張する定理ではなく、量化順序を関数形に直しただけである。
+実際に狙う候補は概念的には
+
+`G(k) ≍ log k / log log k`
+
+だが、ここでは具体式を固定しない。
 -/
-theorem exists_twoThreeUnitExponentBoundFunction
-    (h : NondegenerateTwoThreeUnitExponentBound) :
-    ∃ F : ℕ → ℕ,
-      NondegenerateTwoThreeUnitExponentBoundBy F := by
-  exact ⟨chosenTwoThreeUnitExponentBound h,
-    chosenTwoThreeUnitExponentBound_spec h⟩
+def NatTendsToInfinity (G : ℕ → ℕ) : Prop :=
+  ∀ D : ℕ,
+    ∃ K : ℕ,
+      ∀ k : ℕ, K ≤ k → D < G k
+
+/--
+深さ `k` を含む任意の nondegenerate certificate は、
+少なくとも `G k` 項を必要とする、という直接の定量 target。
+-/
+def NondegenerateTwoThreeUnitCardLowerBound
+    (G : ℕ → ℕ) : Prop :=
+  ∀ {ι : Type} [DecidableEq ι],
+    ∀ (term : ι → SignedTwoThreeUnit)
+      (s : Finset ι)
+      (k : ℕ),
+      NondegenerateSumOne
+        (fun i => (term i).value) s →
+      (∃ i ∈ s, term i = SignedTwoThreeUnit.negThree k) →
+      G k ≤ s.card
+
+/--
+定量 card lower bound `G` が発散するなら、fixed-card escape が従う。
+-/
+theorem NondegenerateTwoThreeUnitCardLowerBound.to_cardEscape
+    {G : ℕ → ℕ}
+    (hLower : NondegenerateTwoThreeUnitCardLowerBound G)
+    (hGrowth : NatTendsToInfinity G) :
+    NondegenerateTwoThreeUnitCardEscape := by
+  intro D
+  rcases hGrowth D with ⟨K, hK⟩
+  refine ⟨K, ?_⟩
+  intro ι inst term s k hk hNondegenerate hThree
+  have hComplexity : G k ≤ s.card :=
+    hLower term s k hNondegenerate hThree
+  have hLarge : D < G k := hK k hk
+  omega
 
 end Arithmetic
 end Collatz3
