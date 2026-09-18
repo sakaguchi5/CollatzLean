@@ -14,6 +14,7 @@ import CollatzLean.Collatz3.Mersenne.QuantitativeDefectEscape
 import CollatzLean.Collatz3.Mersenne.TwoSidedSparseDefectEscape
 import CollatzLean.Collatz3.Mersenne.SmallHoleExact
 import CollatzLean.Collatz3.Mersenne.SmallHoleModular
+import CollatzLean.Collatz3.Mersenne.NoHoleProof
 
 /-!
 # Collatz3 Mersenne
@@ -35,7 +36,11 @@ coefficient へ移す bridge も含む。
 small-hole 層では exact equation の well-formedness を保持し、hole 0/1/2 を
 0,1,2 個の dyadic correction を持つ正規形へ exact に分解する。
 さらに `ZMod` 上の period certificate により exponent を有限 residue window へ落とす
-modular-lifting bridge までを用意する。
+modular-lifting bridgeまでを用意する。
+
+no-hole 層では mod 3 / mod 8 の elementary constraints を証明し、`k=1,2` を完全分類する。
+`k≥3` の未解決部分は、偶数 exponent の source-one 型と
+`3^k(2^n-1)=2^N-1` 型という二つの residual arithmetic problem に局所化される。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
