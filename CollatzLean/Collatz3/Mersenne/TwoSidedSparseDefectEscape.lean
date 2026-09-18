@@ -1,5 +1,6 @@
 import CollatzLean.Collatz3.Mersenne.BoundedBlockSUnitReduction
 import CollatzLean.Collatz3.Arithmetic.TwoSidedSignedSparsePow3
+import Mathlib.Tactic.NormNum
 
 /-!
 # Collatz3 Mersenne: exact block-sparse equation と hole complexity
@@ -70,8 +71,13 @@ source 側は `3^k` layer、target 側は pure dyadic layer で、
 structure ExactBlockSparseEquation
     (k sourceLength r targetLength : ℕ)
     (sourceTail targetBits : List Bool) : Prop where
+  depth_pos : 0 < k
   sourceLength_pos : 0 < sourceLength
   exitDepth_pos : 0 < r
+  targetLength_pos : 0 < targetLength
+  sourceTail_length : (false :: sourceTail).length = sourceLength
+  targetBits_length : targetBits.length = targetLength
+  targetBits_lsb_false : ∃ targetTail : List Bool, targetBits = false :: targetTail
   equation :
     (-1 : ℤ) - (3 : ℤ) ^ k +
         (2 : ℤ) ^ sourceLength * (3 : ℤ) ^ k -
@@ -224,6 +230,48 @@ theorem exists_nondegenerateCertificate_tight_of_exactEquation
 end BlockSparseSUnit
 
 /--
+endpoint `y` は奇数なので、sparse complement の bit 0 は必ず `0`。
+
+`y + missing + 1 = 2^L` の右辺は `L>0` なら偶数であり、
+`y` が奇数なら `missing` も偶数でなければならない。
+-/
+theorem targetBits_eq_false_cons
+    {k r u x y targetLength : ℕ}
+    {targetBits : List Bool}
+    (hBlock : BlockData k r u x y)
+    (hLen : targetBits.length = targetLength)
+    (hEq :
+      y + Binary.valueLSB targetBits + 1 = 2 ^ targetLength) :
+    ∃ targetTail : List Bool, targetBits = false :: targetTail := by
+  have hYPos : 0 < y := by
+    obtain ⟨q, hOdd⟩ := hBlock.end_odd
+    omega
+  have hTargetLengthPos : 0 < targetLength := by
+    by_contra hNot
+    have hZero : targetLength = 0 := Nat.eq_zero_of_not_pos hNot
+    rw [hZero] at hEq
+    norm_num at hEq
+    omega
+  cases targetBits with
+  | nil =>
+      simp at hLen
+      omega
+  | cons b bs =>
+      cases b with
+      | false =>
+          exact ⟨bs, rfl⟩
+      | true =>
+          exfalso
+          obtain ⟨q, hOdd⟩ := hBlock.end_odd
+          obtain ⟨t, hLengthEq⟩ :=
+            Nat.exists_eq_succ_of_ne_zero
+              (Nat.ne_of_gt hTargetLengthPos)
+          rw [hLengthEq] at hEq
+          simp only [Binary.valueLSB_cons, Binary.bitValue_true] at hEq
+          rw [pow_succ] at hEq
+          omega
+
+/--
 `BlockData` と sparse endpoint complements から exact block-sparse equation を取り出す。
 
 quantitative proof はここから先で `BlockData` の意味論を忘れてよい。
@@ -244,16 +292,27 @@ theorem exists_exactBlockSparseEquation_of_sparseComplements
       hBlock hSourceLen hSourceEq with
     ⟨sourceTail, hSourceBits⟩
   subst sourceBits
+  rcases targetBits_eq_false_cons hBlock hTargetLen hTargetEq with
+    ⟨targetTail, hTargetBits⟩
   have hSourceLengthPos : 0 < sourceLength := by
     simp at hSourceLen
+    omega
+  have hTargetLengthPos : 0 < targetLength := by
+    rw [hTargetBits] at hTargetLen
+    simp at hTargetLen
     omega
   have hCount' :
       Binary.oneCount sourceTail + Binary.oneCount targetBits ≤ D := by
     simpa [Binary.oneCount] using hCount
   refine ⟨sourceLength, targetLength, sourceTail, targetBits, ?_, hCount'⟩
   exact ⟨
+    hBlock.depth_pos,
     hSourceLengthPos,
     hBlock.exitDepth_pos,
+    hTargetLengthPos,
+    hSourceLen,
+    hTargetLen,
+    ⟨targetTail, hTargetBits⟩,
     BlockSparseSUnit.blockEquation_int hBlock hSourceEq hTargetEq
   ⟩
 

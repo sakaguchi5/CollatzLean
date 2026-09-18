@@ -12,6 +12,8 @@ import CollatzLean.Collatz3.Mersenne.SourceDefectBridge
 import CollatzLean.Collatz3.Mersenne.FixedDefectEscape
 import CollatzLean.Collatz3.Mersenne.QuantitativeDefectEscape
 import CollatzLean.Collatz3.Mersenne.TwoSidedSparseDefectEscape
+import CollatzLean.Collatz3.Mersenne.SmallHoleExact
+import CollatzLean.Collatz3.Mersenne.SmallHoleModular
 
 /-!
 # Collatz3 Mersenne
@@ -29,6 +31,11 @@ coefficient へ移す bridge も含む。
 を保持し、source/target の hole 数を depth `k` の関数として直接下から抑える。
 将来 `G(k) ≍ log k / log log k` のような lower bound が得られれば、
 そのまま binary defect 下界へ戻せる設計になっている。
+
+small-hole 層では exact equation の well-formedness を保持し、hole 0/1/2 を
+0,1,2 個の dyadic correction を持つ正規形へ exact に分解する。
+さらに `ZMod` 上の period certificate により exponent を有限 residue window へ落とす
+modular-lifting bridge までを用意する。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
