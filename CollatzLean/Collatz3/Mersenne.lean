@@ -16,6 +16,7 @@ import CollatzLean.Collatz3.Mersenne.SmallHoleExact
 import CollatzLean.Collatz3.Mersenne.SmallHoleModular
 import CollatzLean.Collatz3.Mersenne.NoHoleProof
 import CollatzLean.Collatz3.Mersenne.NoHoleSourceOneProof
+import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientProof
 
 /-!
 # Collatz3 Mersenne
@@ -39,10 +40,11 @@ small-hole 層では exact equation の well-formedness を保持し、hole 0/1/
 さらに `ZMod` 上の period certificate により exponent を有限 residue window へ落とす
 modular-lifting bridgeまでを用意する。
 
-no-hole 層では mod 3 / mod 8 の elementary constraints を証明し、`k=1,2` を完全分類する。
-`NoHoleEvenSourceOneResidual` は `ord_(2^r)(3)=2^(r-2)` と差の平方分解により排除済み。
-したがって no-hole 完全分類の未解決部分は、偶数 `k≥4` の
-`3^k(2^n-1)=2^N-1` 型 residual 一つだけに局所化される。
+no-hole 層では mod 3 / mod 8 の elementary constraints、`ord_(2^r)(3)`、
+Mersenne modulus 上の `2` の exact order、geometric-sum 分解、mod 9 を組み合わせ、
+二つの residual をともに排除する。
+したがって `NoHoleCompleteClassification` は無条件に閉じ、hole 0 の解は
+既知の四つだけとなる。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
