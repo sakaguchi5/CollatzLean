@@ -20,6 +20,7 @@ import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientProof
 import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientDerived
 import CollatzLean.Collatz3.Mersenne.SmallHoleExitDepth
 import CollatzLean.Collatz3.Mersenne.TailLoopModular
+import CollatzLean.Collatz3.Mersenne.OneHoleFiniteTailLoopSieve
 
 /-!
 # Collatz3 Mersenne
@@ -52,6 +53,10 @@ Mersenne modulus 上の `2` の exact order、geometric-sum 分解、mod 9 を�
 small-hole exit-depth 層では mod 4 / mod 8 だけで決まる non-resonant branch の `r` を
 exact に固定し、odd `k` の source hole `a=2` や even `k` の source-two holes `(1,2)`
 といった低位 resonance を後段の tail/loop sieve へ明示的に残す。
+
+one-hole finite sieve の第1段では `M₂=2^7*5*17*257` まで lift し、
+source resonance `a=2` と target low-source `n=1,2` の `k mod 256` を
+Lean の有限計算 certificate で少数の residue class に絞る。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
