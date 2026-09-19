@@ -14,6 +14,8 @@ import CollatzLean.Collatz3.Mersenne.QuantitativeDefectEscape
 import CollatzLean.Collatz3.Mersenne.TwoSidedSparseDefectEscape
 import CollatzLean.Collatz3.Mersenne.SmallHoleExact
 import CollatzLean.Collatz3.Mersenne.SmallHoleModular
+import CollatzLean.Collatz3.Mersenne.SmallHolePeel
+import CollatzLean.Collatz3.Mersenne.SmallHoleParity
 import CollatzLean.Collatz3.Mersenne.NoHoleProof
 import CollatzLean.Collatz3.Mersenne.NoHoleSourceOneProof
 import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientProof
@@ -25,6 +27,8 @@ import CollatzLean.Collatz3.Mersenne.OneHoleFiniteLift65536
 import CollatzLean.Collatz3.Mersenne.OneHoleThreeTailLargeDepth
 import CollatzLean.Collatz3.Mersenne.OneHoleSourceResidualProof
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleGeometric
+import CollatzLean.Collatz3.Mersenne.GeometricSum
+import CollatzLean.Collatz3.Mersenne.TwoAdicArithmetic
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleValuation
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleGcd
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleLocks
@@ -37,97 +41,24 @@ import CollatzLean.Collatz3.Mersenne.SourceTwoHoleRegularProof
 import CollatzLean.Collatz3.Mersenne.TargetTwoHolePhase
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGeometric
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleTwoAdicCuts
+import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGcd
+import CollatzLean.Collatz3.Mersenne.TargetTwoHoleValuation
 
 /-!
 # Collatz3 Mersenne
 
-Mersenne block の純粋整数算術、one-zero family、fixed `(d,r)` affine lift、
-one-zero obstruction の三領域 reduction、および bounded defect からの sparse equation をまとめる。
-さらに、一般 `BlockData` について source coefficient / target の bounded defect を
-固定項数 `{2,3}`-unit obstruction へ送る qualitative route と、source 本体の defect を
-coefficient へ移す bridge も含む。
+Mersenne block の純粋整数算術、small-hole normal form、one-hole closure、
+two-hole internal reduction をまとめる aggregate import。
 
-定量層では exponent 上界関数 `F(N)` を主役にせず、BlockData から得られる exact equation
+今回の refactor では次の薄い共通層を追加した。
 
-`-1 - 3^k + 2^n 3^k - 3^k S + 2^r T + 2^r - 2^(L+r) = 0`
+* `GeometricSum`: geometric sum の単調性・奇偶・上界・tail 分解。
+* `TwoAdicArithmetic`: cut proof で共通する 2-adic helper。
+* `SmallHolePeel`: top hole を一つ短い既知 small-hole equation へ落とす。
+* `SmallHoleParity`: source endpoint / split target の mod 3 parity rigidity。
+* `TargetTwoHoleGcd`: `n≥4` で triple gcd `gcd(q,u,t)=1`。
+* `TargetTwoHoleValuation`: 三 phase 共通で width を `v₂(k)` / `v₂(k-1)` から抑える。
 
-を保持し、source/target の hole 数を depth `k` の関数として直接下から抑える。
-将来 `G(k) ≍ log k / log log k` のような lower bound が得られれば、
-そのまま binary defect 下界へ戻せる設計になっている。
-
-small-hole 層では exact equation の well-formedness を保持し、hole 0/1/2 を
-0,1,2 個の dyadic correction を持つ正規形へ exact に分解する。
-さらに `ZMod` 上の period certificate に加えて tail/loop certificate を導入し、
-低い exponent を exact に保持した finite modular lifting を可能にする。
-
-no-hole 層では mod 3 / mod 8 の elementary constraints、`ord_(2^r)(3)`、
-Mersenne modulus 上の `2` の exact order、geometric-sum 分解、mod 9 を組み合わせ、
-二つの residual をともに排除する。
-したがって `NoHoleCompleteClassification` は無条件に閉じ、hole 0 の解は
-既知の四つだけとなる。
-
-small-hole exit-depth 層では mod 4 / mod 8 だけで決まる non-resonant branch の `r` を
-exact に固定し、odd `k` の source hole `a=2` や even `k` の source-two holes `(1,2)`
-といった低位 resonance を後段の tail/loop sieve へ明示的に残す。
-
-one-hole finite sieve の第1段では `M₂=2^7*5*17*257` で `k mod 256` を絞る。
-第2段では `M₃=2^8*5*17*257*65537` へ survivor class だけを lift し、
-source resonance `a=2` を14個、target low-source `n=1,2` を10個の
-`mod 65536` class に絞る。
-
-第3段では `3^6` を含む `M₄=3^6*7*19*73*163*487` を使い、`k≥6` を
-3-adic tail state として扱う。これにより source `a=2` と target `n=1,2` の
-large-depth branch を完全排除し、source-one の残りを even `k`, `a≥3`, `r=1`、
-target-one の残りを `n≥3` の parity-controlled exit-depth branch へ局所化する。
-
-source-one の最後の residual S では、low-bit congruence から `2^(a-2) ∣ k`、
-`3^k ∣ 2^(L+1)-1` から `2*3^(k-1) ∣ L+1` を導く。
-前者と元の等式から得る線形上界 `L+1 < 5k+3` と、後者の指数的下界を衝突させ、
-well-formed source-one について無条件に `k≤5` を得る。
-
-target-one の残りでは `mod (2^n-1)` の residue rigidity から
-`n ∣ b+r`, `n ∣ L` を導き、`b+r=nq`, `L=nt` として
-
-`3^k + G_q(2^n) = 2^r G_t(2^n)`
-
-へ exact に落とす。`q=t` は既存 no-hole 完全分類へ戻るため large-depth では消える。
-`q<t` では 2-adic valuation により `n` が `v₂(k)` または `v₂(k-1)` から exact に決まり、
-さらに `gcd(q,t)>1` は no-hole 分類から例外形 `n=3, gcd(q,t)=2` に局所化される。
-
-lock 層では同じ `q<t` geometric equation を base `2^n` の二 block normal form として
-読み直す。最上位位置は `Critical.beattyIndex k = r+n(t-1)` に exact に固定され、
-切替位置は
-
-`v₂((2^n-1)3^k + (2^r-1)) = nq`
-
-として exact に復元される。primitive `gcd(q,t)=1` branch ではさらに even 側の `n` は even、
-odd 側では `n ≡ 3 (mod 6)` が排除される。唯一の non-primitive branch
-`n=3, gcd(q,t)=2` は `G_(2m)(8)=9G_m(64)` により base 64 の primitive equation へ descent する。
-
-外部 closure 層では、最終四枝
-
-* A: even / `q=1`
-* B: even / `q>=2`
-* C: odd  / `q=1`
-* D: odd  / `q>=2`
-
-だけを `TargetOneHoleExternalArithmetic` に明示する。
-A/C は generalized Ramanujan--Nagell uniqueness、B/D は Stephan/Baker--Wustholz 型の
-`k<10^45` bound と Hensel--cyclotomic finite certificate を外部入力として分離する。
-primitive gcd-one branch は四枝で閉じ、exceptional gcd-two branch は base-64 descent 後に
-同じ closure を再利用する。従って外部 package の下では
-`TargetOneHoleEquation.depth_le_five_of_external`、さらに
-`atMostOneHoleDepthBound_of_external : AtMostOneHoleDepthBound` を得る。
-
-two-hole 内部層では、まず source-two の regular branch を elementary arithmetic で削る。
-`r=2` は mod 3 で排除され、`r=1, k≥7` は low-bit correction による線形上界と
-`ord_(3^k)(2)` の指数的下界を衝突させる。従って `k≥7` の source-two は
-`SourceTwoHoleLowResonance` の二枝に局所化される。
-
-target-two の `n≥4`, `r∈{1,2}` では Mersenne modulus が hole phase を三型に固定する。
-wrapped / split-forward / split-reverse をそれぞれ三 block の geometric data へ持ち上げ、
-さらに二つの block cut を exact 2-adic valuation として復元する。
-これにより target-two の後段は、one-hole の一 cut 理論を二 cut へ拡張した形で扱える。
-
-actual `Runs` への接続は Bridge 層へ分離したままにする。
+既存 public theorem 名は維持し、既存ファイル内の private helper はこの段階では削除しない。
+この ZIP が通過した後、それら private 重複を共通層への一行 corollary に置換できる。
 -/
