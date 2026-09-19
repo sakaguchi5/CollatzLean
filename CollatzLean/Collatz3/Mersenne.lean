@@ -30,6 +30,9 @@ import CollatzLean.Collatz3.Mersenne.TargetOneHoleGcd
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleLocks
 import CollatzLean.Collatz3.Mersenne.TargetOneHolePrimitive
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleBase64Descent
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleExternalArithmetic
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleFourBranchClosure
+import CollatzLean.Collatz3.Mersenne.AtMostOneHoleExternalClosure
 
 /-!
 # Collatz3 Mersenne
@@ -87,7 +90,7 @@ target-one の残りでは `mod (2^n-1)` の residue rigidity から
 `q<t` では 2-adic valuation により `n` が `v₂(k)` または `v₂(k-1)` から exact に決まり、
 さらに `gcd(q,t)>1` は no-hole 分類から例外形 `n=3, gcd(q,t)=2` に局所化される。
 
-新しい lock 層では同じ `q<t` geometric equation を base `2^n` の二 block normal form として
+lock 層では同じ `q<t` geometric equation を base `2^n` の二 block normal form として
 読み直す。最上位位置は `Critical.beattyIndex k = r+n(t-1)` に exact に固定され、
 切替位置は
 
@@ -96,6 +99,21 @@ target-one の残りでは `mod (2^n-1)` の residue rigidity から
 として exact に復元される。primitive `gcd(q,t)=1` branch ではさらに even 側の `n` は even、
 odd 側では `n ≡ 3 (mod 6)` が排除される。唯一の non-primitive branch
 `n=3, gcd(q,t)=2` は `G_(2m)(8)=9G_m(64)` により base 64 の primitive equation へ descent する。
+
+外部 closure 層では、最終四枝
+
+* A: even / `q=1`
+* B: even / `q>=2`
+* C: odd  / `q=1`
+* D: odd  / `q>=2`
+
+だけを `TargetOneHoleExternalArithmetic` に明示する。
+A/C は generalized Ramanujan--Nagell uniqueness、B/D は Stephan/Baker--Wustholz 型の
+`k<10^45` bound と Hensel--cyclotomic finite certificate を外部入力として分離する。
+primitive gcd-one branch は四枝で閉じ、exceptional gcd-two branch は base-64 descent 後に
+同じ closure を再利用する。従って外部 package の下では
+`TargetOneHoleEquation.depth_le_five_of_external`、さらに
+`atMostOneHoleDepthBound_of_external : AtMostOneHoleDepthBound` を得る。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
