@@ -22,6 +22,7 @@ import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientProof
 import CollatzLean.Collatz3.Mersenne.NoHoleMersenneQuotientDerived
 import CollatzLean.Collatz3.Mersenne.SmallHoleExitDepth
 import CollatzLean.Collatz3.Mersenne.TailLoopModular
+import CollatzLean.Collatz3.Mersenne.ThreeTailModular
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteTailLoopSieve
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteLift65536
 import CollatzLean.Collatz3.Mersenne.OneHoleThreeTailLargeDepth
@@ -38,11 +39,13 @@ import CollatzLean.Collatz3.Mersenne.TargetOneHoleExternalArithmetic
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleFourBranchClosure
 import CollatzLean.Collatz3.Mersenne.AtMostOneHoleExternalClosure
 import CollatzLean.Collatz3.Mersenne.SourceTwoHoleRegularProof
+import CollatzLean.Collatz3.Mersenne.SplitTwoHoleMinimalPatterns
 import CollatzLean.Collatz3.Mersenne.TargetTwoHolePhase
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGeometric
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleTwoAdicCuts
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGcd
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleValuation
+import CollatzLean.Collatz3.Mersenne.BlockComplexity
 
 /-!
 # Collatz3 Mersenne
@@ -50,7 +53,7 @@ import CollatzLean.Collatz3.Mersenne.TargetTwoHoleValuation
 Mersenne block の純粋整数算術、small-hole normal form、one-hole closure、
 two-hole internal reduction をまとめる aggregate import。
 
-今回の refactor では次の薄い共通層を追加した。
+共通 refactor 層:
 
 * `GeometricSum`: geometric sum の単調性・奇偶・上界・tail 分解。
 * `TwoAdicArithmetic`: cut proof で共通する 2-adic helper。
@@ -59,6 +62,14 @@ two-hole internal reduction をまとめる aggregate import。
 * `TargetTwoHoleGcd`: `n≥4` で triple gcd `gcd(q,u,t)=1`。
 * `TargetTwoHoleValuation`: 三 phase 共通で width を `v₂(k)` / `v₂(k-1)` から抑える。
 
-既存 public theorem 名は維持し、既存ファイル内の private helper はこの段階では削除しない。
-この ZIP が通過した後、それら private 重複を共通層への一行 corollary に置換できる。
+今回の 7--9 層:
+
+* `BlockComplexity`: 既存 `Binary.HasPeriodBreakAtMost` を target-two の内部 target として固定し、
+  Stephan の variable-period corollary を明示的 external interface として接続する。
+* `ThreeTailModular`: M₄ の 2/3 tail-loop certificate を one-hole finite sieve から独立させ、
+  source-two resonance などが軽量 import だけで再利用できるようにする。
+* `SplitTwoHoleMinimalPatterns`: split-two の六項 `{2,3}`-unit 語彙を固定し、
+  known lower-hole / full six-term / proper card≤5 residual の三分岐を与える。
+
+既存 public theorem 名は維持する。
 -/
