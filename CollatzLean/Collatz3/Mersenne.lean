@@ -24,6 +24,9 @@ import CollatzLean.Collatz3.Mersenne.OneHoleFiniteTailLoopSieve
 import CollatzLean.Collatz3.Mersenne.OneHoleFiniteLift65536
 import CollatzLean.Collatz3.Mersenne.OneHoleThreeTailLargeDepth
 import CollatzLean.Collatz3.Mersenne.OneHoleSourceResidualProof
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleGeometric
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleValuation
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleGcd
 
 /-!
 # Collatz3 Mersenne
@@ -71,6 +74,15 @@ source-one の最後の residual S では、low-bit congruence から `2^(a-2) �
 `3^k ∣ 2^(L+1)-1` から `2*3^(k-1) ∣ L+1` を導く。
 前者と元の等式から得る線形上界 `L+1 < 5k+3` と、後者の指数的下界を衝突させ、
 well-formed source-one について無条件に `k≤5` を得る。
+
+target-one の残りでは `mod (2^n-1)` の residue rigidity から
+`n ∣ b+r`, `n ∣ L` を導き、`b+r=nq`, `L=nt` として
+
+`3^k + G_q(2^n) = 2^r G_t(2^n)`
+
+へ exact に落とす。`q=t` は既存 no-hole 完全分類へ戻るため large-depth では消える。
+`q<t` では 2-adic valuation により `n` が `v₂(k)` または `v₂(k-1)` から exact に決まり、
+さらに `gcd(q,t)>1` は no-hole 分類から例外形 `n=3, gcd(q,t)=2` に局所化される。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
