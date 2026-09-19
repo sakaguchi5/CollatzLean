@@ -33,6 +33,10 @@ import CollatzLean.Collatz3.Mersenne.TargetOneHoleBase64Descent
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleExternalArithmetic
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleFourBranchClosure
 import CollatzLean.Collatz3.Mersenne.AtMostOneHoleExternalClosure
+import CollatzLean.Collatz3.Mersenne.SourceTwoHoleRegularProof
+import CollatzLean.Collatz3.Mersenne.TargetTwoHolePhase
+import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGeometric
+import CollatzLean.Collatz3.Mersenne.TargetTwoHoleTwoAdicCuts
 
 /-!
 # Collatz3 Mersenne
@@ -114,6 +118,16 @@ primitive gcd-one branch は四枝で閉じ、exceptional gcd-two branch は bas
 同じ closure を再利用する。従って外部 package の下では
 `TargetOneHoleEquation.depth_le_five_of_external`、さらに
 `atMostOneHoleDepthBound_of_external : AtMostOneHoleDepthBound` を得る。
+
+two-hole 内部層では、まず source-two の regular branch を elementary arithmetic で削る。
+`r=2` は mod 3 で排除され、`r=1, k≥7` は low-bit correction による線形上界と
+`ord_(3^k)(2)` の指数的下界を衝突させる。従って `k≥7` の source-two は
+`SourceTwoHoleLowResonance` の二枝に局所化される。
+
+target-two の `n≥4`, `r∈{1,2}` では Mersenne modulus が hole phase を三型に固定する。
+wrapped / split-forward / split-reverse をそれぞれ三 block の geometric data へ持ち上げ、
+さらに二つの block cut を exact 2-adic valuation として復元する。
+これにより target-two の後段は、one-hole の一 cut 理論を二 cut へ拡張した形で扱える。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/

@@ -296,7 +296,7 @@ private theorem mersenneResidue_pair_unique
     exact twoPow_pair_unique hr hNatEq
 
 /-- `2` は `mod (2^n-1)` で period `n` を持つ。 -/
-private theorem twoPow_period_mersenne
+theorem twoPow_period_mersenne
     (n : ℕ) :
     (2 : ZMod (2 ^ n - 1)) ^ n = 1 := by
   have hPos : 0 < 2 ^ n := Nat.pow_pos (by norm_num)
