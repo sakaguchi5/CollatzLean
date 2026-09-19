@@ -27,6 +27,9 @@ import CollatzLean.Collatz3.Mersenne.OneHoleSourceResidualProof
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleGeometric
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleValuation
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleGcd
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleLocks
+import CollatzLean.Collatz3.Mersenne.TargetOneHolePrimitive
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleBase64Descent
 
 /-!
 # Collatz3 Mersenne
@@ -83,6 +86,16 @@ target-one の残りでは `mod (2^n-1)` の residue rigidity から
 へ exact に落とす。`q=t` は既存 no-hole 完全分類へ戻るため large-depth では消える。
 `q<t` では 2-adic valuation により `n` が `v₂(k)` または `v₂(k-1)` から exact に決まり、
 さらに `gcd(q,t)>1` は no-hole 分類から例外形 `n=3, gcd(q,t)=2` に局所化される。
+
+新しい lock 層では同じ `q<t` geometric equation を base `2^n` の二 block normal form として
+読み直す。最上位位置は `Critical.beattyIndex k = r+n(t-1)` に exact に固定され、
+切替位置は
+
+`v₂((2^n-1)3^k + (2^r-1)) = nq`
+
+として exact に復元される。primitive `gcd(q,t)=1` branch ではさらに even 側の `n` は even、
+odd 側では `n ≡ 3 (mod 6)` が排除される。唯一の non-primitive branch
+`n=3, gcd(q,t)=2` は `G_(2m)(8)=9G_m(64)` により base 64 の primitive equation へ descent する。
 
 actual `Runs` への接続は Bridge 層へ分離したままにする。
 -/
