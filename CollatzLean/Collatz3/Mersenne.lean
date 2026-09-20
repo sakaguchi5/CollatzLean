@@ -40,12 +40,14 @@ import CollatzLean.Collatz3.Mersenne.TargetOneHoleFourBranchClosure
 import CollatzLean.Collatz3.Mersenne.AtMostOneHoleExternalClosure
 import CollatzLean.Collatz3.Mersenne.SourceTwoHoleRegularProof
 import CollatzLean.Collatz3.Mersenne.SplitTwoHoleMinimalPatterns
+import CollatzLean.Collatz3.Mersenne.SplitTwoHoleMinimalCertificate
 import CollatzLean.Collatz3.Mersenne.TargetTwoHolePhase
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGeometric
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleTwoAdicCuts
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGcd
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleValuation
 import CollatzLean.Collatz3.Mersenne.BlockComplexity
+import CollatzLean.Collatz3.Mersenne.TargetTwoHoleBlockComplexityProof
 
 /-!
 # Collatz3 Mersenne
@@ -70,6 +72,14 @@ two-hole internal reduction をまとめる aggregate import。
   source-two resonance などが軽量 import だけで再利用できるようにする。
 * `SplitTwoHoleMinimalPatterns`: split-two の六項 `{2,3}`-unit 語彙を固定し、
   known lower-hole / full six-term / proper card≤5 residual の三分岐を与える。
+
+今回の追加 closure 層:
+
+* `Binary.BlockPeriod`: 固定幅 block 列の period-break を隣接 block mismatch へ還元する。
+* `TargetTwoHoleBlockComplexityProof`: 三 geometric phase の 3-block normal form から
+  `TargetTwoHolePeriodBreakAtMostFive` を内部 theorem として閉じる。
+* `SplitTwoHoleMinimalCertificate`: split-two equation から anchor-minimal certificate の存在を回収し、
+  known lower-hole / full six-term / proper card≤5 の三分岐へ直接接続する。
 
 既存 public theorem 名は維持する。
 -/
