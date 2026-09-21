@@ -58,6 +58,10 @@ import CollatzLean.Collatz3.Mersenne.SourceTargetTwoHoleProperResidualProof
 import CollatzLean.Collatz3.Mersenne.TwoHoleFullPattern
 import CollatzLean.Collatz3.Mersenne.TwoHoleFullExternalArithmetic
 import CollatzLean.Collatz3.Mersenne.AtMostTwoHoleExternalClosure
+import CollatzLean.Collatz3.Mersenne.TwoHoleM5Modular
+import CollatzLean.Collatz3.Mersenne.TwoHoleDeepArithmeticInterfaces
+import CollatzLean.Collatz3.Mersenne.SourceSplitTwoHoleDeepClosure
+import CollatzLean.Collatz3.Mersenne.TwoHoleFullExternalDerived
 
 /-!
 # Collatz3 Mersenne
@@ -102,6 +106,17 @@ full six-term 統合層:
 * `TwoHoleFullExternalArithmetic`: genuinely full six-term case だけの外部算術 interface。
 * `AtMostTwoHoleExternalClosure`: one-hole external package と full-six-term package から
   `AtMostTwoHoleDepthBound` と `smallHoleLowerBound` を閉じる。
+
+A2 細分化層:
+
+* `TwoHoleM5Modular`: corrected M₅ modulus と 2/3 tail-loop certificate を内部化し、
+    source/split odd `a=2` を finite state へ送る。
+* `TwoHoleDeepArithmeticInterfaces`: A2 を既知 two-log corollary、finite modular certificate、
+  genuinely residual arithmetic に分離する。
+* `SourceSplitTwoHoleDeepClosure`: source-two を既知/有限入力だけで閉じ、split の `a=1` と
+  odd `a=2` を residual 本体から除去する。target top hole も A1 へ peel する。
+* `TwoHoleFullExternalDerived`: 分解された入力から従来 A2 を derived theorem として再構成し、
+  `AtMostTwoHoleDepthBound` / `smallHoleLowerBound` へ接続する。
 
 既存 public theorem 名は維持する。
 -/
