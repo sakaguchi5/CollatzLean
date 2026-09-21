@@ -51,6 +51,13 @@ import CollatzLean.Collatz3.Mersenne.TargetTwoHoleBlockComplexityProof
 import CollatzLean.Collatz3.Mersenne.SplitTwoHoleProperResidualProof
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleSmallSource
 import CollatzLean.Collatz3.Mersenne.SourceTwoHoleResonanceThreeTail
+import CollatzLean.Collatz3.Mersenne.TwoHoleUnitArithmetic
+import CollatzLean.Collatz3.Mersenne.SourceTargetTwoHoleMinimalPatterns
+import CollatzLean.Collatz3.Mersenne.SourceTargetTwoHoleMinimalCertificate
+import CollatzLean.Collatz3.Mersenne.SourceTargetTwoHoleProperResidualProof
+import CollatzLean.Collatz3.Mersenne.TwoHoleFullPattern
+import CollatzLean.Collatz3.Mersenne.TwoHoleFullExternalArithmetic
+import CollatzLean.Collatz3.Mersenne.AtMostTwoHoleExternalClosure
 
 /-!
 # Collatz3 Mersenne
@@ -72,8 +79,7 @@ two-hole internal reduction をまとめる aggregate import。
 * `BlockComplexity`: `Binary.HasPeriodBreakAtMost` を target-two の内部 target として固定し、
   Stephan の variable-period corollary を明示的 external interface として接続する。
 * `ThreeTailModular`: M₄ の 2/3 tail-loop certificate を one-hole finite sieve から独立させる。
-* `SplitTwoHoleMinimalPatterns`: split-two の六項 `{2,3}`-unit 語彙を固定し、
-  known lower-hole / full six-term / proper card≤5 residual の三分岐を与える。
+* `SplitTwoHoleMinimalPatterns`: split-two の六項 `{2,3}`-unit 語彙を固定する。
 
 追加 closure 層:
 
@@ -81,12 +87,21 @@ two-hole internal reduction をまとめる aggregate import。
 * `TargetTwoHoleBlockComplexityProof`: `n≥4` の三 geometric phase から
   `TargetTwoHolePeriodBreakAtMostFive` を内部 theorem として閉じる。
 * `SplitTwoHoleMinimalCertificate`: split-two equation から anchor-minimal certificate の存在を回収する。
-* `SplitTwoHoleProperResidualProof`: non-full minimal certificate の補集合 zero-sum を有限分類し、
-  `k≤2` へ落とす。従って `k≥3` では full six-term だけが残る。
-* `TargetTwoHoleSmallSource`: `n=2→n=1` bridge と `n=3` の mod 7 residue phase を固定し、
-  small-source period-break を Stephan interface へ接続する。
-* `SourceTwoHoleResonanceThreeTail`: source-two の二つの low resonance を M₄ tail/loop state へ送り、
-  even branch を単一 residue class、odd branch を有限 residual state へ縮約する。
+* `SplitTwoHoleProperResidualProof`: non-full minimal certificate を `k≤2` へ落とし、
+  `k≥3` では full six-term だけにする。
+* `TargetTwoHoleSmallSource`: `n=2→n=1` bridge と `n=3` の mod 7 residue phase を固定する。
+* `SourceTwoHoleResonanceThreeTail`: source-two low resonance を M₄ residual state へ縮約する。
+
+full six-term 統合層:
+
+* `TwoHoleUnitArithmetic`: source/target non-full 排除で共有する局所指数算術。
+* `SourceTargetTwoHoleMinimalPatterns`: source/target の six-unit index と certificate 語彙。
+* `SourceTargetTwoHoleMinimalCertificate`: exact equation から minimal certificate を構成する。
+* `SourceTargetTwoHoleProperResidualProof`: source/target の non-full をともに `k=1` へ落とす。
+* `TwoHoleFullPattern`: three placements を `TwoHoleWellFormedEquation` / `TwoHoleFullCase` にまとめる。
+* `TwoHoleFullExternalArithmetic`: genuinely full six-term case だけの外部算術 interface。
+* `AtMostTwoHoleExternalClosure`: one-hole external package と full-six-term package から
+  `AtMostTwoHoleDepthBound` と `smallHoleLowerBound` を閉じる。
 
 既存 public theorem 名は維持する。
 -/
