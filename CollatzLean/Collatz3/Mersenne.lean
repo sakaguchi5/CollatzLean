@@ -48,6 +48,9 @@ import CollatzLean.Collatz3.Mersenne.TargetTwoHoleGcd
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleValuation
 import CollatzLean.Collatz3.Mersenne.BlockComplexity
 import CollatzLean.Collatz3.Mersenne.TargetTwoHoleBlockComplexityProof
+import CollatzLean.Collatz3.Mersenne.SplitTwoHoleProperResidualProof
+import CollatzLean.Collatz3.Mersenne.TargetTwoHoleSmallSource
+import CollatzLean.Collatz3.Mersenne.SourceTwoHoleResonanceThreeTail
 
 /-!
 # Collatz3 Mersenne
@@ -64,22 +67,26 @@ two-hole internal reduction をまとめる aggregate import。
 * `TargetTwoHoleGcd`: `n≥4` で triple gcd `gcd(q,u,t)=1`。
 * `TargetTwoHoleValuation`: 三 phase 共通で width を `v₂(k)` / `v₂(k-1)` から抑える。
 
-今回の 7--9 層:
+7--9 層:
 
-* `BlockComplexity`: 既存 `Binary.HasPeriodBreakAtMost` を target-two の内部 target として固定し、
+* `BlockComplexity`: `Binary.HasPeriodBreakAtMost` を target-two の内部 target として固定し、
   Stephan の variable-period corollary を明示的 external interface として接続する。
-* `ThreeTailModular`: M₄ の 2/3 tail-loop certificate を one-hole finite sieve から独立させ、
-  source-two resonance などが軽量 import だけで再利用できるようにする。
+* `ThreeTailModular`: M₄ の 2/3 tail-loop certificate を one-hole finite sieve から独立させる。
 * `SplitTwoHoleMinimalPatterns`: split-two の六項 `{2,3}`-unit 語彙を固定し、
   known lower-hole / full six-term / proper card≤5 residual の三分岐を与える。
 
-今回の追加 closure 層:
+追加 closure 層:
 
 * `Binary.BlockPeriod`: 固定幅 block 列の period-break を隣接 block mismatch へ還元する。
-* `TargetTwoHoleBlockComplexityProof`: 三 geometric phase の 3-block normal form から
+* `TargetTwoHoleBlockComplexityProof`: `n≥4` の三 geometric phase から
   `TargetTwoHolePeriodBreakAtMostFive` を内部 theorem として閉じる。
-* `SplitTwoHoleMinimalCertificate`: split-two equation から anchor-minimal certificate の存在を回収し、
-  known lower-hole / full six-term / proper card≤5 の三分岐へ直接接続する。
+* `SplitTwoHoleMinimalCertificate`: split-two equation から anchor-minimal certificate の存在を回収する。
+* `SplitTwoHoleProperResidualProof`: non-full minimal certificate の補集合 zero-sum を有限分類し、
+  `k≤2` へ落とす。従って `k≥3` では full six-term だけが残る。
+* `TargetTwoHoleSmallSource`: `n=2→n=1` bridge と `n=3` の mod 7 residue phase を固定し、
+  small-source period-break を Stephan interface へ接続する。
+* `SourceTwoHoleResonanceThreeTail`: source-two の二つの low resonance を M₄ tail/loop state へ送り、
+  even branch を単一 residue class、odd branch を有限 residual state へ縮約する。
 
 既存 public theorem 名は維持する。
 -/
