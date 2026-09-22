@@ -38,6 +38,7 @@ import CollatzLean.Collatz3.Mersenne.TargetOneHoleBase64Descent
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleExternalArithmetic
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleFourBranchClosure
 import CollatzLean.Collatz3.Mersenne.AtMostOneHoleExternalClosure
+import CollatzLean.Collatz3.Mersenne.TargetOneHoleQOneArithmetic
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleFinalExternalArithmetic
 import CollatzLean.Collatz3.Mersenne.SourceTwoHoleRegularProof
 import CollatzLean.Collatz3.Mersenne.SplitTwoHoleMinimalPatterns
@@ -102,11 +103,12 @@ two-hole internal reduction をまとめる aggregate import。
 
 A1 最終 interface 層:
 
-* `TargetOneHoleFinalExternalArithmetic`: A/C (`q=1`) の Bugeaud--Shorey 型 direct-impossible
-  interface を廃し、A/B/C/D の四枝すべてを Stephan/Baker--Wüstholz 型の
-  `explicit periodic-run bound + bounded finite sieve` に統一する。
-  A/C は安全側 `k<10^23`、B/D は従来どおり `k<10^45` を使い、
-  旧 `TargetOneHoleExternalArithmetic` と `AtMostOneHoleDepthBound` を derived theorem として回収する。
+* `TargetOneHoleQOneArithmetic`: A/C (`q=1`) を exact three-log identity に落とし、
+  Baker--Wüstholz [BW93] から `k<10^23` を内部導出する。bounded residual は既存 M₄ の
+  tail/loop `native_decide` certificate で survivor 0 まで閉じる。
+* `TargetOneHoleFinalExternalArithmetic`: A/C field を完全に削除し、外部 package を
+  B/D (`q≥2`) の `explicit periodic-run bound + bounded finite sieve` だけへ縮約する。
+  旧 `TargetOneHoleExternalArithmetic` と `AtMostOneHoleDepthBound` は互換 bridge で回収する。
 
 full six-term 統合層:
 
