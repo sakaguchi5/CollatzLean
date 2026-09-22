@@ -63,6 +63,8 @@ import CollatzLean.Collatz3.Mersenne.TwoHoleDeepArithmeticInterfaces
 import CollatzLean.Collatz3.Mersenne.SourceSplitTwoHoleDeepClosure
 import CollatzLean.Collatz3.Mersenne.TwoHoleFiniteInternal
 import CollatzLean.Collatz3.Mersenne.TwoHoleFullExternalDerived
+import CollatzLean.Collatz3.Mersenne.TwoHoleFinalInternal
+import CollatzLean.Collatz3.Mersenne.TwoHoleFinalExternalArithmetic
 
 /-!
 # Collatz3 Mersenne
@@ -113,14 +115,22 @@ A2 細分化層:
 * `TwoHoleM5Modular`: corrected M₅ modulus と 2/3 tail-loop certificate を内部化し、
   source/split odd `a=2` を finite state へ送る。
 * `TwoHoleDeepArithmeticInterfaces`: A2 を既知 two-log corollary、finite modular certificate、
-  genuinely residual arithmetic に分離する。
+  genuinely residual arithmetic に分離する研究用 interface。
 * `SourceSplitTwoHoleDeepClosure`: source-two を既知/有限入力だけで閉じ、split の `a=1` と
   odd `a=2` を residual 本体から除去する。target top hole も A1 へ peel する。
 * `TwoHoleFiniteInternal`: finite certificate 三本と target `n=3` を実計算で内部化し、
   外部既知入力を Chim / Gouillon の4特殊 corollaryだけへ縮約する。
 * `TwoHoleFullExternalDerived`: 分解された入力、または finite 内部化後の縮約入力から
-  従来 A2 を derived theorem として再構成し、
-  `AtMostTwoHoleDepthBound` / `smallHoleLowerBound` へ接続する。
+  従来 A2 を derived theorem として再構成する互換層。
+
+A2 最終 interface 層:
+
+* `TwoHoleFinalInternal`: source-even `2^392∣k`、split regular second-cut、
+  target `n=1` の `period-break≤6` を無条件 theorem として固定する。
+* `TwoHoleFinalExternalArithmetic`: direct residual-impossible 仮定を最終 API から外し、
+  A1 と同じ「effective depth bound + bounded finite sieve」だけを source/split/target の
+  concrete branch ごとに受け取る。そこから旧 A2、`AtMostTwoHoleDepthBound`、
+  `smallHoleLowerBound` を derived theorem として再構成する。
 
 既存 public theorem 名は維持する。
 -/
