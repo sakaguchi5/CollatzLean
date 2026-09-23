@@ -547,6 +547,12 @@ private theorem qGeTwoTopHeightProduct_le
   have h := mul_le_mul h12 mh_three h3nonneg hRightNonneg
   simpa [mul_assoc] using h
 
+/--
+上側 exact identity に対する Baker--Wüstholz 下界。
+
+外部定理へ渡す基数は
+`(2, 2^n - 1, 3)`、係数は `(M+n, -1, -k)`。
+-/
 private theorem qGeTwoTopBW_log_lower
     {k n : ℕ}
     (hk4 : 4 ≤ k)
@@ -556,16 +562,53 @@ private theorem qGeTwoTopBW_log_lower
     -(BakerWustholz.C 3 1 * max (Real.log (4 * k)) 1 *
         ((n : ℝ) * Real.log 2 * Real.log 3)) ≤
       Real.log (qGeTwoTopLinearForm k n) := by
+  have hAlphaPos :
+      (0 : ℚ) < (((qGeTwoGap n : ℕ) : ℤ) : ℚ) := by
+    exact_mod_cast qGeTwoGap_pos (by omega : 0 < n)
+  have hz :
+      qGeTwoLogDepth k ≤ k := by
+    unfold qGeTwoLogDepth
+    exact Nat.log_le_self 2 k
+  have hnK : n ≤ k + 2 := by
+    omega
+  have haB :
+      qGeTwoMainExponent k + n ≤ 4 * k := by
+    have hM := qGeTwoMainExponent_le_two_mul k
+    omega
+  have hkB : k ≤ 4 * k := by
+    omega
+  have hForm :
+      qGeTwoTopLinearForm k n =
+        BakerWustholz.threeLogRatForm
+          (qGeTwoMainExponent k + n) k (-1)
+          (((qGeTwoGap n : ℕ) : ℤ) : ℚ) := by
+    unfold qGeTwoTopLinearForm BakerWustholz.threeLogRatForm
+    norm_num
+    ring
   have hBW :=
-    log_linearForm_rat_ge (n := 3) (by norm_num)
-      (qGeTwoTopAlpha n) (qGeTwoTopAlpha_pos hn3) (qGeTwoTopCoeff k n)
-      (B := 4 * k) (by omega) (qGeTwoTopCoeff_natAbs_le hk4 hnLog)
-      (qGeTwoTopLinearForm_eq_sum k n) hΛPos.ne'
+    log_threeForm_rat_ge
+      (a := qGeTwoMainExponent k + n)
+      (k := k)
+      (B := 4 * k)
+      (α := (((qGeTwoGap n : ℕ) : ℤ) : ℚ))
+      hAlphaPos
+      (ε := -1)
+      (Or.inr rfl)
+      (by omega)
+      haB
+      hkB
+      hForm
+      hΛPos
   have hProd := qGeTwoTopHeightProduct_le hn3
+  rw [Fin.prod_univ_three] at hProd
+  dsimp [qGeTwoTopAlpha] at hProd
   have hScaleNonneg :
       0 ≤ BakerWustholz.C 3 1 * max (Real.log (4 * k)) 1 :=
-    mul_nonneg (C_one_nonneg 3) (le_trans zero_le_one (le_max_right _ _))
-  have hMul := mul_le_mul_of_nonneg_left hProd hScaleNonneg
+    mul_nonneg
+      (C_one_nonneg 3)
+      (le_trans zero_le_one (le_max_right _ _))
+  have hMul :=
+    mul_le_mul_of_nonneg_left hProd hScaleNonneg
   have hNeg := neg_le_neg hMul
   exact le_trans (by simpa [mul_assoc] using hNeg) hBW
 
@@ -923,6 +966,16 @@ private theorem qGeTwoBottomHeightProduct_le
   have h := mul_le_mul h12 mh_three h3nonneg hRightNonneg
   simpa [mul_assoc] using h
 
+/--
+下側 exact identity に対する Baker--Wüstholz 下界。
+
+ここでは中央の基数
+`α = qGeTwoAlpha n U`
+が一般には整数ではなく正の有理数になる。
+
+外部定理へ渡す基数は `(2, α, 3)`、
+係数は `(Q, 1, -k)`。
+-/
 private theorem qGeTwoBottomBW_log_lower
     {k n r L b : ℕ}
     (h : TargetOneHoleGeometricData k n r L b)
@@ -930,26 +983,70 @@ private theorem qGeTwoBottomBW_log_lower
     (hn3 : 3 ≤ n)
     (hr12 : r = 1 ∨ r = 2)
     (hqt : h.q < h.t)
-    (hΛPos : 0 < qGeTwoBottomLinearForm k n h.q (qGeTwoUpperRun n r h.q h.t)) :
+    (hΛPos :
+      0 < qGeTwoBottomLinearForm
+        k n h.q (qGeTwoUpperRun n r h.q h.t)) :
     -(BakerWustholz.C 3 1 * max (Real.log (4 * k)) 1 *
-        ((((qGeTwoUpperRun n r h.q h.t + 2 * n : ℕ) : ℝ) * Real.log 2) * Real.log 3)) ≤
-      Real.log (qGeTwoBottomLinearForm k n h.q (qGeTwoUpperRun n r h.q h.t)) := by
-  have hr : 0 < r := by rcases hr12 with rfl | rfl <;> norm_num
+        ((((qGeTwoUpperRun n r h.q h.t + 2 * n : ℕ) : ℝ) *
+            Real.log 2) *
+          Real.log 3)) ≤
+      Real.log
+        (qGeTwoBottomLinearForm
+          k n h.q (qGeTwoUpperRun n r h.q h.t)) := by
+  have hr : 0 < r := by
+    rcases hr12 with rfl | rfl <;> norm_num
   let U := qGeTwoUpperRun n r h.q h.t
+  have hAlphaPos :
+      (0 : ℚ) < qGeTwoAlpha n U :=
+    qGeTwoAlpha_pos (U := U) (by omega)
+  have hQleM :=
+    qGeTwoCutExponent_le_main
+      h (by omega : 0 < n) hr hqt
+  have hM :=
+    qGeTwoMainExponent_le_two_mul k
+  have haB :
+      qGeTwoCutExponent n h.q ≤ 4 * k := by
+    omega
+  have hkB : k ≤ 4 * k := by
+    omega
+  have hForm :
+      qGeTwoBottomLinearForm k n h.q U =
+        BakerWustholz.threeLogRatForm
+          (qGeTwoCutExponent n h.q)
+          k
+          1
+          (qGeTwoAlpha n U) := by
+    unfold qGeTwoBottomLinearForm BakerWustholz.threeLogRatForm
+    norm_num
   have hBW :=
-    log_linearForm_rat_ge (n := 3) (by norm_num)
-      (qGeTwoBottomAlpha n U) (qGeTwoBottomAlpha_pos (U := U) hn3)
-      (qGeTwoBottomCoeff k n h.q)
-      (B := 4 * k) (by omega)
-      (qGeTwoBottomCoeff_natAbs_le h hk4 (by omega) hr hqt)
-      (qGeTwoBottomLinearForm_eq_sum k n h.q U) hΛPos.ne'
-  have hProd := qGeTwoBottomHeightProduct_le (U := U) hn3
+    log_threeForm_rat_ge
+      (a := qGeTwoCutExponent n h.q)
+      (k := k)
+      (B := 4 * k)
+      (α := qGeTwoAlpha n U)
+      hAlphaPos
+      (ε := 1)
+      (Or.inl rfl)
+      (by omega)
+      haB
+      hkB
+      hForm
+      hΛPos
+  have hProd :=
+    qGeTwoBottomHeightProduct_le (U := U) hn3
+  rw [Fin.prod_univ_three] at hProd
+  dsimp [qGeTwoBottomAlpha] at hProd
   have hScaleNonneg :
       0 ≤ BakerWustholz.C 3 1 * max (Real.log (4 * k)) 1 :=
-    mul_nonneg (C_one_nonneg 3) (le_trans zero_le_one (le_max_right _ _))
-  have hMul := mul_le_mul_of_nonneg_left hProd hScaleNonneg
+    mul_nonneg
+      (C_one_nonneg 3)
+      (le_trans zero_le_one (le_max_right _ _))
+  have hMul :=
+    mul_le_mul_of_nonneg_left hProd hScaleNonneg
   have hNeg := neg_le_neg hMul
-  exact le_trans (by simpa [U, mul_assoc] using hNeg) hBW
+  exact le_trans
+    (by simpa [U, mul_assoc] using hNeg)
+    hBW
 
 /-- bottom 3-log から `k` の実数 bound を得る。 -/
 private theorem qGeTwoDepth_real_bound

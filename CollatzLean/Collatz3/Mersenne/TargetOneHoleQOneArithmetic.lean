@@ -679,8 +679,11 @@ private theorem qOneHeightProduct_le
   simpa [mul_assoc] using h
 
 /--
-Baker--Wüstholz の 3-log 定理と height 積評価を合成し、
+Baker--Wüstholz の三対数特殊化と height 積評価を合成し、
 `log Λ` の共通下界を得る。
+
+ここで外部定理へ渡す基数は
+`(2, 2^n - 1, 3)`、係数は `(M+n, -1, -k)` である。
 -/
 private theorem qOneBW_log_lower
     {k n : ℕ}
@@ -691,21 +694,57 @@ private theorem qOneBW_log_lower
     -(BakerWustholz.C 3 1 * max (Real.log (4 * k)) 1 *
         ((n : ℝ) * Real.log 2 * Real.log 3)) ≤
       Real.log (qOneLinearForm k n) := by
-  have hB2 : 2 ≤ 4 * k := by omega
+  have hB2 : 2 ≤ 4 * k := by
+    omega
+  have hAlphaPos :
+      (0 : ℚ) < (((qOneGap n : ℕ) : ℤ) : ℚ) := by
+    exact_mod_cast qOneGap_pos (by omega : 0 < n)
+  have hnK : n ≤ k + 1 := by
+    calc
+      n ≤ Nat.log 2 k + 1 := hnLog
+      _ ≤ k + 1 :=
+        Nat.add_le_add_right (Nat.log_le_self 2 k) 1
+  have haB :
+      qOneMainExponent k + n ≤ 4 * k := by
+    have hM := qOneMainExponent_le_two_mul k
+    omega
+  have hkB : k ≤ 4 * k := by
+    omega
+  have hForm :
+      qOneLinearForm k n =
+        BakerWustholz.threeLogRatForm
+          (qOneMainExponent k + n) k (-1)
+          (((qOneGap n : ℕ) : ℤ) : ℚ) := by
+    unfold qOneLinearForm BakerWustholz.threeLogRatForm
+    norm_num
+    ring
   have hBW :=
-    log_linearForm_rat_ge (n := 3) (by norm_num)
-      (qOneAlpha n) (qOneAlpha_pos hn3) (qOneCoeff k n)
-      (B := 4 * k) hB2 (qOneCoeff_natAbs_le hk4 hnLog)
-      (qOneLinearForm_eq_sum k n) hΛPos.ne'
+    log_threeForm_rat_ge
+      (a := qOneMainExponent k + n)
+      (k := k)
+      (B := 4 * k)
+      (α := (((qOneGap n : ℕ) : ℤ) : ℚ))
+      hAlphaPos
+      (ε := -1)
+      (Or.inr rfl)
+      hB2
+      haB
+      hkB
+      hForm
+      hΛPos
   have hProd := qOneHeightProduct_le hn3
   have hCNonneg : 0 ≤ BakerWustholz.C 3 1 :=
     C_one_nonneg 3
-  have hHNonneg : 0 ≤ max (Real.log (4 * k)) 1 :=
+  have hHNonneg :
+      0 ≤ max (Real.log (4 * k)) 1 :=
     le_trans zero_le_one (le_max_right _ _)
   have hScaleNonneg :
       0 ≤ BakerWustholz.C 3 1 * max (Real.log (4 * k)) 1 :=
     mul_nonneg hCNonneg hHNonneg
-  have hMul := mul_le_mul_of_nonneg_left hProd hScaleNonneg
+  rw [Fin.prod_univ_three] at hProd
+  dsimp [qOneAlpha] at hProd
+  have hMul :=
+    mul_le_mul_of_nonneg_left hProd hScaleNonneg
   have hNeg := neg_le_neg hMul
   exact le_trans (by simpa [mul_assoc] using hNeg) hBW
 

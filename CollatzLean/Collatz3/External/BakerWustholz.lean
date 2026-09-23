@@ -9,15 +9,21 @@ import Mathlib.Tactic.Linarith
 /-!
 # Baker--Wüstholz の引用定理と有理数上の薄い補助層
 
-A/C (`q=1`) を外部 package の仮定ではなく、既知の線形対数形定理から
-直接閉じるために必要な最小部分だけを置く。
+このファイルで trusted input として置くのは、Baker--Wüstholz [BW93] のうち
+現在の `Collatz3/Mersenne` が実際に使う三対数特殊化だけである。
 
-ここで `linearForms_logs` は Baker--Wüstholz [BW93] の主定理そのものを
-引用定理として記録する。Collatz 固有の結論や `q=1` の不可能性を axiom として
-置くものではない。
+repo 内の実際の利用形は常に
 
-定数・modified height・有理数特殊化は Ralf Stephan の 2026 年の Lean
-formalization `Aperiodicity-and-Subword-Complexity` の CC0 実装と同じ規約を使う。
+* 数体は `ℚ`
+* 対数は三個
+* 基数は `(2, α, 3)`（`α` は正の有理数）
+* 係数は `(a, ε, -k)`（`a,k : ℕ`, `ε = ±1`）
+
+である。そのため、任意の数体・任意個数の対数・任意係数を量化する
+一般 Baker--Wüstholz 定理を axiom としては置かない。
+
+`C` と `modifiedHeight` は通常の定義であり axiom ではない。
+高さ評価、実対数への特殊化、具体定数評価はすべて mathlib から証明する。
 -/
 
 open Complex
@@ -30,28 +36,47 @@ noncomputable def C (n d : ℕ) : ℝ :=
   18 * (n + 1).factorial * (n : ℝ) ^ (n + 1) *
     (32 * (d : ℝ)) ^ (n + 2) * Real.log (2 * n * d)
 
-/-- Baker--Wüstholz の modified height。 -/
+/-- Baker--Wüstholz の modified height。定義であって trusted input ではない。 -/
 noncomputable def modifiedHeight
     {K : Type*} [Field K] [NumberField K] (φ : K →+* ℂ) (α : K) : ℝ :=
   let d : ℝ := Module.finrank ℚ K
   max (Height.logHeight₁ α / d) (max (‖Complex.log (φ α)‖ / d) (1 / d))
 
 /--
-Baker--Wüstholz [BW93] の線形対数形下界。
+repo で実際に使う三対数線形形式
 
-これは既知の外部数学定理そのものを引用する唯一の trusted input であり、
-A/C や Collatz 固有の命題は仮定していない。
+`a log 2 + ε log α - k log 3`
+
+を明示する。`α` は後の axiom では正の有理数、`ε` は `±1` に限定する。
 -/
-axiom linearForms_logs
-    {n : ℕ} (hn : 0 < n)
-    {K : Type*} [Field K] [NumberField K] (φ : K →+* ℂ)
-    (α : Fin n → K) (hα : ∀ i, α i ≠ 0)
-    (b : Fin n → ℤ) {B : ℕ} (hB : 2 ≤ B) (hbB : ∀ i, (b i).natAbs ≤ B)
-    (hΛ_ne_zero : (∑ i, (b i : ℂ) * Complex.log (φ (α i))) ≠ 0) :
-    Real.log ‖∑ i, (b i : ℂ) * Complex.log (φ (α i))‖
-      ≥ -(BakerWustholz.C n (Module.finrank ℚ K)
-          * max (Real.log B) (1 / (Module.finrank ℚ K : ℝ))
-          * ∏ i, BakerWustholz.modifiedHeight φ (α i))
+noncomputable def threeLogRatForm
+    (a k : ℕ) (ε : ℤ) (α : ℚ) : ℝ :=
+  (a : ℝ) * Real.log 2 +
+    (ε : ℝ) * Real.log (α : ℝ) -
+    (k : ℝ) * Real.log 3
+
+/--
+Baker--Wüstholz [BW93] のうち、この repository が実際に必要とする特殊化。
+
+基数を `(2, α, 3)`、数体を `ℚ`、対数の個数を `3`、
+係数を `(a, ε, -k)` (`ε = ±1`) に固定している。
+
+これがこのファイルに残す唯一の trusted mathematical input である。
+Collatz 固有の式、Mersenne block、depth bound、有限 sieve は仮定しない。
+-/
+axiom linearForms_logs_three_rat
+    {a k B : ℕ}
+    (α : ℚ) (hα : 0 < α)
+    (ε : ℤ) (hε : ε = 1 ∨ ε = -1)
+    (hB : 2 ≤ B)
+    (haB : a ≤ B)
+    (hkB : k ≤ B)
+    (hΛ_ne_zero : threeLogRatForm a k ε α ≠ 0) :
+    -(BakerWustholz.C 3 1 * max (Real.log B) 1 *
+        (BakerWustholz.modifiedHeight (Rat.castHom ℂ) (2 : ℚ) *
+          BakerWustholz.modifiedHeight (Rat.castHom ℂ) α *
+          BakerWustholz.modifiedHeight (Rat.castHom ℂ) (3 : ℚ)))
+      ≤ Real.log |threeLogRatForm a k ε α|
 
 end BakerWustholz
 
@@ -174,37 +199,35 @@ lemma modifiedHeight_nonneg (q : ℚ) :
   rw [modifiedHeight_rat]
   exact le_trans zero_le_one (le_max_of_le_right (le_max_right _ _))
 
-/-- 正有理数の複素 principal log は実 log の cast。 -/
-lemma complex_log_ratCast_pos {q : ℚ} (hq : 0 < q) :
-    Complex.log ((Rat.castHom ℂ) q) = ((Real.log (q : ℝ) : ℝ) : ℂ) := by
-  rw [eq_ratCast, show ((q : ℚ) : ℂ) = (((q : ℝ)) : ℂ) by push_cast; ring,
-    ← Complex.ofReal_log (by exact_mod_cast hq.le)]
-
 /--
-Baker--Wüstholz を有理数の実線形形式へ包装した版。
+特殊化した Baker--Wüstholz axiom を、正の実線形形式へ使いやすく包装する。
+
+この定理自身は axiom ではなく、`linearForms_logs_three_rat` と
+`|Λ| = Λ` (`Λ>0`) から直接従う。
 -/
-theorem log_linearForm_rat_ge {n : ℕ} (hn : 0 < n) (α : Fin n → ℚ)
-    (hα : ∀ i, 0 < α i) (b : Fin n → ℤ) {B : ℕ} (hB : 2 ≤ B)
-    (hbB : ∀ i, (b i).natAbs ≤ B) {Λ : ℝ}
-    (hΛeq : Λ = ∑ i, (b i : ℝ) * Real.log (α i : ℝ)) (hΛ : Λ ≠ 0) :
-    -(BakerWustholz.C n 1 * max (Real.log B) 1
-        * ∏ i, BakerWustholz.modifiedHeight (Rat.castHom ℂ) (α i))
+theorem log_threeForm_rat_ge
+    {a k B : ℕ}
+    {α : ℚ} (hα : 0 < α)
+    {ε : ℤ} (hε : ε = 1 ∨ ε = -1)
+    (hB : 2 ≤ B)
+    (haB : a ≤ B)
+    (hkB : k ≤ B)
+    {Λ : ℝ}
+    (hΛeq : Λ = BakerWustholz.threeLogRatForm a k ε α)
+    (hΛPos : 0 < Λ) :
+    -(BakerWustholz.C 3 1 * max (Real.log B) 1 *
+        (BakerWustholz.modifiedHeight (Rat.castHom ℂ) (2 : ℚ) *
+          BakerWustholz.modifiedHeight (Rat.castHom ℂ) α *
+          BakerWustholz.modifiedHeight (Rat.castHom ℂ) (3 : ℚ)))
       ≤ Real.log Λ := by
-  have hαne : ∀ i, α i ≠ 0 := fun i => (hα i).ne'
-  have hsum :
-      (∑ i, ((b i : ℂ) * Complex.log ((Rat.castHom ℂ) (α i)))) = ((Λ : ℝ) : ℂ) := by
-    rw [hΛeq]
-    push_cast
-    exact Finset.sum_congr rfl fun i _ => by rw [complex_log_ratCast_pos (hα i)]
-  have hΛneC :
-      (∑ i, ((b i : ℂ) * Complex.log ((Rat.castHom ℂ) (α i)))) ≠ 0 := by
-    rw [hsum]
-    exact Complex.ofReal_ne_zero.mpr hΛ
-  have hBW := BakerWustholz.linearForms_logs (n := n) hn
-    (Rat.castHom ℂ) α hαne b (B := B) hB hbB hΛneC
-  rw [hsum, Complex.norm_real, Real.norm_eq_abs, Real.log_abs,
-    Module.finrank_self, Nat.cast_one] at hBW
-  rw [show (1 : ℝ) / (1 : ℝ) = 1 by norm_num] at hBW
+  have hFormPos : 0 < BakerWustholz.threeLogRatForm a k ε α := by
+    rw [← hΛeq]
+    exact hΛPos
+  have hBW :=
+    BakerWustholz.linearForms_logs_three_rat
+      (a := a) (k := k) (B := B) α hα ε hε hB haB hkB hFormPos.ne'
+  rw [abs_of_pos hFormPos] at hBW
+  rw [← hΛeq] at hBW
   exact hBW
 
 /-- A/C 用の粗い安全定数: `C(3,1) * log 3 ≤ 8·10^12`。 -/
