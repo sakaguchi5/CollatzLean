@@ -67,6 +67,7 @@ import CollatzLean.Collatz3.Mersenne.TwoHoleFiniteInternal
 import CollatzLean.Collatz3.Mersenne.TwoHoleFullExternalDerived
 import CollatzLean.Collatz3.Mersenne.TwoHoleFinalInternal
 import CollatzLean.Collatz3.Mersenne.TwoHoleFinalExternalArithmetic
+import CollatzLean.Collatz3.Mersenne.TwoHoleInternalA1Closure
 
 /-!
 # Collatz3 Mersenne
@@ -104,11 +105,11 @@ two-hole internal reduction をまとめる aggregate import。
 A1 最終 interface 層:
 
 * `TargetOneHoleQOneArithmetic`: A/C (`q=1`) を exact three-log identity に落とし、
-  Baker--Wüstholz [BW93] から `k<10^23` を内部導出する。bounded residual は既存 M₄ の
-  tail/loop `native_decide` certificate で survivor 0 まで閉じる。
-* `TargetOneHoleFinalExternalArithmetic`: A/C field を完全に削除し、外部 package を
-  B/D (`q≥2`) の `explicit periodic-run bound + bounded finite sieve` だけへ縮約する。
-  旧 `TargetOneHoleExternalArithmetic` と `AtMostOneHoleDepthBound` は互換 bridge で回収する。
+  Baker--Wüstholz [BW93] の有理数三対数特殊化から `k<10^23` を内部導出する。
+  bounded residual は既存 M₄ tail/loop `native_decide` certificate で閉じる。
+* `TargetOneHoleFinalExternalArithmetic`: A/B/C/D をすべて内部化し、
+  `targetOneHoleExternalArithmetic_internal` と `atMostOneHoleDepthBound_internal` を与える。
+  型名 `ExternalArithmetic` は旧 API 互換のためにだけ残る。
 
 full six-term 統合層:
 
@@ -118,8 +119,8 @@ full six-term 統合層:
 * `SourceTargetTwoHoleProperResidualProof`: source/target の non-full をともに `k=1` へ落とす。
 * `TwoHoleFullPattern`: three placements を `TwoHoleWellFormedEquation` / `TwoHoleFullCase` にまとめる。
 * `TwoHoleFullExternalArithmetic`: genuinely full six-term case だけの外部算術 interface。
-* `AtMostTwoHoleExternalClosure`: one-hole external package と full-six-term package から
-  `AtMostTwoHoleDepthBound` と `smallHoleLowerBound` を閉じる。
+* `AtMostTwoHoleExternalClosure`: one-hole / two-hole package から
+  `AtMostTwoHoleDepthBound` と `smallHoleLowerBound` を閉じる旧互換層。
 
 A2 細分化層:
 
@@ -139,9 +140,12 @@ A2 最終 interface 層:
 * `TwoHoleFinalInternal`: source-even `2^392∣k`、split regular second-cut、
   target `n=1` の `period-break≤6` を無条件 theorem として固定する。
 * `TwoHoleFinalExternalArithmetic`: direct residual-impossible 仮定を最終 API から外し、
-  A1 と同じ「effective depth bound + bounded finite sieve」だけを source/split/target の
-  concrete branch ごとに受け取る。そこから旧 A2、`AtMostTwoHoleDepthBound`、
-  `smallHoleLowerBound` を derived theorem として再構成する。
+  「effective depth bound + bounded finite sieve」だけを source/split/target の
+  concrete branch ごとに受け取る。
+* `TwoHoleInternalA1Closure`: 完全内部化済み A1 witness を自動挿入し、
+  A2 の主利用 API から `(A1 : TargetOneHoleExternalArithmetic)` 引数を消す。
+  特に `TwoHoleFinalExternalArithmetic` だけから `AtMostTwoHoleDepthBound` と
+  `smallHoleLowerBound` まで到達できる。
 
-既存 public theorem 名は維持する。
+既存 public theorem 名は互換用に維持し、A1-free theorem を追加する。
 -/
