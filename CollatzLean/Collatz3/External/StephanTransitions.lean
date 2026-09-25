@@ -27,9 +27,13 @@ A2 target `n=1` で必要なのは `B=6` だけなので、ここでは cited in
 `C(3,1) * log 3 ≤ 8 * 10^12`
 
 と `log 2 > 0.69`, `log 10 < 3` を粗く組み合わせると `C ≤ 42` とできる。
-transition 数を 7 以上にする shared endgame の threshold は
-`exp ((8 * (2 + C))^2)` で抑えられ、これは `2^180000` より小さい。
-そこで successor を含めた自然数 bound として `2^180000 + 1` を採用する。
+headline lower bound
+
+`log k / (log log k + C) - 1 ≤ transitionCount (3^k)`
+
+に `transitionCount≤6` を入れると、`log k / (log log k + C) ≤ 7`。
+上の `C≤42` と `log 2 > 0.69` を使えば `k≥2^512` では左辺が 7 を超えるため、
+A2 が必要とする安全な explicit bound として `2^512` を採用できる。
 
 このファイルではまだ Stephan の digit-block proof 全体を再構成せず、上記の
 explicit specialization を cited theorem として隔離する。Collatz equation、hole、
@@ -43,15 +47,16 @@ namespace StephanTransitions
 /--
 period-1 break が 6 以下の場合に使う explicit safe depth bound。
 
-`+1` は shared endgame の `ceil(exp(...)) + 1` を安全に自然数側へ包むために付ける。
 値は計算可能であり、後段の finite sieve が直接参照できる。
+`2^512` は sharp constant を狙った値ではなく、Stephan の explicit lower bound を
+安全側に丸めた working bound である。
 -/
 def periodOneBreakSixDepthBound : ℕ :=
-  2 ^ 180000 + 1
+  2 ^ 512
 
 /--
 `3^k` の canonical binary word の period-1 break 数が 6 以下なら
-`k < 2^180000 + 1`。
+`k < 2^512`。
 
 Stephan [2026] の period `p=1` theorem の、A2 が実際に必要とする explicit specialization。
 この theorem は Collatz 固有の branch を仮定しない。

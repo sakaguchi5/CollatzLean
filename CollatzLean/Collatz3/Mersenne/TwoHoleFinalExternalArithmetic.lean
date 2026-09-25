@@ -1,5 +1,5 @@
 import CollatzLean.Collatz3.Mersenne.TwoHoleFinalInternal
-import CollatzLean.Collatz3.Mersenne.TargetTwoSourceOneArithmetic
+import CollatzLean.Collatz3.Mersenne.TargetTwoSourceOneFinite
 import CollatzLean.Collatz3.Mersenne.SourceTwoEvenAnalytic
 import CollatzLean.Collatz3.Mersenne.TwoHoleFullExternalDerived
 
@@ -21,9 +21,10 @@ A1 (`TargetOneHoleExternalArithmetic`) と同じ証明分業へ置き換える�
 Chim / Gouillon / Stephan の特殊化で数値上界が確定した時点で、その witness を
 より具体的な定数へ置き換えられる。
 
-target `n=1` だけは一段先へ進み、内部 `period-break≤6` と
-`External.StephanTransitions` の cited period-1 theorem から analytic depth bound を
-内部導出する。従って final A2 package に残るのは同じ bound 未満の finite sieve だけである。
+target `n=1` はさらに一段進み、内部 `period-break≤6` と
+`External.StephanTransitions` の cited period-1 theorem から analytic depth bound を得た後、
+M₅ と `mod 2^515` の finite certificate まで repository 内で閉じる。
+従って final A2 package には `n=1` field 自体が残らない。
 
 source-even は内部 theorem `2^392 ∣ k` が既にあるので、外部側は
 `k < 2^392` の特殊 corollary 一本で閉じる。
@@ -120,6 +121,14 @@ theorem TargetTwoSourceOneFinalCase.internal_depth_bound
   rcases h with ⟨r, L, a, b, hk7, hr, ha0, hab, hbDeep, hEq⟩
   exact hEq.source_one_internal_depth_bound hk7 hr ha0 hab hbDeep
 
+/-- `n=1` final case は analytic bound + finite certificate まで完全内部化済み。 -/
+theorem TargetTwoSourceOneFinalCase.impossible_internal
+    {k : ℕ}
+    (h : TargetTwoSourceOneFinalCase k) :
+    False := by
+  rcases h with ⟨r, L, a, b, hk7, hr, ha0, hab, hbDeep, hEq⟩
+  exact hEq.source_one_impossible_internal hk7 hr ha0 hab hbDeep
+
 /-- target-two `n≥4`, even depth (`r=1`) branch。 -/
 def TargetTwoLargeEvenFinalCase (k : ℕ) : Prop :=
   ∃ n L a b : ℕ,
@@ -178,19 +187,13 @@ structure SplitTwoFinalExternalArithmetic : Prop where
 /--
 target-two の最終外部算術 package。
 
-* `n=1`: `period-break≤6` と Stephan period-1 theorem から depth bound まで内部化済み。
-  final package に残すのは bounded finite sieve だけ。
+* `n=1`: analytic bound と M₅ / 2-adic finite certificate まで完全内部化済み。
 * `n≥4`: 内部で geometric/gcd/valuation と `period-break≤5` まで証明済み。
-  こちらはまだ A1 型 bound+sieve を受け取る。
+  こちらだけ A1 型 bound+sieve を受け取る。
 
 `n=2` は `n=1,k+1` へ exact shift、`n=3` は純有限 M₅ certificate で内部排除済み。
 -/
 structure TargetTwoFinalExternalArithmetic : Prop where
-  source_one_finite_sieve :
-    ∀ {k : ℕ},
-      TargetTwoSourceOneFinalCase k →
-      k < targetTwoSourceOneInternalDepthBound →
-      False
   large_even :
     EffectiveDepthBoundAndFiniteSieve TargetTwoLargeEvenFinalCase
   large_odd :
@@ -199,17 +202,17 @@ structure TargetTwoFinalExternalArithmetic : Prop where
 /--
 互換用 accessor。
 
-旧 API の `A.source_one : EffectiveDepthBoundAndFiniteSieve ...` を維持する。
-analytic bound は内部 theorem、finite sieve だけを final package の field から回収する。
+旧 API の `A.source_one : EffectiveDepthBoundAndFiniteSieve ...` を維持するが、
+現在は package field を一切使わず、内部 theorem だけから構成する。
 -/
 theorem TargetTwoFinalExternalArithmetic.source_one
-    (A : TargetTwoFinalExternalArithmetic) :
+    (_A : TargetTwoFinalExternalArithmetic) :
     EffectiveDepthBoundAndFiniteSieve TargetTwoSourceOneFinalCase := by
   refine ⟨targetTwoSourceOneInternalDepthBound, ?_, ?_⟩
   · intro k h
     exact TargetTwoSourceOneFinalCase.internal_depth_bound h
-  · intro k h hBound
-    exact A.source_one_finite_sieve h hBound
+  · intro k h _hBound
+    exact TargetTwoSourceOneFinalCase.impossible_internal h
 
 /--
 A2 の最終外部算術 package。

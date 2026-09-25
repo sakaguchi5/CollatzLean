@@ -66,6 +66,8 @@ import CollatzLean.Collatz3.Mersenne.SourceSplitTwoHoleDeepClosure
 import CollatzLean.Collatz3.Mersenne.TwoHoleFiniteInternal
 import CollatzLean.Collatz3.Mersenne.TwoHoleFullExternalDerived
 import CollatzLean.Collatz3.Mersenne.TwoHoleFinalInternal
+import CollatzLean.Collatz3.Mersenne.TargetTwoSourceOneArithmetic
+import CollatzLean.Collatz3.Mersenne.TargetTwoSourceOneFinite
 import CollatzLean.Collatz3.Mersenne.TwoHoleFinalExternalArithmetic
 import CollatzLean.Collatz3.Mersenne.TwoHoleInternalA1Closure
 
@@ -139,9 +141,10 @@ A2 最終 interface 層:
 
 * `TwoHoleFinalInternal`: source-even `2^392∣k`、split regular second-cut、
   target `n=1` の `period-break≤6` を無条件 theorem として固定する。
+* `TargetTwoSourceOneArithmetic`: Stephan period-1 theorem から `n=1` の explicit depth bound を得る。
+* `TargetTwoSourceOneFinite`: M₅ の段階 sieve と `mod 2^515` certificate で `n=1` を完全内部排除する。
 * `TwoHoleFinalExternalArithmetic`: direct residual-impossible 仮定を最終 API から外し、
-  「effective depth bound + bounded finite sieve」だけを source/split/target の
-  concrete branch ごとに受け取る。
+  source/split と target `n≥4` の concrete branch だけを外部 package に残す。
 * `TwoHoleInternalA1Closure`: 完全内部化済み A1 witness を自動挿入し、
   A2 の主利用 API から `(A1 : TargetOneHoleExternalArithmetic)` 引数を消す。
   特に `TwoHoleFinalExternalArithmetic` だけから `AtMostTwoHoleDepthBound` と

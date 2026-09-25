@@ -23,7 +23,7 @@ A2 target 側の small-source residual のうち `n=1` を、A1 と同じ
 
 この版では `External.StephanTransitions` の explicit `B=6` specialization を使い、
 
-`targetTwoSourceOneInternalDepthBound = 2^180000 + 1`
+`targetTwoSourceOneInternalDepthBound = 2^512`
 
 を計算可能な自然数定数として固定する。
 -/
@@ -41,7 +41,7 @@ def targetTwoSourceOneInternalDepthBound : ℕ :=
 
 /-- bound の具体形。finite certificate 側で展開したい時の public lemma。 -/
 theorem targetTwoSourceOneInternalDepthBound_eq :
-    targetTwoSourceOneInternalDepthBound = 2 ^ 180000 + 1 := by
+    targetTwoSourceOneInternalDepthBound = 2 ^ 512 := by
   rfl
 
 /--
