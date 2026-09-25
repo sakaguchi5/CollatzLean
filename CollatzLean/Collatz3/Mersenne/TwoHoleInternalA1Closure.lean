@@ -1,5 +1,6 @@
 import CollatzLean.Collatz3.Mersenne.TargetOneHoleFinalExternalArithmetic
 import CollatzLean.Collatz3.Mersenne.TwoHoleFinalExternalArithmetic
+import CollatzLean.Collatz3.Mersenne.A2ExternalCore
 
 /-!
 # Collatz3 Mersenne: A2 から A1 external 引数を消す互換 refactor
@@ -23,12 +24,10 @@ A1 は `TargetOneHoleFinalExternalArithmetic` で完全内部化され、
 * 下位の旧 theorem は互換性のためそのまま残す。
 * 新しい A2 の実利用経路では A1 package を要求しない。
 * A2 側で本当に外部に残る入力だけを theorem signature に露出させる。
+* `A2ExternalCore` では source-even と target analytic bound も branch package から剥がす。
 
-これにより、最終的な A2 closure は
-
-`TwoHoleFinalExternalArithmetic → AtMostTwoHoleDepthBound`
-
-と書け、A1 は repo 内部の確立済み theorem として自動的に使われる。
+これにより、旧 final package と新 core package の双方から
+`AtMostTwoHoleDepthBound` / `smallHoleLowerBound` へ到達できる。
 -/
 
 namespace Collatz3
