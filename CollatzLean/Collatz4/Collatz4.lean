@@ -8,6 +8,8 @@ import CollatzLean.Collatz4.Family.Research
 
 import CollatzLean.Collatz4.Parametric.Reachability
 import CollatzLean.Collatz4.Parametric.Reverse
+import CollatzLean.Collatz4.Parametric.ReachabilityWord
+import CollatzLean.Collatz4.Parametric.BranchTerminalMacro
 
 import CollatzLean.Collatz4.Finite.Forward
 import CollatzLean.Collatz4.Finite.Normalization
@@ -52,6 +54,7 @@ Collatz4 の研究対象は、二進数表記で
 3. `Parametric`
    族の内部で target branch `M` を変数にする一般化。
    `M=3,5,7,9,...` を同じ語彙で比較する。
+   actual reachability から exponent word / branch terminal macro を復元する一般 bridge も置く。
 
 4. `Finite`
    M に依存しない有限状態・包絡線・候補区間・certificate の証明機械。
@@ -61,6 +64,7 @@ Collatz4 の研究対象は、二進数表記で
    今後 `Targets/M5`, `Targets/M9`, `Targets/M11`, ... を横並びで追加する。
 
 `Targets/M7` の finite exclusion は既存 ZIP の証明を保持して再配置している。
-`Parametric` の reachability から M7 witness への最上流 bridge は、研究対象の定義を
-固定した後に別途接続する。
+さらに `OddQBranchReachable 7` から固定 record より上流の `M7MasterWitness` までを
+exact に接続する。`M7MasterWitness` から固定 `(2401,29)/(13396,8455)` witness への
+次の bridge は未接続の研究課題として分離する。
 -/
