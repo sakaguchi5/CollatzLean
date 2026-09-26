@@ -2,7 +2,7 @@ import CollatzLean.Collatz4.Parametric.ReachabilityWord
 import CollatzLean.Collatz4.Family.Branch
 
 import Mathlib.Tactic.NormNum
---import Mathlib.Tactic
+
 
 /-!
 # Collatz4.Parametric.BranchTerminalMacro

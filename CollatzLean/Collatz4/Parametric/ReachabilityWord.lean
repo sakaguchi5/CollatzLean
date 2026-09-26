@@ -1,6 +1,6 @@
 import CollatzLean.Collatz4.Parametric.Reachability
 
---import Mathlib.Tactic
+
 
 /-!
 # Collatz4.Parametric.ReachabilityWord
