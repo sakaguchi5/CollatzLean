@@ -1,25 +1,18 @@
+import CollatzLean.Collatz4.General.ForwardProblem
 import CollatzLean.Collatz4.M7.LengthBound
 
 /-!
 # Collatz4.M7.ForwardReduction
 
-`4088 ≤ r ≤ 8444`, `r` 偶数を
+一般 `ForwardProblem` に渡すための m=7 固有データを定義する。
 
-`n = 8456 - r`
-
-へ移した 2179 個の候補を、`Fin 2179` で重複なく表す。
+候補列そのものは `LengthBound` で一般等差列から特殊化済みなので、
+ここでは開始状態・残り段数・目標状態だけを組み立てる。
 -/
 
 namespace Collatz4.M7
 
-/-- 偶数候補 `12,14,...,4368` の個数。 -/
-def candidateCount : ℕ := 2179
-
-/-- `Fin 2179` による候補 `n` の列挙。 -/
-def candidateN (i : Fin candidateCount) : ℕ :=
-  12 + 2 * i.1
-
-/-- 候補 `n` の開始自然数 `3^n-1`。 -/
+/-- 候補 n の開始自然数 `3^n-1`。 -/
 def initialA (i : Fin candidateCount) : ℕ :=
   3 ^ candidateN i - 1
 
@@ -27,11 +20,11 @@ def initialA (i : Fin candidateCount) : ℕ :=
 def initialState (i : Fin candidateCount) : ForwardState :=
   ForwardState.ofNat (initialA i)
 
-/-- `n` から共通時刻 8456 までに必要な段数。 -/
+/-- n から共通時刻 8456 までに必要な段数。 -/
 def remainingSteps (i : Fin candidateCount) : ℕ :=
   targetTime - candidateN i
 
-/-- 候補 `i` の最終状態。 -/
+/-- 従来名との互換用: 候補 i の最終状態。 -/
 def finalState (i : Fin candidateCount) : ForwardState :=
   run (remainingSteps i) (initialState i)
 
@@ -43,28 +36,31 @@ def checkpointState (i : Fin candidateCount) : ForwardState :=
 def targetState : ForwardState :=
   ⟨targetTwoExponent, targetOdd⟩
 
-/-- 候補列の最小値。 -/
-theorem candidateN_lower (i : Fin candidateCount) : 12 ≤ candidateN i := by
-  simp [candidateN]
+/--
+一般層へ渡す m=7 の前向き問題。
+ここが m=7 特殊化と一般 finite exclusion の接点になる。
+-/
+def forwardProblem : Collatz4.General.ForwardProblem (Fin candidateCount) where
+  initialState := initialState
+  remainingSteps := remainingSteps
+  targetState := targetState
 
-/-- 候補列の最大値は 4368。 -/
-theorem candidateN_upper (i : Fin candidateCount) : candidateN i ≤ 4368 := by
-  have hi : i.1 < 2179 := by
-    simpa [candidateCount] using i.2
-  simp [candidateN]
-  omega
-
-/-- 候補 `n` は全て偶数。 -/
-theorem candidateN_even_mod (i : Fin candidateCount) : candidateN i % 2 = 0 := by
-  simp [candidateN, Nat.add_mod]
+/-- 一般 problem の finalState は従来の m=7 finalState と定義的に一致する。 -/
+theorem forwardProblem_finalState (i : Fin candidateCount) :
+    forwardProblem.finalState i = finalState i := by
+  rfl
 
 /--
-Collatz4 における m=7 の最終前向き候補。
+Collatz4 における m=7 の reduced 前向き候補。
 
-元の指数語側から `12≤n≤4368, n` 偶数まで落ちた後の reduced witness を
-この命題で表す。Collatz3 の語彙は使わない。
+元の数論的 witness からここへ落とす bridge は別定理として積み上げる。
 -/
 def M7ForwardCandidate : Prop :=
-  ∃ i : Fin candidateCount, finalState i = targetState
+  forwardProblem.Candidate
+
+/-- 従来の存在量化表示。 -/
+theorem m7ForwardCandidate_iff :
+    M7ForwardCandidate ↔ ∃ i : Fin candidateCount, finalState i = targetState := by
+  rfl
 
 end Collatz4.M7

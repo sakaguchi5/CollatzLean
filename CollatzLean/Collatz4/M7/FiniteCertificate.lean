@@ -3,18 +3,17 @@ set_option linter.style.nativeDecide false
 /-!
 # Collatz4.M7.FiniteCertificate
 
-m=7 前向き排除の唯一の有限計算部分。
+m=7 に本当に固有な有限計算部分。
 
-巨大整数をリテラルとして埋め込まず、2179 個の候補を定義から native 実行で
-再生成する。したがって certificate はソース中の固定巨大表に依存しない。
+一般理論はこのファイルの数値を知らず、ここで得られた certificate だけを受け取る。
 -/
 
 namespace Collatz4.M7
 
 /--
-最終時刻 `s=8456` では、2179候補のどれも必要な2指数 `10996` を持たない。
+最終時刻では、m=7 の有限候補のどれも必要な目標2指数を持たない。
 
-これが主有限 certificate。`native_decide` はコンパイル済み自然数演算で評価する。
+一般 `ForwardProblem` に対する2指数 certificate の m=7 実体。
 -/
 theorem final_two_exponent_certificate :
     ∀ i : Fin candidateCount, (finalState i).t ≠ targetTwoExponent := by
@@ -23,17 +22,11 @@ theorem final_two_exponent_certificate :
 /--
 構造確認用 checkpoint certificate。
 
-`s=8455` では各枝が
-
-* 既に純粋な2のべき、または
-* 2指数が 11057 以上、または
-* 2指数が 10671 以下かつ奇数部分が `21 mod 64` ではない
-
-の三群に分かれる。
+三分岐の形は一般層、11057/10671/64/21 という値だけが m=7 固有である。
 -/
 theorem checkpoint_certificate :
     ∀ i : Fin candidateCount, checkpointSafe (checkpointState i) := by
-  simp only [checkpointSafe]
+  simp only [checkpointSafe, Collatz4.General.checkpointSafe, checkpointSpec]
   native_decide
 
 end Collatz4.M7

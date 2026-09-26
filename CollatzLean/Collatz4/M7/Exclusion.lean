@@ -1,34 +1,28 @@
 import CollatzLean.Collatz4.Core.Normalization
-import CollatzLean.Collatz4.M7.QBound
-import CollatzLean.Collatz4.M7.FiniteCertificate
+import CollatzLean.Collatz4.Specialization.M7
 
 /-!
 # Collatz4.M7.Exclusion
 
-前向き有限 certificate を最終 m=7 reduced theorem へ接続する。
+既存 API を保つための互換層。
+
+実際の排除論理は `Collatz4.General.Exclusion`、m=7 への適用は
+`Collatz4.Specialization.M7` に置き、このファイルでは従来名だけを公開する。
 -/
 
 namespace Collatz4.M7
 
-/--
-Collatz4 の reduced m=7 候補は存在しない。
+/-- 一般 exclusion theorem を m=7 に特殊化して得た reduced candidate の非存在。 -/
+theorem no_m7_forward_candidate : ¬ M7ForwardCandidate :=
+  Collatz4.Specialization.M7.no_m7_forward_candidate
 
-等号 `finalState i = targetState` が成立すれば双方の `t` 成分も等しいが、
-有限 certificate は全2179候補でそれを否定する。
--/
-theorem no_m7_forward_candidate : ¬ M7ForwardCandidate := by
-  intro h
-  rcases h with ⟨i, hi⟩
-  have ht : (finalState i).t = targetTwoExponent := by
-    simpa [targetState] using congrArg ForwardState.t hi
-  exact (final_two_exponent_certificate i) ht
-
-/-- 同内容を存在量化を展開した形でも公開する。 -/
+/-- 同内容を存在量化を展開した従来形式でも公開する。 -/
 theorem no_m7_target_hit :
-    ¬ ∃ i : Fin candidateCount, finalState i = targetState :=
-  no_m7_forward_candidate
+    ¬ ∃ i : Fin candidateCount, finalState i = targetState := by
+  intro h
+  exact no_m7_forward_candidate ((m7ForwardCandidate_iff).2 h)
 
-/-- 短い公開名。Collatz4 内でいう `m=7` reduced candidate の非存在。 -/
+/-- 短い従来公開名。 -/
 theorem no_m7_candidate : ¬ M7ForwardCandidate :=
   no_m7_forward_candidate
 

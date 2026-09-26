@@ -1,3 +1,4 @@
+import CollatzLean.Collatz4.General.QCutoff
 import CollatzLean.Collatz4.M7.Constants
 
 set_option exponentiation.threshold 10996
@@ -5,17 +6,17 @@ set_option linter.style.nativeDecide false
 /-!
 # Collatz4.M7.QBound
 
-`q=1275/1276` の切替を独立ファイルに隔離する。
+m=7 固有の包絡線データを、一般理論 `Collatz4.General` へ代入する特殊化。
 
-主有限証明は `n` の前向き系だけで完結するが、m=7 の候補生成側で
-`q≤1275` が探索上限ではなく包絡線条件から来ることも、この層で検証する。
+`q≤1275` の論理骨格は General.QCutoff 側にあり、このファイルに残るのは
+m=7 固有定数と有限 certificate だけである。
 -/
 
 namespace Collatz4.M7
 
-/-- `G_*` が、その `q` に残された2指数の包絡線以下であるという必要条件。 -/
+/-- m=7 の包絡線必要条件。一般定義への単なる特殊化。 -/
 def qEnvelopeAdmissible (q : ℕ) : Prop :=
-  gStar ≤ gEnvelope (residualTwoExponent q)
+  Collatz4.General.EnvelopeAdmissible gStar gEnvelope residualTwoExponent q
 
 /-- `q≥1276` なら残り2指数は 8444 以下。 -/
 theorem residualTwoExponent_le_8444 {q : ℕ} (hq : 1276 ≤ q) :
@@ -48,28 +49,35 @@ theorem gEnvelope_zero : gEnvelope 0 = 0 := by
   decide
 
 /--
-`q<5498` の有限領域について、包絡線必要条件を満たすなら `q≤1275`。
+`q<5498` の有限領域について、m=7 の包絡線必要条件を満たすなら `q≤1275`。
 
-ここは巨大候補表を埋め込まず、定義から native に再計算する。
+ここだけが m=7 固有の有限計算。
 -/
 theorem finite_q_envelope_cutoff :
     ∀ q : Fin 5498, qEnvelopeAdmissible q.1 → q.1 ≤ 1275 := by
-  simp only [qEnvelopeAdmissible]
+  simp only [qEnvelopeAdmissible, Collatz4.General.EnvelopeAdmissible]
   native_decide
 
+/-- 有限領域の外側では m=7 の包絡線必要条件自体が不可能。 -/
+theorem q_envelope_impossible_of_large {q : ℕ} (hq : 5498 ≤ q) :
+    ¬ qEnvelopeAdmissible q := by
+  intro hadm
+  have hz : residualTwoExponent q = 0 :=
+    residualTwoExponent_eq_zero_of_large hq
+  unfold qEnvelopeAdmissible Collatz4.General.EnvelopeAdmissible at hadm
+  rw [hz, gEnvelope_zero] at hadm
+  have hg := gStar_pos
+  omega
+
 /--
-包絡線必要条件を満たす任意の `q` は `1275` 以下。
-したがって `q≥1276` は一括して排除される。
+包絡線必要条件を満たす任意の m=7 の q は 1275 以下。
+
+一般 cutoff 定理に m=7 の二つの certificate を渡すだけで得る。
 -/
 theorem q_le_1275_of_envelope {q : ℕ} (hq : qEnvelopeAdmissible q) : q ≤ 1275 := by
-  by_cases hs : q < 5498
-  · exact finite_q_envelope_cutoff ⟨q, hs⟩ hq
-  · have hlarge : 5498 ≤ q := by omega
-    have hz : residualTwoExponent q = 0 :=
-      residualTwoExponent_eq_zero_of_large hlarge
-    unfold qEnvelopeAdmissible at hq
-    rw [hz, gEnvelope_zero] at hq
-    have hg := gStar_pos
-    omega
+  exact Collatz4.General.q_le_of_finite_cutoff
+    finite_q_envelope_cutoff
+    (fun n hn => q_envelope_impossible_of_large hn)
+    hq
 
 end Collatz4.M7
