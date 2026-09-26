@@ -1,18 +1,19 @@
-import CollatzLean.Collatz4.M7.LengthBound
+import CollatzLean.Collatz4.M7.ResidualBounds
 
 /-!
 # Collatz4.M7.ResidualBridge
 
-q-bound と残余語長 bound を finite candidate へ接続する薄い bridge。
+q-bound と残余語長 G-bound を finite candidate へ接続する bridge。
 
-ここでは依存関係を正確に保つ。
+現在は
 
-* `qEnvelopeAdmissible q` から `q ≤ 1275` は一般 QCutoff 理論で得る。
-* `4088 ≤ r ≤ 8444` と r 偶数から finite candidate index を得る。
-* `q ≤ 1275` だけから r の範囲を導くことはしない。
+* `qEnvelopeAdmissible q` から `q ≤ 1275`
+* 正確な `G_min/G_max` から `4088 ≤ r ≤ 8444`
+* r の偶数性から有限候補添字
 
-今後、残余語の G-bound から `r` の上下限を証明すれば、
-その定理をこの bridge の `hlo/hhi/heven` にそのまま渡せる。
+までが連結されている。
+
+残る意味論的課題は、元の m=7 witness から `ResidualData` を構成することだけである。
 -/
 
 namespace Collatz4.M7
@@ -20,7 +21,7 @@ namespace Collatz4.M7
 /--
 包絡線必要条件を満たす q と、許容残余語長 r を同時に finite candidate へ接続する。
 
-返り値には q の cutoff と、対応候補添字の両方を含める。
+低レベル API として残し、`ResidualData.to_candidate_index` が通常の入口になる。
 -/
 theorem q_and_residual_bounds_to_candidate
     {q r : ℕ}
@@ -33,5 +34,28 @@ theorem q_and_residual_bounds_to_candidate
         candidateR i = r ∧ candidateN i = targetTime - r := by
   refine ⟨q_le_1275_of_envelope hq, ?_⟩
   exact exists_candidate_of_residual_bounds_even hlo hhi heven
+
+namespace ResidualData
+
+/--
+正確な residual G-bound を持つデータは、必ず2179候補のどれか一つへ入る。
+
+ここで候補数2179を仮定として使っているわけではなく、
+`LengthBound` の interval family から得られる `Fin candidateCount` を返す。
+-/
+theorem to_candidate_index (d : ResidualData) :
+    d.q ≤ 1275 ∧
+      ∃ i : Fin candidateCount,
+        candidateR i = d.r ∧ candidateN i = targetTime - d.r := by
+  exact q_and_residual_bounds_to_candidate
+    d.q_admissible d.r_lower d.r_upper d.r_even
+
+/-- 対応する前向き変数 `n = targetTime-r` が有限候補列に現れる。 -/
+theorem exists_candidateN (d : ResidualData) :
+    ∃ i : Fin candidateCount, candidateN i = targetTime - d.r := by
+  rcases d.to_candidate_index with ⟨_, i, _, hiN⟩
+  exact ⟨i, hiN⟩
+
+end ResidualData
 
 end Collatz4.M7
