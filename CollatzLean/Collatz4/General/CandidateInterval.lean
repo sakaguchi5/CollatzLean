@@ -5,6 +5,9 @@ import CollatzLean.Collatz4.Core.Forward
 
 有限候補を等差列として保持するための一般層。
 
+`ArithmeticFamily` は既存 API を保ちつつ、
+`intervalFamily` によって「下端・上端・刻み」から候補数を自動生成できるようにする。
+これにより各特殊化で候補数を独立に手入力する必要をなくす。
 -/
 
 namespace Collatz4.General
@@ -37,5 +40,29 @@ theorem contains_value (f : ArithmeticFamily) (i : Fin f.count) :
   exact ⟨i, rfl⟩
 
 end ArithmeticFamily
+
+/--
+閉区間 `lo ≤ x ≤ hi` を刻み `step` で列挙するときの候補数。
+
+`step = 0` は特殊化では使わない。一般定義としては自然数除算の規約に従う。
+-/
+def intervalCount (lo hi step : ℕ) : ℕ :=
+  if lo ≤ hi then (hi - lo) / step + 1 else 0
+
+/--
+下端・上端・刻みから等差候補 family を作る。
+候補数は `intervalCount` から自動的に決まる。
+-/
+def intervalFamily (lo hi step : ℕ) : ArithmeticFamily :=
+  ⟨lo, step, intervalCount lo hi step⟩
+
+@[simp] theorem intervalFamily_start (lo hi step : ℕ) :
+    (intervalFamily lo hi step).start = lo := rfl
+
+@[simp] theorem intervalFamily_step (lo hi step : ℕ) :
+    (intervalFamily lo hi step).step = step := rfl
+
+@[simp] theorem intervalFamily_count (lo hi step : ℕ) :
+    (intervalFamily lo hi step).count = intervalCount lo hi step := rfl
 
 end Collatz4.General

@@ -13,6 +13,7 @@ import CollatzLean.Collatz4.General.Exclusion
 import CollatzLean.Collatz4.M7.Constants
 import CollatzLean.Collatz4.M7.QBound
 import CollatzLean.Collatz4.M7.LengthBound
+import CollatzLean.Collatz4.M7.ResidualBridge
 import CollatzLean.Collatz4.M7.ForwardReduction
 import CollatzLean.Collatz4.M7.LivePruning
 import CollatzLean.Collatz4.M7.FiniteCertificate
@@ -32,6 +33,10 @@ Collatz3 から独立した前向き有限状態アプローチ。
 2. 各 m は `ForwardProblem` と有限 certificate だけを与える。
 3. 元の数論的 witness から finite problem への bridge を積み上げる。
 4. 最終排除の論理は `General.Exclusion` を再利用する。
+
+m=7 の候補列については、残余語長境界 `4088 ≤ r ≤ 8444` と偶数性から
+`n = 12,14,...,4368` および候補数2179を導出する。
+したがって `12/4368/2179` は独立な手入力値ではない。
 
 現在の m=7 reduced 主結果:
 
