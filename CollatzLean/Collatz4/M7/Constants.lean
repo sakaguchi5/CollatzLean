@@ -3,8 +3,11 @@ set_option exponentiation.threshold 10996
 /-!
 # Collatz4.M7.Constants
 
-m=7 前向き排除で使う固定定数だけを集約する。
+m=7 前向き排除で使う固定定数を集約する。
 Collatz3 の定義・名前空間には依存しない。
+
+`gEnvelope` 自体は m=7 の数値を含まないが、現在の互換 API を保つため
+このファイルに置いたまま、その一般的な単調性を数学的に証明する。
 -/
 
 namespace Collatz4.M7
@@ -32,6 +35,30 @@ def residualTwoExponent (q : ℕ) : ℕ := targetTwoExponent - 2 * q
 
 /-- 総2指数 `E` で作れる `G` の理論包絡線。 -/
 def gEnvelope (E : ℕ) : ℕ := 3 ^ (E + 1) - 2 ^ (E + 2)
+
+/--
+`gEnvelope` は指数を1増やしても減らない。
+
+証明では冪そのものを比較する必要はなく、
+`A - B ≤ 3A - 2B` という自然数減算の一般的な算術だけを使う。
+-/
+theorem gEnvelope_le_succ (E : ℕ) :
+    gEnvelope E ≤ gEnvelope (E + 1) := by
+  have h3 : 3 ^ ((E + 1) + 1) = 3 * 3 ^ (E + 1) := by
+    rw [pow_succ]
+    ac_rfl
+  have h2 : 2 ^ ((E + 1) + 2) = 2 * 2 ^ (E + 2) := by
+    have hexp : (E + 1) + 2 = (E + 2) + 1 := by
+      omega
+    rw [hexp, pow_succ]
+    ac_rfl
+  unfold gEnvelope
+  rw [h3, h2]
+  omega
+
+/-- `gEnvelope` は総2指数 `E` に関して単調増加。 -/
+theorem gEnvelope_monotone : Monotone gEnvelope := by
+  exact monotone_nat_of_le_succ gEnvelope_le_succ
 
 /-- 1275 境界の左端。 -/
 theorem residualTwoExponent_1275 : residualTwoExponent 1275 = 8446 := by
