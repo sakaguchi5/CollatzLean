@@ -7,13 +7,12 @@ q-bound と残余語長 G-bound を finite candidate へ接続する bridge。
 
 現在は
 
-* `qEnvelopeAdmissible q` から `q ≤ 1275`
-* 正確な `G_min/G_max` から `4088 ≤ r ≤ 8444`
+* 正確な `G_min/G_max` と `r≤E` から `qEnvelopeAdmissible q`
+* 一般 QCutoff から `q ≤ 1275`
+* 正確な G-bound から `4088 ≤ r ≤ 8444`
 * r の偶数性から有限候補添字
 
 までが連結されている。
-
-残る意味論的課題は、元の m=7 witness から `ResidualData` を構成することだけである。
 -/
 
 namespace Collatz4.M7
@@ -38,10 +37,7 @@ theorem q_and_residual_bounds_to_candidate
 namespace ResidualData
 
 /--
-正確な residual G-bound を持つデータは、必ず2179候補のどれか一つへ入る。
-
-ここで候補数2179を仮定として使っているわけではなく、
-`LengthBound` の interval family から得られる `Fin candidateCount` を返す。
+正確な residual G-bound を持つデータは、必ず有限候補のどれか一つへ入る。
 -/
 theorem to_candidate_index (d : ResidualData) :
     d.q ≤ 1275 ∧

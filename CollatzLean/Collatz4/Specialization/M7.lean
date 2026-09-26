@@ -1,5 +1,5 @@
 import CollatzLean.Collatz4.General.Exclusion
-import CollatzLean.Collatz4.M7.QBound
+import CollatzLean.Collatz4.M7.Witness
 import CollatzLean.Collatz4.M7.FiniteCertificate
 
 /-!
@@ -7,8 +7,11 @@ import CollatzLean.Collatz4.M7.FiniteCertificate
 
 一般理論を m=7 に適用する薄い特殊化層。
 
-このファイルの役割は新しい計算をすることではなく、m=7 固有 certificate を
-一般 exclusion theorem へ渡すことだけである。
+現在は
+
+`M7Witness → ResidualData → finite candidate → target hit → finite certificate contradiction`
+
+までが接続されている。
 -/
 
 namespace Collatz4.Specialization.M7
@@ -28,9 +31,7 @@ theorem t_certificate :
     Collatz4.M7.finalState, Collatz4.M7.targetState] using
       (Collatz4.M7.final_two_exponent_certificate i)
 
-/--
-一般 exclusion theorem から得られる m=7 reduced candidate の非存在。
--/
+/-- 一般 exclusion theorem から得られる m=7 reduced candidate の非存在。 -/
 theorem no_reduced_candidate : ¬ problem.Candidate := by
   exact Collatz4.General.no_candidate_of_t_certificate problem t_certificate
 
@@ -39,10 +40,37 @@ theorem no_m7_forward_candidate : ¬ Collatz4.M7.M7ForwardCandidate := by
   exact no_reduced_candidate
 
 /--
-将来、元の m=7 witness `W` から `problem.Candidate` への bridge を証明したら、
-その bridge だけで直ちに `¬ W` が得られる。
+ユーザーが求めた第三 bridge の特殊化公開版。
 
-この定理により finite certificate 側を今後触り直す必要がない。
+意味論的 `M7Witness` があれば必ず reduced candidate が存在する。
+-/
+theorem forward_candidate_of_m7_witness
+    (h : Collatz4.M7.M7Witness) :
+    Collatz4.M7.M7ForwardCandidate :=
+  h.forward_candidate_of_m7_witness
+
+/--
+一般 reduction theorem を使った形でも m=7 witness 非存在を得る。
+-/
+theorem no_m7_witness : ¬ Collatz4.M7.HasM7Witness := by
+  exact Collatz4.General.no_witness_of_reduction
+    Collatz4.M7.hasM7Witness_reducesTo
+    no_reduced_candidate
+
+/--
+任意のさらに原始的な witness `W` が `HasM7Witness` へ落ちるなら、その `W` も存在しない。
+
+今後、指数語・Mersenne block などからの最上流 bridge はこの定理へ接続すればよい。
+-/
+theorem no_source_witness_of_reduction
+    {W : Prop}
+    (hreduce : W → Collatz4.M7.HasM7Witness) :
+    ¬ W := by
+  intro hW
+  exact no_m7_witness (hreduce hW)
+
+/--
+互換用の一般 API。任意の命題 `W` から直接 finite problem へ reduction があれば排除できる。
 -/
 theorem no_witness_of_reduction
     {W : Prop}

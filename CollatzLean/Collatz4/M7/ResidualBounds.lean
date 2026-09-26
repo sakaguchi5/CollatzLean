@@ -1,4 +1,4 @@
-import CollatzLean.Collatz4.General.ResidualBounds
+import CollatzLean.Collatz4.General.ResidualEnvelope
 import CollatzLean.Collatz4.M7.LengthBound
 
 set_option exponentiation.threshold 10996
@@ -13,9 +13,8 @@ m=7 の残余語に対する `G`-bound を、一般 `ResidualGBounds` に特殊�
 * 上端側: `G_* < L(8446)`
 * 下端側: `U(10994,4087) < G_*`
 
-ここで `L/U` は `General.ResidualBounds` の粗い包絡線。
-正確な `G_min/G_max` から粗い包絡線への移行は一般層で証明済みなので、
-m=7 側では巨大な有限探索を行わない。
+さらに `r ≤ E` と正確な上側 G-bound から `qEnvelopeAdmissible` 自体を導く。
+したがって `ResidualData` は admissibility を独立フィールドとして持たない。
 -/
 
 namespace Collatz4.M7
@@ -24,13 +23,14 @@ namespace Collatz4.M7
 残余語側から finite candidate へ進むために必要な最小データ。
 
 `g_bounds` は正確な `G_min/G_max` の間に `G_*` があることを保持する。
-`q_pos` と偶数性は元の残余語の構造から供給されるべき意味論的条件である。
+`r_le_residual` は「各残余段が少なくとも1つの2指数を消費する」意味論から
+供給される条件で、これと上側 G-bound から q の envelope admissibility も導かれる。
 -/
 structure ResidualData where
   q : ℕ
   r : ℕ
   q_pos : 0 < q
-  q_admissible : qEnvelopeAdmissible q
+  r_le_residual : r ≤ residualTwoExponent q
   r_even : r % 2 = 0
   g_bounds :
     Collatz4.General.ResidualGBounds gStar (residualTwoExponent q) r
@@ -63,6 +63,18 @@ theorem coarseResidualUpper_10994_4087_lt_gStar :
 
 namespace ResidualData
 
+/--
+正確な残余 G-bound と `r≤E` から m=7 の q-envelope 必要条件を導く。
+
+以前は `ResidualData` の独立フィールドだったが、現在は派生定理である。
+-/
+theorem q_admissible (d : ResidualData) : qEnvelopeAdmissible d.q := by
+  unfold qEnvelopeAdmissible Collatz4.General.EnvelopeAdmissible
+  have h :
+      gStar ≤ Collatz4.General.residualGlobalEnvelope (residualTwoExponent d.q) :=
+    Collatz4.General.residual_le_globalEnvelope d.g_bounds d.r_le_residual
+  simpa [Collatz4.General.residualGlobalEnvelope, gEnvelope] using h
+
 /-- admissible な residual data では従来どおり `q≤1275`。 -/
 theorem q_le_1275 (d : ResidualData) : d.q ≤ 1275 :=
   q_le_1275_of_envelope d.q_admissible
@@ -84,7 +96,7 @@ theorem r_upper (d : ResidualData) : d.r ≤ 8444 := by
   have heven := d.r_even
   omega
 
-/-- m=7 residual data が満たす有限化直前の三条件をまとめる。 -/
+/-- m=7 residual data が満たす有限化直前の条件をまとめる。 -/
 theorem finite_interval (d : ResidualData) :
     d.q ≤ 1275 ∧ 4088 ≤ d.r ∧ d.r ≤ 8444 ∧ d.r % 2 = 0 := by
   exact ⟨d.q_le_1275, d.r_lower, d.r_upper, d.r_even⟩
