@@ -3,6 +3,7 @@ import CollatzLean.Collatz4.Dynamics.Reachability
 import CollatzLean.Collatz4.Dynamics.Accumulated
 import CollatzLean.Collatz4.Dynamics.Merge
 import CollatzLean.Collatz4.Dynamics.ThreePowerFamily
+import CollatzLean.Collatz4.Dynamics.SynchronizedMerge
 
 import CollatzLean.Collatz4.Family.Basic
 import CollatzLean.Collatz4.Family.Branch
@@ -15,6 +16,7 @@ import CollatzLean.Collatz4.Parametric.ReachabilityWord
 import CollatzLean.Collatz4.Parametric.BranchTerminalMacro
 
 import CollatzLean.Collatz4.Finite.Forward
+import CollatzLean.Collatz4.Finite.AccumulatedForwardBridge
 import CollatzLean.Collatz4.Finite.Normalization
 import CollatzLean.Collatz4.Finite.Envelope
 import CollatzLean.Collatz4.Finite.QCutoff
@@ -53,6 +55,8 @@ Collatz4 の研究対象は、二進数表記で
    Collatz4 が一般の Collatz 予想を研究対象にする、という意味ではない。
    `Accumulated` / `Merge` / `ThreePowerFamily` では、累積2指数写像、合流の永続性、
    `3^n-1` 族の局所合流則を M 固有定数なしで扱う。
+   `SynchronizedMerge` では開始時刻の異なる候補を共通絶対時刻で比較し、
+   途中で合流した候補を代表軌道へ圧縮するための一般語彙を与える。
 
 2. `Family`
    `A_n = 3*2^n-1`、すなわち `101...` 族そのものを定義する研究対象層。
@@ -64,6 +68,7 @@ Collatz4 の研究対象は、二進数表記で
 
 4. `Finite`
    M に依存しない有限状態・包絡線・候補区間・certificate の証明機械。
+   `AccumulatedForwardBridge` は一般累積写像と既存 `ForwardState` / `run` を exact に接続する。
    `ValuationGap` では、終点2指数の禁止帯から target を一括排除する一般定理を置く。
 
 5. `Targets/M*`
