@@ -1,21 +1,24 @@
 import CollatzLean.Collatz4.Finite.Exclusion
 import CollatzLean.Collatz4.Targets.M7.Witness
 import CollatzLean.Collatz4.Targets.M7.FiniteCertificate
+import CollatzLean.Collatz4.Targets.M7.StructuralResult
 
 /-!
 # Collatz4.Targets.M7.Result
 
 `M = 7` 個別研究の公開結果をまとめる最終層。
 
-ここでは
+現在は二つの独立な finite exclusion を保持する。
 
-`M7Witness → finite candidate → finite certificate contradiction`
+1. 従来証明:
+   2179候補の checkpoint / final certificate を `native_decide` で直接確認する。
+2. 構造証明:
+   `2179 -> 97 -> (58 + 39)` の同期合流圧縮と禁止帯から排除する。
 
-だけを接続する。`M7Witness` より上流、すなわち `Family` / `Parametric` 層の
-reachability から `M7Witness` を構成する bridge は、研究対象の定義と分離して追加する。
+両者は同じ `M7ForwardCandidate` を否定するが、前者は回帰検査、
+後者は今後 M を変えて再利用する主構造として位置づける。
 
-`M = 7` は `Targets` 配下の一ケースにすぎず、今後 `Targets/M5`, `Targets/M9`, ...
-を同じ位置に追加できる。
+`M7MasterWitness` より上流との完全接続については `MasterToWitness` を参照。
 -/
 
 namespace Collatz4.Targets.M7
@@ -35,24 +38,37 @@ theorem t_certificate :
     finalState, targetState] using
       (final_two_exponent_certificate i)
 
-/-- 一般 exclusion theorem から得られる M=7 reduced candidate の非存在。 -/
+/-- 従来の直接 finite certificate から得られる M=7 reduced candidate の非存在。 -/
 theorem no_reduced_candidate : ¬ problem.Candidate := by
   exact Collatz4.Finite.no_candidate_of_t_certificate problem t_certificate
 
-/-- M=7 の reduced forward candidate は存在しない。 -/
+/--
+新しい同期合流圧縮証明から得られる reduced candidate の非存在。
+従来の `final_two_exponent_certificate` には依存しない。
+-/
+theorem no_reduced_candidate_structural : ¬ problem.Candidate := by
+  exact no_m7_forward_candidate_via_compression
+
+/-- M=7 の reduced forward candidate は存在しない。従来 certificate 版。 -/
 theorem no_m7_forward_candidate : ¬ M7ForwardCandidate := by
   exact no_reduced_candidate
 
-/-- 意味論的 M7 witness は存在しない。 -/
+/-- M=7 の reduced forward candidate は存在しない。構造圧縮版。 -/
+theorem no_m7_forward_candidate_structural : ¬ M7ForwardCandidate := by
+  exact no_m7_forward_candidate_via_compression
+
+/-- 意味論的 M7 witness は存在しない。従来 certificate 版。 -/
 theorem no_m7_witness : ¬ HasM7Witness := by
   exact Collatz4.Finite.no_witness_of_reduction
     hasM7Witness_reducesTo
     no_reduced_candidate
 
+/-- 意味論的 M7 witness は存在しない。構造圧縮版。 -/
+theorem no_m7_witness_structural : ¬ HasM7Witness := by
+  exact no_m7_witness_via_compression
+
 /--
 任意のさらに上流の命題 `W` が `HasM7Witness` へ落ちるなら、その `W` も存在しない。
-
-今後、`Parametric` 層の reachability から M=7 witness を構成する bridge はここへ接続する。
 -/
 theorem no_source_witness_of_reduction
     {W : Prop}

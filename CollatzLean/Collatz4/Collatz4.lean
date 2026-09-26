@@ -19,6 +19,7 @@ import CollatzLean.Collatz4.Parametric.BranchTerminalMacro
 
 import CollatzLean.Collatz4.Finite.Forward
 import CollatzLean.Collatz4.Finite.AccumulatedForwardBridge
+import CollatzLean.Collatz4.Finite.ThreePowerForwardCompression
 import CollatzLean.Collatz4.Finite.Normalization
 import CollatzLean.Collatz4.Finite.Envelope
 import CollatzLean.Collatz4.Finite.QCutoff
@@ -55,35 +56,30 @@ Collatz4 の研究対象は、二進数表記で
 
 1. `Dynamics`
    任意の奇数 Collatz 軌道にも適用できる一般定理だけを置く道具層。
-   Collatz4 が一般の Collatz 予想を研究対象にする、という意味ではない。
-   `Accumulated` / `Merge` / `ThreePowerFamily` では、累積2指数写像、合流の永続性、
-   `3^n-1` 族の局所合流則を M 固有定数なしで扱う。
-   `SynchronizedMerge` では開始時刻の異なる候補を共通絶対時刻で比較し、
-   途中で合流した候補を代表軌道へ圧縮するための一般語彙を与える。
-   `MergeCompression` / `ThreePowerCompression` では、多数の同期合流候補を
-   少数の代表終点へ圧縮し、代表上の性質を全候補へ転送する。
+   `Accumulated` / `Merge` / `SynchronizedMerge` で累積2指数写像と合流を扱い、
+   `MergeCompression` で多数候補を代表軌道へ圧縮する。
+   `ThreePowerFamily` / `ThreePowerCompression` は `3^n-1` 族への特殊化。
 
 2. `Family`
    `A_n = 3*2^n-1`、すなわち `101...` 族そのものを定義する研究対象層。
 
 3. `Parametric`
    族の内部で target branch `M` を変数にする一般化。
-   `M=3,5,7,9,...` を同じ語彙で比較する。
-   actual reachability から exponent word / branch terminal macro を復元する一般 bridge も置く。
+   actual reachability から exponent word / branch terminal macro を復元する。
 
 4. `Finite`
    M に依存しない有限状態・包絡線・候補区間・certificate の証明機械。
-   `AccumulatedForwardBridge` は一般累積写像と既存 `ForwardState` / `run` を exact に接続する。
-   `ValuationGap` では、終点2指数の禁止帯から target を一括排除する一般定理を置く。
-   `RepresentativeCompression` では、代表終点だけの禁止帯 certificate を
-   元の `ForwardProblem` 全候補へ転送する。
+   `AccumulatedForwardBridge` / `ThreePowerForwardCompression` により
+   一般累積写像・合流圧縮を既存 `ForwardProblem` へ exact に接続する。
+   `ValuationGap` / `RepresentativeCompression` は代表だけの certificate から
+   全候補を排除する論理を担当する。
 
 5. `Targets/M*`
-   各 M の個別研究。現在は `Targets/M7` を収録する。
-   今後 `Targets/M5`, `Targets/M9`, `Targets/M11`, ... を横並びで追加する。
+   各 M の個別研究。
+   M=7 では従来の直接 finite certificate に加え、
+   `2179 -> 97 -> (58 + 39)` の構造圧縮証明を保持する。
 
-`Targets/M7` の finite exclusion は既存 ZIP の証明を保持して再配置している。
-さらに `OddQBranchReachable 7` から固定 record より上流の `M7MasterWitness` までを
-exact に接続する。`M7MasterWitness` から固定 `(2401,29)/(13396,8455)` witness への
-次の bridge は未接続の研究課題として分離する。
+`OddQBranchReachable 7 -> HasM7MasterWitness` は exact に接続済み。
+固定 finite problem への record extraction は `MasterToWitness` で未証明義務として
+明示されている。
 -/
