@@ -12,8 +12,12 @@ import CollatzLean.Collatz3.CSTCarry.MidpointDuality
 
 の strip に必ず入る。
 
-この strip を `CSTCarry.MidpointDuality` に渡し、任意の H-bit shift `U` の binary MSB を
-三進 quotient threshold `111...111_3` へ exact に移す。
+midpoint duality 自体にはこの strip の下側
+
+  2^(H-1) < 3^p
+
+だけが必要である。まず任意の自然数 `U` に対する half-threshold theorem を公開し、
+その上で `U < 2^H` を明示した H-bit/MSB 版を派生させる。
 -/
 
 namespace Collatz3
@@ -50,23 +54,40 @@ def ternaryShiftQuotient
   (3 ^ P.endpointOddCount * U) / 2 ^ P.length
 
 /--
-任意の canonical H-bit shift `U` に対し、MSB 判定を三進 midpoint 比較へ移す。
+任意の自然数 `U` に対し、binary half-threshold 判定を三進 midpoint 比較へ移す。
 
 右辺の `threeMidpoint p` は三進数で `111...111`（p 桁）。
+`U < 2^P.length` はこの同値自体には不要。
 -/
-theorem shift_msb_iff_ternary_midpoint
+theorem shift_half_iff_ternary_midpoint
     (P : FirstPassagePath)
     (hp : 0 < P.endpointOddCount)
-    {U : ℕ}
-    (hU : U < 2 ^ P.length) :
+    {U : ℕ} :
     2 ^ (P.length - 1) ≤ U ↔
       CSTCarry.threeMidpoint P.endpointOddCount ≤ P.ternaryShiftQuotient U := by
   unfold ternaryShiftQuotient
   exact CSTCarry.power_midpoint_duality
     P.length_pos
     (P.halfTwoPow_lt_threePow hp)
-    P.terminal_contracting
-    hU
+
+/--
+H-bit 標準範囲 `U < 2^P.length` を含めた MSB 版。
+
+左辺は「`U` が H-bit 範囲内にあり、その最高位 bit が `1`」を表し、
+右辺では同じ H-bit 範囲条件を保ったまま ternary midpoint 比較へ移す。
+-/
+theorem shift_msb_iff_ternary_midpoint
+    (P : FirstPassagePath)
+    (hp : 0 < P.endpointOddCount)
+    {U : ℕ} :
+    (U < 2 ^ P.length ∧ 2 ^ (P.length - 1) ≤ U) ↔
+      (U < 2 ^ P.length ∧
+        CSTCarry.threeMidpoint P.endpointOddCount ≤ P.ternaryShiftQuotient U) := by
+  constructor
+  · rintro ⟨hU, hHalf⟩
+    exact ⟨hU, (P.shift_half_iff_ternary_midpoint hp).1 hHalf⟩
+  · rintro ⟨hU, hMid⟩
+    exact ⟨hU, (P.shift_half_iff_ternary_midpoint hp).2 hMid⟩
 
 end FirstPassagePath
 end CSTMicro

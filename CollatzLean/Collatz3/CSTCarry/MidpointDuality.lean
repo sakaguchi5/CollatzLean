@@ -1,18 +1,21 @@
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
+
 /-!
-# Collatz3 CSTCarry: binary MSB と ternary midpoint の双対
+# Collatz3 CSTCarry: binary half-threshold と ternary midpoint の双対
+
+一般の odd numerator `A = 2a+1` と even denominator `2m` について、
+`m < A` だけから quotient の midpoint threshold が決まる。
 
 first coefficient crossing では
 
-  M/2 < A < M,
-  A = 3^P,
-  M = 2^H
+  2^(H-1) < 3^P < 2^H
 
-となる。
+となるが、midpoint duality 自体に必要なのは下側の不等式
 
-`q = floor(AU/M)` とすると、binary shift `U` の MSB が 1 であること
-`U ≥ M/2` は、ternary quotient が midpoint を越えることと exact に同値になる。
+  2^(H-1) < 3^P
+
+だけである。
 
 三進 midpoint は recursive に
 
@@ -49,17 +52,19 @@ theorem threePow_eq_two_mul_threeMidpoint_add_one (P : ℕ) :
       ring
 
 /--
-一般の odd numerator `A=2a+1` / even modulus `M=2m` 版 midpoint lemma。
-`m < A < 2m` のとき、`U<2m` に対して
+一般の odd numerator `A = 2a+1` / even denominator `2m` に対する
+quotient threshold lemma。
+
+`0 < m` かつ `m < A` なら、任意の `U : ℕ` に対して
 
   U ≥ m  <->  floor(AU/(2m)) ≥ a.
+
+`A < 2m` や `U < 2m` はこの同値自体には不要。
 -/
 theorem quotient_midpoint_iff
     {a m U : ℕ}
     (hm : 0 < m)
-    (hLower : m < 2 * a + 1)
-    (hUpper : 2 * a + 1 < 2 * m)
-    (_hU : U < 2 * m) :
+    (hLower : m < 2 * a + 1) :
     m ≤ U ↔
       a ≤ ((2 * a + 1) * U) / (2 * m) := by
   have hMpos : 0 < 2 * m := by omega
@@ -98,23 +103,29 @@ theorem quotient_midpoint_iff
     omega
 
 /--
-`A=3^P`, `M=2^H` への特殊化。
-first crossing の half-open strip `2^(H-1) < 3^P < 2^H` の下で、
+`A = 3^P`, `M = 2^H` への特殊化。
 
-  binary MSB(U)=1
+`0 < H` かつ
+
+  2^(H-1) < 3^P
+
+なら、任意の `U : ℕ` に対して
+
+  U ≥ 2^(H-1)
 
 と
 
-  floor(3^P U / 2^H) >= 111...111_3
+  floor(3^P U / 2^H) ≥ 111...111_3
 
 は exact に同値。
+
+上側 first-crossing 条件 `3^P < 2^H` と `U < 2^H` は
+この threshold equivalence 自体には不要。
 -/
 theorem power_midpoint_duality
     {P H U : ℕ}
     (hH : 0 < H)
-    (hLower : 2 ^ (H - 1) < 3 ^ P)
-    (hUpper : 3 ^ P < 2 ^ H)
-    (hU : U < 2 ^ H) :
+    (hLower : 2 ^ (H - 1) < 3 ^ P) :
     2 ^ (H - 1) ≤ U ↔
       threeMidpoint P ≤ (3 ^ P * U) / 2 ^ H := by
   have hHs : H = (H - 1) + 1 := by omega
@@ -129,8 +140,6 @@ theorem power_midpoint_duality
     (U := U)
     (by positivity)
     (by simpa [hA] using hLower)
-    (by simpa [hA, hM] using hUpper)
-    (by simpa [hM] using hU)
   simpa [hA, hM] using hBase
 
 end CSTCarry
