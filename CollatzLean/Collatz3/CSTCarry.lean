@@ -3,8 +3,10 @@ import CollatzLean.Collatz3.CSTCarry.ThreeModFour
 import CollatzLean.Collatz3.CSTCarry.TrailingOnes
 import CollatzLean.Collatz3.CSTCarry.BinaryWrap
 import CollatzLean.Collatz3.CSTCarry.FerrersCarry
+import CollatzLean.Collatz3.CSTCarry.CarryDeterministic
 import CollatzLean.Collatz3.CSTCarry.WrapExceptions
 import CollatzLean.Collatz3.CSTCarry.CarryBudget
+import CollatzLean.Collatz3.CSTCarry.TernaryCorrection
 import CollatzLean.Collatz3.CSTCarry.BinaryShift
 import CollatzLean.Collatz3.CSTCarry.CarryResidueBridge
 import CollatzLean.Collatz3.CSTCarry.CriticalRowEnvelope
@@ -12,6 +14,7 @@ import CollatzLean.Collatz3.CSTCarry.FinalWrapLowerBound
 import CollatzLean.Collatz3.CSTCarry.FinalWrap26
 import CollatzLean.Collatz3.CSTCarry.ProfileRowBridge
 import CollatzLean.Collatz3.CSTCarry.FirstPassageRowBridge
+import CollatzLean.Collatz3.CSTCarry.FirstPassageCanonicalCarry
 import CollatzLean.Collatz3.CSTCarry.MidpointDuality
 import CollatzLean.Collatz3.CSTCarry.FirstPassageBridge
 import CollatzLean.Collatz3.CSTCarry.CSTGapBridge
@@ -45,21 +48,25 @@ final wrap 側ではさらに、
 
 まで証明済み。
 
-今回 `ProfileRowBridge` / `FirstPassageRowBridge` を追加し、以前は外部仮定だった
+`ProfileRowBridge` / `FirstPassageRowBridge` により、以前は外部仮定だった
 
   Critical.Profile / FirstPassagePath -> CriticalCarryRows
 
-を閉じる。
+も閉じている。
 
-* admissible profile の row を
-  `boundary = beattyIndex r`, `actual = checkpoint h r` と canonical に構成、
-* row を `r=m-1,...,0` の terminal-to-initial 順に並べると
-  `CriticalCarryRows m` を満たす、
-* standard parity `FirstPassagePath` を odd-only exponent word へ exact に圧縮し、
-  `IsCriticalWord -> profileOfWord -> CriticalCarryRows` まで接続、
-* その結果 `2 <= p <= 26` では FirstPassagePath 由来 rows に対して
-  `CriticalCarryRows` を別仮定せず final-wrap 排除定理を適用できる。
+今回さらに `CarryDeterministic` / `TernaryCorrection` /
+`FirstPassageCanonicalCarry` を追加し、三進 carry recurrence 自身を canonical 化する。
 
-なお、actual arithmetic からこの canonical rows 上の `CarryRealizes` witness を構成する
-三進 recurrence の存在・同定は別責務であり、この bridge では捏造しない。
+* `2^H` は mod 3 の unit なので各 row digit は一意、
+* canonical digit / next carry を逐次定義できる、
+* 任意の Ferrers row list に対し `CarryRealizes (2^H)` witness が存在一意、
+* digit value は global に
+  `- (2^H)^(-1) * ferrersWeightedDefect rows (mod 3^P)`
+  の canonical representative と exact に一致、
+* FirstPassagePath には canonical ternary digits / final carry が仮定なしで定義できる、
+* `2 <= p <= 26` では外部 `CarryRealizes` witness を仮定せず
+  canonical final carry が `2^criticalTwoDepth p` 未満、
+* 同範囲では canonical final carry と `ferrersBinaryShift` が自然数として exact に一致、
+
+まで接続する。
 -/
