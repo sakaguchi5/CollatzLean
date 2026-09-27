@@ -231,6 +231,8 @@ import CollatzLean.Collatz3.CSTMicro
 
 -- CST を global assumption として置く条件付き package（unconditional 本体とは分離）
 import CollatzLean.Collatz3.CSTConditional
+--
+import CollatzLean.Collatz3.CSTCarry
 
 set_option linter.style.header false
 
