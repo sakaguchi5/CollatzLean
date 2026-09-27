@@ -10,6 +10,8 @@ import CollatzLean.Collatz3.CSTCarry.CarryResidueBridge
 import CollatzLean.Collatz3.CSTCarry.CriticalRowEnvelope
 import CollatzLean.Collatz3.CSTCarry.FinalWrapLowerBound
 import CollatzLean.Collatz3.CSTCarry.FinalWrap26
+import CollatzLean.Collatz3.CSTCarry.ProfileRowBridge
+import CollatzLean.Collatz3.CSTCarry.FirstPassageRowBridge
 import CollatzLean.Collatz3.CSTCarry.MidpointDuality
 import CollatzLean.Collatz3.CSTCarry.FirstPassageBridge
 import CollatzLean.Collatz3.CSTCarry.CSTGapBridge
@@ -33,18 +35,31 @@ fixed-width binary wrap、三進 carry recursion、binary-MSB / ternary-midpoint
 
 として扱う。
 
-今回さらに final wrap 側を強化した。
+final wrap 側ではさらに、
 
-* `CriticalRowEnvelope` で actual first-passage row が持つ最小 envelope を分離、
-* strict actual ordering から positive weighted defect の exact 2-adic exponent を回収、
+* critical row envelope から `S <= criticalWeightedDefectUpper P`、
+* strict actual ordering から positive weighted defect の exact 2-adic exponent、
 * final wrap なら overhang は正の 4 の倍数、
 * 従って `S >= 2^H + 4*3^P`、
-* 一方 `P <= 26` では critical defect envelope がこの下界に届かない、
-* よって `2 <= P <= 26` の `CriticalCarryRows` では final wrap を排除、
+* `2 <= P <= 26` では両 bound が矛盾するため final wrap を排除、
 
-までを `CriticalRowEnvelope` / `FinalWrapLowerBound` / `FinalWrap26` に分離した。
+まで証明済み。
 
-既存 `CSTMicro` / `Ferrers.RecordFerrers` の完成済み語彙は再定義しない。
-`Critical.Profile` から actual CSTCarry row list への exact constructor bridge は別責務とし、
-未証明 bridge を theorem として置かない。
+今回 `ProfileRowBridge` / `FirstPassageRowBridge` を追加し、以前は外部仮定だった
+
+  Critical.Profile / FirstPassagePath -> CriticalCarryRows
+
+を閉じる。
+
+* admissible profile の row を
+  `boundary = beattyIndex r`, `actual = checkpoint h r` と canonical に構成、
+* row を `r=m-1,...,0` の terminal-to-initial 順に並べると
+  `CriticalCarryRows m` を満たす、
+* standard parity `FirstPassagePath` を odd-only exponent word へ exact に圧縮し、
+  `IsCriticalWord -> profileOfWord -> CriticalCarryRows` まで接続、
+* その結果 `2 <= p <= 26` では FirstPassagePath 由来 rows に対して
+  `CriticalCarryRows` を別仮定せず final-wrap 排除定理を適用できる。
+
+なお、actual arithmetic からこの canonical rows 上の `CarryRealizes` witness を構成する
+三進 recurrence の存在・同定は別責務であり、この bridge では捏造しない。
 -/
