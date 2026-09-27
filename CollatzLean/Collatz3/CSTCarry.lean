@@ -37,6 +37,9 @@ import CollatzLean.Collatz3.CSTCarry.ProfileAffineBudgetBridge
 import CollatzLean.Collatz3.CSTCarry.FerrersAffineResidueBridge
 import CollatzLean.Collatz3.CSTCarry.CarryLiftQuotient
 import CollatzLean.Collatz3.CSTCarry.FerrersResidueFrontier
+--
+import CollatzLean.Collatz3.CSTCarry.CarryBudgetAppend
+import CollatzLean.Collatz3.CSTCarry.CarryBudgetInitial
 
 set_option linter.style.header false
 
