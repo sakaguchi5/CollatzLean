@@ -65,6 +65,20 @@ import CollatzLean.Collatz3.CSTCarry.ProfileBlockRows
 import CollatzLean.Collatz3.CSTCarry.RecordBlockRowFactorization
 import CollatzLean.Collatz3.CSTCarry.RecordCarryDigitFactorization
 import CollatzLean.Collatz3.CSTCarry.RecordBlockBudgetFrontier
+/-
+* non-Record exact failure decomposition,
+* 2-power carry scale transport,
+* shifted block row-by-row transport,
+* interior boundary state,
+* exact block piece run / telescope bridge,
+* strong-induction frontier
+-/
+import CollatzLean.Collatz3.CSTCarry.RecordCompatibilityFailure
+import CollatzLean.Collatz3.CSTCarry.CarryScaleTransport
+import CollatzLean.Collatz3.CSTCarry.ShiftedBlockCarryTransport
+import CollatzLean.Collatz3.CSTCarry.InteriorBoundaryState
+import CollatzLean.Collatz3.CSTCarry.RecordBlockPieceRun
+import CollatzLean.Collatz3.CSTCarry.RecordAllWidthFrontier
 
 set_option linter.style.header false
 

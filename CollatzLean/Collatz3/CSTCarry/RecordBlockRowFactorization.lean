@@ -62,11 +62,7 @@ def canonicalRecordCarryRows
     initialRoofAnchor
     (canonicalRecordLengths R.profile.1)
     (by
-      have hSum := canonicalRecordLengths_sum
-        (h := R.profile.1) R.one_lt_width
-      have hm : 1 < m := R.one_lt_width
-      simp only [initialRoofAnchor, hSum]
-      omega)
+      rw [R.initialRoofAnchor_add_sum_canonicalRecordLengths_eq_width])
 
 /-- canonical record rows は interval `[1,m)` の profile rows 全体と一致する。 -/
 theorem canonicalRecordCarryRows_eq_suffix

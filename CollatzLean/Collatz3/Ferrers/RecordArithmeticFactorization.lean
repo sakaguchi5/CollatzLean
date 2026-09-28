@@ -119,6 +119,18 @@ theorem width_eq_one_add_sum_canonicalRecordLengths
     exact lt_trans Nat.zero_lt_one R.one_lt_width
   omega
 
+/--
+canonical record block lengths は canonical initial roof anchor `1` から始まり、
+terminal width `m` までを exact に覆う。
+-/
+theorem initialRoofAnchor_add_sum_canonicalRecordLengths_eq_width
+    {m : ℕ}
+    (R : RecordFerrers m) :
+    initialRoofAnchor +
+        (canonicalRecordLengths R.profile.1).sum = m := by
+  simpa [initialRoofAnchor] using
+    (R.width_eq_one_add_sum_canonicalRecordLengths).symm
+
 /-- canonical block width は必ず whole width より strict に小さい。 -/
 theorem canonicalRecordLength_lt_width
     {m : ℕ}
