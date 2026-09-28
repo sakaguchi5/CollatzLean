@@ -60,6 +60,11 @@ import CollatzLean.Collatz3.CSTCarry.CarryDeterministicSplit
 import CollatzLean.Collatz3.CSTCarry.ZeroDefectHead
 import CollatzLean.Collatz3.CSTCarry.CarryBudgetChain
 import CollatzLean.Collatz3.CSTCarry.CarryBudgetGeneralBound
+--row/digit slicing と shifted-budget frontier
+import CollatzLean.Collatz3.CSTCarry.ProfileBlockRows
+import CollatzLean.Collatz3.CSTCarry.RecordBlockRowFactorization
+import CollatzLean.Collatz3.CSTCarry.RecordCarryDigitFactorization
+import CollatzLean.Collatz3.CSTCarry.RecordBlockBudgetFrontier
 
 set_option linter.style.header false
 

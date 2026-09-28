@@ -36,7 +36,7 @@ def profileActualAffineFromRows
   ferrersActualAffine (profileCarryRows h)
 
 /-- profile row 一行の defect は Beatty roof と checkpoint の 2冪差そのもの。 -/
-@[simp] theorem profileFerrersRow_defect_eq
+theorem profileFerrersRow_defect_eq
     {m : ℕ}
     (h : Profile m)
     (r : Fin m) :
