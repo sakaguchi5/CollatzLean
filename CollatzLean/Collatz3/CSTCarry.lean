@@ -37,9 +37,16 @@ import CollatzLean.Collatz3.CSTCarry.ProfileAffineBudgetBridge
 import CollatzLean.Collatz3.CSTCarry.FerrersAffineResidueBridge
 import CollatzLean.Collatz3.CSTCarry.CarryLiftQuotient
 import CollatzLean.Collatz3.CSTCarry.FerrersResidueFrontier
---
+--carry budget telescope
 import CollatzLean.Collatz3.CSTCarry.CarryBudgetAppend
 import CollatzLean.Collatz3.CSTCarry.CarryBudgetInitial
+
+--block budget / shifted Beatty scaling
+import CollatzLean.Collatz3.CSTCarry.CarryRealizesAppend
+import CollatzLean.Collatz3.CSTCarry.CarryBudgetBlock
+import CollatzLean.Collatz3.CSTCarry.ShiftedBeattyBlock
+import CollatzLean.Collatz3.CSTCarry.ShiftedBlockDefect
+
 
 set_option linter.style.header false
 
