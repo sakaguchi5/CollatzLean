@@ -46,7 +46,20 @@ import CollatzLean.Collatz3.CSTCarry.CarryRealizesAppend
 import CollatzLean.Collatz3.CSTCarry.CarryBudgetBlock
 import CollatzLean.Collatz3.CSTCarry.ShiftedBeattyBlock
 import CollatzLean.Collatz3.CSTCarry.ShiftedBlockDefect
+/-
+no-new-assumption continuation
 
+* canonical carry run の append / take-drop split,
+* zero-defect head row の strict bound 保存,
+* strict terminal budget + 任意個の weak block の finite telescope,
+* 任意 initial carry に対する strict / weak budget の exact final-carry characterization,
+
+shifted/intercept local budget 自体は未証明なので、ここでは theorem や仮定として追加しない。
+-/
+import CollatzLean.Collatz3.CSTCarry.CarryDeterministicSplit
+import CollatzLean.Collatz3.CSTCarry.ZeroDefectHead
+import CollatzLean.Collatz3.CSTCarry.CarryBudgetChain
+import CollatzLean.Collatz3.CSTCarry.CarryBudgetGeneralBound
 
 set_option linter.style.header false
 
